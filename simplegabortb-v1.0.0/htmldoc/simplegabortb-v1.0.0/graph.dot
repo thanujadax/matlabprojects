@@ -1,0 +1,34 @@
+/* Created by mdot for Matlab */
+digraph m2html {
+  sg_createfilterbank -> getargs;
+  sg_createfilterbank -> sg_createfilterf2;
+  sg_createfilterbank -> sg_solvefilterparams;
+  sg_createfilterf2 -> getargs;
+  sg_demo01 -> sg_createfilterbank;
+  sg_demo01 -> sg_filterwithbank;
+  sg_demo01 -> sg_filterwithbank2;
+  sg_demo01 -> sg_normalizesamplematrix;
+  sg_demo01 -> sg_resp2samplematrix;
+  sg_demo01 -> sg_version;
+  sg_filterwithbank -> getargs;
+  sg_filterwithbank2 -> getargs;
+  sg_plotfilters2 -> getargs;
+  sg_plotfilters2 -> sg_createfilterf2;
+  sg_plotfilters2 -> sg_solvefilterparams;
+  sg_resp2samplematrix -> getargs;
+
+  Contents [URL="Contents.html"];
+  getargs [URL="getargs.html"];
+  sg_createfilterbank [URL="sg_createfilterbank.html"];
+  sg_createfilterf2 [URL="sg_createfilterf2.html"];
+  sg_demo01 [URL="sg_demo01.html"];
+  sg_filterwithbank [URL="sg_filterwithbank.html"];
+  sg_filterwithbank2 [URL="sg_filterwithbank2.html"];
+  sg_normalizesamplematrix [URL="sg_normalizesamplematrix.html"];
+  sg_plotfilters2 [URL="sg_plotfilters2.html"];
+  sg_resp2samplematrix [URL="sg_resp2samplematrix.html"];
+  sg_rotatesamples [URL="sg_rotatesamples.html"];
+  sg_scalesamples [URL="sg_scalesamples.html"];
+  sg_solvefilterparams [URL="sg_solvefilterparams.html"];
+  sg_version [URL="sg_version.html"];
+}

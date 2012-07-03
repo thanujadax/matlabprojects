@@ -1,0 +1,325 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of sg_createfilterbank</title>
+  <meta name="keywords" content="sg_createfilterbank">
+  <meta name="description" content="SG_CREATEFILTERBANK creates Gabor filter bank">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">simplegabortb-v1.0.0</a> &gt; sg_createfilterbank.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for simplegabortb-v1.0.0&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>sg_createfilterbank
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>SG_CREATEFILTERBANK creates Gabor filter bank</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function [bank]=sg_createfilterbank(N, f, m, n, varargin) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment">SG_CREATEFILTERBANK creates Gabor filter bank
+ 
+ bank = sg_createfilterbank(N, f, m, n)
+
+ Creates filterbank with specified frequencies and orientations.
+ The same filterbank is usable with normal and multi-resolution
+ filtering.
+ Note! Only frequency domain filters are created.
+
+   N - size of the image, [height width].
+   f - frequencies, [f_max], a number of them is
+       automagically generated depending on other arguments,
+       or specific frequencies if 'user_freq' is specified.
+   m - number of filter frequencies.
+   n - number or filter orientations, or specific orientations 
+       'user_orientation' specified.
+
+ Optional arguments are
+   k         - factor for selecting filter frequencies
+               (1, 1/k, 1/k^2, 1/k^3...), default is sqrt(2)
+   p         - crossing point between two consecutive filters, 
+               default 0.5
+   gamma     - gamma of the filter
+   eta       - eta of the filter'
+   pf        - energy to include in the filters, default 0.99
+   user_freq - filter only at frequencies specified in 'f', you
+               must also specify 'gamma' and 'eta'
+   user_orientation  - filter only at orientations specified in 'n'
+   extra_freq - calculate extra_freq frequencies for scale invariance
+   verbose    - 1 = displays the filter bank, 2 = display all filters
+
+ If no optional arguments are specified, filter bank frequencies
+ and filter sharpness values are automatically selected.
+ If there is no special knowledge that specific filter sharpness
+ values (gamma and eta) are wanted, it is most straightforward to
+ use the defaults or specify only other 'k' and 'p' values.
+ If needed, 'gamma' and 'eta' can be set directly.
+
+ Output is a structure which includes 
+   .conf  - parameters (gamma, eta, p, k) of the filters etc
+   .size  - N
+   .fhigh - maximum frequency of the whole filter bank
+   .freq  - a cell array for filters with all different frequencies
+      .f  - frequency of the filter
+      .orient - cell array of filters at different orientations
+         .filter   - the actual filter
+         .envelope - envelope of the filter
+         .fhigh     - maximum frequency of the filter
+         .o        - orientation of the filter
+
+ Example:
+   bank=sg_createfilterbank(size(img),1/10, 5, 4,'verbose',1);
+     Creates a filter bank with frequencies starting from 0.1,
+     5 filter frequencies are used and the filters are in 
+     4 orientations (every 45 degrees). The filter bank
+     will be displayed.
+
+ See also: <a href="sg_filterwithbank.html" class="code" title="function [m]=sg_filterwithbank(s, bank, varargin)">SG_FILTERWITHBANK</a>
+
+ Authors:
+   Jarmo Ilonen
+
+ $Name: V_1_0_0 $ $Id: <a href="sg_createfilterbank.html" class="code" title="function [bank]=sg_createfilterbank(N, f, m, n, varargin)">sg_createfilterbank</a>.m,v 1.7 2007-01-16 13:03:49 ilonen Exp $</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="getargs.html" class="code" title="function S = getargs(defaultS, varglist);">getargs</a>	GETARGS  parse variable argument list into a struct</li><li><a href="sg_createfilterf2.html" class="code" title="function [g, envelope,fhigh]=sg_createfilterf2(f0, theta, gamma, eta, N,varargin)">sg_createfilterf2</a>	SG_CREATEFILTERF2 - creates a 2-d Gabor filter in frequency domain</li><li><a href="sg_solvefilterparams.html" class="code" title="function [gamma, eta] = sg_solvefilterparams(k, p, m, n)">sg_solvefilterparams</a>	SG_SOLVEFILTERPARAMS  solve Gabor filter parameters</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="sg_demo01.html" class="code" title="">sg_demo01</a>	SG_DEMO01 Demonstrates the SimpleGabor Toolbox funtionality</li></ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <span class="comment">%SG_CREATEFILTERBANK creates Gabor filter bank</span>
+0002 <span class="comment">%</span>
+0003 <span class="comment">% bank = sg_createfilterbank(N, f, m, n)</span>
+0004 <span class="comment">%</span>
+0005 <span class="comment">% Creates filterbank with specified frequencies and orientations.</span>
+0006 <span class="comment">% The same filterbank is usable with normal and multi-resolution</span>
+0007 <span class="comment">% filtering.</span>
+0008 <span class="comment">% Note! Only frequency domain filters are created.</span>
+0009 <span class="comment">%</span>
+0010 <span class="comment">%   N - size of the image, [height width].</span>
+0011 <span class="comment">%   f - frequencies, [f_max], a number of them is</span>
+0012 <span class="comment">%       automagically generated depending on other arguments,</span>
+0013 <span class="comment">%       or specific frequencies if 'user_freq' is specified.</span>
+0014 <span class="comment">%   m - number of filter frequencies.</span>
+0015 <span class="comment">%   n - number or filter orientations, or specific orientations</span>
+0016 <span class="comment">%       'user_orientation' specified.</span>
+0017 <span class="comment">%</span>
+0018 <span class="comment">% Optional arguments are</span>
+0019 <span class="comment">%   k         - factor for selecting filter frequencies</span>
+0020 <span class="comment">%               (1, 1/k, 1/k^2, 1/k^3...), default is sqrt(2)</span>
+0021 <span class="comment">%   p         - crossing point between two consecutive filters,</span>
+0022 <span class="comment">%               default 0.5</span>
+0023 <span class="comment">%   gamma     - gamma of the filter</span>
+0024 <span class="comment">%   eta       - eta of the filter'</span>
+0025 <span class="comment">%   pf        - energy to include in the filters, default 0.99</span>
+0026 <span class="comment">%   user_freq - filter only at frequencies specified in 'f', you</span>
+0027 <span class="comment">%               must also specify 'gamma' and 'eta'</span>
+0028 <span class="comment">%   user_orientation  - filter only at orientations specified in 'n'</span>
+0029 <span class="comment">%   extra_freq - calculate extra_freq frequencies for scale invariance</span>
+0030 <span class="comment">%   verbose    - 1 = displays the filter bank, 2 = display all filters</span>
+0031 <span class="comment">%</span>
+0032 <span class="comment">% If no optional arguments are specified, filter bank frequencies</span>
+0033 <span class="comment">% and filter sharpness values are automatically selected.</span>
+0034 <span class="comment">% If there is no special knowledge that specific filter sharpness</span>
+0035 <span class="comment">% values (gamma and eta) are wanted, it is most straightforward to</span>
+0036 <span class="comment">% use the defaults or specify only other 'k' and 'p' values.</span>
+0037 <span class="comment">% If needed, 'gamma' and 'eta' can be set directly.</span>
+0038 <span class="comment">%</span>
+0039 <span class="comment">% Output is a structure which includes</span>
+0040 <span class="comment">%   .conf  - parameters (gamma, eta, p, k) of the filters etc</span>
+0041 <span class="comment">%   .size  - N</span>
+0042 <span class="comment">%   .fhigh - maximum frequency of the whole filter bank</span>
+0043 <span class="comment">%   .freq  - a cell array for filters with all different frequencies</span>
+0044 <span class="comment">%      .f  - frequency of the filter</span>
+0045 <span class="comment">%      .orient - cell array of filters at different orientations</span>
+0046 <span class="comment">%         .filter   - the actual filter</span>
+0047 <span class="comment">%         .envelope - envelope of the filter</span>
+0048 <span class="comment">%         .fhigh     - maximum frequency of the filter</span>
+0049 <span class="comment">%         .o        - orientation of the filter</span>
+0050 <span class="comment">%</span>
+0051 <span class="comment">% Example:</span>
+0052 <span class="comment">%   bank=sg_createfilterbank(size(img),1/10, 5, 4,'verbose',1);</span>
+0053 <span class="comment">%     Creates a filter bank with frequencies starting from 0.1,</span>
+0054 <span class="comment">%     5 filter frequencies are used and the filters are in</span>
+0055 <span class="comment">%     4 orientations (every 45 degrees). The filter bank</span>
+0056 <span class="comment">%     will be displayed.</span>
+0057 <span class="comment">%</span>
+0058 <span class="comment">% See also: SG_FILTERWITHBANK</span>
+0059 <span class="comment">%</span>
+0060 <span class="comment">% Authors:</span>
+0061 <span class="comment">%   Jarmo Ilonen</span>
+0062 <span class="comment">%</span>
+0063 <span class="comment">% $Name: V_1_0_0 $ $Id: sg_createfilterbank.m,v 1.7 2007-01-16 13:03:49 ilonen Exp $</span>
+0064 
+0065 <a name="_sub0" href="#_subfunctions" class="code">function [bank]=sg_createfilterbank(N, f, m, n, varargin)</a>
+0066 
+0067 conf = struct(<span class="keyword">...</span><span class="comment">,</span>
+0068        <span class="string">'gamma'</span>,0, <span class="keyword">...</span>
+0069        <span class="string">'eta'</span>,0,<span class="keyword">...</span>
+0070        <span class="string">'k'</span>,sqrt(2),<span class="keyword">...</span>
+0071        <span class="string">'p'</span>,0.5,<span class="keyword">...</span>
+0072        <span class="string">'verbose'</span>,0,<span class="keyword">...</span>
+0073        <span class="string">'user_freq'</span>,0,<span class="keyword">...</span>
+0074        <span class="string">'user_orientation'</span>,0, <span class="keyword">...</span>
+0075        <span class="string">'domain'</span>,0, <span class="keyword">...</span>
+0076        <span class="string">'extra_freq'</span>,0, <span class="keyword">...</span>
+0077        <span class="string">'pf'</span>,0.99 <span class="keyword">...</span>
+0078        );
+0079 
+0080 conf = <a href="getargs.html" class="code" title="function S = getargs(defaultS, varglist);">getargs</a>(conf, varargin);       
+0081        
+0082 <span class="comment">% choosing the frequencies of filters</span>
+0083 <span class="keyword">if</span> conf.user_freq==0 &amp;&amp; conf.user_orientation==0
+0084   <span class="comment">% select parameters for the filters</span>
+0085   [gamma_,eta_]=<a href="sg_solvefilterparams.html" class="code" title="function [gamma, eta] = sg_solvefilterparams(k, p, m, n)">sg_solvefilterparams</a>(conf.k, conf.p,m,n);
+0086   
+0087   <span class="keyword">if</span> conf.gamma==0,
+0088     conf.gamma=gamma_;
+0089   <span class="keyword">end</span>;
+0090   
+0091   <span class="keyword">if</span> conf.eta==0
+0092     conf.eta=eta_;
+0093   <span class="keyword">end</span>;
+0094   
+0095   <span class="comment">% select frequencies for the filters using k and m</span>
+0096   freq=f./conf.k.^(0:(m+conf.extra_freq-1));
+0097 
+0098 <span class="keyword">else</span>
+0099   freq=sort(f);
+0100   freq=freq(end:-1:1);
+0101   <span class="keyword">if</span> conf.gamma==0 || conf.eta==0
+0102     error(<span class="string">'sg_createfilterbank: You must specify gamma and eta with user_freq'</span>);
+0103     <span class="keyword">return</span>;
+0104   <span class="keyword">end</span>;
+0105 <span class="keyword">end</span>;
+0106 
+0107 <span class="comment">% choosing the orientations of filters</span>
+0108 <span class="keyword">if</span> conf.user_orientation==0
+0109   <span class="comment">% select orientations based</span>
+0110   <span class="keyword">if</span> n==0 || fix(n)~=n
+0111     error(<span class="string">'sg_createfilterbank: Zero/broken orientations without user_orientations specified'</span>);
+0112   <span class="keyword">end</span>;
+0113   orientation=0:pi/n:pi;
+0114   orientation=orientation(1:end-1);
+0115 <span class="keyword">else</span>
+0116   orientation=sort(n);
+0117 <span class="keyword">end</span>;  
+0118 
+0119 <span class="comment">% choose the domain, which is currently always frequency-domain</span>
+0120 <span class="keyword">if</span> conf.domain==0
+0121   conf.domain=1;
+0122 <span class="keyword">end</span>;  
+0123 
+0124 <span class="comment">% warn if the image dimensions are slow to compute for fft</span>
+0125 maxfactor=max([factor(N(1)) factor(N(2))]);
+0126 <span class="keyword">if</span> maxfactor&gt;13
+0127   warning(<span class="string">'sg_createfilterbank: FFT computations might be slow, largest factor of image dimensions is %d'</span>, maxfactor);
+0128 <span class="keyword">end</span>;
+0129 
+0130 
+0131 bank.conf=conf;
+0132 bank.size=N;
+0133 
+0134 bank.fhigh=0;
+0135 
+0136 <span class="keyword">if</span> conf.domain==1
+0137   
+0138   nf=1;
+0139   <span class="keyword">for</span> f0=freq,
+0140     no=1;
+0141     
+0142     bank.freq{nf}.f=f0;
+0143     
+0144     <span class="keyword">for</span> o0=orientation,
+0145       [filt,envelope,fhigh]=<a href="sg_createfilterf2.html" class="code" title="function [g, envelope,fhigh]=sg_createfilterf2(f0, theta, gamma, eta, N,varargin)">sg_createfilterf2</a>(f0,o0,conf.gamma,conf.eta,N,<span class="string">'use_envelope'</span>,1,<span class="string">'pf'</span>,conf.pf);
+0146       
+0147       bank.freq{nf}.orient{no}.filter=filt;
+0148       bank.freq{nf}.orient{no}.envelope=envelope;
+0149       bank.freq{nf}.orient{no}.fhigh=fhigh;
+0150       
+0151       <span class="keyword">if</span> fhigh &gt; bank.fhigh
+0152         bank.fhigh=fhigh;
+0153       <span class="keyword">end</span>;
+0154       
+0155       bank.freq{nf}.orient{no}.o=o0;
+0156       
+0157       no=no+1;
+0158       
+0159     <span class="keyword">end</span>;
+0160     nf=nf+1;
+0161     
+0162   <span class="keyword">end</span>;
+0163   
+0164 <span class="keyword">end</span>;
+0165 
+0166 <span class="comment">% return unless verbose option was used</span>
+0167 <span class="keyword">if</span> conf.verbose==0
+0168   <span class="keyword">return</span>
+0169 <span class="keyword">end</span>;  
+0170 
+0171 <span class="comment">% coordinates are a bit weird</span>
+0172 M(1)=N(2);
+0173 M(2)=N(1);
+0174 
+0175 fspace=zeros(M(2),M(1));
+0176 
+0177 <span class="keyword">for</span> find=1:length(bank.freq),
+0178   <span class="keyword">for</span> oind=1:length(bank.freq{find}.orient),
+0179     a= bank.freq{find}.orient{oind}.envelope;
+0180     
+0181     lx=a(2)-a(1);
+0182     ly=a(4)-a(3);
+0183     
+0184     <span class="comment">% coordinates for the filter area</span>
+0185     xx=mod( (0:lx) + a(1) + M(1) , M(1) ) + 1;
+0186     yy=mod( (0:ly) + a(3) + M(2) , M(2) ) + 1;
+0187     
+0188     fspace(yy,xx) = fspace(yy,xx) + bank.freq{find}.orient{oind}.filter;
+0189     
+0190     <span class="comment">% display single filters in both frequency and spatial domain</span>
+0191     <span class="keyword">if</span> conf.verbose&gt;=2
+0192       f2_=zeros(M(2),M(1));
+0193     
+0194       f2_(yy,xx) = bank.freq{find}.orient{oind}.filter;
+0195       
+0196       <span class="comment">% spatial filter</span>
+0197       f2=ifftshift(ifft2((f2_)));
+0198       
+0199       subplot(1,3,1), imagesc(f2_); colormap gray; axis image; title(<span class="string">'Frequency space'</span>);
+0200       subplot(1,3,2), imagesc(real(f2)); colormap gray; axis image; title(<span class="string">'Real'</span>)
+0201       subplot(1,3,3), imagesc(imag(f2)); colormap gray; axis image; title(<span class="string">'Imag'</span>);
+0202       str=sprintf(<span class="string">'Filter with frequency %.6f, orientation %.2f degrees [press enter to continue]'</span>, bank.freq{find}.f,bank.freq{find}.orient{oind}.o*180/pi );
+0203       input(str);
+0204     <span class="keyword">end</span>;
+0205     
+0206   <span class="keyword">end</span>;        
+0207 <span class="keyword">end</span>;
+0208 
+0209 <span class="comment">% display the whole filterbank in frequency space</span>
+0210 clf
+0211 subplot(1,2,1), imagesc(fspace); colormap(gray); axis image; axis off; title(<span class="string">'Combined frequency response of the bank'</span>);
+0212 
+0213 subplot(1,2,2), imagesc(fftshift(fspace)); colormap(gray); axis image; title(<span class="string">'Zero frequency shifted to center'</span>);
+0214 tick=get(gca,<span class="string">'YTick'</span>);
+0215 set(gca,<span class="string">'YTickLabel'</span>,1-tick/max(tick)-0.5);
+0216 tick=get(gca,<span class="string">'XTick'</span>);
+0217 set(gca,<span class="string">'XTickLabel'</span>,tick/max(tick)-0.5);</pre></div>
+<hr><address>Generated on Fri 23-Nov-2007 13:14:20 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

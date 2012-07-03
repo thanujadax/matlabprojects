@@ -1,0 +1,114 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of sg_rotatesamples</title>
+  <meta name="keywords" content="sg_rotatesamples">
+  <meta name="description" content="SG_ROTATESAMPLES">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">simplegabortb-v1.0.0</a> &gt; sg_rotatesamples.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for simplegabortb-v1.0.0&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>sg_rotatesamples
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>SG_ROTATESAMPLES</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function feh=sg_rotatesamples(matr,rot,norient) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment">SG_ROTATESAMPLES
+
+   m = sg_rotatesamples(matr,rot,n)
+
+ Rotates samples in sample matrix for rotation invariance. 
+
+   matr  - Sample matrix, either two or three dimensional
+   rot   - Rotation. How many steps the responses are rotated.
+           Usually values [0,n-1] should be used but any
+           integer value, also negative values, will work.
+   n     - Number of orientations in the sample matrix
+
+ See also: <a href="sg_resp2samplematrix.html" class="code" title="function meh=sg_resp2samplematrix(r,varargin)">SG_RESP2SAMPLEMATRIX</a>, <a href="sg_scalesamples.html" class="code" title="function feh=sg_scalesamples(matr,sc,nf,norient)">SG_SCALESAMPLES</a>
+
+ Authors:
+   Jarmo Ilonen, 2004
+
+ $Name: V_1_0_0 $ $Id: <a href="sg_rotatesamples.html" class="code" title="function feh=sg_rotatesamples(matr,rot,norient)">sg_rotatesamples</a>.m,v 1.3 2005-10-12 14:27:31 ilonen Exp $</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <span class="comment">%SG_ROTATESAMPLES</span>
+0002 <span class="comment">%</span>
+0003 <span class="comment">%   m = sg_rotatesamples(matr,rot,n)</span>
+0004 <span class="comment">%</span>
+0005 <span class="comment">% Rotates samples in sample matrix for rotation invariance.</span>
+0006 <span class="comment">%</span>
+0007 <span class="comment">%   matr  - Sample matrix, either two or three dimensional</span>
+0008 <span class="comment">%   rot   - Rotation. How many steps the responses are rotated.</span>
+0009 <span class="comment">%           Usually values [0,n-1] should be used but any</span>
+0010 <span class="comment">%           integer value, also negative values, will work.</span>
+0011 <span class="comment">%   n     - Number of orientations in the sample matrix</span>
+0012 <span class="comment">%</span>
+0013 <span class="comment">% See also: SG_RESP2SAMPLEMATRIX, SG_SCALESAMPLES</span>
+0014 <span class="comment">%</span>
+0015 <span class="comment">% Authors:</span>
+0016 <span class="comment">%   Jarmo Ilonen, 2004</span>
+0017 <span class="comment">%</span>
+0018 <span class="comment">% $Name: V_1_0_0 $ $Id: sg_rotatesamples.m,v 1.3 2005-10-12 14:27:31 ilonen Exp $</span>
+0019 
+0020 <a name="_sub0" href="#_subfunctions" class="code">function feh=sg_rotatesamples(matr,rot,norient)</a>
+0021 
+0022 dim=ndims(matr);
+0023 
+0024 ntotal=size(matr,dim);
+0025 
+0026 <span class="keyword">if</span> mod(ntotal,norient)~=0
+0027   error(<span class="string">'sg_rotatesamples:invalid_matrix'</span>,<span class="string">'Invalid number of orientations'</span>);
+0028 <span class="keyword">end</span>,
+0029 
+0030 ind=0:ntotal-1; <span class="comment">% indexes</span>
+0031 find=floor(ind/norient); <span class="comment">% frequencies</span>
+0032 
+0033 rind=mod(ind,norient)-rot;  <span class="comment">% orientations and the shift</span>
+0034 
+0035 new_ind=find*norient+mod(rind,norient); <span class="comment">% new indexes after rotation</span>
+0036 
+0037 <span class="comment">% the indexes that &quot;wrap&quot; and are complex conjugates of the current values</span>
+0038 wrap_ind=new_ind( mod(rind,norient*2) &gt;= norient )+1;
+0039 
+0040 <span class="keyword">if</span> dim==2
+0041   feh(:,new_ind+1)=matr; 
+0042 
+0043   feh(:,wrap_ind)=conj(feh(:,wrap_ind));
+0044 
+0045 <span class="keyword">end</span>;
+0046 
+0047 <span class="keyword">if</span> dim==3
+0048   feh(:,:,new_ind+1)=matr;
+0049   feh(:,:,wrap_ind)=conj(feh(:,:,wrap_ind));
+0050 <span class="keyword">end</span>;
+0051</pre></div>
+<hr><address>Generated on Fri 23-Nov-2007 13:14:20 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

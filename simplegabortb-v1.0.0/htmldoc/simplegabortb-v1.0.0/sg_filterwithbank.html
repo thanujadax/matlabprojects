@@ -1,0 +1,297 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of sg_filterwithbank</title>
+  <meta name="keywords" content="sg_filterwithbank">
+  <meta name="description" content="SG_FILTERWITHBANK - Gabor filtering with filterbank">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">simplegabortb-v1.0.0</a> &gt; sg_filterwithbank.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for simplegabortb-v1.0.0&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>sg_filterwithbank
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>SG_FILTERWITHBANK - Gabor filtering with filterbank</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function [m]=sg_filterwithbank(s, bank, varargin) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment">SG_FILTERWITHBANK - Gabor filtering with filterbank
+
+ r = sg_filterwithbank(s, bank)
+
+ Filter 2D signal using a filterbank. 
+
+   s - signal (image)
+   bank - filterbank, created with sg_createfilterbank()
+
+ Optional arguments are
+   points    - Calculate filter values at only specific points,
+               array of [x0 y0;x1 y1;...].
+   method    - If 1 then the signal will be initially downscaled
+               to include only frequencies up to filterbank's fhigh.
+   max_zoom  - Maximum scaling to be used with method 1. Will be used 
+               only if lower than scaling factor based on highest 
+               frequency of the filter. Default 0 means that the
+               image will be downscaled as much as possible.
+
+ Response structure includes
+   .N      - the size of the filtered image
+   .method - 0 or 1 (see optional arguments)
+   .freq   - a cell array of filter responses which contains fields
+      .f    - frequency of the filter
+      .zoom - scaling factor at with this filter frequency (currently
+              always the same as the same field in the main structure)
+      .resp - actual filter responses, [N x X x Y] matrix where 
+              N is number of filter orientations and X and Y are
+              the response resolution
+   [Following fields are mainly relevant with method 1 (however, they are
+   always set)]
+   .zoom       - integer factor of how much the image was downscaled 
+                 during filtering
+   .respSize   - the resolution of responses
+   .actualZoom - actual scaling factors for x and y directions, may differ
+                 slightly to .zoom
+
+ Note that with 'method 1 and' different scaling factors the scale
+ of the responses changes (actually the total energy of responses
+ is the same with all scaling levels). If the responses must be 
+ in same scale and different scaling factors are used, the response
+ values must be divided by 'r.zoom^2', or for example by
+   r=sg_filterwithbank(image,bank,'method',1);
+   m=sg_resp2samplematrix(r)./prod(r.actualZoom);
+
+ See also: <a href="sg_createfilterbank.html" class="code" title="function [bank]=sg_createfilterbank(N, f, m, n, varargin)">SG_CREATEFILTERBANK</a>, <a href="sg_resp2samplematrix.html" class="code" title="function meh=sg_resp2samplematrix(r,varargin)">SG_RESP2SAMPLEMATRIX</a>
+
+ Authors:
+   Jarmo Ilonen, 2004
+
+ $Name: V_1_0_0 $ $Id: <a href="sg_filterwithbank.html" class="code" title="function [m]=sg_filterwithbank(s, bank, varargin)">sg_filterwithbank</a>.m,v 1.8 2006-02-02 10:44:11 ilonen Exp $</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="getargs.html" class="code" title="function S = getargs(defaultS, varglist);">getargs</a>	GETARGS  parse variable argument list into a struct</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="sg_demo01.html" class="code" title="">sg_demo01</a>	SG_DEMO01 Demonstrates the SimpleGabor Toolbox funtionality</li></ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <span class="comment">%SG_FILTERWITHBANK - Gabor filtering with filterbank</span>
+0002 <span class="comment">%</span>
+0003 <span class="comment">% r = sg_filterwithbank(s, bank)</span>
+0004 <span class="comment">%</span>
+0005 <span class="comment">% Filter 2D signal using a filterbank.</span>
+0006 <span class="comment">%</span>
+0007 <span class="comment">%   s - signal (image)</span>
+0008 <span class="comment">%   bank - filterbank, created with sg_createfilterbank()</span>
+0009 <span class="comment">%</span>
+0010 <span class="comment">% Optional arguments are</span>
+0011 <span class="comment">%   points    - Calculate filter values at only specific points,</span>
+0012 <span class="comment">%               array of [x0 y0;x1 y1;...].</span>
+0013 <span class="comment">%   method    - If 1 then the signal will be initially downscaled</span>
+0014 <span class="comment">%               to include only frequencies up to filterbank's fhigh.</span>
+0015 <span class="comment">%   max_zoom  - Maximum scaling to be used with method 1. Will be used</span>
+0016 <span class="comment">%               only if lower than scaling factor based on highest</span>
+0017 <span class="comment">%               frequency of the filter. Default 0 means that the</span>
+0018 <span class="comment">%               image will be downscaled as much as possible.</span>
+0019 <span class="comment">%</span>
+0020 <span class="comment">% Response structure includes</span>
+0021 <span class="comment">%   .N      - the size of the filtered image</span>
+0022 <span class="comment">%   .method - 0 or 1 (see optional arguments)</span>
+0023 <span class="comment">%   .freq   - a cell array of filter responses which contains fields</span>
+0024 <span class="comment">%      .f    - frequency of the filter</span>
+0025 <span class="comment">%      .zoom - scaling factor at with this filter frequency (currently</span>
+0026 <span class="comment">%              always the same as the same field in the main structure)</span>
+0027 <span class="comment">%      .resp - actual filter responses, [N x X x Y] matrix where</span>
+0028 <span class="comment">%              N is number of filter orientations and X and Y are</span>
+0029 <span class="comment">%              the response resolution</span>
+0030 <span class="comment">%   [Following fields are mainly relevant with method 1 (however, they are</span>
+0031 <span class="comment">%   always set)]</span>
+0032 <span class="comment">%   .zoom       - integer factor of how much the image was downscaled</span>
+0033 <span class="comment">%                 during filtering</span>
+0034 <span class="comment">%   .respSize   - the resolution of responses</span>
+0035 <span class="comment">%   .actualZoom - actual scaling factors for x and y directions, may differ</span>
+0036 <span class="comment">%                 slightly to .zoom</span>
+0037 <span class="comment">%</span>
+0038 <span class="comment">% Note that with 'method 1 and' different scaling factors the scale</span>
+0039 <span class="comment">% of the responses changes (actually the total energy of responses</span>
+0040 <span class="comment">% is the same with all scaling levels). If the responses must be</span>
+0041 <span class="comment">% in same scale and different scaling factors are used, the response</span>
+0042 <span class="comment">% values must be divided by 'r.zoom^2', or for example by</span>
+0043 <span class="comment">%   r=sg_filterwithbank(image,bank,'method',1);</span>
+0044 <span class="comment">%   m=sg_resp2samplematrix(r)./prod(r.actualZoom);</span>
+0045 <span class="comment">%</span>
+0046 <span class="comment">% See also: SG_CREATEFILTERBANK, SG_RESP2SAMPLEMATRIX</span>
+0047 <span class="comment">%</span>
+0048 <span class="comment">% Authors:</span>
+0049 <span class="comment">%   Jarmo Ilonen, 2004</span>
+0050 <span class="comment">%</span>
+0051 <span class="comment">% $Name: V_1_0_0 $ $Id: sg_filterwithbank.m,v 1.8 2006-02-02 10:44:11 ilonen Exp $</span>
+0052 
+0053 <a name="_sub0" href="#_subfunctions" class="code">function [m]=sg_filterwithbank(s, bank, varargin)</a>
+0054 
+0055 conf = struct(<span class="keyword">...</span><span class="comment">,</span>
+0056        <span class="string">'points'</span>,[], <span class="keyword">...</span>
+0057        <span class="string">'method'</span>,0, <span class="keyword">...</span>
+0058        <span class="string">'domain'</span>,0, <span class="keyword">...</span>
+0059        <span class="string">'max_zoom'</span>,0 <span class="keyword">...</span>
+0060        );
+0061 
+0062 conf = <a href="getargs.html" class="code" title="function S = getargs(defaultS, varglist);">getargs</a>(conf, varargin);
+0063 
+0064 [N(2) N(1)]=size(s);
+0065 <span class="comment">%N=size(s);</span>
+0066 
+0067 m.N=[N(2) N(1)];
+0068 m.method=conf.method;
+0069 
+0070 <span class="comment">% method=1 -&gt; initial zoom</span>
+0071 <span class="comment">% the image is downscaled if the maximum frequency of the filterbank</span>
+0072 <span class="comment">% allows, no multiresolution but only initial downscaling</span>
+0073 <span class="keyword">if</span> m.method==1  
+0074   
+0075   <span class="comment">% power of two zoom factor</span>
+0076   m.zoom=2^floor( log2(0.5/bank.fhigh) );
+0077   
+0078   <span class="keyword">if</span> conf.max_zoom&gt;0 &amp;&amp; m.zoom&gt;conf.max_zoom
+0079     m.zoom=conf.max_zoom;
+0080   <span class="keyword">end</span>;        
+0081   
+0082   <span class="keyword">if</span> m.zoom&gt;1
+0083     
+0084     <span class="comment">% the responsesize is always wanted to be divisible by two</span>
+0085     m.respSize=round(N/m.zoom/2)*2; 
+0086     
+0087     <span class="comment">% actual zoom factor</span>
+0088     m.actualZoom=N./m.respSize;
+0089     
+0090     <span class="comment">% shift the points. if some points are very close to image border, they might</span>
+0091     <span class="comment">% be shifted &quot;out-of-matrix&quot;</span>
+0092     <span class="keyword">if</span> ~isempty(conf.points)
+0093       conf.points=round((conf.points-1)./repmat(m.actualZoom,size(conf.points,1),1))+1; 
+0094       <span class="comment">% too high value? -&gt; fix</span>
+0095       conf.points(conf.points(:,1)&gt;m.respSize(1),1)=m.respSize(1);
+0096       conf.points(conf.points(:,2)&gt;m.respSize(2),2)=m.respSize(2);
+0097     <span class="keyword">end</span>;
+0098   <span class="keyword">else</span>
+0099     <span class="comment">% if we cannot downscale the signal, go back to method 0</span>
+0100     m.method=0;
+0101   <span class="keyword">end</span>;
+0102   
+0103 <span class="keyword">end</span>;
+0104 
+0105 <span class="keyword">if</span> m.method==0
+0106   m.zoom=1;
+0107   m.respSize=N; <span class="comment">%[N(2) N(1)];</span>
+0108   m.actualZoom=[1 1];
+0109 <span class="keyword">end</span>;  
+0110 
+0111 
+0112 
+0113 <span class="keyword">if</span> bank.conf.domain==1
+0114   fs=fft2(ifftshift(s));
+0115   
+0116   <span class="comment">% the loop for calculating responses at all frequencies</span>
+0117 
+0118   <span class="comment">%responses=zeros(length(freq),length(orientation),N(2),N(1));</span>
+0119   
+0120   <span class="keyword">for</span> find=1:length(bank.freq),
+0121     f0=bank.freq{find}.f;
+0122     
+0123     m.freq{find}.f=f0;
+0124     
+0125     <span class="comment">% zero memory for filter responses when filtering all points with original resolution</span>
+0126     <span class="keyword">if</span> isempty(conf.points) &amp;&amp; conf.method==0
+0127       m.freq{find}.resp=zeros(length(bank.freq{find}.orient),N(2),N(1));
+0128     <span class="keyword">end</span>;
+0129     
+0130     <span class="comment">% zero memory for filter responses when filtering all points with</span>
+0131     <span class="comment">% downscaled (by the highest frequency of the filter bank)</span>
+0132     <span class="comment">% resolution</span>
+0133     <span class="keyword">if</span> isempty(conf.points) &amp;&amp; conf.method==1
+0134       m.freq{find}.resp=zeros(length(bank.freq{find}.orient),m.respSize(2),m.respSize(1));
+0135     <span class="keyword">end</span>;      
+0136     
+0137     <span class="keyword">if</span> ~isempty(conf.points)
+0138       m.freq{find}.resp=zeros(length(bank.freq{find}.orient),size(conf.points,1));
+0139     <span class="keyword">end</span>;
+0140     
+0141     <span class="comment">% loop through orientations</span>
+0142     <span class="keyword">for</span> oind=1:length(bank.freq{find}.orient),
+0143       
+0144       a= bank.freq{find}.orient{oind}.envelope;
+0145       fhigh=bank.freq{find}.orient{oind}.fhigh;
+0146       
+0147       <span class="comment">% method 0 (full size responses)</span>
+0148       <span class="keyword">if</span> conf.method==0
+0149         
+0150         m.freq{find}.zoom=1;
+0151         
+0152         f2_=zeros(N(2),N(1));
+0153         
+0154         lx=a(2)-a(1);
+0155         ly=a(4)-a(3);
+0156         
+0157         <span class="comment">% coordinates for the filter area</span>
+0158         xx=mod( (0:lx) + a(1) + N(1) , N(1) ) + 1;
+0159         yy=mod( (0:ly) + a(3) + N(2) , N(2) ) + 1;
+0160         
+0161         <span class="comment">% filter the image</span>
+0162         f2_(yy,xx) = bank.freq{find}.orient{oind}.filter .* fs(yy,xx);
+0163     
+0164       <span class="keyword">end</span>;
+0165       
+0166       <span class="comment">% method 1 (initial downscale)</span>
+0167       <span class="keyword">if</span> conf.method==1
+0168         
+0169         m.freq{find}.zoom=m.zoom;
+0170         f2_=zeros(m.respSize(2),m.respSize(1));
+0171         
+0172         lx=a(2)-a(1);
+0173         ly=a(4)-a(3);
+0174 
+0175         <span class="comment">% coordinates for the filter area in filtered fullsize image</span>
+0176         xx=mod( (0:lx) + a(1) + N(1) , N(1) ) + 1;
+0177         yy=mod( (0:ly) + a(3) + N(2) , N(2) ) + 1;
+0178         
+0179         <span class="comment">% coordinates for the filter area in downscaled response image</span>
+0180         xx_z=mod( (0:lx) + a(1) + m.respSize(1) , m.respSize(1) ) + 1;
+0181         yy_z=mod( (0:ly) + a(3) + m.respSize(2) , m.respSize(2) ) + 1;
+0182  
+0183         <span class="comment">% filter the image</span>
+0184         f2_(yy_z,xx_z) = bank.freq{find}.orient{oind}.filter .* fs(yy,xx);
+0185         
+0186       <span class="keyword">end</span>;    
+0187       
+0188       <span class="keyword">if</span> isempty(conf.points)
+0189         m.freq{find}.resp(oind,:,:)=fftshift(ifft2(f2_));
+0190       <span class="keyword">else</span>
+0191         temp=fftshift(ifft2(f2_));
+0192         <span class="keyword">for</span> p=1:size(conf.points,1)
+0193           m.freq{find}.resp(oind,p)=temp(conf.points(p,2),conf.points(p,1));
+0194         <span class="keyword">end</span>;
+0195       <span class="keyword">end</span>;
+0196     
+0197     <span class="keyword">end</span>;
+0198     
+0199   <span class="keyword">end</span>;
+0200   
+0201 <span class="keyword">end</span>;</pre></div>
+<hr><address>Generated on Fri 23-Nov-2007 13:14:20 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

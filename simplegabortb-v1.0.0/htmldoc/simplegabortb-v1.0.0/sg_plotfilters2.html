@@ -1,0 +1,141 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of sg_plotfilters2</title>
+  <meta name="keywords" content="sg_plotfilters2">
+  <meta name="description" content="SG_PLOTFILTERS2 displays Gabor filter bank">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">simplegabortb-v1.0.0</a> &gt; sg_plotfilters2.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for simplegabortb-v1.0.0&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>sg_plotfilters2
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>SG_PLOTFILTERS2 displays Gabor filter bank</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function sg_plotfilters2(N,fmax,m,n,varargin) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment">SG_PLOTFILTERS2 displays Gabor filter bank
+
+ sg_plotfilters(N, fmax, m, n)
+
+ This function displays a Gabor filter bank in frequency space.
+ It is mainly meant to be called from sg_createfilterbank
+ with verbose option.
+
+   N - size of the image, [height width].
+   fmax - frequency of the highest frequency filter
+   m - number of filter frequencies.
+   n - number or filter orientations
+
+ Optional arguments are
+   k         - factor for selecting filter frequencies
+               (1, 1/k, 1/k^2, 1/k^3...), default is sqrt(2)
+   p         - crossing point between two consecutive filters, 
+               default 0.5
+   gamma     - gamma of the filter
+   eta       - eta of the filter
+
+ $Name: V_1_0_0 $ $Id: sg_plotfilters2.m,v 1.4 2005-09-27 10:53:00 ilonen Exp $</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="getargs.html" class="code" title="function S = getargs(defaultS, varglist);">getargs</a>	GETARGS  parse variable argument list into a struct</li><li><a href="sg_createfilterf2.html" class="code" title="function [g, envelope,fhigh]=sg_createfilterf2(f0, theta, gamma, eta, N,varargin)">sg_createfilterf2</a>	SG_CREATEFILTERF2 - creates a 2-d Gabor filter in frequency domain</li><li><a href="sg_solvefilterparams.html" class="code" title="function [gamma, eta] = sg_solvefilterparams(k, p, m, n)">sg_solvefilterparams</a>	SG_SOLVEFILTERPARAMS  solve Gabor filter parameters</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <span class="comment">%SG_PLOTFILTERS2 displays Gabor filter bank</span>
+0002 <span class="comment">%</span>
+0003 <span class="comment">% sg_plotfilters(N, fmax, m, n)</span>
+0004 <span class="comment">%</span>
+0005 <span class="comment">% This function displays a Gabor filter bank in frequency space.</span>
+0006 <span class="comment">% It is mainly meant to be called from sg_createfilterbank</span>
+0007 <span class="comment">% with verbose option.</span>
+0008 <span class="comment">%</span>
+0009 <span class="comment">%   N - size of the image, [height width].</span>
+0010 <span class="comment">%   fmax - frequency of the highest frequency filter</span>
+0011 <span class="comment">%   m - number of filter frequencies.</span>
+0012 <span class="comment">%   n - number or filter orientations</span>
+0013 <span class="comment">%</span>
+0014 <span class="comment">% Optional arguments are</span>
+0015 <span class="comment">%   k         - factor for selecting filter frequencies</span>
+0016 <span class="comment">%               (1, 1/k, 1/k^2, 1/k^3...), default is sqrt(2)</span>
+0017 <span class="comment">%   p         - crossing point between two consecutive filters,</span>
+0018 <span class="comment">%               default 0.5</span>
+0019 <span class="comment">%   gamma     - gamma of the filter</span>
+0020 <span class="comment">%   eta       - eta of the filter</span>
+0021 <span class="comment">%</span>
+0022 <span class="comment">% $Name: V_1_0_0 $ $Id: sg_plotfilters2.m,v 1.4 2005-09-27 10:53:00 ilonen Exp $</span>
+0023 
+0024 <a name="_sub0" href="#_subfunctions" class="code">function sg_plotfilters2(N,fmax,m,n,varargin)</a>
+0025 
+0026 conf = struct(<span class="keyword">...</span><span class="comment">,</span>
+0027        <span class="string">'gamma'</span>,0, <span class="keyword">...</span>
+0028        <span class="string">'eta'</span>,0,<span class="keyword">...</span>
+0029        <span class="string">'k'</span>,sqrt(2),<span class="keyword">...</span>
+0030        <span class="string">'p'</span>,0.5 <span class="keyword">...</span>
+0031        );
+0032        
+0033        
+0034 conf = <a href="getargs.html" class="code" title="function S = getargs(defaultS, varglist);">getargs</a>(conf, varargin);     
+0035        
+0036 [gamma_,eta_]=<a href="sg_solvefilterparams.html" class="code" title="function [gamma, eta] = sg_solvefilterparams(k, p, m, n)">sg_solvefilterparams</a>(conf.k, conf.p,m,n);
+0037 
+0038 <span class="keyword">if</span> conf.gamma==0,
+0039   conf.gamma=gamma_;
+0040 <span class="keyword">end</span>;
+0041 
+0042 <span class="keyword">if</span> conf.eta==0
+0043   conf.eta=eta_;
+0044 <span class="keyword">end</span>;
+0045 
+0046 f=fmax*conf.k.^-(0:(m-1));
+0047 
+0048 o=(0:(n-1))*pi/n;
+0049 
+0050 <span class="comment">%N=200</span>
+0051 
+0052 map=zeros(N(1),N(2));
+0053 
+0054 count=1;
+0055 <span class="keyword">for</span> ff=f
+0056   <span class="keyword">for</span> oo=o <span class="comment">%+ pi + pi/no</span>
+0057     <span class="comment">% be verbose</span>
+0058     fprintf(<span class="string">'Preparing filter bank for display, %d/%d\r'</span>,count,length(f)*length(o));
+0059     count=count+1;
+0060     
+0061     <span class="comment">% create the filter and prepare the display</span>
+0062     g=<a href="sg_createfilterf2.html" class="code" title="function [g, envelope,fhigh]=sg_createfilterf2(f0, theta, gamma, eta, N,varargin)">sg_createfilterf2</a>(ff,oo,conf.gamma,conf.eta,N);
+0063     map=map+g;
+0064   
+0065   <span class="keyword">end</span>;
+0066 <span class="keyword">end</span>;
+0067 fprintf(<span class="string">'Preparing filter bank for display, done.    \n'</span>);
+0068 
+0069 imagesc(fftshift(max(max(map))-map)); colormap(gray); drawnow
+0070 
+0071 tick=get(gca,<span class="string">'YTick'</span>);
+0072 set(gca,<span class="string">'YTickLabel'</span>,1-tick/max(tick)-0.5);
+0073 tick=get(gca,<span class="string">'XTick'</span>);
+0074 set(gca,<span class="string">'XTickLabel'</span>,tick/max(tick)-0.5);</pre></div>
+<hr><address>Generated on Fri 23-Nov-2007 13:14:20 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

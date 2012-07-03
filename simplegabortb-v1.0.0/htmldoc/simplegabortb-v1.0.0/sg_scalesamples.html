@@ -1,0 +1,117 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of sg_scalesamples</title>
+  <meta name="keywords" content="sg_scalesamples">
+  <meta name="description" content="SG_SCALESAMPLES">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">simplegabortb-v1.0.0</a> &gt; sg_scalesamples.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for simplegabortb-v1.0.0&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>sg_scalesamples
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>SG_SCALESAMPLES</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function feh=sg_scalesamples(matr,sc,nf,norient) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment">SG_SCALESAMPLES
+
+   m = sg_scalesamples(matr,sc,m,n)
+
+ Scales samples in sample matrix for scale invariance. Returns responses for
+ nf frequencies (frequencies [r:nf+r] from the original sample matrix).
+
+   matr  - Sample matrix, either two or three dimensional
+   sc    - Scaling, how many steps the frequencies are shifted.
+           Extra frequencies must be specified with 
+           sg_createfilter(), and the value must be
+           [0,extra_freq].
+   m     - Number of usable frequencies in the sample matrix
+   n     - Number of orientations in the sample matrix
+
+ See also: <a href="sg_resp2samplematrix.html" class="code" title="function meh=sg_resp2samplematrix(r,varargin)">SG_RESP2SAMPLEMATRIX</a>, <a href="sg_rotatesamples.html" class="code" title="function feh=sg_rotatesamples(matr,rot,norient)">SG_ROTATESAMPLES</a>
+
+ Authors:
+   Jarmo Ilonen, 2004
+
+ $Name: V_1_0_0 $ $Id: <a href="sg_scalesamples.html" class="code" title="function feh=sg_scalesamples(matr,sc,nf,norient)">sg_scalesamples</a>.m,v 1.4 2005-10-12 14:29:03 ilonen Exp $</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <span class="comment">%SG_SCALESAMPLES</span>
+0002 <span class="comment">%</span>
+0003 <span class="comment">%   m = sg_scalesamples(matr,sc,m,n)</span>
+0004 <span class="comment">%</span>
+0005 <span class="comment">% Scales samples in sample matrix for scale invariance. Returns responses for</span>
+0006 <span class="comment">% nf frequencies (frequencies [r:nf+r] from the original sample matrix).</span>
+0007 <span class="comment">%</span>
+0008 <span class="comment">%   matr  - Sample matrix, either two or three dimensional</span>
+0009 <span class="comment">%   sc    - Scaling, how many steps the frequencies are shifted.</span>
+0010 <span class="comment">%           Extra frequencies must be specified with</span>
+0011 <span class="comment">%           sg_createfilter(), and the value must be</span>
+0012 <span class="comment">%           [0,extra_freq].</span>
+0013 <span class="comment">%   m     - Number of usable frequencies in the sample matrix</span>
+0014 <span class="comment">%   n     - Number of orientations in the sample matrix</span>
+0015 <span class="comment">%</span>
+0016 <span class="comment">% See also: SG_RESP2SAMPLEMATRIX, SG_ROTATESAMPLES</span>
+0017 <span class="comment">%</span>
+0018 <span class="comment">% Authors:</span>
+0019 <span class="comment">%   Jarmo Ilonen, 2004</span>
+0020 <span class="comment">%</span>
+0021 <span class="comment">% $Name: V_1_0_0 $ $Id: sg_scalesamples.m,v 1.4 2005-10-12 14:29:03 ilonen Exp $</span>
+0022 
+0023 <a name="_sub0" href="#_subfunctions" class="code">function feh=sg_scalesamples(matr,sc,nf,norient)</a>
+0024 
+0025 dim=ndims(matr);
+0026 
+0027 ntotal=size(matr,dim);
+0028 
+0029 <span class="keyword">if</span> mod(ntotal,norient)~=0
+0030   error(<span class="string">'sg_scalesamples:invalid_matrix'</span>,<span class="string">'Invalid number of orientations'</span>);
+0031 <span class="keyword">end</span>,
+0032 
+0033 favail=ntotal/norient;
+0034 
+0035 <span class="keyword">if</span> nf+sc&gt;favail~=0
+0036   error(<span class="string">'sg_scalesamples:invalid_matrix'</span>,<span class="string">'Not enough frequencies available'</span>);
+0037 <span class="keyword">end</span>,
+0038 
+0039 
+0040 ind=1:(nf*norient);
+0041 orig_ind=ind + sc*norient;
+0042 
+0043 <span class="keyword">if</span> dim==2
+0044   feh=matr(:,orig_ind); 
+0045 
+0046 <span class="keyword">end</span>;
+0047 
+0048 <span class="keyword">if</span> dim==3
+0049   feh=matr(:,:,orig_ind);
+0050 <span class="keyword">end</span>;
+0051</pre></div>
+<hr><address>Generated on Fri 23-Nov-2007 13:14:20 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

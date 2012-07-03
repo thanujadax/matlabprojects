@@ -1,0 +1,151 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of sg_demo01</title>
+  <meta name="keywords" content="sg_demo01">
+  <meta name="description" content="SG_DEMO01 Demonstrates the SimpleGabor Toolbox funtionality">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">simplegabortb-v1.0.0</a> &gt; sg_demo01.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for simplegabortb-v1.0.0&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>sg_demo01
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>SG_DEMO01 Demonstrates the SimpleGabor Toolbox funtionality</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>This is a script file. </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment">SG_DEMO01 Demonstrates the SimpleGabor Toolbox funtionality
+
+ Just type 'sg_demo01' in the Matlab prompt
+
+ For more information see Contents.m (help Contents) or README.txt
+
+ Authors:
+   Jarmo Ilonen
+   Joni Kamarainen</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="sg_createfilterbank.html" class="code" title="function [bank]=sg_createfilterbank(N, f, m, n, varargin)">sg_createfilterbank</a>	SG_CREATEFILTERBANK creates Gabor filter bank</li><li><a href="sg_filterwithbank.html" class="code" title="function [m]=sg_filterwithbank(s, bank, varargin)">sg_filterwithbank</a>	SG_FILTERWITHBANK - Gabor filtering with filterbank</li><li><a href="sg_filterwithbank2.html" class="code" title="function [m]=sg_filterwithbank(s, bank, varargin)">sg_filterwithbank2</a>	SG_FILTERWITHBANK2 - Gabor filtering with filterbank</li><li><a href="sg_normalizesamplematrix.html" class="code" title="function meh=sg_normalizesamplematrix(meh)">sg_normalizesamplematrix</a>	SG_NORMALIZESAMPLEMATRIX</li><li><a href="sg_resp2samplematrix.html" class="code" title="function meh=sg_resp2samplematrix(r,varargin)">sg_resp2samplematrix</a>	SG_RESP2SAMPLEMATRIX</li><li><a href="sg_version.html" class="code" title="function version = sg_version();">sg_version</a>	SG_VERSION  - Version string for SimpleGabor toolbox</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <span class="comment">%SG_DEMO01 Demonstrates the SimpleGabor Toolbox funtionality</span>
+0002 <span class="comment">%</span>
+0003 <span class="comment">% Just type 'sg_demo01' in the Matlab prompt</span>
+0004 <span class="comment">%</span>
+0005 <span class="comment">% For more information see Contents.m (help Contents) or README.txt</span>
+0006 <span class="comment">%</span>
+0007 <span class="comment">% Authors:</span>
+0008 <span class="comment">%   Jarmo Ilonen</span>
+0009 <span class="comment">%   Joni Kamarainen</span>
+0010 
+0011 <span class="comment">%</span>
+0012 <span class="comment">% Display version number</span>
+0013 disp([<span class="string">'SimpleGabor Toolbox Version: '</span> <a href="sg_version.html" class="code" title="function version = sg_version();">sg_version</a>]);
+0014 
+0015 <span class="comment">%</span>
+0016 <span class="comment">% Read and normalise image</span>
+0017 fprintf(<span class="string">'Reading an input image...'</span>);
+0018 img = imread(<span class="string">'trewas.jpg'</span>);
+0019 img = squeeze(img(:,:,1));
+0020 img = double(img)/255;
+0021 fprintf(<span class="string">'Done!\n'</span>);
+0022 
+0023 fh = figure;
+0024 colormap gray
+0025 
+0026 <span class="comment">%</span>
+0027 <span class="comment">% Create Gabor filter bank</span>
+0028 fprintf(<span class="string">'Creating Gabor filter bank with selected parameters...'</span>);
+0029 gaborBank = <a href="sg_createfilterbank.html" class="code" title="function [bank]=sg_createfilterbank(N, f, m, n, varargin)">sg_createfilterbank</a>(size(img),1/4,3,4,<span class="string">'pf'</span>,0.9);
+0030 fprintf(<span class="string">'Done!\n'</span>);
+0031 
+0032 <span class="comment">%</span>
+0033 <span class="comment">% Filter with the filter bank</span>
+0034 fprintf(<span class="string">'Filtering...'</span>);
+0035 fResp = <a href="sg_filterwithbank.html" class="code" title="function [m]=sg_filterwithbank(s, bank, varargin)">sg_filterwithbank</a>(img,gaborBank);
+0036 fResp2 = <a href="sg_filterwithbank2.html" class="code" title="function [m]=sg_filterwithbank(s, bank, varargin)">sg_filterwithbank2</a>(img,gaborBank);
+0037 fprintf(<span class="string">'Done!\n'</span>);
+0038 
+0039 <span class="comment">%</span>
+0040 <span class="comment">% Convert responses to simple 3-D matrix</span>
+0041 fprintf(<span class="string">'Convert responses to matrix form...'</span>);
+0042 fResp = <a href="sg_resp2samplematrix.html" class="code" title="function meh=sg_resp2samplematrix(r,varargin)">sg_resp2samplematrix</a>(fResp);
+0043 fprintf(<span class="string">'Done!\n'</span>);
+0044 
+0045 <span class="comment">%</span>
+0046 <span class="comment">% Normalise</span>
+0047 fprintf(<span class="string">'Normalise responses to reduce illumination effect...'</span>);
+0048 fResp = <a href="sg_normalizesamplematrix.html" class="code" title="function meh=sg_normalizesamplematrix(meh)">sg_normalizesamplematrix</a>(fResp);
+0049 fprintf(<span class="string">'Done!\n'</span>);
+0050 
+0051 <span class="comment">%</span>
+0052 <span class="comment">% Display responses</span>
+0053 fprintf(<span class="string">'Displaying input image and responses...'</span>);
+0054 subplot(1,3,1);
+0055 imagesc(img);
+0056 axis off
+0057 title(<span class="string">'Input'</span>);
+0058 <span class="keyword">for</span> featInd = 1:size(fResp,3)
+0059   subplot(1,3,2);
+0060   imagesc(squeeze(real(fResp(:,:,featInd))));
+0061   axis off
+0062   title(<span class="string">'Real'</span>);
+0063   subplot(1,3,3);
+0064   imagesc(squeeze(imag(fResp(:,:,featInd))));
+0065   axis off
+0066   title(<span class="string">'Imaginary'</span>);
+0067   input(<span class="string">'&lt;RETURN&gt;'</span>);
+0068 <span class="keyword">end</span>;
+0069 fprintf(<span class="string">'Done!\n'</span>);
+0070 
+0071 <span class="comment">%</span>
+0072 <span class="comment">% Display scaled responses</span>
+0073 fprintf(<span class="string">'Displaying input image and the same but &quot;unscaled&quot; responses...'</span>);
+0074 subplot(1,3,1);
+0075 imagesc(img);
+0076 axis off;
+0077 title(<span class="string">'Input'</span>);
+0078 <span class="keyword">for</span> freqInd = 1:size(fResp2.freq,2)
+0079   <span class="keyword">for</span> orientInd = 1:size(fResp2.freq{1}.resp,1)
+0080     subplot(1,3,2);
+0081     imagesc(squeeze(real(fResp2.freq{freqInd}.resp(orientInd,:,:))));
+0082     axis([1 size(img,1) 1 size(img,2)]);
+0083     axis off
+0084     title(<span class="string">'Real'</span>);
+0085     subplot(1,3,3);
+0086     imagesc(squeeze(imag(fResp2.freq{freqInd}.resp(orientInd,:,:))));
+0087     axis([1 size(img,1) 1 size(img,2)]);
+0088     axis off
+0089     title(<span class="string">'Imaginary'</span>);
+0090     input(<span class="string">'&lt;RETURN&gt;'</span>);
+0091   <span class="keyword">end</span>;
+0092 <span class="keyword">end</span>;
+0093 fprintf(<span class="string">'Done!\n'</span>);
+0094 
+0095 close(fh);
+0096 
+0097</pre></div>
+<hr><address>Generated on Fri 23-Nov-2007 13:14:20 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

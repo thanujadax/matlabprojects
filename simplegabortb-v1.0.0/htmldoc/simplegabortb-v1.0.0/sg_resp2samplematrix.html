@@ -1,0 +1,147 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of sg_resp2samplematrix</title>
+  <meta name="keywords" content="sg_resp2samplematrix">
+  <meta name="description" content="SG_RESP2SAMPLEMATRIX">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">simplegabortb-v1.0.0</a> &gt; sg_resp2samplematrix.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for simplegabortb-v1.0.0&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>sg_resp2samplematrix
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>SG_RESP2SAMPLEMATRIX</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function meh=sg_resp2samplematrix(r,varargin) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment">SG_RESP2SAMPLEMATRIX
+
+   m = sg_resp2samplematrix(r)
+
+ Converts response structure returned by sg_filterwithbank to a
+ matrix more suitable for e.g. using with classifiers. 
+
+ If responses were computer for all points, a [height x width x
+ filter_values] matrix will be created. Filter values are arranged in
+ [f1o1 f1o2 ... f2o1 f2o2 ... ] order. If responses for only some
+ points were computer, matrix will be of format 
+ [point x filter_values].
+
+ Options:
+   normalize - set to 1 to normalize responses. For info on 
+               normalization see sg_normalizesamplematrix
+
+ Example:
+   s = sg_resp2samplematrix(r,'normalize',1);
+
+ See also: <a href="sg_filterwithbank.html" class="code" title="function [m]=sg_filterwithbank(s, bank, varargin)">SG_FILTERWITHBANK</a>, <a href="sg_scalesamples.html" class="code" title="function feh=sg_scalesamples(matr,sc,nf,norient)">SG_SCALESAMPLES</a>, <a href="sg_rotatesamples.html" class="code" title="function feh=sg_rotatesamples(matr,rot,norient)">SG_ROTATESAMPLES</a>,
+           <a href="sg_normalizesamplematrix.html" class="code" title="function meh=sg_normalizesamplematrix(meh)">SG_NORMALIZESAMPLEMATRIX</a>
+
+ Authors:
+   Jarmo Ilonen, 2004
+
+ $Name: V_1_0_0 $ $Id: <a href="sg_resp2samplematrix.html" class="code" title="function meh=sg_resp2samplematrix(r,varargin)">sg_resp2samplematrix</a>.m,v 1.2 2005-10-12 14:28:35 ilonen Exp $</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="getargs.html" class="code" title="function S = getargs(defaultS, varglist);">getargs</a>	GETARGS  parse variable argument list into a struct</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="sg_demo01.html" class="code" title="">sg_demo01</a>	SG_DEMO01 Demonstrates the SimpleGabor Toolbox funtionality</li></ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <span class="comment">%SG_RESP2SAMPLEMATRIX</span>
+0002 <span class="comment">%</span>
+0003 <span class="comment">%   m = sg_resp2samplematrix(r)</span>
+0004 <span class="comment">%</span>
+0005 <span class="comment">% Converts response structure returned by sg_filterwithbank to a</span>
+0006 <span class="comment">% matrix more suitable for e.g. using with classifiers.</span>
+0007 <span class="comment">%</span>
+0008 <span class="comment">% If responses were computer for all points, a [height x width x</span>
+0009 <span class="comment">% filter_values] matrix will be created. Filter values are arranged in</span>
+0010 <span class="comment">% [f1o1 f1o2 ... f2o1 f2o2 ... ] order. If responses for only some</span>
+0011 <span class="comment">% points were computer, matrix will be of format</span>
+0012 <span class="comment">% [point x filter_values].</span>
+0013 <span class="comment">%</span>
+0014 <span class="comment">% Options:</span>
+0015 <span class="comment">%   normalize - set to 1 to normalize responses. For info on</span>
+0016 <span class="comment">%               normalization see sg_normalizesamplematrix</span>
+0017 <span class="comment">%</span>
+0018 <span class="comment">% Example:</span>
+0019 <span class="comment">%   s = sg_resp2samplematrix(r,'normalize',1);</span>
+0020 <span class="comment">%</span>
+0021 <span class="comment">% See also: SG_FILTERWITHBANK, SG_SCALESAMPLES, SG_ROTATESAMPLES,</span>
+0022 <span class="comment">%           SG_NORMALIZESAMPLEMATRIX</span>
+0023 <span class="comment">%</span>
+0024 <span class="comment">% Authors:</span>
+0025 <span class="comment">%   Jarmo Ilonen, 2004</span>
+0026 <span class="comment">%</span>
+0027 <span class="comment">% $Name: V_1_0_0 $ $Id: sg_resp2samplematrix.m,v 1.2 2005-10-12 14:28:35 ilonen Exp $</span>
+0028 
+0029 <a name="_sub0" href="#_subfunctions" class="code">function meh=sg_resp2samplematrix(r,varargin)</a>
+0030 
+0031 conf=struct(<span class="keyword">...</span>
+0032      <span class="string">'normalize'</span>,0 <span class="keyword">...</span>
+0033          );
+0034      
+0035 conf = <a href="getargs.html" class="code" title="function S = getargs(defaultS, varglist);">getargs</a>(conf, varargin);     
+0036      
+0037 nf=length(r.freq);
+0038 of=length(r.freq{1}.resp(:,1,1));
+0039 
+0040 n=size(r.freq{1}.resp);
+0041 
+0042 
+0043 <span class="comment">% handle case with responses from all points</span>
+0044 <span class="keyword">if</span> length(n)==3
+0045   meh=zeros(n(2),n(3),nf*of);
+0046   
+0047   <span class="keyword">for</span> i=1:nf
+0048     <span class="keyword">for</span> u=1:of
+0049       meh(:,:,(i-1)*of+(u-1) + 1)=r.freq{i}.resp(u,:,:);
+0050     <span class="keyword">end</span>;
+0051   <span class="keyword">end</span>;
+0052   <span class="keyword">if</span> conf.normalize&gt;0,
+0053     meh=(1./repmat(sqrt(sum(abs(meh).^2,3)),[1,1,nf*of])).*meh;
+0054   <span class="keyword">end</span>;
+0055   <span class="keyword">return</span>;
+0056 <span class="keyword">end</span>;
+0057 
+0058 <span class="comment">% case with only some responses</span>
+0059 <span class="keyword">if</span> length(n)==2
+0060   meh=zeros(n(2),nf*of);
+0061   
+0062   <span class="keyword">for</span> i=1:nf
+0063     <span class="keyword">for</span> u=1:of
+0064       meh(:,(i-1)*of+(u-1) + 1)=r.freq{i}.resp(u,:);
+0065     <span class="keyword">end</span>;
+0066   <span class="keyword">end</span>;
+0067   <span class="keyword">if</span> conf.normalize&gt;0,
+0068     meh=(1./repmat(sqrt(sum(abs(meh).^2,2)),[1,nf*of])).*meh;
+0069   <span class="keyword">end</span>;
+0070   <span class="keyword">return</span>;
+0071 <span class="keyword">end</span>;
+0072 
+0073 error(<span class="string">'Could not decipher response structure'</span>);
+0074 
+0075</pre></div>
+<hr><address>Generated on Fri 23-Nov-2007 13:14:20 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

@@ -1,0 +1,276 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of sg_createfilterf2</title>
+  <meta name="keywords" content="sg_createfilterf2">
+  <meta name="description" content="SG_CREATEFILTERF2 - creates a 2-d Gabor filter in frequency domain">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">simplegabortb-v1.0.0</a> &gt; sg_createfilterf2.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for simplegabortb-v1.0.0&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>sg_createfilterf2
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>SG_CREATEFILTERF2 - creates a 2-d Gabor filter in frequency domain</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function [g, envelope,fhigh]=sg_createfilterf2(f0, theta, gamma, eta, N,varargin) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment">SG_CREATEFILTERF2 - creates a 2-d Gabor filter in frequency domain
+
+   [g, envelope, fhigh]=sg_createfilterf2(f,theta,gamma,eta,N)
+
+ Creates a frequency domain Gabor filter with specified arguments.
+ Optionally uses effective envelope, so that the created filter
+ includes only 'pf' of the total filter energy.  
+
+   f     - the frequency of the filter
+   theta - orientation of the filter
+   gamma - sharpness of the filter along major axis
+   eta   - sharpness of the filter along minor axis
+   N     - size of the filter, [height width]
+
+ Optional arguments are:
+   use_envelope - 0 = create a full size filter, 1 = use the envelope
+   pf           - the amount of energy to include inside envelope,
+                  default 0.99
+
+ Output arguments are [g, envelope, fhigh], where g is the
+ filter, envelope is the effective filter envelope and fhigh
+ is the maximum frequency of the filter. Envelope is a vector of
+ [xmin,xmax,ymin,ymax] and the coordinates may be negative because
+ the zero frequency is located in the upper lefthand corner
+ of the frequency space. 
+
+ Authors: 
+   Jarmo Ilonen, &lt;ilonen@lut.fi&gt;
+   Joni Kamarainen &lt;Joni.Kamarainen@lut.fi&gt;
+   Ville Kyrki &lt;Ville.Kyrki@lut.fi&gt;</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="getargs.html" class="code" title="function S = getargs(defaultS, varglist);">getargs</a>	GETARGS  parse variable argument list into a struct</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="sg_createfilterbank.html" class="code" title="function [bank]=sg_createfilterbank(N, f, m, n, varargin)">sg_createfilterbank</a>	SG_CREATEFILTERBANK creates Gabor filter bank</li><li><a href="sg_plotfilters2.html" class="code" title="function sg_plotfilters2(N,fmax,m,n,varargin)">sg_plotfilters2</a>	SG_PLOTFILTERS2 displays Gabor filter bank</li></ul>
+<!-- crossreference -->
+
+<h2><a name="_subfunctions"></a>SUBFUNCTIONS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="#_sub1" class="code">function envelope=accurate_envelope_f(f0,a,b,theta)</a></li><li><a href="#_sub2" class="code">function [x,y]=ellipsoid_envelope_point(a,b,c)</a></li><li><a href="#_sub3" class="code">function fhigh=compute_fhigh(f0,a,b)</a></li><li><a href="#_sub4" class="code">function x = norminv(p,mu,sigma)</a></li></ul>
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <span class="comment">%SG_CREATEFILTERF2 - creates a 2-d Gabor filter in frequency domain</span>
+0002 <span class="comment">%</span>
+0003 <span class="comment">%   [g, envelope, fhigh]=sg_createfilterf2(f,theta,gamma,eta,N)</span>
+0004 <span class="comment">%</span>
+0005 <span class="comment">% Creates a frequency domain Gabor filter with specified arguments.</span>
+0006 <span class="comment">% Optionally uses effective envelope, so that the created filter</span>
+0007 <span class="comment">% includes only 'pf' of the total filter energy.</span>
+0008 <span class="comment">%</span>
+0009 <span class="comment">%   f     - the frequency of the filter</span>
+0010 <span class="comment">%   theta - orientation of the filter</span>
+0011 <span class="comment">%   gamma - sharpness of the filter along major axis</span>
+0012 <span class="comment">%   eta   - sharpness of the filter along minor axis</span>
+0013 <span class="comment">%   N     - size of the filter, [height width]</span>
+0014 <span class="comment">%</span>
+0015 <span class="comment">% Optional arguments are:</span>
+0016 <span class="comment">%   use_envelope - 0 = create a full size filter, 1 = use the envelope</span>
+0017 <span class="comment">%   pf           - the amount of energy to include inside envelope,</span>
+0018 <span class="comment">%                  default 0.99</span>
+0019 <span class="comment">%</span>
+0020 <span class="comment">% Output arguments are [g, envelope, fhigh], where g is the</span>
+0021 <span class="comment">% filter, envelope is the effective filter envelope and fhigh</span>
+0022 <span class="comment">% is the maximum frequency of the filter. Envelope is a vector of</span>
+0023 <span class="comment">% [xmin,xmax,ymin,ymax] and the coordinates may be negative because</span>
+0024 <span class="comment">% the zero frequency is located in the upper lefthand corner</span>
+0025 <span class="comment">% of the frequency space.</span>
+0026 <span class="comment">%</span>
+0027 <span class="comment">% Authors:</span>
+0028 <span class="comment">%   Jarmo Ilonen, &lt;ilonen@lut.fi&gt;</span>
+0029 <span class="comment">%   Joni Kamarainen &lt;Joni.Kamarainen@lut.fi&gt;</span>
+0030 <span class="comment">%   Ville Kyrki &lt;Ville.Kyrki@lut.fi&gt;</span>
+0031 
+0032 <span class="comment">% $Name: V_1_0_0 $ $Id: sg_createfilterf2.m,v 1.7 2006-02-03 09:05:07 ilonen Exp $</span>
+0033 
+0034 <a name="_sub0" href="#_subfunctions" class="code">function [g, envelope,fhigh]=sg_createfilterf2(f0, theta, gamma, eta, N,varargin)</a>
+0035 
+0036 conf = struct(<span class="keyword">...</span>
+0037     <span class="string">'use_envelope'</span>, 0, <span class="keyword">...</span>
+0038     <span class="string">'pf'</span>,0.99 <span class="keyword">...</span>
+0039     );
+0040 
+0041 conf = <a href="getargs.html" class="code" title="function S = getargs(defaultS, varglist);">getargs</a>(conf, varargin);
+0042 
+0043 alpha=f0/gamma;
+0044 beta=f0/eta;
+0045 
+0046 <span class="keyword">if</span> length(N)==1
+0047   N(2)=N(1);
+0048 <span class="keyword">end</span>;  
+0049 
+0050 <span class="comment">% filter size</span>
+0051 Nx=N(2);
+0052 Ny=N(1);
+0053 
+0054   
+0055 pf=sqrt(conf.pf);
+0056 
+0057 <span class="comment">% accurate rectangular envelope</span>
+0058 majenv=<a href="#_sub4" class="code" title="subfunction x = norminv(p,mu,sigma)">norminv</a>([1-pf 1+pf]./2,0,f0/(sqrt(2)*pi*gamma));
+0059 minenv=<a href="#_sub4" class="code" title="subfunction x = norminv(p,mu,sigma)">norminv</a>([1-pf 1+pf]./2,0,f0/(sqrt(2)*pi*eta));
+0060 envelope=<a href="#_sub1" class="code" title="subfunction envelope=accurate_envelope_f(f0,a,b,theta)">accurate_envelope_f</a>(f0,majenv(2),minenv(2),theta);
+0061 envelope(1:2)=envelope(1:2)*N(2);
+0062 envelope(3:4)=envelope(3:4)*N(1);
+0063 
+0064 fhigh=<a href="#_sub3" class="code" title="subfunction fhigh=compute_fhigh(f0,a,b)">compute_fhigh</a>(f0,majenv(2),minenv(2));
+0065 
+0066 <span class="comment">% envelope area compared to total area</span>
+0067 <span class="comment">%area=(envelope(2)-envelope(1))*(envelope(4)-envelope(3))/(N(1)*N(2));</span>
+0068 
+0069 envelope=[floor(envelope(1)) ceil(envelope(2)) floor(envelope(3)) ceil(envelope(4))];
+0070 
+0071 
+0072 
+0073 <span class="keyword">if</span> conf.use_envelope&gt;0
+0074   <span class="comment">% create filter with envelope</span>
+0075   
+0076   nx=envelope(1):1:envelope(2);
+0077   ny=envelope(3):1:envelope(4);
+0078   
+0079   <span class="comment">% feature: the filter envelope could be larger than the image</span>
+0080   
+0081   u = nx/Nx; <span class="comment">% frequencies that bank contains</span>
+0082   v = ny/Ny;
+0083 
+0084   [U,V]=meshgrid(u,v);
+0085   gf = exp(-pi^2*( (-U*sin(theta)+V*cos(theta)).^2/beta^2 + <span class="keyword">...</span>
+0086                    (U*cos(theta)+V*sin(theta)-f0).^2/alpha^2 ));
+0087   
+0088   g=gf;
+0089 
+0090   <span class="keyword">return</span>
+0091 
+0092 <span class="keyword">else</span>
+0093   
+0094   <span class="comment">% full size filter</span>
+0095   
+0096   nx = -Nx:1:Nx;
+0097   ny = -Ny:1:Ny;
+0098 
+0099   u = nx/Nx; <span class="comment">% frequencies that bank contains</span>
+0100   v = ny/Ny;
+0101 
+0102   [U,V]=meshgrid(u,v);
+0103   gf = exp(-pi^2*( (-U*sin(theta)+V*cos(theta)).^2/beta^2 + <span class="keyword">...</span>
+0104                    (U*cos(theta)+V*sin(theta)-f0).^2/alpha^2 ));
+0105   
+0106   <span class="comment">% Calculating the filter using aliasing</span>
+0107   g = zeros(Ny,Nx);
+0108   g = g+gf(1:Ny,1:Nx); <span class="comment">% A_1</span>
+0109   g = g+gf(1:Ny,(Nx+1):(2*Nx)); <span class="comment">% A_2</span>
+0110   g = g+gf((Ny+1):(2*Ny),1:Nx); <span class="comment">% A_3</span>
+0111   g = g+gf((Ny+1):(2*Ny),(Nx+1):(2*Nx)); <span class="comment">% A_4</span>
+0112   <span class="keyword">return</span>;
+0113 <span class="keyword">end</span>;  
+0114 
+0115 
+0116 
+0117 
+0118 <span class="comment">% calculates the accurate rectangular envelope when f0, major/minor axes</span>
+0119 <span class="comment">% of the ellipsode, and</span>
+0120 <a name="_sub1" href="#_subfunctions" class="code">function envelope=accurate_envelope_f(f0,a,b,theta)</a>
+0121 
+0122 
+0123 <span class="keyword">if</span> mod(theta,pi/2)~=0
+0124   
+0125   <span class="comment">% solve points with slopes -tan(pi/2-theta) and tan(theta)</span>
+0126   [x1,y1]=<a href="#_sub2" class="code" title="subfunction [x,y]=ellipsoid_envelope_point(a,b,c)">ellipsoid_envelope_point</a>(a,b,-tan(pi/2-theta));
+0127   [x2,y2]=<a href="#_sub2" class="code" title="subfunction [x,y]=ellipsoid_envelope_point(a,b,c)">ellipsoid_envelope_point</a>(a,b,tan(theta));
+0128   envelope=[x1 y1; -x1 -y1; x2 y2; -x2 -y2];
+0129   <span class="comment">% shift by f0</span>
+0130   envelope=envelope+repmat([f0 0],4,1);
+0131   
+0132   <span class="comment">% rotate by theta</span>
+0133   envelope=envelope*[cos(theta) sin(theta);-sin(theta) cos(theta)];
+0134   
+0135   xmin=min(envelope(:,1));
+0136   xmax=max(envelope(:,1));
+0137   ymin=min(envelope(:,2));
+0138   ymax=max(envelope(:,2));
+0139   
+0140   envelope=real([xmin xmax ymin ymax]);
+0141   
+0142 <span class="keyword">else</span> 
+0143 
+0144   envelope=[f0-a 0; f0+a 0 ; f0 b; f0 -b];
+0145   envelope=envelope*[cos(theta) sin(theta);-sin(theta) cos(theta)];
+0146   xmin=min(envelope(:,1));
+0147   xmax=max(envelope(:,1));
+0148   ymin=min(envelope(:,2));
+0149   ymax=max(envelope(:,2));
+0150   envelope=real([xmin xmax ymin ymax]);
+0151   
+0152 <span class="keyword">end</span>;
+0153 
+0154 
+0155 
+0156 
+0157 <span class="comment">% tells a point in ellipsoid with major axis a, minor b, where slope (kulmakerroin) is c</span>
+0158 <a name="_sub2" href="#_subfunctions" class="code">function [x,y]=ellipsoid_envelope_point(a,b,c)</a>
+0159 
+0160 x=(c*a^2)/sqrt(b^2+c^2*a^2);
+0161 y=b/a*sqrt(a^2-x^2);
+0162 
+0163 
+0164 
+0165 
+0166 <span class="comment">% calculate fhigh</span>
+0167 <a name="_sub3" href="#_subfunctions" class="code">function fhigh=compute_fhigh(f0,a,b)</a>
+0168 
+0169 
+0170 d=f0;
+0171 
+0172 <span class="keyword">if</span> b&gt;a
+0173   
+0174   foo=-(a^2*d)/(a^2-b^2);
+0175   
+0176   <span class="keyword">if</span> foo&lt;a
+0177     fhigh2=sqrt((d+foo)^2 + (b/a * sqrt(a^2 - foo^2))^2);
+0178   <span class="keyword">else</span>
+0179     fhigh2=d+a;
+0180   <span class="keyword">end</span>;
+0181   
+0182 <span class="keyword">else</span>
+0183   fhigh2=d+a;
+0184 <span class="keyword">end</span>;  
+0185 
+0186 <span class="keyword">if</span> fhigh2&gt;0.5
+0187   fhigh2=0.5;
+0188 <span class="keyword">end</span>;  
+0189 
+0190 fhigh=fhigh2;
+0191 
+0192 
+0193 
+0194 <span class="comment">% calculates the inverse of the normal cumulative distribution function</span>
+0195 <a name="_sub4" href="#_subfunctions" class="code">function x = norminv(p,mu,sigma)</a>
+0196 
+0197 x0 = -sqrt(2).*erfcinv(2*p);
+0198 x = sigma.*x0 + mu;
+0199</pre></div>
+<hr><address>Generated on Fri 23-Nov-2007 13:14:20 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>
