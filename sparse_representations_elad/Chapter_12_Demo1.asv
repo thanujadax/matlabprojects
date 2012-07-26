@@ -1,0 +1,121 @@
+% Figures - 12.2 and 12.4
+% =========================================
+% in this script a synthetic test of the MOD and the K-SVD algorithms 
+% is performed. First, a random dictionary with normalized columns is 
+% generated, and then a set of data signals, each as a linear 
+% combination of 3 dictionary element is created, with noise level of 
+% sigma. this set is given as input to the MOD/K-SVD algorithm.
+%
+% There are two different mode for activating these algorithms - 
+% getting a fixed number of atoms in the representation, or until a 
+% fixed error is reached in the sparse coding stage. Both options are 
+% explored. 
+%
+% Note: The function 
+
+
+clear; clc; pack;
+
+randn('state',sum(100*clock));
+rand('state',sum(100*clock));
+
+% Setting parameters 
+param.L=4;   % number of elements in each linear combination
+param.K=60; % number of dictionary elements
+param.numIteration=50; % number of iteration to execute the learning algorithms
+
+% Creating the data to train on 
+N=4000; % number of signals to generate
+n=30;   % dimension of each data
+sigma=0.1; % level of noise to be added
+
+% Creating the dictionary
+Dictionary=randn(n,param.K);
+Dictionary=Dictionary*diag(1./sqrt(sum(Dictionary.*Dictionary)));
+param.TrueDictionary=Dictionary; 
+param.InitializationMethod='DataElements'; % initial  by data elements 
+
+% Creating the coefficients
+coefs=zeros(param.K,N);
+coefs(1:param.L,:)=randn(param.L,N);
+for i=1:N
+    coefs(:,i)=coefs(randperm(param.K),i);
+end
+data=Dictionary*coefs;
+
+% Adding noise to the data
+noise=randn(size(data));
+data=data+noise*sigma;
+
+SNR=sum(sum((Dictionary*coefs)'*(Dictionary*coefs)))...
+                /sum(sum((data-Dictionary*coefs)'*(data-Dictionary*coefs)));
+disp(['SNR=',num2str(SNR)]); 
+
+% ========================================================
+% ========================================================
+
+% Training the dictionary with a fixed number of atoms (L)
+RefError=sqrt(sum(sum((data-Dictionary*coefs).^2))/numel(data));
+disp(['The ref. error (with the true dicitonary and coef.) is: ',num2str(RefError)]);
+disp('   ');
+param.errorFlag=0; % decompose signals with a fixed number of atoms 
+param.L=4;   
+param.Method='MOD';
+[DicMOD1,OutMOD1]=Chapter_12_TrainDic(data,param);
+param.Method='KSVD';
+[DicKSVD1,OutKSVD1]=Chapter_12_TrainDic(data,param);
+
+save Chapter_12_Demo1.mat
+
+figure(1); clf; 
+h=plot(0:0.5:param.numIteration,OutMOD1.ratio,'k'); 
+set(h,'LineWidth',2);
+set(gca,'FontSize',14);
+h=xlabel('Iteration');
+set(h,'FontSize',14);
+h=ylabel('Relative # of Recovered Atoms');
+set(h,'FontSize',14);
+grid on;
+% print -depsc2 Chapter_12_MOD_ratio.eps
+
+figure(2); clf; 
+h=plot(0:0.5:param.numIteration,OutMOD1.totalErr,'k'); 
+set(h,'LineWidth',2);
+set(gca,'FontSize',14);
+h=xlabel('Iteration');
+set(h,'FontSize',14);
+h=ylabel('Average Representation Error');
+set(h,'FontSize',14);
+grid on;
+% print -depsc2 Chapter_12_MOD_error.eps
+
+figure(3); clf; 
+h=plot(0:0.5:param.numIteration,OutMOD1.ratio,'k'); 
+set(h,'LineWidth',2);
+hold on;
+h=plot(0:0.5:param.numIteration,OutKSVD1.ratio,'k--'); 
+set(h,'LineWidth',2);
+set(gca,'FontSize',14);
+h=xlabel('Iteration');
+set(h,'FontSize',14);
+h=ylabel('Relative # of Recovered Atoms');
+set(h,'FontSize',14);
+legend({'MOD','K-SVD'},4); 
+grid on;
+% print -depsc2 Chapter_12_MOD_vs_KSVD_ratio.eps
+
+figure(4); clf; 
+h=plot(0:0.5:param.numIteration,OutMOD1.totalErr,'k'); 
+set(h,'LineWidth',2);
+hold on;
+h=plot(0:0.5:param.numIteration,OutKSVD1.totalErr,'k--'); 
+set(h,'LineWidth',2);
+set(gca,'FontSize',14);
+h=xlabel('Iteration');
+set(h,'FontSize',14);
+h=ylabel('Average Representation Error');
+set(h,'FontSize',14);
+legend({'MOD','K-SVD'}); 
+grid on;
+% print -depsc2 Chapter_12_MOD_vs_KSVD_error.eps
+

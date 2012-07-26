@@ -1,0 +1,119 @@
+% Figures - 12.2 and 12.4
+% =========================================
+% in this script a test of the MOD and the K-SVD algorithms is performed on image patches. 
+% ========================================================
+
+clear; clc; pack;
+
+% Gathering the data to train on from an image
+% ========================================================
+
+bb=8; % block size
+K=121; % number of atoms in the dictionary
+
+[IMin0,pp]=imread('barbara.png');
+IMin0=im2double(IMin0);
+
+figure(1); clf; 
+imagesc(IMin0); axis image; axis off; colormap(gray(256));
+print -depsc2 Chapter_12_barbara.eps
+
+if (length(size(IMin0))>2), IMin0 = rgb2gray(IMin0); end
+if (max(IMin0(:))<2), IMin0 = IMin0*255; end
+
+blkMatrix=im2col(IMin0,[bb,bb],'sliding');
+TrainData=blkMatrix(:,1:10:end); % extract 1/10 of the patches
+% TrainData=(eye(bb^2)-ones(bb^2)/bb^2)*TrainData; % removing the mean
+
+% Initial dictionary
+% ========================================================
+
+DCT=zeros(bb,sqrt(K));
+for k=0:1:sqrt(K)-1,
+    V=cos([0:1:bb-1]'*k*pi/sqrt(K));
+    if k>0, V=V-mean(V); end;
+    DCT(:,k+1)=V/norm(V);
+end;
+DCT=kron(DCT,DCT);
+I1=Chapter_12_DispDict(DCT, sqrt(K),sqrt(K),bb,bb,0);
+figure(1); clf; 
+imagesc(I1); colormap(gray(256)); axis image; axis off; 
+
+% Training a dictionary
+% ========================================================
+
+param.errorFlag=0;
+param.K=K; 
+param.numIteration=50; 
+param.InitializationMethod='GivenMatrix'; 
+param.TrueDictionary=0;
+param.Method='MOD';
+param.L=4;   
+param.initialDictionary=DCT;
+[DicMOD,OutMOD]=Chapter_12_TrainDic(TrainData,param);
+I2=Chapter_12_DispDict(DicMOD,sqrt(K),sqrt(K),bb,bb,0);
+figure(1); clf; 
+imagesc(I2); colormap(gray(256)); axis image; axis off; 
+
+param.Method='KSVD';
+[DicKSVD,OutKSVD]=Chapter_12_TrainDic(TrainData,param);
+I3=Chapter_12_DispDict(DicKSVD,sqrt(K),sqrt(K),bb,bb,0);
+figure(1); clf; 
+imagesc(I3); colormap(gray(256)); axis image; axis off; 
+
+figure(1); clf; 
+h=plot(0:0.5:param.numIteration,OutMOD.totalErr); 
+set(h,'LineWidth',2);
+hold on;
+h=plot(0:0.5:param.numIteration,OutKSVD.totalErr,'r--'); 
+set(h,'LineWidth',2);
+set(gca,'FontSize',14);
+h=xlabel('Iteration');
+set(h,'FontSize',14);
+h=ylabel('Average Representation Error');
+set(h,'FontSize',14);
+legend({'MOD','K-SVD'}); 
+print -depsc2 Chapter_12_MOD_vs_KSVD_error_image.eps
+
+figure(2); clf; 
+imagesc(I1); axis off; axis image;
+print -depsc2 Chapter_12_DCT_dic.eps
+
+figure(3); clf; 
+imagesc(I2); axis off; axis image;
+print -depsc2 Chapter_12_MOD_dic.eps
+
+figure(4); clf; 
+imagesc(I3); axis off; axis image;
+print -depsc2 Chapter_12_KSVD_dic.eps
+
+% Checking the representation error for the complete set of patches
+param.errorFlag=0;
+param.K=K; 
+param.numIteration=0; 
+param.InitializationMethod='GivenMatrix'; 
+param.TrueDictionary=0;
+param.Method='MOD';
+param.L=4;   
+param.initialDictionary=DCT;
+Chapter_12_TrainDic(blkMatrix,param);
+param.initialDictionary=DicMOD;
+[DicMOD,OutMOD]=Chapter_12_TrainDic(blkMatrix,param);
+param.initialDictionary=DicKSVD;
+Chapter_12_TrainDic(blkMatrix,param);
+
+% Checking the distance between the MOD and the K-SVD dictionaries
+original=DicMOD;
+new=DicKSVD; 
+T1=0.01;
+catchCounter=0;
+distances=abs(original'*new);
+for i=1:1:size(original,2)
+    minValue=1-max(distances(i,:));
+    catchCounter=catchCounter+(minValue<T1);
+end;
+disp(100*catchCounter/size(original,2));
+
+
+
+

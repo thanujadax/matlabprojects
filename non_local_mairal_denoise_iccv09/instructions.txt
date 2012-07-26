@@ -1,0 +1,10 @@
+The software only works on Linux 64bits computers.
+
+There is one matlab script, script_denoise.m  which reproduces something similar as Table 1 in the ICCV'09 paper using a function denoise.m. 
+There are minor differences (it is better on some images, not as good on others) because:
+   - this script produces a table from an experiment with a noise obtained with a particular seed (randn('seed',0)), whereas the Table in the paper is obtained after averaging the results of 5 experiments with different seeds.
+   - there might be minor differences between this software package and the one used in the ICCV paper, but the differences in terms of results should be insignificant.
+
+All parameters are set up for obtaining good results, regardless of the speed. If you are interested in faster results that are still good, an easy way is to reduce the number of learning iterations (for instance set J1=5 and J2=0 in denoise.m),   reduce the window size of the block matching procedure  window_size=16 for instance.
+Another way would be to use smaller dictionaries, but I have not included such dictionaries in the package.
+If you want to do so, you can use the SPAMS package http://www.di.ens.fr/willow/SPAMS/ to learn your own dictionaries.

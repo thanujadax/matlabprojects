@@ -1,0 +1,7 @@
+This software is free for academic use only. 
+For other usage, please contact the author: julien.mairal@m4x.org
+
+When this software is used in an academic work, we kindly ask to cite the following paper: 
+
+J. Mairal, F. Bach, J. Ponce, G. Sapiro and A. Zisserman. Non-Local Sparse Models for Image Restoration. International Conference on Computer Vision, 2009.
+
