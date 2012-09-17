@@ -5,16 +5,17 @@ function [A]=OMPerr(D,X,errorGoal);
 % input arguments: D - the dictionary
 %                  X - the signals to represent
 %                  errorGoal - the maximal allowed representation error for
-%                  each siganl.
+%                  each signal.
 % output arguments: A - sparse coefficient matrix.
 %=============================================
 [n,P]=size(X);
 [n,K]=size(D);
 E2 = errorGoal^2*n;
-maxNumCoef = n/2;
+maxNumCoef = n/2; % upper limit of the number of coefficients
 A = sparse(size(D,2),size(X,2));
 for k=1:1:P,
     a=[];
+    %k
     x=X(:,k);
     residual=x;
 	indx = [];
@@ -27,6 +28,7 @@ for k=1:1:P,
         pos=find(abs(proj)==max(abs(proj)));
         pos=pos(1);
         indx(j)=pos;
+        %j
         a=pinv(D(:,indx(1:j)))*x;
         residual=x-D(:,indx(1:j))*a;
 		currResNorm2 = sum(residual.^2);

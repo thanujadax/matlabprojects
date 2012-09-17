@@ -111,6 +111,7 @@ totalErr = zeros(1,param.numIteration);
 % the K-SVD algorithm starts here.
 
 for iterNum = 1:param.numIteration
+    disp('Training iteration (KSVD):'+ iterNum)
     % find the coefficients
     if (param.errorFlag==0)
         %CoefMatrix = mexOMPIterative2(Data, [FixedDictionaryElement,Dictionary],param.L);
@@ -120,7 +121,7 @@ for iterNum = 1:param.numIteration
         CoefMatrix = OMPerr([FixedDictionaryElement,Dictionary],Data, param.errorGoal);
         param.L = 1;
     end
-    
+    % finding better dictionary words
     replacedVectorCounter = 0;
 	rPerm = randperm(size(Dictionary,2));
     for j = rPerm

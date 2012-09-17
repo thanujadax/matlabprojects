@@ -1,4 +1,5 @@
-function [IOut,output] = denoiseImageKSVD(Image,sigma,K,varargin)
+function [IOut,output] = denoiseImageKSVD(Image,sigma,K,bb,varargin)
+% edit - thanuja: added bb to the parameter list
 %==========================================================================
 %   P E R F O R M   D E N O I S I N G   U S I N G   A  D I C T  I O N A R Y
 %                  T R A I N E D   O N   N O I S Y   I M A G E
@@ -22,6 +23,7 @@ function [IOut,output] = denoiseImageKSVD(Image,sigma,K,varargin)
 % INPUT ARGUMENTS : Image - the noisy image (gray-level scale)
 %                   sigma - the s.d. of the noise (assume to be white Gaussian).
 %                   K - the number of atoms in the trained dictionary.
+%                   bb - patch size
 %    Optional arguments:              
 %                  'blockSize' - the size of the blocks the algorithm
 %                       works. All blocks are squares, therefore the given
@@ -33,7 +35,7 @@ function [IOut,output] = denoiseImageKSVD(Image,sigma,K,varargin)
 %                       (which is also the default  value here).
 %                  'maxBlocksToConsider' - maximal number of blocks that
 %                       can be processed. This number is dependent on the memory
-%                       capabilities of the machine, and performances’
+%                       capabilities of the machine, and performancesï¿½
 %                       considerations. If the number of available blocks in the
 %                       image is larger than 'maxBlocksToConsider', the sliding
 %                       distance between the blocks increases. The default value
@@ -61,6 +63,7 @@ function [IOut,output] = denoiseImageKSVD(Image,sigma,K,varargin)
 %                  'waitBarOn' - can be set to either 1 or 0. If
 %                       waitBarOn==1 a waitbar, presenting the progress of the
 %                       algorithm will be displayed.
+%                   
 % OUTPUT ARGUMENTS : Iout - a 2-dimensional array in the same size of the
 %                       input image, that contains the cleaned image.
 %                    output.D - the trained dictionary.
@@ -71,15 +74,16 @@ function [IOut,output] = denoiseImageKSVD(Image,sigma,K,varargin)
 reduceDC = 1;
 [NN1,NN2] = size(Image);
 waitBarOn = 1;
-if (sigma > 5)
+if (sigma > 10)
     numIterOfKsvd = 10;
 else
     numIterOfKsvd = 5;
 end
 C = 1.15;
 maxBlocksToConsider = 260000;
+
 slidingDis = 1;
-bb = 8;
+%bb = 8;
 maxNumBlocksToTrainOn = 65000;
 displayFlag = 1;
 
@@ -114,7 +118,7 @@ if (sigma <= 5)
     numIterOfKsvd = 5;
 end
 
-% first, train a dictionary on blocks from the noisy image
+%% train a dictionary on blocks from the noisy image
 
 if(prod([NN1,NN2]-bb+1)> maxNumBlocksToTrainOn)
     randPermutation =  randperm(prod([NN1,NN2]-bb+1));
@@ -171,7 +175,7 @@ if (displayFlag)
 end
 
 
-% denoise the image using the resulted dictionary
+%% denoise the image using the resulted dictionary
 errT = sigma*C;
 IMout=zeros(NN1,NN2);
 Weight=zeros(NN1,NN2);
@@ -197,7 +201,7 @@ for jj = 1:30000:size(blocks,2)
         blocks(:,jj:jumpSize) = blocks(:,jj:jumpSize) - repmat(vecOfMeans,size(blocks,1),1);
     end
     
-    %Coefs = mexOMPerrIterative(blocks(:,jj:jumpSize),Dictionary,errT);
+    % Coefs = mexOMPerrIterative(blocks(:,jj:jumpSize),Dictionary,errT);
     Coefs = OMPerr(Dictionary,blocks(:,jj:jumpSize),errT);
     if (reduceDC)
         blocks(:,jj:jumpSize)= Dictionary*Coefs + ones(size(blocks,1),1) * vecOfMeans;
@@ -212,7 +216,7 @@ IMout = zeros(NN1,NN2);
 [rows,cols] = ind2sub(size(Image)-bb+1,idx);
 for i  = 1:length(cols)
     col = cols(i); row = rows(i);        
-    block =reshape(blocks(:,count),[bb,bb]);
+    block = reshape(blocks(:,count),[bb,bb]);
     IMout(row:row+bb-1,col:col+bb-1)=IMout(row:row+bb-1,col:col+bb-1)+block;
     Weight(row:row+bb-1,col:col+bb-1)=Weight(row:row+bb-1,col:col+bb-1)+ones(bb);
     count = count+1;

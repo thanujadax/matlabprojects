@@ -24,7 +24,7 @@ if (max(IMin0(:))<2)
     IMin0 = IMin0*255;
 end
 
-IMin=IMin0+sigma*randn(size(IMin0)); % creating noisy image
+IMin=IMin0+sigma*randn(size(IMin0));                % creating noisy image
 PSNRIn = 20*log10(255/sqrt(mean((IMin(:)-IMin0(:)).^2)));
 %==========================================================================
 %   P E R F O R M   D E N O I S I N G   U S I N G   O V E R C O M P L E T E 
