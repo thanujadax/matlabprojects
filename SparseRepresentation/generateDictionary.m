@@ -6,7 +6,7 @@
 % Thanuja 05.09.2012
 
 function [Dictionary output] = generateDictionary(bb,RR,K,maxNumBlocksToTrainOn,...
-    maxBlocksToConsider,sigma,imageIn, slidingDis,numIterOfKsvd)
+    maxBlocksToConsider,sigma,imageIn, slidingDis,numIterOfKsvd,C)
 
 [IMin,pp]=imread(imageIn);
 
@@ -22,7 +22,7 @@ end
 %%  KSVD routine to train dictionary
 % Learn dictionary
 reduceDC = 1;
-[NN1,NN2] = size(imageIn);
+[NN1,NN2] = size(IMin);
 waitBarOn = 1;
 displayFlag = 1;
 
@@ -33,12 +33,12 @@ if(prod([NN1,NN2]-bb+1)> maxNumBlocksToTrainOn)
 
     blkMatrix = zeros(bb^2,maxNumBlocksToTrainOn);
     for i = 1:maxNumBlocksToTrainOn
-        [row,col] = ind2sub(size(Image)-bb+1,selectedBlocks(i));
-        currBlock = Image(row:row+bb-1,col:col+bb-1);
+        [row,col] = ind2sub(size(IMin)-bb+1,selectedBlocks(i));
+        currBlock = IMin(row:row+bb-1,col:col+bb-1);
         blkMatrix(:,i) = currBlock(:);
     end
 else
-    blkMatrix = im2col(Image,[bb,bb],'sliding');
+    blkMatrix = im2col(IMin,[bb,bb],'sliding');
 end
 
 param.K = K;

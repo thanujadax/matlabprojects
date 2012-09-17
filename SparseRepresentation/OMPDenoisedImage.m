@@ -1,6 +1,31 @@
-function IOut = OMPDenoisedImage(sigma,C)
+% function IOut = OMPDenoisedImage(Image,Dictionary0,DictionaryN,bb,...
+%     maxBlocksToConsidersigma,C,slidingDis,waitBarOn,reduceDC)
+% 
+% Takes in the image to be denoised, the first dictionary and the second
+% dictionary and produces a denoised image  using the words of the second
+% dictionary, based on the coefficients learned via  the first dictionary
+%
+% Inputs:
+% Image - image to be denoised
+% Dictionary0 - denoised dictionary
+% DictionaryN - initial dictionary
+% bb - block size
+% maxBlocksToConsider - to adjust the sliding distance (for defining blocks)
+% sigma
+% C
+% slidingDis
+% waitBarOn
+%
+% Thanuja 
 
-errT = sigma*C;
+% TEST: temporarily, use just one dictionary to ensure the functionality of the
+% code
+
+function IOut = OMPDenoisedImage(Image,Dictionary,bb,...
+    maxBlocksToConsider,sigma,C,slidingDis,waitBarOn,reduceDC)
+
+[NN1,NN2] = size(Image);
+errT = sigma*C;      % Error threshold for OMP (OMPErr)
 
 %blocks = im2col(Image,[NN1,NN2],[bb,bb],'sliding');
 while (prod(floor((size(Image)-bb)/slidingDis)+1)>maxBlocksToConsider)
@@ -9,14 +34,14 @@ end
 [blocks,idx] = my_im2col(Image,[bb,bb],slidingDis);
 
 if (waitBarOn)
-    newCounterForWaitBar = (param.numIteration+1)*size(blocks,2);
+    % newCounterForWaitBar = (param.numIteration+1)*size(blocks,2);
 end
 
 
 % go with jumps of 30000
 for jj = 1:30000:size(blocks,2)
     if (waitBarOn)
-        waitbar(((param.numIteration*size(blocks,2))+jj)/newCounterForWaitBar);
+        % waitbar(((param.numIteration*size(blocks,2))+jj)/newCounterForWaitBar);
     end
     jumpSize = min(jj+30000-1,size(blocks,2));
     if (reduceDC)
@@ -46,6 +71,6 @@ for i  = 1:length(cols)
 end;
 
 if (waitBarOn)
-    close(h);
+%    close(h);
 end
 IOut = (Image+0.034*sigma*IMout)./(1+0.034*sigma*Weight);
