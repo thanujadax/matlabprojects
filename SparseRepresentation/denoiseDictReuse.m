@@ -15,7 +15,7 @@ maxNumBlocksToTrainOn = 1000; %  - the maximal number of blocks
 %                       to train on. The default value for this parameter is
 %                       65000. However, it might not be enough for very large
 %                       images
-maxBlocksToConsider = 5000; % - maximal number of blocks that
+maxBlocksToConsider = 30000; % - maximal number of blocks that
 %                       can be processed. This number is dependent on the memory
 %                       capabilities of the machine, and performances�
 %                       considerations. If the number of available blocks in the
@@ -67,6 +67,6 @@ end
 
 %% Reconstruct the unseen image Iu using the denoised dictionary D0 and  
 % the sparse codes learned via the first dictionary Dn
-
-IOut = OMPDenoisedImage(IMin,Dictionary,bb,...
+[IOut,sparsecoeff,vecOfMeans] = OMPDenoisedImage(IMin,Dictionary,bb,...
     maxBlocksToConsider,sigma,C,slidingDis,waitBarOn,reduceDC);
+imshow(IOut,[]);

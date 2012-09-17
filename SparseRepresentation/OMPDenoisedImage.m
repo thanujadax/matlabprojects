@@ -21,7 +21,7 @@
 % TEST: temporarily, use just one dictionary to ensure the functionality of the
 % code
 
-function IOut = OMPDenoisedImage(Image,Dictionary,bb,...
+function [IOut, sparsecoeff,vecOfMeans] = OMPDenoisedImage(Image,Dictionary,bb,...
     maxBlocksToConsider,sigma,C,slidingDis,waitBarOn,reduceDC)
 
 [NN1,NN2] = size(Image);
@@ -37,7 +37,7 @@ if (waitBarOn)
     % newCounterForWaitBar = (param.numIteration+1)*size(blocks,2);
 end
 
-
+sparsecoeff = zeros(size(Dictionary,2),size(blocks,2));
 % go with jumps of 30000
 for jj = 1:30000:size(blocks,2)
     if (waitBarOn)
@@ -56,6 +56,7 @@ for jj = 1:30000:size(blocks,2)
     else
         blocks(:,jj:jumpSize)= Dictionary*Coefs ;
     end
+    sparsecoeff(:,jj:size(Coefs,2)) = Coefs; 
 end
 
 count = 1;
