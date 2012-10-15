@@ -1,13 +1,21 @@
 % MRF learning
+% Thanuja
 
 % parameters and variables
 hasInitDict = 1;
-pathToDict = '';
+pathToDict = 'Dictionary_256x_200w_16bb.mat';
 
 % get the dictionary words
+if(hasInitDict)
+    load(pathToDict);       % loads the structure output (from KSVD)
+    Dictionary = output.D;  % copy the dictionary
+    clear output;           % output from KSVD is no more required 
+else
+    % generateDictionary()
+end
+
 % build the association matrices 
-%   top-down
-%   left-right
+HorizontalAssociations = getHorizontalAssociations(image,Dictionary);
 % (remember to add 1)
 
 % Build MRF

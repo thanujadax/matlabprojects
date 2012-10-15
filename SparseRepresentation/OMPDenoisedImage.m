@@ -15,6 +15,8 @@
 % C
 % slidingDis
 % waitBarOn
+% numWords: if zero, go for the error goal. If nonzero, this is the number
+% of atoms allowed per represented patch.
 %
 % Thanuja 
 
@@ -22,7 +24,7 @@
 % code
 
 function [IOut, sparsecoeff,vecOfMeans] = OMPDenoisedImage(Image,Dictionary,bb,...
-    maxBlocksToConsider,sigma,C,slidingDis,waitBarOn,reduceDC)
+    maxBlocksToConsider,sigma,C,slidingDis,waitBarOn,reduceDC,numWords)
 
 [NN1,NN2] = size(Image);
 errT = sigma*C;      % Error threshold for OMP (OMPErr)
@@ -38,6 +40,7 @@ if (waitBarOn)
 end
 
 sparsecoeff = zeros(size(Dictionary,2),size(blocks,2));
+% sparsecoeff = 0;
 % go with jumps of 30000
 for jj = 1:30000:size(blocks,2)
     if (waitBarOn)
@@ -50,13 +53,24 @@ for jj = 1:30000:size(blocks,2)
     end
     
     % Coefs = mexOMPerrIterative(blocks(:,jj:jumpSize),Dictionary,errT);
-    Coefs = OMPerr(Dictionary,blocks(:,jj:jumpSize),errT);
+    %Coefs = OMPerrOne(Dictionary,blocks(:,jj:jumpSize),errT);
+    if(numWords>0)
+        Coefs = OMP(Dictionary,blocks(:,jj:jumpSize),numWords);
+    else
+        Coefs = OMPerr(Dictionary,blocks(:,jj:jumpSize),errT);
+    end
+    
     if (reduceDC)
         blocks(:,jj:jumpSize)= Dictionary*Coefs + ones(size(blocks,1),1) * vecOfMeans;
     else
         blocks(:,jj:jumpSize)= Dictionary*Coefs ;
     end
-    sparsecoeff(:,jj:size(Coefs,2)) = Coefs; 
+    
+    kk = size(Coefs,2)+jj-1;
+%     if(kk>size(sparsecoeff,2))
+%         kk = size(sparsecoeff,2);
+%     end
+    sparsecoeff(:,jj:kk) = Coefs;
 end
 
 count = 1;
@@ -74,4 +88,5 @@ end;
 if (waitBarOn)
 %    close(h);
 end
-IOut = (Image+0.034*sigma*IMout)./(1+0.034*sigma*Weight);
+%IOut = (Image+0.034*sigma*IMout)./(1+0.034*sigma*Weight);
+IOut = IMout./Weight;

@@ -10,22 +10,25 @@ LearnNewDictionary0 = 0;
 bb = 16; % block size
 RR = 4; % redundancy factor
 %K = RR*bb^2; % number of atoms in the dictionary
-K = 64;
+K = 400;
 maxNumBlocksToTrainOn = 1000; %  - the maximal number of blocks
 %                       to train on. The default value for this parameter is
 %                       65000. However, it might not be enough for very large
 %                       images
-maxBlocksToConsider = 30000; % - maximal number of blocks that
+maxBlocksToConsider = 60000; % - maximal number of blocks that
 %                       can be processed. This number is dependent on the memory
 %                       capabilities of the machine, and performances�
 %                       considerations. If the number of available blocks in the
 %                       image is larger than 'maxBlocksToConsider', the sliding
 %                       distance between the blocks increases. The default value
-sigma = 40;
+numWords = 1;       % every patch should be represented by exactly one atom.
+                    % if set to zero, it keeps the number of atoms open and
+                    % keeps within the error goal.
+sigma = 80;
 pathForImages = '/home/thanuja/matlabprojects/data/mitoData/';
-imageName = 'stem1_256by256.png';
+imageName = 'stem1_256by256.png'; % for initial dictionary
 
-newImagePath = '/home/thanuja/matlabprojects/data/mitoData/stem1_256by256_2.png';
+newImagePath = '/home/thanuja/matlabprojects/data/mitoData/stem1_256by256_2.png'; % unseen image
 IMin_0 = imread(newImagePath);
 % preprocessing (to remove the dark edges at the bottom and to the right)
 removedEdgeSize = 0;
@@ -52,8 +55,10 @@ waitBarOn = 1;
 reduceDC = 1;
 
 % TEST: loads Dictionary (from noisy image)
-load('Dictionary_bb16_64w_256x.mat');
-%% Learn the dictionary Dn from a noisy image In
+load('/home/thanuja/matlabprojects/MRF_dict/Dictionary_256x_400w_16bb_NN.mat');
+Dictionary = output.D;  % copy the dictionary from 'output' struct loaded
+clear output;           % output from KSVD is no more required 
+%% Learn the dictionary Dn from a noisy image In (if not already provided)
 if(LearnNewDictionaryN)
 [Dictionary_n, output_n] = generateDictionary(bb,RR,K,maxNumBlocksToTrainOn,...
     maxBlocksToConsider,sigma,imageIn, slidingDis,numIterOfKsvd,C);
@@ -65,8 +70,7 @@ if(LearnNewDictionary0)
 
 end
 
-%% Reconstruct the unseen image Iu using the denoised dictionary D0 and  
-% the sparse codes learned via the first dictionary Dn
+%% Reconstruct the unseen image
 [IOut,sparsecoeff,vecOfMeans] = OMPDenoisedImage(IMin,Dictionary,bb,...
-    maxBlocksToConsider,sigma,C,slidingDis,waitBarOn,reduceDC);
+    maxBlocksToConsider,sigma,C,slidingDis,waitBarOn,reduceDC,numWords);
 imshow(IOut,[]);

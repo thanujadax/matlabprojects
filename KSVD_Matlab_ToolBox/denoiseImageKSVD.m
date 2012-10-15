@@ -1,3 +1,4 @@
+%function [IOut,output] = denoiseImageKSVD(Image,sigma,K,bb,varargin)
 function [IOut,output] = denoiseImageKSVD(Image,sigma,K,bb,varargin)
 % edit - thanuja: added bb to the parameter list
 %==========================================================================
@@ -137,7 +138,9 @@ end
 param.K = K;
 param.numIteration = numIterOfKsvd ;
 
-param.errorFlag = 1; % decompose signals until a certain error is reached. do not use fix number of coefficients.
+%param.errorFlag = 1; % decompose signals until a certain error is reached. do not use fix number of coefficients.
+param.errorFlag = 0; % no error goal is considered. param.L number of atoms per signal.
+param.L = 1;       % number of atoms per signal
 param.errorGoal = sigma*C;
 param.preserveDCAtom = 0;
 
@@ -167,7 +170,8 @@ end
 
 
 param.displayProgress = displayFlag;
-[Dictionary,output] = KSVD(blkMatrix,param);
+% [Dictionary,output] = KSVD(blkMatrix,param);
+[Dictionary,output] = KSVD_NN(blkMatrix,param);
 output.D = Dictionary;
 
 if (displayFlag)
@@ -202,7 +206,8 @@ for jj = 1:30000:size(blocks,2)
     end
     
     % Coefs = mexOMPerrIterative(blocks(:,jj:jumpSize),Dictionary,errT);
-    Coefs = OMPerr(Dictionary,blocks(:,jj:jumpSize),errT);
+    % EDIT: OMPerr replaced by OMPerrOne
+    Coefs = OMPerrOne(Dictionary,blocks(:,jj:jumpSize),errT);
     if (reduceDC)
         blocks(:,jj:jumpSize)= Dictionary*Coefs + ones(size(blocks,1),1) * vecOfMeans;
     else
@@ -225,5 +230,6 @@ end;
 if (waitBarOn)
     close(h);
 end
-IOut = (Image+0.034*sigma*IMout)./(1+0.034*sigma*Weight);
+%IOut = (Image+0.034*sigma*IMout)./(1+0.034*sigma*Weight);
+IOut = IMout./Weight;
 

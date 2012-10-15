@@ -6,7 +6,9 @@
 % Thanuja 05.09.2012
 
 function [Dictionary output] = generateDictionary(bb,RR,K,maxNumBlocksToTrainOn,...
-    maxBlocksToConsider,sigma,imageIn, slidingDis,numIterOfKsvd,C)
+    maxBlocksToConsider,sigma,imageIn, slidingDis,numIterOfKsvd,C,NN)
+
+% NN - nonnegative flag
 
 [IMin,pp]=imread(imageIn);
 
@@ -44,8 +46,12 @@ end
 param.K = K;
 param.numIteration = numIterOfKsvd ;
 
-param.errorFlag = 1; 
+%param.errorFlag = 1; 
 % decompose signals until a certain error is reached. do not use fix number of coefficients.
+
+param.errorFlag = 0; % describe each signal by exactly one atom
+param.L = 1;
+
 param.errorGoal = sigma*C;
 param.preserveDCAtom = 0;  % if 1, tells KSVD to keep the first word of Dict constant
 
@@ -75,5 +81,9 @@ end
 
 
 param.displayProgress = displayFlag;
-[Dictionary,output] = KSVD(blkMatrix,param);
+if(NN)
+    [Dictionary,output] = KSVD_NN(blkMatrix,param);
+else
+    [Dictionary,output] = KSVD(blkMatrix,param);
+end
 

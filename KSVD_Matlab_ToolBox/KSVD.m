@@ -118,7 +118,7 @@ for iterNum = 1:param.numIteration
         CoefMatrix = OMP([FixedDictionaryElement,Dictionary],Data, param.L);
     else 
         %CoefMatrix = mexOMPerrIterative(Data, [FixedDictionaryElement,Dictionary],param.errorGoal);
-        CoefMatrix = OMPerr([FixedDictionaryElement,Dictionary],Data, param.errorGoal);
+        CoefMatrix = OMPerrOne([FixedDictionaryElement,Dictionary],Data, param.errorGoal);
         param.L = 1;
     end
     % finding better dictionary words
