@@ -23,8 +23,8 @@
 % TEST: temporarily, use just one dictionary to ensure the functionality of the
 % code
 
-function [IOut, sparsecoeff,vecOfMeans] = SparseCodeImageNN(Image,Dictionary,bb,...
-    maxBlocksToConsider,sigma,C,slidingDis,waitBarOn,reduceDC,numWords)
+function [IOut, allcoeffs,vecOfMeans] = SparseCodeImageNN(Image,Dictionary,bb,...
+    maxBlocksToConsider,sigma,C,slidingDis,waitBarOn,reduceDC,numWords,numIter)
 
 [NN1,NN2] = size(Image);
 errT = sigma*C;      % Error threshold for OMP (OMPErr)
@@ -39,39 +39,73 @@ if (waitBarOn)
     % newCounterForWaitBar = (param.numIteration+1)*size(blocks,2);
 end
 
-sparsecoeff = zeros(size(Dictionary,2),size(blocks,2));
+% Coefs = sparse(param.K,size(blocks,2));
+%Coefs = sparse(size(Dictionary,2),30000);
+allcoeffs = sparse(0,0);
+% sparsecoeff = zeros(size(Dictionary,2),size(blocks,2));
 % sparsecoeff = 0;
 % go with jumps of 30000
+
+% calculating coefficients with the non-negativity constraint
 for jj = 1:30000:size(blocks,2)
-    if (waitBarOn)
-        % waitbar(((param.numIteration*size(blocks,2))+jj)/newCounterForWaitBar);
-    end
     jumpSize = min(jj+30000-1,size(blocks,2));
     if (reduceDC)
         vecOfMeans = mean(blocks(:,jj:jumpSize));
         blocks(:,jj:jumpSize) = blocks(:,jj:jumpSize) - repmat(vecOfMeans,size(blocks,1),1);
     end
-    
-    % Coefs = mexOMPerrIterative(blocks(:,jj:jumpSize),Dictionary,errT);
-    %Coefs = OMPerrOne(Dictionary,blocks(:,jj:jumpSize),errT);
+        
     if(numWords>0)
-        Coefs = OMP(Dictionary,blocks(:,jj:jumpSize),numWords);
+        Coefs = sparse(size(Dictionary,2),size(blocks(:,jj:jumpSize),2));
+        Coefs = NN_BP(blocks(:,jj:jumpSize), Dictionary,numWords,Coefs,numIter);
+        Coeff = full(Coefs);
+        %Coefs = OMP(Dictionary,blocks(:,jj:jumpSize),numWords);
     else
-        Coefs = OMPerr(Dictionary,blocks(:,jj:jumpSize),errT);
+        Coeff = OMPerr(Dictionary,blocks(:,jj:jumpSize),errT);
     end
     
     if (reduceDC)
-        blocks(:,jj:jumpSize)= Dictionary*Coefs + ones(size(blocks,1),1) * vecOfMeans;
+        blocks(:,jj:jumpSize)= Dictionary*Coeff + ones(size(blocks,1),1) * vecOfMeans;
     else
-        blocks(:,jj:jumpSize)= Dictionary*Coefs ;
+        blocks(:,jj:jumpSize)= Dictionary*Coeff ;
     end
     
-    kk = size(Coefs,2)+jj-1;
-%     if(kk>size(sparsecoeff,2))
-%         kk = size(sparsecoeff,2);
-%     end
-    sparsecoeff(:,jj:kk) = Coefs;
+    % kk = size(Coeff,2)+jj-1;
+    % sparsecoeff(:,jj:kk) = Coefs;
+    allcoeffs = [allcoeffs Coefs];
+
 end
+
+
+% for jj = 1:30000:size(blocks,2)
+%     if (waitBarOn)
+%         % waitbar(((param.numIteration*size(blocks,2))+jj)/newCounterForWaitBar);
+%     end
+%     jumpSize = min(jj+30000-1,size(blocks,2));
+%     if (reduceDC)
+%         vecOfMeans = mean(blocks(:,jj:jumpSize));
+%         blocks(:,jj:jumpSize) = blocks(:,jj:jumpSize) - repmat(vecOfMeans,size(blocks,1),1);
+%     end
+%     
+%     % Coefs = mexOMPerrIterative(blocks(:,jj:jumpSize),Dictionary,errT);
+%     %Coefs = OMPerrOne(Dictionary,blocks(:,jj:jumpSize),errT);
+%     if(numWords>0)
+%         Coefs = OMP(Dictionary,blocks(:,jj:jumpSize),numWords);
+%     else
+%         Coefs = OMPerr(Dictionary,blocks(:,jj:jumpSize),errT);
+%     end
+%     
+%     if (reduceDC)
+%         blocks(:,jj:jumpSize)= Dictionary*Coefs + ones(size(blocks,1),1) * vecOfMeans;
+%     else
+%         blocks(:,jj:jumpSize)= Dictionary*Coefs ;
+%     end
+%     
+%     kk = size(Coefs,2)+jj-1;
+% %     if(kk>size(sparsecoeff,2))
+% %         kk = size(sparsecoeff,2);
+% %     end
+%     sparsecoeff(:,jj:kk) = Coefs;
+% end
 
 count = 1;
 Weight = zeros(NN1,NN2);

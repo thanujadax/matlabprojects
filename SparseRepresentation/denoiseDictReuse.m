@@ -7,6 +7,7 @@
 %% Parameters
 LearnNewDictionaryN = 0;
 LearnNewDictionary0 = 0;
+numIter = 30;           % number of iterations of NN_BP
 bb = 16; % block size
 RR = 4; % redundancy factor
 %K = RR*bb^2; % number of atoms in the dictionary
@@ -28,7 +29,9 @@ sigma = 80;
 pathForImages = '/home/thanuja/matlabprojects/data/mitoData/';
 imageName = 'stem1_256by256.png'; % for initial dictionary
 
-newImagePath = '/home/thanuja/matlabprojects/data/mitoData/stem1_256by256_2.png'; % unseen image
+% newImagePath = '/home/thanuja/matlabprojects/data/mitoData/stem1_256by256_2.png'; % unseen image
+newImagePath = '/home/thanuja/matlabprojects/data/mitoData/stem1_256by256.png';
+
 IMin_0 = imread(newImagePath);
 % preprocessing (to remove the dark edges at the bottom and to the right)
 removedEdgeSize = 0;
@@ -71,6 +74,8 @@ if(LearnNewDictionary0)
 end
 
 %% Reconstruct the unseen image
-[IOut,sparsecoeff,vecOfMeans] = OMPDenoisedImage(IMin,Dictionary,bb,...
-    maxBlocksToConsider,sigma,C,slidingDis,waitBarOn,reduceDC,numWords);
+% [IOut,sparsecoeff,vecOfMeans] = OMPDenoisedImage(IMin,Dictionary,bb,...
+%     maxBlocksToConsider,sigma,C,slidingDis,waitBarOn,reduceDC,numWords);
+[IOut,sparsecoeff,vecOfMeans] = SparseCodeImageNN(IMin,Dictionary,bb,...
+    maxBlocksToConsider,sigma,C,slidingDis,waitBarOn,reduceDC,numWords,numIter);
 imshow(IOut,[]);

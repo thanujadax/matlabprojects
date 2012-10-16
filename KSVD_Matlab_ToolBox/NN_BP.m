@@ -1,6 +1,6 @@
-function coefMatrix = NN_BP(Data,D,maxCoef,coefMatrix)
+function coefMatrix = NN_BP(Data,D,maxCoef,coefMatrix,numIterations)
 MulFactor = 5;
-numIterations = 15;
+%numIterations = 15;
 lambda = 1e-9;
 
 numberOfIncreasedElems = ceil(maxCoef);
