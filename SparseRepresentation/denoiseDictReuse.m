@@ -7,7 +7,7 @@
 %% Parameters
 LearnNewDictionaryN = 0;
 LearnNewDictionary0 = 0;
-numIter = 30;           % number of iterations of NN_BP
+numIter = 200;           % number of iterations of NN_BP
 bb = 16; % block size
 RR = 4; % redundancy factor
 %K = RR*bb^2; % number of atoms in the dictionary
