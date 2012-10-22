@@ -24,7 +24,10 @@ for e = 1:nEdges*2
 end
 
 [V,E] = UGM_makeEdgeVE(edgeEnds,nNodes,useMex);
-
+% E - [ [indexes of edges connected to node 1][indexes of edges connected to node 2]
+% .... [indexes of edges connected to node nNodes] ]
+% V -- V(i) = the sum of the number of edges connected to nodes (1,2,...i-1)
+% plus 1  (the sums of the lengths of the above blocks 1,2..i-1 plus 1)
 
 edgeStruct.edgeEnds = edgeEnds;
 edgeStruct.V = V;

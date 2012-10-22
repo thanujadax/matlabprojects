@@ -1,4 +1,5 @@
 function adj = getAdjMatrix(NN1,NN2,bb)
+% returns upper triangular adjacency matrix
 
 numNodesHorizontal = NN - bb + 1;
 numNodesVertical = NN - bb + 1;
