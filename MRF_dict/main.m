@@ -1,10 +1,10 @@
 % MRF learning
 % Thanuja
 
-% parameters and variables
-hasInitDict = 1;
-pathToDict = 'Dictionary_256x_200w_16bb.mat';
-
+%% parameters, variables and other inputs
+hasInitDict = 1;                                % 1 if initial dictionary is provided
+pathToDict = 'Dictionary_256x_400w_16bb_NN.mat';
+bb = 16;                                        % block size
 % get the dictionary words
 if(hasInitDict)
     load(pathToDict);       % loads the structure output (from KSVD)
@@ -13,17 +13,53 @@ if(hasInitDict)
 else
     % generateDictionary()
 end
+numWords = size(Dictionary,2);
+
+% image for training
+trImageFilePath = '/home/thanuja/matlabprojects/data/mitoData/';
+imageName = 'stem1_256by256.png';
+
+% Get input image
+[IMin,pp]=imread(strcat([trImageFilePath,imageName]));
+
+% imSize = size(IMin_0);
+% resizeDim = [imSize(1)-removedEdgeSize imSize(2)-removedEdgeSize];
+% IMin = IMin_0(1:resizeDim(1), 1:resizeDim(2), 1);
+
+% fixing input image format
+IMin=im2double(IMin);
+if (length(size(IMin))>2)
+    IMin = rgb2gray(IMin);
+end
+if (max(IMin(:))<2)
+    IMin = IMin*255;
+end
 
 % build the association matrices 
-HorizontalAssociations = getHorizontalAssociations(image,Dictionary);
+% HorizontalAssociations = getHorizontalAssociations(image,Dictionary);
 % (remember to add 1)
 
-% Build MRF
-% define potentials
-%   1-clique:   Vc(f_i) = (pixel error)
-%   pairwise:   Vc(f_i,f_i') = (from associations matrix)
+%% Build MRF
+% make the graph structure
+[NN1 NN2] = size(IMin);
+numNodes = prod([NN1,NN2]-bb+1);
 
-% run energy minimization
+adj = getAdjMatrix(NN1,NN2,bb);          % adjacency matrix
+adj = adj + adj';
 
-% sample MRF to generate sample image
+edgeStruct = UGM_makeEdgeStruct(adj,numWords);
+nEdges = edgeStruct.nEdges;
+
+%% Training Ising edge potentials
+
+% Make node map
+nodeMap = zeros(numNodes,numWords,'int32');
+nodeMap(:,1) = 1;
+
+% Make edge map
+edgeMap = zeros(numWords,numWords,nEdges,'int32');
+
+
+
+
 
