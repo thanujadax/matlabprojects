@@ -10,12 +10,12 @@ img1 = imread(infile2, 'tif');
 img1 = double(img1)./255;
 
 %% filter bank parameters
-max_freq = 0.9;
+max_freq = 0.01;
 num_freq = 1;
 num_orientation = 4;
 
 %% create filter bank
-bank=sg_createfilterbank(size(img1), max_freq , num_freq, num_orientation,'verbose',2);
+bank=sg_createfilterbank(size(img1), max_freq , num_freq, num_orientation,'verbose',1);
 %% filtering and output generation
 % filter image with filter bank
 r=sg_filterwithbank(img1,bank,'method',1);

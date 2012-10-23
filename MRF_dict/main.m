@@ -40,11 +40,18 @@ end
 % (remember to add 1)
 
 %% Build MRF
-% make the graph structure
-[NN1 NN2] = size(IMin);
+imgInPatches = img2patches(IMin,bb);                        % TODO
+% imgInPatches is 3D matrix mxnxk
+%   m: number of patches in each column
+%   n: number of patches in each row
+%   k: number of pixels in each patch = bb*bb
+
+% make edge structure
+NN1 = size(imgInPatches,1);
+NN2 = size(imgInPatches,2);
 numNodes = prod([NN1,NN2]-bb+1);
 
-adj = getAdjMatrix(NN1,NN2,bb);          % adjacency matrix
+adj = getAdjMatrix(size(IMin,1),size(IMin,2),bb);           % adjacency matrix
 adj = adj + adj';
 
 edgeStruct = UGM_makeEdgeStruct(adj,numWords);
@@ -54,10 +61,13 @@ nEdges = edgeStruct.nEdges;
 
 % Make node map
 nodeMap = zeros(numNodes,numWords,'int32');
-nodeMap(:,1) = 1;
+nodeMap(:,1) = 1;               % initialize with all nodes with word #1. TODO ############
 
 % Make edge map
 edgeMap = zeros(numWords,numWords,nEdges,'int32');
+
+
+
 
 
 

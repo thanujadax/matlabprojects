@@ -22,6 +22,7 @@ for i=1:NumberImages
       row_inds = r:min(mImage,r+rps-1);
       stripNum = tifflib('computeStrip',FileID,r);
       tmp = tifflib('readEncodedStrip',FileID,stripNum);
+      % tmp receives 3 copies of the same image as a 3D array
       FinalImage(row_inds,:,i) = tmp(:,:,1); 
    end
 end

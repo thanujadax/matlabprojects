@@ -12,6 +12,7 @@ TifLink = Tiff(FileTif, 'r');
 for i=1:NumberImages
    TifLink.setDirectory(i);
    %TifLink.setTag('SubFileType', Tiff.SubFileType.Page);
+   % tmp receives 3 copies of the same image as a 3D array
    tmp=TifLink.read();
    FinalImage(:,:,i)=tmp(:,:,1);
 end
