@@ -1,4 +1,4 @@
-function AMat = getHorizontalAssociations(coefmat,outfilename)
+function AMat = getHorizontalAssociations(coefmat)
 
 % coefmat - sparse matrix of coefficients. Rows correspond to the
 % dictionary words and the columns correspond to the overlapping patches of
@@ -19,4 +19,6 @@ for i = 2:(size(coefmat,2)-1)
     ind1 = ind2;
 end
 
+% write AMat to outfilename
+% save(outfilename,AMat);
 
