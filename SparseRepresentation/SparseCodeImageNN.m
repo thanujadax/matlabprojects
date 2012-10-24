@@ -54,7 +54,7 @@ for jj = 1:30000:size(blocks,2)
         blocks(:,jj:jumpSize) = blocks(:,jj:jumpSize) - repmat(vecOfMeans,size(blocks,1),1);
     end
         
-    if(numWords>0)
+    if(numWords==1)
         Coefs = sparse(size(Dictionary,2),size(blocks(:,jj:jumpSize),2));
         Coefs = NN_BP(blocks(:,jj:jumpSize), Dictionary,numWords,Coefs,numIter);
         Coeff = full(Coefs);

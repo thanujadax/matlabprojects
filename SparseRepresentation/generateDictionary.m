@@ -5,7 +5,7 @@
 %
 % Thanuja 05.09.2012
 
-function [Dictionary output] = generateDictionary(bb,RR,K,maxNumBlocksToTrainOn,...
+function [Dictionary output] = generateDictionary(bb,K,maxNumBlocksToTrainOn,...
     maxBlocksToConsider,sigma,imageIn, slidingDis,numIterOfKsvd,C,NN)
 
 % NN - nonnegative flag

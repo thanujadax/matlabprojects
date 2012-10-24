@@ -1,6 +1,6 @@
 % Algorithm that denoises unseen images using a denoised dictionary, for EM
 % images
-% uses the KSVD MATLAB Toolbox
+% uses some functions from the KSVD MATLAB Toolbox
 % 
 % Thanuja 05.09.2012
 
@@ -12,7 +12,7 @@ bb = 16; % block size
 RR = 4; % redundancy factor
 %K = RR*bb^2; % number of atoms in the dictionary
 K = 400;
-maxNumBlocksToTrainOn = 1000; %  - the maximal number of blocks
+maxNumBlocksToTrainOn = 10000; %  - the maximal number of blocks
 %                       to train on. The default value for this parameter is
 %                       65000. However, it might not be enough for very large
 %                       images
@@ -55,12 +55,12 @@ slidingDis = 1; % the gap between two blocks considered in the sliding window
 numIterOfKsvd = 5; % for training the dictionary - the number of KSVD iterations processed
 %                       blocks from the noisy image. 
 waitBarOn = 1;
-reduceDC = 1;
+reduceDC = 0;
 
 % TEST: loads Dictionary (from noisy image)
-load('/home/thanuja/matlabprojects/MRF_dict/Dictionary_256x_400w_16bb_NN.mat');
-Dictionary = output.D;  % copy the dictionary from 'output' struct loaded
-clear output;           % output from KSVD is no more required 
+load('/home/thanuja/matlabprojects/MRF_dict/Dictionary_256x_400w_16bb_NN_shifted.mat');
+Dictionary = Dictionary2;  % copy the dictionary from 'output' struct loaded
+clear Dictionary2;           % output from KSVD is no more required 
 %% Learn the dictionary Dn from a noisy image In (if not already provided)
 if(LearnNewDictionaryN)
 [Dictionary_n, output_n] = generateDictionary(bb,RR,K,maxNumBlocksToTrainOn,...
@@ -70,7 +70,6 @@ end
 %% Learn the dictionary D0 corresponding to the denoised version of image In
 if(LearnNewDictionary0)
 % Denoise Dn to get D0
-
 end
 
 %% Reconstruct the unseen image

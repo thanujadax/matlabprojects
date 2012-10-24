@@ -6,13 +6,13 @@ imgSize = 256;
 outfilenameH = 'associationsH_1.mat';
 outfilenameV = 'associationsV_1.mat';
 %% load Dictionary
-pathToDict = '/home/thanuja/matlabprojects/MRF_dict/Dictionary_256x_400w_16bb_NN.mat';
+pathToDict = '/home/thanuja/matlabprojects/MRF_dict/Dictionary_256x_400w_16bb_NN_shifted.mat';
 load(pathToDict);       % loads the structure output (from KSVD)
-Dictionary = output.D;  % copy the dictionary
-clear output;           % output from KSVD is no more required
+Dictionary = Dictionary2;  % copy the dictionary
+clear Dictionary2;           % output from KSVD is no more required
 
 %% get sparse coefficients for image 1
-pathToSparseCoefMat = '/home/thanuja/matlabprojects/MRF_dict/sparse_stem1_256x_400w_16bb_NN.mat';
+pathToSparseCoefMat = '/home/thanuja/matlabprojects/MRF_dict/sparse_stem1_256x_400w_16bb_NN_shD.mat';
 load(pathToSparseCoefMat);
 
 %% get horizontal associations matrix
