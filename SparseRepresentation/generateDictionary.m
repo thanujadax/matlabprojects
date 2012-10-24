@@ -6,7 +6,7 @@
 % Thanuja 05.09.2012
 
 function [Dictionary output] = generateDictionary(bb,K,maxNumBlocksToTrainOn,...
-    maxBlocksToConsider,sigma,imageIn, slidingDis,numIterOfKsvd,C,NN)
+    maxBlocksToConsider,sigma,imageIn,slidingDis,numIterOfKsvd,C,NN,L,reduceDC,numBPiterations)
 
 % NN - nonnegative flag
 
@@ -23,13 +23,15 @@ end
 
 %%  KSVD routine to train dictionary
 % Learn dictionary
-reduceDC = 1;
+%reduceDC = 1;
 [NN1,NN2] = size(IMin);
 waitBarOn = 1;
 displayFlag = 1;
 
 % train a dictionary on blocks from the noisy image
 if(prod([NN1,NN2]-bb+1)> maxNumBlocksToTrainOn)
+    display('DICT_WARNING: maxNumBlocksToTrainOn is less than the number of training blocks');
+    display('choosing a random permutation for training...');
     randPermutation =  randperm(prod([NN1,NN2]-bb+1));
     selectedBlocks = randPermutation(1:maxNumBlocksToTrainOn);
 
@@ -45,12 +47,13 @@ end
 
 param.K = K;
 param.numIteration = numIterOfKsvd ;
+param.numBPiterations = numBPiterations;
 
 %param.errorFlag = 1; 
 % decompose signals until a certain error is reached. do not use fix number of coefficients.
 
 param.errorFlag = 0; % describe each signal by exactly one atom
-param.L = 1;
+param.L = L;
 
 param.errorGoal = sigma*C;
 param.preserveDCAtom = 0;  % if 1, tells KSVD to keep the first word of Dict constant
@@ -74,7 +77,7 @@ end
 
 if (waitBarOn)
     counterForWaitBar = param.numIteration+1;
-    h = waitbar(0,'Denoising In Process ...');
+    h = waitbar(0,'Learning dictionary ...');
     param.waitBarHandle = h;
     param.counterForWaitBar = counterForWaitBar;
 end

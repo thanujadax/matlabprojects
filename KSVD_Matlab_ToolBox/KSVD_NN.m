@@ -96,7 +96,7 @@ CoefMatrix = sparse(param.K,size(Data,2));
 % the K-SVD algorithm starts here.
 for iterNum = 1:param.numIteration
     % find the coefficients
-	CoefMatrix = NN_BP(Data, [FixedDictionaryElement,Dictionary],param.L,CoefMatrix);
+	CoefMatrix = NN_BP(Data, [FixedDictionaryElement,Dictionary],param.L,CoefMatrix,param.numBPiterations);
     
     replacedVectorCounter = 0;
 	rPerm = randperm(size(Dictionary,2));
