@@ -26,6 +26,8 @@
 function [IOut, allcoeffs,vecOfMeans] = SparseCodeImageNN(Image,Dictionary,bb,...
     maxBlocksToConsider,sigma,C,slidingDis,waitBarOn,reduceDC,numWords,numIter)
 
+vecOfMeans = 0;
+
 [NN1,NN2] = size(Image);
 errT = sigma*C;      % Error threshold for OMP (OMPErr)
 
@@ -40,23 +42,29 @@ if (waitBarOn)
 end
 
 % Coefs = sparse(param.K,size(blocks,2));
-%Coefs = sparse(size(Dictionary,2),30000);
+%Coefs = sparse(size(Dictionary,2),stepWidth);
 allcoeffs = sparse(0,0);
 % sparsecoeff = zeros(size(Dictionary,2),size(blocks,2));
 % sparsecoeff = 0;
-% go with jumps of 30000
+% go with jumps of stepWidth
+
+stepWidth=100;
 
 % calculating coefficients with the non-negativity constraint
-for jj = 1:30000:size(blocks,2)
-    jumpSize = min(jj+30000-1,size(blocks,2));
+for jj = 1:stepWidth:size(blocks,2)
+    jumpSize = min(jj+stepWidth-1,size(blocks,2));
     if (reduceDC)
         vecOfMeans = mean(blocks(:,jj:jumpSize));
         blocks(:,jj:jumpSize) = blocks(:,jj:jumpSize) - repmat(vecOfMeans,size(blocks,1),1);
     end
-        
+
+    display('processing patch ');
+    display(jj);
+    display(' to ');
+    display(jumpSize);
+    
     if(numWords==1)
-        Coefs = sparse(size(Dictionary,2),size(blocks(:,jj:jumpSize),2));
-        Coefs = NN_BP(blocks(:,jj:jumpSize), Dictionary,numWords,Coefs,numIter);
+        Coefs = least_squares_match(blocks(:,jj:jumpSize), Dictionary);
         Coeff = full(Coefs);
         %Coefs = OMP(Dictionary,blocks(:,jj:jumpSize),numWords);
     else
@@ -76,11 +84,11 @@ for jj = 1:30000:size(blocks,2)
 end
 
 
-% for jj = 1:30000:size(blocks,2)
+% for jj = 1:stepWidth:size(blocks,2)
 %     if (waitBarOn)
 %         % waitbar(((param.numIteration*size(blocks,2))+jj)/newCounterForWaitBar);
 %     end
-%     jumpSize = min(jj+30000-1,size(blocks,2));
+%     jumpSize = min(jj+stepWidth-1,size(blocks,2));
 %     if (reduceDC)
 %         vecOfMeans = mean(blocks(:,jj:jumpSize));
 %         blocks(:,jj:jumpSize) = blocks(:,jj:jumpSize) - repmat(vecOfMeans,size(blocks,1),1);

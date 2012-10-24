@@ -58,9 +58,9 @@ waitBarOn = 1;
 reduceDC = 0;
 
 % TEST: loads Dictionary (from noisy image)
-load('/home/thanuja/matlabprojects/MRF_dict/Dictionary_256x_400w_16bb_NN_shifted.mat');
-Dictionary = Dictionary2;  % copy the dictionary from 'output' struct loaded
-clear Dictionary2;           % output from KSVD is no more required 
+load('/home/thanuja/matlabprojects/MRF_dict/dict_interchanged.mat');
+%Dictionary = Dictionary2;  % copy the dictionary from 'output' struct loaded
+%clear Dictionary2;           % output from KSVD is no more required 
 %% Learn the dictionary Dn from a noisy image In (if not already provided)
 if(LearnNewDictionaryN)
 [Dictionary_n, output_n] = generateDictionary(bb,RR,K,maxNumBlocksToTrainOn,...

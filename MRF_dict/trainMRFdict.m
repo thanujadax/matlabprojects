@@ -12,7 +12,7 @@ Dictionary = Dictionary2;  % copy the dictionary
 clear Dictionary2;           % output from KSVD is no more required
 
 %% get sparse coefficients for image 1
-pathToSparseCoefMat = '/home/thanuja/matlabprojects/MRF_dict/sparse_stem1_256x_400w_16bb_NN_shD.mat';
+pathToSparseCoefMat = '/home/thanuja/matlabprojects/MRF_dict/sparsecoeff_NN_noDCred.mat';
 load(pathToSparseCoefMat);
 
 %% get horizontal associations matrix

@@ -4,11 +4,11 @@
 %% Parameters
 bb = 16;
 K = 400;
-maxNumBlocksToTrainOn = 200000; % training
+maxNumBlocksToTrainOn = 10000; % training
 maxBlocksToConsider = 100000;   % to adjust the sliding distance for reconstruction
 L = 1;                          % maximum number of atoms per signal
 sigma = 40;                     % error. useful when L is not set.
-imageIn = '/home/thanuja/matlabprojects/data/mitoData/stem1.png';
+imageIn = '/home/thanuja/matlabprojects/data/mitoData/stem1_256by256.png';
 slidingDis = 1;
 numIterOfKsvd = 10;
 C = 2;                          % factor for error. not useful when L is set. (>0)
