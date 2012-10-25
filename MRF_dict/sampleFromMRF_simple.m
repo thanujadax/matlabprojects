@@ -32,14 +32,17 @@ for i = 2:totPatches
     if(mod(i,cols) ~= 1) % i is not in the first colum
         wordInFirstCol = 0;             % flag
                                         % sample a word from Hmat given i-1 th word
-        [wordIndH,probH] = sampleWordToRight(wordToLeft,Hmat);    
+        wordToLeftInd = find(coefMat(:,i-1));                                
+                                        
+        [wordIndH,probH] = sampleWordToRight(wordToLeftInd,Hmat);    
     else
         wordInFirstCol = 1;
     end
     if(i>cols)                          % i is not in the first row
         wordInFirstRow = 0;
                                         % sample a word from Vmat given the one above
-        [wordIndV,probV] = sampleWordToBottom(wordToTop,Vmat);  
+        wordToTopInd = find(coefMat(:,i-cols));                                
+        [wordIndV,probV] = sampleWordToBottom(wordToTopInd,Vmat);  
     else
         wordInFirstRow = 1;
     end

@@ -1,4 +1,4 @@
-function [wordIndH,probH] = sampleWordToRight(wordToLeft,Hmat)
+function [wordIndH,probH] = sampleWordToRight(wordToLeftInd,Hmat)
 
 % Inputs:
 % Hmat - horizontal associations given in element (left,right)
@@ -10,7 +10,7 @@ function [wordIndH,probH] = sampleWordToRight(wordToLeft,Hmat)
 
 %%
 % obtain associations for the relevant word
-wordsToRight = Hmat(wordToLeft,:);
+wordsToRight = Hmat(wordToLeftInd,:);
 sumWordsToRight = sum(wordsToRight);
 wordsToRightNormalized = wordsToRight./sumWordsToRight; % contains the normalized cond. prob.
 
