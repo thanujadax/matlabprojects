@@ -8,12 +8,12 @@
 % each word. column vector.
 % usageNum = number of times each word has been used. column vector.
 
-function [usageNumMat, usageSumMat] = getWordUsage(sparsecoefmatrix)
-cumulative = sum(sparsecoefmatrix,1); % sums up the coefficient values for each word
+function [cumulative, usage] = getWordUsage(sparsecoefmatrix)
+cumulative = sum(sparsecoefmatrix,2); % sums up the coefficient values for each word
 
-usageNumMat = zeros(size(sparsecoefmatrix,1),1);
-for i = 1:size(sparsecoef,1)
-    usageNumMat = length(find(sparsecoef(i,:))); % 
+usage = zeros(size(sparsecoefmatrix,1),1);
+for i = 1:size(sparsecoefmatrix,1)
+    usage(i) = length(find(sparsecoefmatrix(i,:))); % 
 end
 
 figure(1);
