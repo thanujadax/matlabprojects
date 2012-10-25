@@ -76,7 +76,7 @@ for i = 2:totPatches
 end
 
 %% Combine the overlapping patches to get the sampled whole image
-IOut = getImageFromCoeff(Dictionary,coefMat,imgDim);
+IOut = getImageFromCoeff(Dictionary,coefMat,imgDim,bb);
 figure(3)
 imagesc(IOut);
 

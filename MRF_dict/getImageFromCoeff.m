@@ -1,4 +1,4 @@
-function IOut = getImageFromCoeff(Dictionary,coefMat,imgSize)
+function IOut = getImageFromCoeff(Dictionary,coefMat,imgSize,bb)
 
 NN1 = imgSize(1);
 NN2 = imgSize(2);
