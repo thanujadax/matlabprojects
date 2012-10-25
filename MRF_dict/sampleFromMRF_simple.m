@@ -32,14 +32,14 @@ for i = 2:totPatches
     if(mod(i,cols) ~= 1) % i is not in the first colum
         wordInFirstCol = 0;             % flag
                                         % sample a word from Hmat given i-1 th word
-        [wordIndH,probH] = sampleWordToRight(wordToLeft,Hmat);       % TODO
+        [wordIndH,probH] = sampleWordToRight(wordToLeft,Hmat);    
     else
         wordInFirstCol = 1;
     end
     if(i>cols)                          % i is not in the first row
         wordInFirstRow = 0;
                                         % sample a word from Vmat given the one above
-        [wordIndV,probV] = sampleWordToBottom(wordToTop,Vmat);      % TODO
+        [wordIndV,probV] = sampleWordToBottom(wordToTop,Vmat);  
     else
         wordInFirstRow = 1;
     end
@@ -74,3 +74,5 @@ end
 
 %% Combine the overlapping patches to get the sampled whole image
 % TODO
+
+
