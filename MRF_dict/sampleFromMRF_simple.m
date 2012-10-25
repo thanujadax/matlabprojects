@@ -1,6 +1,7 @@
-%% function IOut = sampleFromMRF(imgDim,bb,Hmat,Vmat,prior,Dictionary)
+%% function IOut = sampleFromMRF_simple(imgDim,bb,Hmat,Vmat,prior,Dictionary)
 
-% generates a sample image based on the learned MRF
+% generates a sample image based on the learned MRF. Generates the image
+% sequentially from the top left corner to the bottom right corner.
 
 % Inputs:
 % imgDim - vector containing the size of the output image to be sampled [rows columns]
@@ -13,7 +14,7 @@
 % Output:
 % Iout - sampled image
 
-function IOut = sampleFromMRF(imgDim,bb,Hmat,Vmat,prior,Dictionary) 
+function IOut = sampleFromMRF_simple(imgDim,bb,Hmat,Vmat,prior,Dictionary) 
 
 % Initialize random field
 rows = imgDim(1) - bb + 1;              % number of overlapping image patches per column
@@ -23,25 +24,11 @@ totPatches = rows*cols;                 % total number of patches to be generate
 
 coefMat = sparse(size(Dictionary,2),totPatches);
 
-for i = 0:totPatches
+% Pick a random word for the first image patch
+wordInd = ceil(rand(1) * size(Dictionary,2)) ;
+coefMat(wordInd,1) = 1;                 % assign the word to the first patch
+for i = 2:totPatches
     % loop until all the patches are processed
- 
-    patchInd = ceil(rand(1) * totPatches);
-    if(length(find(coefMat(:,patchInd)))==0)
-        % i.e. this patch has not been processed before
-        % pick a word for this
-        
-    else
-        % i.e. this pach has already been assigned
-        % pick another patch - one that has not been assigned yet
-        
-    end
+    
     
 end
-
-
-
-
-
-
-
