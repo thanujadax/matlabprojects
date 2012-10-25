@@ -78,5 +78,6 @@ end
 %% Combine the overlapping patches to get the sampled whole image
 IOut = getImageFromCoeff(Dictionary,coefMat,imgDim,bb);
 figure(3)
-imagesc(IOut);
+imshow(IOut);
+colormap('gray');
 
