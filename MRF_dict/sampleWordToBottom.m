@@ -10,7 +10,7 @@ function [wordIndV,probV] = sampleWordToBottom(wordToTop,Vmat)
 
 %%
 % obtain associations for the relevant word
-wordsToBottom = Hmat(wordToTop,:);
+wordsToBottom = Vmat(wordToTop,:);
 sumWordsToBottom = sum(wordsToBottom);
 wordsToBottomNormalized = wordsToBottom./sumWordsToBottom; % contains the normalized cond. prob.
 
