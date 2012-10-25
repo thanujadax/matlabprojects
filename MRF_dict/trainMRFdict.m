@@ -16,7 +16,7 @@ pathToSparseCoefMat = '/home/thanuja/matlabprojects/MRF_dict/sparsecoeff_NN_noDC
 load(pathToSparseCoefMat);
 
 %% get horizontal associations matrix
-AMat_H = getHorizontalAssociations(sparsecoeff);
+AMat_H = getHorizontalAssociations(sparsecoeff,rowSize);
 
 %% get vertical associations matrix
 rowSize = imgSize -bb + 1;      % num of patches per row in image
