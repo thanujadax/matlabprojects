@@ -65,7 +65,116 @@ nodeMap(:,1) = 1;               % initialize with all nodes with word #1. TODO #
 
 % Make edge map
 edgeMap = zeros(numWords,numWords,nEdges,'int32');
+% initialize edge map ############## TODO ###################3
+for i = 1:numWords
+    edgeMap(i,i,:) = numWords;
+end
 
+% Initialize weights
+nParams = max([nodeMap(:);edgeMap(:)]);
+w = zeros(nParams,1);
+
+% Example of making potentials
+[nodePot,edgePot] = UGM_MRF_makePotentials(w,nodeMap,edgeMap,edgeStruct);
+
+% Compute sufficient statistics
+suffStat = UGM_MRF_computeSuffStat(y,nodeMap,edgeMap,edgeStruct);
+
+% Evaluate NLL
+nll = UGM_MRF_NLL(w,nInstances,suffStat,nodeMap,edgeMap,edgeStruct,@UGM_Infer_Chain)
+
+% Optimize
+w = minFunc(@UGM_MRF_NLL,w,[],nInstances,suffStat,nodeMap,edgeMap,edgeStruct,@UGM_Infer_Chain)
+
+% Now make potentials
+[nodePot,edgePot] = UGM_MRF_makePotentials(w,nodeMap,edgeMap,edgeStruct);
+nodePot(1,:)
+edgePot(:,:,1)
+fprintf('(paused)\n');
+pause
+
+%% Training (Full Potentials)
+
+edgeMap(2,2,:) = 0;
+edgeMap(1,2,:) = 3;
+edgeMap(2,1,:) = 4;
+
+% Initialize weights
+nParams = max([nodeMap(:);edgeMap(:)]);
+w = zeros(nParams,1);
+
+% Example of making potentials
+[nodePot,edgePot] = UGM_MRF_makePotentials(w,nodeMap,edgeMap,edgeStruct);
+
+% Compute sufficient statistics
+suffStat = UGM_MRF_computeSuffStat(y,nodeMap,edgeMap,edgeStruct);
+
+% Optimize
+w = minFunc(@UGM_MRF_NLL,w,[],nInstances,suffStat,nodeMap,edgeMap,edgeStruct,@UGM_Infer_Chain)
+
+% Now make potentials
+[nodePot,edgePot] = UGM_MRF_makePotentials(w,nodeMap,edgeMap,edgeStruct);
+nodePot(1,:)
+edgePot(:,:,1)
+fprintf('(paused)\n');
+pause
+
+
+%% Training (incorporating untied potentials for boundaries)
+
+nodeMap(1,1) = 5;
+nodeMap(end,1) = 5;
+
+% Initialize weights
+nParams = max([nodeMap(:);edgeMap(:)]);
+w = zeros(nParams,1);
+
+% Compute sufficient statistics
+suffStat = UGM_MRF_computeSuffStat(y,nodeMap,edgeMap,edgeStruct);
+
+% Optimize
+w = minFunc(@UGM_MRF_NLL,w,[],nInstances,suffStat,nodeMap,edgeMap,edgeStruct,@UGM_Infer_Chain)
+
+% Now make potentials
+[nodePot,edgePot] = UGM_MRF_makePotentials(w,nodeMap,edgeMap,edgeStruct);
+nodePot(1,:)
+nodePot(2,:)
+edgePot(:,:,1)
+fprintf('(paused)\n');
+pause
+
+%% Do decoding/infence/sampling in learned model
+
+decode = UGM_Decode_Chain(nodePot,edgePot,edgeStruct)
+
+[nodeBel,edgeBel,logZ] = UGM_Infer_Chain(nodePot,edgePot,edgeStruct);
+nodeBel
+
+samples = UGM_Sample_Chain(nodePot,edgePot,edgeStruct);
+figure;
+imagesc(samples')
+title('Samples from MRF model');
+fprintf('(paused)\n');
+pause
+
+%% Do conditional decoding/inference/sampling in learned model
+
+clamped = zeros(nNodes,1);
+clamped(1:2) = 2;
+
+condDecode = UGM_Decode_Conditional(nodePot,edgePot,edgeStruct,clamped,@UGM_Decode_Chain)
+condNodeBel = UGM_Infer_Conditional(nodePot,edgePot,edgeStruct,clamped,@UGM_Infer_Chain)
+condSamples = UGM_Sample_Conditional(nodePot,edgePot,edgeStruct,clamped,@UGM_Sample_Chain);
+
+figure;
+imagesc(condSamples')
+title('Conditional samples from MRF model');
+fprintf('(paused)\n');
+pause
+
+
+
+    
 
 
 
