@@ -5,6 +5,7 @@ function AMat = getVerticalAssociations(coefmat,rowSize)
 % the image.
 % rowSize - number of patches in one row of the image
 
+% AMat stores the associations in element (topword,bottomword)
 
 AMat = ones(size(coefmat,1));     % initializing association matrix
     
