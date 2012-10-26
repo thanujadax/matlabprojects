@@ -14,7 +14,7 @@
 % Output:
 % Iout - sampled image
 
-function IOut = sampleFromMRF_simple(imgDim,bb,Hmat,Vmat,Dictionary) 
+function [IOut,coefMat] = sampleFromMRF_simple(imgDim,bb,Hmat,Vmat,Dictionary) 
 
                                         % Initialize random field
 rows = imgDim(1) - bb + 1;              % number of overlapping image patches per column
@@ -78,6 +78,6 @@ end
 %% Combine the overlapping patches to get the sampled whole image
 IOut = getImageFromCoeff(Dictionary,coefMat,imgDim,bb);
 figure(3)
-imshow(IOut);
+imagesc(IOut);
 colormap('gray');
 

@@ -16,7 +16,7 @@ if (length(who('X'))==0)
     Y = 8;
 end
 if (length(who('sortVarFlag'))==0)
-    sortVarFlag = 1;
+    sortVarFlag = 0;
 end
 
 numElems = size(D,2);
