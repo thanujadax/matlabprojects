@@ -23,12 +23,16 @@ for i = 1:totPatches
     % pick a label for this patch according to the conditional prob distr 
     % based on the neighborhood
     wordIndForCurrPatch = getWordForThisPatch(patchID,Dictionary,verticalAMat,horizontalAMat,...
-                    currentLabels,inputData,rowSize,colSize,sigma)
+                    currentLabels,inputData,rowSize,colSize,sigma);
+    coefMat(wordIndForCurrPatch,currentPatchInd) = 1;
     
     % mark this patch as sampled. i.e. remove it from the list to be
     % sampled
     % b = a(a~=3);
     listOfNotSampledPatchIndices = ...
         listOfNotSampledPatchIndices(listOfNotSampledPatchIndices~=currentPatchInd);
+    remainingPatches = length(listOfNotSampledPatchIndices);
+    display('Remaining Patches: ');
+    display(remainingPatches);
 
 end
