@@ -15,13 +15,13 @@ function z = getZ(Dictionary,inputData,verticalAMat,horizontalAMat,currentLabels
 % Output:
 % z - normalization factor
 
-if(inputData~=0)
-    f1 = zeros(1,size(Dictionary,1));
+if(inputData(1,1)==0)
+    f1 = zeros(size(currentLabels,2),1);
 else
     f1 = getUnaryPotentialVec(inputData,Dictionary,sigma);    % column vector
 end
 
-f2 = getPairwisePotentialVec(currentLabels,verticalAMat,horizontalAMat,rowSize,colSize); % column vector
+f2 = getPairwisePotentialVec(currentLabels,verticalAMat,horizontalAMat,rowSize); % column vector
 
 expPotentials = exp(-f1-f2);
 

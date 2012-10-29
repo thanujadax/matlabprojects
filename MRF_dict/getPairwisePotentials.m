@@ -1,7 +1,8 @@
-function f2 = getPairwisePotentials(patchID,currentLabels,verticalAMat,horizontalAMat,rowSize)
+function f2 = getPairwisePotentials(patchID,currentLabels,dictionarySize,...
+                    verticalAMat,horizontalAMat,rowSize)
 % for a single patch considering its neighborhoot
-pairwisePotMat = zeros(size(Dictionary,2),4);
-for i = 1:size(Dictionary,2)
+pairwisePotMat = zeros(dictionarySize,4);
+for i = 1:dictionarySize
 
     if(patchID - rowSize > 0)
         pairwisePotMat(i,1) = -1.*log(verticalAMat(i,currentLabels(patchID-rowSize)));

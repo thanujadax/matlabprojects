@@ -14,18 +14,18 @@ function f2 = getPairwisePotentialVec(currentLabels,verticalAMat,horizontalAMat,
 % However, in this code, the neighborhood elements are directly accessed
 % from currentLabels matrix.
 
-pairwisePotMat = zeros(size(currentLabels,1),4);
+pairwisePotMat = zeros(size(currentLabels,2),4);
 
 for i = 1:size(currentLabels,2)
     % condCostGivenTop
     if(i - rowSize > 0)
-        pairwisePotMat(i,1) = -1.*log(verticalAMat(currentLabels(i),currentLables(i-rowSize)));
+        pairwisePotMat(i,1) = -1.*log(verticalAMat(currentLabels(i),currentLabels(i-rowSize)));
     else
         pairwisePotMat(i,1) = 0;    % nothing on top
     end
     % condCostGivenBottom
     if(i+rowSize <= size(currentLabels,2))
-        pairwisePotMat(i,2) = -1.*log(verticalAMat(currentLables(i+rowSize),currentLabels(i)));
+        pairwisePotMat(i,2) = -1.*log(verticalAMat(currentLabels(i+rowSize),currentLabels(i)));
     else
         pairwisePotMat(i,2) = 0;    % nothing to the bottom
     end

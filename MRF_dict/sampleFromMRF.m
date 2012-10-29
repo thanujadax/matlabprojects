@@ -1,8 +1,9 @@
-function coefMat = sampleFromMRF(initLabels,Dictionary,rowSize,...
+function coefMat = sampleFromMRF(currentLabels,inputData,Dictionary,rowSize,...
                     colSize,verticalAMat,horizontalAMat,sigma)
 
 % Inputs:
 % initLabels - initial labels for each patch. num cols = num patches.
+% inputData - im2col matrix or vector of zeros if no input is given.
 % Dictionary
 % rowSize
 % colSize
@@ -10,7 +11,7 @@ function coefMat = sampleFromMRF(initLabels,Dictionary,rowSize,...
 % horizontalAMat
 
 %% Init
-totPatches = size(initLabels,2);
+totPatches = size(currentLabels,2);
 coefMat = sparse(size(Dictionary,2),totPatches);
 listOfNotSampledPatchIndices = 1:totPatches;
 
@@ -22,8 +23,8 @@ for i = 1:totPatches
 
     % pick a label for this patch according to the conditional prob distr 
     % based on the neighborhood
-    wordIndForCurrPatch = getWordForThisPatch(patchID,Dictionary,verticalAMat,horizontalAMat,...
-                    currentLabels,inputData,rowSize,colSize,sigma);
+    wordIndForCurrPatch = getWordForThisPatch(currentPatchInd,Dictionary,verticalAMat,horizontalAMat,...
+                    currentLabels,inputData(:,currentPatchInd),rowSize,colSize,sigma);
     coefMat(wordIndForCurrPatch,currentPatchInd) = 1;
     
     % mark this patch as sampled. i.e. remove it from the list to be
