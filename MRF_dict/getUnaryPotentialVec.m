@@ -2,7 +2,7 @@ function f1 = getUnaryPotentialVec(data,Dictionary)
 
 numWords = size(Dictionary,2);
 
-f1 = zeros(numWords,1);         % initialize column vector
+% f1 = zeros(numWords,1);         % initialize column vector
 
 dataAsColVector = repmat(data,numWords,1);
 

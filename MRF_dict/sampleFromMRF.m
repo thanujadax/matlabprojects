@@ -1,47 +1,32 @@
-%% function IOut = sampleFromMRF(imgDim,bb,Hmat,Vmat,prior,Dictionary)
-
-% generates a sample image based on the learned MRF
+function [IOut,coefMat] = sampleFromMRF(initLabels,Dictionary,rowSize,colSize,verticalAMat,horizontalAMat)
 
 % Inputs:
-% imgDim - vector containing the size of the output image to be sampled [rows columns]
-% bb - block size
-% Hmat - horizontal association matrix learned (row,column -> left to right)
-% Vmat - vertical association matrix learned (row,column -> top to bottom)
-% prior - prior for label (word) usage
+% initLabels - initial labels for each patch. num cols = num patches.
 % Dictionary
+% rowSize
+% colSize
+% verticalAMat
+% horizontalAMat
 
-% Output:
-% Iout - sampled image
-
-function IOut = sampleFromMRF(imgDim,bb,Hmat,Vmat,prior,Dictionary) 
-
-% Initialize random field
-rows = imgDim(1) - bb + 1;              % number of overlapping image patches per column
-cols = imgDim(2) - bb + 1;              % number of overlapping image patches per row
-
-totPatches = rows*cols;                 % total number of patches to be generated
-
+%% Init
+totPatches = size(initLabels,2);
 coefMat = sparse(size(Dictionary,2),totPatches);
+listOfNotSampledPatchIndices = 1:totPatches;
 
-for i = 0:totPatches
-    % loop until all the patches are processed
- 
-    patchInd = ceil(rand(1) * totPatches);
-    if(length(find(coefMat(:,patchInd)))==0)
-        % i.e. this patch has not been processed before
-        % pick a word for this
-        
-    else
-        % i.e. this pach has already been assigned
-        % pick another patch - one that has not been assigned yet
-        
-    end
+%% Sampling
+for i = 1:totPatches    
+    % pick a random patch which is not yet sampled
+    ind = ceil(rand(1)*length(listOfNotSampledPatchIndices));
+    currentPatchInd = listOfNotSampledPatchIndices(ind);
+
+    % pick a label for this patch according to the conditional prob distr 
+    % based on the neighborhood
+    wordIndForCurrPatch = getWordForThisPatch()
     
+    % mark this patch as sampled. i.e. remove it from the list to be
+    % sampled
+    % b = a(a~=3);
+    listOfNotSampledPatchIndices = ...
+        listOfNotSampledPatchIndices(listOfNotSampledPatchIndices~=currentPatchInd);
+
 end
-
-
-
-
-
-
-
