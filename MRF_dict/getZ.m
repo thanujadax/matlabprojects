@@ -1,4 +1,5 @@
-function z = getZ(Dictionary,inputData,verticalAMat,horizontalAMat,currentLabels,rowSize,colSize)
+function z = getZ(Dictionary,inputData,verticalAMat,horizontalAMat,currentLabels,...
+    rowSize,colSize,sigma)
 % calculate the normalization factor z for a given 4-neighborhood N(i) and
 % for a given input patch
 
@@ -17,7 +18,7 @@ function z = getZ(Dictionary,inputData,verticalAMat,horizontalAMat,currentLabels
 if(inputData~=0)
     f1 = zeros(1,size(Dictionary,1));
 else
-    f1 = getUnaryPotentialVec(inputData,Dictionary);    % column vector
+    f1 = getUnaryPotentialVec(inputData,Dictionary,sigma);    % column vector
 end
 
 f2 = getPairwisePotentialVec(currentLabels,verticalAMat,horizontalAMat,rowSize,colSize); % column vector

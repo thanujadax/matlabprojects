@@ -1,4 +1,5 @@
-function [IOut,coefMat] = sampleFromMRF(initLabels,Dictionary,rowSize,colSize,verticalAMat,horizontalAMat)
+function coefMat = sampleFromMRF(initLabels,Dictionary,rowSize,...
+                    colSize,verticalAMat,horizontalAMat,sigma)
 
 % Inputs:
 % initLabels - initial labels for each patch. num cols = num patches.
@@ -21,7 +22,8 @@ for i = 1:totPatches
 
     % pick a label for this patch according to the conditional prob distr 
     % based on the neighborhood
-    wordIndForCurrPatch = getWordForThisPatch()
+    wordIndForCurrPatch = getWordForThisPatch(patchID,Dictionary,verticalAMat,horizontalAMat,...
+                    currentLabels,inputData,rowSize,colSize,sigma)
     
     % mark this patch as sampled. i.e. remove it from the list to be
     % sampled
