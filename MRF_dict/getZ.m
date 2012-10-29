@@ -1,4 +1,4 @@
-function z = getZ(Dictionary,data,verticalAMat,horizontalAmat,N)
+function z = getZ(Dictionary,data,verticalAMat,horizontalAmat,currentLabels,rowSize,colSize)
 % calculate the normalization factor z for a given 4-neighborhood N(i) and
 % for a given input patch
 
@@ -7,13 +7,14 @@ function z = getZ(Dictionary,data,verticalAMat,horizontalAmat,N)
 % data - the input patch for the current position
 % verticalAMat - vertical associations
 % horizontalAMat - horizontal associations
-% N - vector containing the 4 neighborhood elements
+% rowSize - number of patches per row in the image
+% colSize - number of patches per column in the image
 
 % Output:
 % z - normalization factor
 
 f1 = getUnaryPotentialVec(data,Dictionary);    % column vector
-f2 = getPairwisePotentialVec(Dictionary,N,verticalAMat,horizontalAMat); % column vector
+f2 = getPairwisePotentialVec(Dictionary,currentLabels,verticalAMat,horizontalAMat,rowSize,colSize); % column vector
 
 expPotentials = exp(-f1-f2);
 
