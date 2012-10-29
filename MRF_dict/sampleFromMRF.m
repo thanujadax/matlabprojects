@@ -1,4 +1,4 @@
-function coefMat = sampleFromMRF(currentLabels,inputData,Dictionary,rowSize,...
+function [coefMat,labelVector] = sampleFromMRF(currentLabels,inputData,Dictionary,rowSize,...
                     colSize,verticalAMat,horizontalAMat,sigma)
 
 % Inputs:
@@ -14,6 +14,7 @@ function coefMat = sampleFromMRF(currentLabels,inputData,Dictionary,rowSize,...
 totPatches = size(currentLabels,2);
 coefMat = sparse(size(Dictionary,2),totPatches);
 listOfNotSampledPatchIndices = 1:totPatches;
+labelVector = zeros(1,size(currentLabels,2));
 
 %% Sampling
 for i = 1:totPatches    
@@ -26,6 +27,7 @@ for i = 1:totPatches
     wordIndForCurrPatch = getWordForThisPatch(currentPatchInd,Dictionary,verticalAMat,horizontalAMat,...
                     currentLabels,inputData(:,currentPatchInd),rowSize,colSize,sigma);
     coefMat(wordIndForCurrPatch,currentPatchInd) = 1;
+    labelVector(1,currentPatchInd) = wordIndForCurrPatch; 
     
     % mark this patch as sampled. i.e. remove it from the list to be
     % sampled

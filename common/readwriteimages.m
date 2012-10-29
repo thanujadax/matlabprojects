@@ -5,8 +5,8 @@ fmt = 'png';
 A = imread(filename, fmt);
 C = rgb2gray(A);
 % write to another file
-writefile = '/home/thanuja/matlabprojects/data/mitoData/labels/stem1_memlb_256_2';
-B = C(1:256,257:512,1);
+writefile = '/home/thanuja/matlabprojects/data/mitoData/stem1_48.png';
+B = C(200:248,100:148,1);
 imwrite(B,writefile,'png')
 
 
