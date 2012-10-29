@@ -66,6 +66,9 @@ for k=0:1:Pn-1,
     DCT(:,k+1)=V/norm(V);
 end;
 DCT=kron(DCT,DCT);
+% rescale DCT values so that all the elements range between 0 and 255
+DCT = (DCT - min(min(DCT)));
+DCT = (DCT./(max(max(DCT)))).*255;
 
 param.initialDictionary = DCT(:,1:param.K );
 param.InitializationMethod =  'GivenMatrix';
