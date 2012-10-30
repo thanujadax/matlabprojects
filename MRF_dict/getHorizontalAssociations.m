@@ -3,6 +3,7 @@ function AMat = getHorizontalAssociations(coefmat,rowSize)
 % coefmat - sparse matrix of coefficients. Rows correspond to the
 % dictionary words and the columns correspond to the overlapping patches of
 % the image.
+% rowSize - number of image patches per row
 
 AMat = ones(size(coefmat,1));       % initializing association matrix
 
