@@ -1,8 +1,10 @@
 function wordInd = getWordForThisPatch(patchID,Dictionary,verticalAMat,horizontalAMat,...
-    currentLabels,inputData,rowSize,colSize,sigma)
+    currentLabels,inputData,rowSize,sigma,lambda)
 % patchID - index number of the current patch according to im2col
 % inputData - row vector containing the current patch. or 0 if no input
 % data is provided
+% lambda - weighting for the unary potential
+
 wordInd = 0;    % initialize
 %z = getZ(Dictionary,inputData,verticalAMat,horizontalAMat,currentLabels,rowSize,colSize);
 
@@ -18,7 +20,7 @@ else
     % with unary potentials
     f1 = getUnaryPotentialVec(inputData,Dictionary,sigma);
     %condProbs = exp(-f1-f2) ./ z;
-    condProbs = exp(-f1-f2);
+    condProbs = exp(-f1.*lambda - f2);
 end
 z = sum(condProbs);
 condProbs = condProbs./z;

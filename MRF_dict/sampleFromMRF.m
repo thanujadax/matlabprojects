@@ -1,5 +1,5 @@
 function [coefMat,labelVector] = sampleFromMRF(currentLabels,inputData,Dictionary,rowSize,...
-                    colSize,verticalAMat,horizontalAMat,sigma)
+                    verticalAMat,horizontalAMat,sigma,lambda)
 
 % Inputs:
 % initLabels - initial labels for each patch. num cols = num patches.
@@ -9,6 +9,8 @@ function [coefMat,labelVector] = sampleFromMRF(currentLabels,inputData,Dictionar
 % colSize
 % verticalAMat
 % horizontalAMat
+% sigma - normalization factor for pixel error. (not used anymore)
+% lambda - weighting parameter for unary potential
 
 %% Init
 totPatches = size(currentLabels,2);
@@ -25,7 +27,7 @@ for i = 1:totPatches
     % pick a label for this patch according to the conditional prob distr 
     % based on the neighborhood
     wordIndForCurrPatch = getWordForThisPatch(currentPatchInd,Dictionary,verticalAMat,horizontalAMat,...
-                    currentLabels,inputData(:,currentPatchInd),rowSize,colSize,sigma);
+                    currentLabels,inputData(:,currentPatchInd),rowSize,sigma,lambda);
     coefMat(wordIndForCurrPatch,currentPatchInd) = 1;
     labelVector(1,currentPatchInd) = wordIndForCurrPatch; 
     

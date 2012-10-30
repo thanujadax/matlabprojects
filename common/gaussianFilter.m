@@ -7,4 +7,4 @@ G = fspecial('gaussian',[maskSize maskSize],sigma);
 %# Filter it
 imageOut = imfilter(imageIn,G,'same');
 %# Display
-imshow(imageOut)
+% imagesc(imageOut)
