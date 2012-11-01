@@ -1,5 +1,5 @@
-function [coefMat,labelVector] = sampleFromMRF(currentLabels,inputData,Dictionary,rowSize,...
-                    verticalAMat,horizontalAMat,sigma,lambda)
+function [coefMat,patchLabels] = sampleFromMRF(currentLabels,inputData,Dictionary,rowSize,...
+                    colSize,verticalAMat,horizontalAMat,sigma,lambda)
 
 % Inputs:
 % initLabels - initial labels for each patch. num cols = num patches.
@@ -41,3 +41,6 @@ for i = 1:totPatches
     display(remainingPatches);
 
 end
+
+%% post processing
+patchLabels = reshape(labelVector,rowSize,colSize);

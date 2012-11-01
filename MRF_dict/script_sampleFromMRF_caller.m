@@ -39,11 +39,11 @@ load('HorizontalAssociations_25w.mat');
 %%
                 
 [coefMat,labelVector] = sampleFromMRF(initLabels,inputData,Dictionary,rowSize,...
-                    verticalA,horizontalA,sigma,lambda);
+                    colSize,verticalA,horizontalA,sigma,lambda);
                 
 for i = 1:numIterations-1
     [coefMat,labelVector] = sampleFromMRF(labelVector,inputData,Dictionary,rowSize,...
-                    verticalA,horizontalA,sigma,lambda);
+                    colSize,verticalA,horizontalA,sigma,lambda);
 end
 
 %% Combine the overlapping patches to get the sampled whole image

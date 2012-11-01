@@ -5,8 +5,8 @@ function f2 = getPairwisePotentials(patchID,currentLabels,dictionarySize,...
 verticalAMat_colNormalized = normalizeAMat(verticalAMat,1);
 verticalAMat_rowNormalized = normalizeAMat(verticalAMat,0);
 
-horizontalAMat_colNormalized = normalizedAMat(horizontalAMat,1);
-horizontalAMat_rowNormalized = normalizedAMat(horizontalAMat,0);
+horizontalAMat_colNormalized = normalizeAMat(horizontalAMat,1);
+horizontalAMat_rowNormalized = normalizeAMat(horizontalAMat,0);
 
 % for a single patch considering its neighborhoot
 pairwisePotMat = zeros(dictionarySize,4);
