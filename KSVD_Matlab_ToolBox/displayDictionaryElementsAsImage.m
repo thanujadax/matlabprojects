@@ -36,7 +36,7 @@ end
 sizeForEachImage = sqrt(size(D,1))+borderSize;
 I = zeros(sizeForEachImage*numRows+borderSize,sizeForEachImage*numCols+borderSize,3);
 %%% fill all this image in blue
-I(:,:,1) = 0;%min(min(D));
+I(:,:,1) = 0; %min(min(D));
 I(:,:,2) = 0; %min(min(D));
 I(:,:,3) = 1; %max(max(D));
 
