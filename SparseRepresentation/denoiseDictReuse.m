@@ -55,7 +55,10 @@ if (max(IMin(:))<2)
     IMin = IMin*255;
 end
 
-imageIn = strcat([pathForImages,imageName]);
+sigmaGauss = 5.0;
+gaussMaskSize = 5;
+IMin = gaussianFilter(IMin,sigmaGauss,gaussMaskSize);
+% imageIn = strcat([pathForImages,imageName]);
 C = 1.15;  % error factor: to control the weight on sigma for denoising the noisy image to learn the dictionary
 slidingDis = 1; % the gap between two blocks considered in the sliding window
 numIterOfKsvd = 5; % for training the dictionary - the number of KSVD iterations processed

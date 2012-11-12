@@ -20,8 +20,6 @@
 %
 % Thanuja 
 
-% TEST: temporarily, use just one dictionary to ensure the functionality of the
-% code
 
 function [IOut, allcoeffs,vecOfMeans] = SparseCodeImageNN(Image,Dictionary,bb,...
     maxBlocksToConsider,sigma,C,slidingDis,waitBarOn,reduceDC,numWords,numIter)
