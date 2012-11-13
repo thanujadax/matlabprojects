@@ -34,6 +34,11 @@ i = i + 1;
 tmpWordBlock = ones(bb,bb) .* G4;
 Dictionary(:,i) = reshape(tmpWordBlock,wordSize,1);
 
+% gray word
+i = i + 1;
+tmpWordBlock = ones(bb,bb) .* G3;
+Dictionary(:,i) = reshape(tmpWordBlock,wordSize,1);
+
 %% half blocks - horizontal and vertical
 i = i + 1; % left vertical half black
 tmpWordBlock = ones(bb,bb).*G1;
