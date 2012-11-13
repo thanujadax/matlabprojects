@@ -30,61 +30,61 @@ Dictionary(:,i) = reshape(tmpWordBlock,wordSize,1); % insert word to Dictionary 
 
 % word 2
 % plane white
-i = 2;
+i = i + 1;
 tmpWordBlock = ones(bb,bb) .* G4;
 Dictionary(:,i) = reshape(tmpWordBlock,wordSize,1);
 
 %% half blocks - horizontal and vertical
-i = 3; % left vertical half black
+i = i + 1; % left vertical half black
 tmpWordBlock = ones(bb,bb).*G1;
 halfHorizontal = bb/2;
 tmpWordBlock(:,halfHorizontal+1:bb) = ones(bb,halfHorizontal).*G4;
 Dictionary(:,i) = reshape(tmpWordBlock,wordSize,1);
 
-i = 4; % right vertical half black
+i = i + 1; % right vertical half black
 tmpWordBlock = ones(bb,bb).*G1;
 halfHorizontal = bb/2;
 tmpWordBlock(:,1:halfHorizontal) = ones(bb,halfHorizontal).*G4;
 Dictionary(:,i) = reshape(tmpWordBlock,wordSize,1);
 
-i = 5; % upper horizontal half black
+i = i + 1; % upper horizontal half black
 tmpWordBlock = rot90(tmpWordBlock);
 Dictionary(:,i) = reshape(tmpWordBlock,wordSize,1);
 
-i = 6; % lower horizontal half black
+i = i + 1; % lower horizontal half black
 tmpWordBlock = rot90(tmpWordBlock,2);
 Dictionary(:,i) = reshape(tmpWordBlock,wordSize,1);
 
 %% half blocks - diagonals
-i = 7; % upper left triangle black
+i = i + 1; % upper left triangle black
 tmpWordBlock = fliplr(triu(ones(bb,bb),0)).*G1 + fliplr(tril(ones(bb,bb),-1)).*G4;
 Dictionary(:,i) = reshape(tmpWordBlock,wordSize,1);
 
-i = 8; % lower right triangle black
+i = i + 1; % lower right triangle black
 tmpWordBlock = fliplr(triu(ones(bb,bb),0)).*G4 + fliplr(tril(ones(bb,bb),-1)).*G1;
 Dictionary(:,i) = reshape(tmpWordBlock,wordSize,1);
 
-i = 9; % lower left triangle black
+i = i + 1; % lower left triangle black
 tmpWordBlock = triu(ones(bb,bb),0).*G4 + tril(ones(bb,bb),-1).*G1;
 Dictionary(:,i) = reshape(tmpWordBlock,wordSize,1);
 
-i = 10; % upper right triangle black
+i = i + 1; % upper right triangle black
 tmpWordBlock = triu(ones(bb,bb),0).*G1 + tril(ones(bb,bb),-1).*G4;
 Dictionary(:,i) = reshape(tmpWordBlock,wordSize,1);
 
 %% Line segments
-i = 11; % horizontal black line segment
+i = i + 1; % horizontal black line segment
 tmpWordBlock = ones(bb,bb).*G4;
 horizontalDarkStripe = ones(lineWidth,bb).*G1;
 startRow = bb/2 - lineWidth/2 +1;
 tmpWordBlock(startRow:(startRow+lineWidth-1),:) = horizontalDarkStripe;
 Dictionary(:,i) = reshape(tmpWordBlock,wordSize,1);
 
-i = 12; % vertical black line segment
+i = i + 1; % vertical black line segment
 tmpWordBlock = rot90(tmpWordBlock);
 Dictionary(:,i) = reshape(tmpWordBlock,wordSize,1);
 
-i = 13; % digoanal black strip starting from bottom left
+i = i + 1; % digoanal black strip starting from bottom left
 Diagonal_0 = ones(1,bb).*G1;
 Diagonal_1 = ones(1,bb-1).*G1;
 Diagonal_2 = ones(1,bb-2).*G2;
@@ -104,12 +104,12 @@ tmpWordBlock = tmpWordBlock - diag(diag(tmpWordBlock,0),0)...
 Dictionary(:,i) = reshape(tmpWordBlock,wordSize,1);
 diagonalBlock1 = tmpWordBlock;
 
-i = 14; % diagonal black strip starting from top left
+i = i + 1; % diagonal black strip starting from top left
 tmpWordBlock = fliplr(tmpWordBlock);
 Dictionary(:,i) = reshape(tmpWordBlock,wordSize,1);
 
 %% Y shapes
-i = 15; % Y downwards
+i = i + 1; % Y downwards
 tmpWordBlock = zeros(bb,bb).*G4;
 center = bb/2;
 Segment1 = ones(center,lineWidth).*G1;
@@ -141,17 +141,18 @@ zeroInd = find(tmpWordBlock==0);
 tmpWordBlock(zeroInd) = G4;
 Dictionary(:,i) = reshape(tmpWordBlock,wordSize,1);
 
-i = 16; % Y pointing to the right
+i = i + 1; % Y pointing to the right
 tmpWordBlock = rot90(tmpWordBlock);
 Dictionary(:,i) = reshape(tmpWordBlock,wordSize,1);
 
-i = 17; % Y normal way
+i = i + 1; % Y normal way
 tmpWordBlock = rot90(tmpWordBlock);
 Dictionary(:,i) = reshape(tmpWordBlock,wordSize,1);
 
-i = 18; % Y pointing to the left
+i = i + 1; % Y pointing to the left
 tmpWordBlock = rot90(tmpWordBlock);
 Dictionary(:,i) = reshape(tmpWordBlock,wordSize,1);
+
 
 %% Return value - normalized dictionary
 Dictionary = Dictionary./G5;
