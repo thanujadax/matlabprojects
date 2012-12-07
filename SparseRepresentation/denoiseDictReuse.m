@@ -6,7 +6,7 @@
 
 %% Inputs
 % Loads dictionary to variable Dictionary (matrix)
-load('/home/thanuja/matlabprojects/SparseRepresentation/Dictionary_wellTrained_25w_scaled.mat');
+load('/home/thanuja/matlabprojects/SparseRepresentation/Dictionary_synthetic1.mat');
 %Dictionary = Dictionary2;  % copy the dictionary from 'output' struct loaded
 %clear Dictionary2;           % output from KSVD is no more required
 %% Parameters

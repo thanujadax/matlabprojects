@@ -21,6 +21,6 @@ for i = 1:numBlksPerCol
     end
 end
 
-figure(11);imagesc(imgBlocksAsImg);colormap('gray');
+figure();imagesc(imgBlocksAsImg);colormap('gray');
 
 

@@ -62,8 +62,8 @@ for jj = 1:stepWidth:size(blocks,2)
     display(jumpSize);
     
     if(numWords==1)
-        % Coefs = least_squares_match(blocks(:,jj:jumpSize), Dictionary);
-        Coefs = XwordPick(blocks(:,jj:jumpSize), Dictionary,bb,1);
+        Coefs = least_squares_match(blocks(:,jj:jumpSize), Dictionary);
+        % Coefs = XwordPick(blocks(:,jj:jumpSize), Dictionary,bb,1);
         Coeff = full(Coefs);
         %Coefs = OMP(Dictionary,blocks(:,jj:jumpSize),numWords);
     else
