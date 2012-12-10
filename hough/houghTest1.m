@@ -2,17 +2,36 @@
 
 %% parameters
 imagePath = '/home/thanuja/matlabprojects/data/mitoData/stem1_48.png';
+% imagePath = '/home/thanuja/matlabprojects/data/mitoData/stem1_256by256.png';
 houghSupNHood = [5 5];
-rhoResolution = 0.5;
+rhoResolution = 1;
 thetaRange = -90:0.5:89.5;
-houghThresh = 0.5;          % fraction of max(H)
-maxLines = 100;
-fillGap = 3;                % line segments with a gap less than this will be merged
-minLength = 2;              % lines with length below this will be discarded
+houghThresh = 0.9;          % fraction of max(H)
+maxLines = 500;
+fillGap = 2;                % line segments with a gap less than this will be merged
+minLength = 20;              % lines with length below this will be discarded
+
+gaussianFiltering = 0;      % 1 if gaussian filtering should be performed on the input image
+sigma = 1;
+maskSize = 5;
+
+grayThresholding = 1;       % 1 if the inverted image should be thresholded
+grayThreshold = 0.5;
+
+edgeDetection = 0;          % 1 if edge detection should be performed
+
+gaussSmoothH = 0;       % 1 if H should be smoothed by Gaussian
+sigmaH = 2;
+maskSizeH = 5;
 % read image
 
 %% input 
-img = double(imread(imagePath))/255;
+imgIn = double(imread(imagePath))/255;
+if(size(size(imgIn),2)>2)
+    img = imgIn(:,:,1);
+else
+    img = imgIn;
+end
 figure(1);
 imagesc(img);
 colormap('gray');
@@ -26,23 +45,57 @@ figure(2);
 imagesc(imgInv);
 title('inverted input')
 colormap('gray');
+
+% thresholding
+if(grayThresholding == 1)
+ imgInv = simpleThreshold(imgInv,grayThreshold);
+ figure(8);
+ imagesc(imgInv);
+ title('inverted input after thresholding')
+ colormap('gray');
+end
+%% gaussian smoothening
+if(gaussianFiltering==1)
+    imgInv = gaussianFilter(imgInv,sigma,maskSize);
+    figure(5);
+    imagesc(imgInv);
+    title('gaussian smoothening');
+    colormap('gray');
+end
+
 %% edge detection - canny
 % extract edges
-BW = edge(imgInv,'canny');
-
-figure(3); 
-imagesc(BW);
-title('edge detection - canny')
-colormap('gray');
+if(edgeDetection==0)
+    BW = imgInv;
+else
+    BW = edge(imgInv,'canny');
+    figure(3); 
+    imagesc(BW);
+    title('edge detection - canny')
+    colormap('gray');
+end
 
 %% Hough transform
-[H,T,R] = hough(BW,'RhoResolution',rhoResolution,'Theta',thetaRange);
+% [H,T,R] = hough(BW,'RhoResolution',rhoResolution,'Theta',thetaRange);
+[H,T,R] = hough2(BW,rhoResolution,thetaRange);
 figure(4)
 imshow(H,[],'XData',T,'YData',R,...
             'InitialMagnification','fit');
 title('Hough transform');
 xlabel('theta');
 ylabel('rho');
+
+%% gaussian smoothening H
+if(gaussSmoothH==1)
+    H = gaussianFilter(H,sigmaH,maskSizeH);
+    H = ceil(H);
+    imshow(H,[],'XData',T,'YData',R,...
+            'InitialMagnification','fit');
+    title('Hough transform after smoothening');
+    xlabel('theta');
+    ylabel('rho');
+end
+
 % get hough peaks
 P  = houghpeaks(H,maxLines,'threshold',ceil(0.4*max(H(:))),'NHoodSize',houghSupNHood);
 % P = [(row,col), ...]
@@ -56,7 +109,7 @@ plot(x,y,'s','color','green');
 
 %% inverse Hough - finding the lines 
 lines = houghlines(BW,T,R,P,'FillGap',fillGap,'MinLength',minLength);
-figure, imshow(BW), hold on
+figure(7), imagesc(BW), hold on
 max_len = 0;
 for k = 1:length(lines)
    xy = [lines(k).point1; lines(k).point2];
