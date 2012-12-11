@@ -1,4 +1,4 @@
-function [houghSpace,theta,rho,xy] = houghFixedLength(theImage,rhoResolution,theta,LENGTH)
+function [houghSpace,theta,rho] = houghFixedLength(theImage,rhoResolution,theta)
  
     %Define the hough space
     theImage = flipud(theImage);

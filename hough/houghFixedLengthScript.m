@@ -14,6 +14,9 @@ gaussianFiltering = 0;      % 1 if gaussian filtering should be performed on the
 sigma = 1;
 maskSize = 5;
 
+bb = 16;                    % patch size
+slidingDist = 8;            % sliding distance for the overlap of patches
+
 %% input preprocessing
 imgIn = double(imread(imagePath))/255;
 if(size(size(imgIn),2)>2)
@@ -53,6 +56,12 @@ if(gaussianFiltering==1)
     colormap('gray');
 end
 
-%% Hough transform
+%% Localized Hough transform
+
+% for each image block (overlapping)
+% calculate the Hough space and store it in a structure
+[localizedHoughSpaces,R,T] = getLocalHoughs(imgInv,rhoResolution,thetaRange,bb,slidingDist);
 
 %% Inverse Hough transform
+% Reconstruct the global line sketch using the local Hough spaces
+globalHoughLines = localToGlobalHoughLines(localizedHoughSpaces,R,T);
