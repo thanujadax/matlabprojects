@@ -17,6 +17,12 @@ maskSize = 5;
 bb = 16;                    % patch size
 slidingDist = 8;            % sliding distance for the overlap of patches
 
+maxLinesPerPatch
+peakThresh
+houghSupNHood
+fillGap
+minLength
+
 %% input preprocessing
 imgIn = double(imread(imagePath))/255;
 if(size(size(imgIn),2)>2)
@@ -60,8 +66,11 @@ end
 
 % for each image block (overlapping)
 % calculate the Hough space and store it in a structure
-[localizedHoughSpaces,R,T] = getLocalHoughs(imgInv,rhoResolution,thetaRange,bb,slidingDist);
+[localHoughSpaces,patchLocations,R,T] = getLocalHoughs(imgInv,rhoResolution,thetaRange,bb,slidingDist);
 
 %% Inverse Hough transform
 % Reconstruct the global line sketch using the local Hough spaces
-globalHoughLines = localToGlobalHoughLines(localizedHoughSpaces,R,T);
+patchLines = localHoughLines(localHoughSpaces,R,T,imgInv,bb,maxLinesPerPatch,...
+            peakThresh,houghSupNHood,fillGap,minLength);
+
+
