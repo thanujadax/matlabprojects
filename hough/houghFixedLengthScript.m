@@ -75,9 +75,9 @@ patchLines = localHoughLines(localHoughSpaces,R,T,imgInv,bb,maxLinesPerPatch,...
 % patchLines is a cell array
         
 %% Reconstruct local patches from the patch lines
-localPatches = reconstructLocalPatches();
+localPatches = reconstructLocalPatches(patchLines,bb);
 
 %% Reconstruct the image
-imOut = reconstructImageFromPatches()
+%imOut = reconstructImageFromPatches();
 
 
