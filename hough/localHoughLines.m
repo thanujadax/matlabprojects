@@ -1,5 +1,5 @@
 function patchLines = localHoughLines(localHoughSpaces,R,T,imgIn,bb,maxLinesPerPatch,...
-            peakThresh,houghSupNHood,fillGap,minLength)
+            peakThresh,houghSupNHood,fillGap,minLength,maxHoughPeak)
 % inputs:
 % localHoughSpaces -
 % R - rho values
@@ -12,31 +12,51 @@ function patchLines = localHoughLines(localHoughSpaces,R,T,imgIn,bb,maxLinesPerP
 % fillGap - if there's a gap less than this between 2 line segments, merge
 % them
 % minLength - minimum line length to consider
+% maxHoughPeak
         
         
 % output:
-% patchLines - a cell array containing the lines of each
-% patch. Dimenstions : [numRowPatches numColPatches]
-%   patchLines.start = [r1 c1]
-%   patchLines.ends = [r2 c2]
+% patchLines - a cell array containing the lines of each patch
+%   
 
 % get the size of localHoughSpaces cell array
 [rows cols] = size(localHoughSpaces);
+[imgRows imgCols] = size(imgIn);
 
-% initialize the cell array patchLines
+% initialize the struct array patchLines
 patchLines = cell(rows,cols);
+ %lineStruct = struct('point1',[],'point2',[],'theta',nan,'rho',nan);
+ %patchLines(rows,cols) = lineStruct;
+        
 
 for i = 1:rows
+    startRow = (i-1)*bb +1;
+    if(startRow==imgRows)
+        break;
+    end
+    stopRow = startRow + bb -1;
+    if(stopRow>imgRows)
+        stopRow = imgRows;
+    end
     for j = 1:cols
         % for the H of the (i,j)th patch 
-        P  = houghpeaks(localHoughSpaces{i,j},maxLinesPerPatch,'threshold',ceil(peakThresh*max(H(:))),...
+        P  = houghpeaks(localHoughSpaces{i,j},maxLinesPerPatch,'threshold',ceil(peakThresh*maxHoughPeak),...
             'NHoodSize',houghSupNHood);
-        startRow = (i-1)*bb +1;
-        startCol = (j-1)*bb +1;
-        stopRow = startRow + bb -1;
+        
+        startCol = (j-1)*bb +1;       
         stopCol = startCol + bb -1;
-        patchLines{i,j} = houghlines(imgIn(startRow:stopRow, startCol:stopCol)...
-            ,T,R,P,'FillGap',fillGap,'MinLength',minLength);
+        if(startCol==imgCols)
+            break
+        end
+        if(stopCol<=imgCols)
+            patchLines{i,j} = houghlines(imgIn(startRow:stopRow, startCol:stopCol)...
+                ,T,R,P,'FillGap',fillGap,'MinLength',minLength);
+        else
+            stopCol = imgCols;
+            patchLines{i,j} = houghlines(imgIn(startRow:stopRow, startCol:stopCol)...
+                ,T,R,P,'FillGap',fillGap,'MinLength',minLength);
+        end
         
     end
+
 end

@@ -1,4 +1,4 @@
-function [localHoughSpaces,patchLocations rho, theta] = getLocalHoughSpaces(imgIn,rhoResolution,...
+function [localHoughSpaces,patchLocations, rho, theta,maxHoughPeak] = getLocalHoughSpaces(imgIn,rhoResolution,...
                         theta,bb,slidingDist)
                     
 % for each patch
@@ -24,6 +24,8 @@ patchLocations = cell(numColPatch,numRowPatch);
 % initialize struct
 %s = struct('H',houghSpace,'origin',[patchOriginY patchOriginX]);
 
+maxHoughPeak = 0;
+
 % TODO: parallelize by storing the starting points in a different data
 % structure
 for i=1:numColPatch
@@ -37,6 +39,10 @@ for i=1:numColPatch
             [houghSpace,theta,rho] = houghFixedLength(localPatch,rhoResolution,theta);
             
             localHoughSpaces{i,j} = houghSpace;
+            maxVal = max(max(houghSpace));
+            if(maxVal>maxHoughPeak)
+                maxHoughPeak = maxVal;
+            end
             patchLocations{i,j} = [patchOriginY patchOriginX];
         else
             localHoughSpaces{i,j} = 0;

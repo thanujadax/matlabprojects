@@ -17,11 +17,11 @@ maskSize = 5;
 bb = 16;                    % patch size
 slidingDist = 8;            % sliding distance for the overlap of patches
 
-maxLinesPerPatch
-peakThresh
-houghSupNHood
-fillGap
-minLength
+maxLinesPerPatch = 4;
+peakThresh = 0.5;           % fraction of max(H) to be used as a threshold for peaks
+houghSupNHood = [5 5];      % suppression neighborhood at each identified peak
+fillGap = 2;                % fill gaps smaller than this to combine two collinear lines    
+minLength = 6;              % minimum length of lines to be detected
 
 %% input preprocessing
 imgIn = double(imread(imagePath))/255;
@@ -66,11 +66,18 @@ end
 
 % for each image block (overlapping)
 % calculate the Hough space and store it in a structure
-[localHoughSpaces,patchLocations,R,T] = getLocalHoughs(imgInv,rhoResolution,thetaRange,bb,slidingDist);
+[localHoughSpaces,patchLocations,R,T,maxHoughPeak] = getLocalHoughSpaces(imgInv,rhoResolution,thetaRange,bb,slidingDist);
 
 %% Inverse Hough transform
 % Reconstruct the global line sketch using the local Hough spaces
 patchLines = localHoughLines(localHoughSpaces,R,T,imgInv,bb,maxLinesPerPatch,...
-            peakThresh,houghSupNHood,fillGap,minLength);
+            peakThresh,houghSupNHood,fillGap,minLength,maxHoughPeak);
+% patchLines is a cell array
+        
+%% Reconstruct local patches from the patch lines
+localPatches = reconstructLocalPatches();
+
+%% Reconstruct the image
+imOut = reconstructImageFromPatches()
 
 
