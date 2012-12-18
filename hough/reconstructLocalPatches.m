@@ -21,17 +21,17 @@ for i=1:rows
         for k = 1:length(patchLines{i,j}) % for each line in this patch
             % create patch
             % TODO: check the existence of point1 with isfield
-            if(isfield(patchLines{i,j},'point1'))
-                startPt = patchLines{i,j}.point1;
-                stopPt = patchLines{i,j}.point2;
+            if(isfield(patchLines{i,j}(k),'point1'))
+                startPt = patchLines{i,j}(k).point1;
+                stopPt = patchLines{i,j}(k).point2;
                 % x = patchLines{i,j}.point1(1):patchLines{i,j}.point2(1);
                 x = startPt(1):stepSize:stopPt(1);
                 % x = int8(x);
             else
                 break;
             end
-            theta = patchLines{i,j}.theta;
-            rho = patchLines{i,j}.rho;
+            theta = patchLines{i,j}(k).theta;
+            rho = patchLines{i,j}(k).rho;
             if(startPt(1)==stopPt(1))
                 % if it's a vertical line
                 y = startPt(2):stepSize:stopPt(2);

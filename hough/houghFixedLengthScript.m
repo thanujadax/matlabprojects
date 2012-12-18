@@ -78,6 +78,7 @@ patchLines = localHoughLines(localHoughSpaces,R,T,imgInv,bb,maxLinesPerPatch,...
 localPatches = reconstructLocalPatches(patchLines,bb);
 
 %% Reconstruct the image
-%imOut = reconstructImageFromPatches();
+patchLinesGlobal = patchLinesToGlobal(patchLines,slidingDist,bb);
+h = plotHoughLines(patchLinesGlobal,imgInv);
 
 
