@@ -19,8 +19,8 @@ numRowPatch = (imgSize(2) - bb)/slidingDist + 1; % num patches per row
 numColPatch = (imgSize(1) - bb)/slidingDist + 1; % num patches per column
 
 % initialize cell array
-localHoughSpaces = cell(numColPatch,numRowPatch);
-patchLocations = cell(numColPatch,numRowPatch);
+localHoughSpaces = cell([numColPatch numRowPatch]);
+patchLocations = cell([numColPatch numRowPatch]);
 % initialize struct
 %s = struct('H',houghSpace,'origin',[patchOriginY patchOriginX]);
 
