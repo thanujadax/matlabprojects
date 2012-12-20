@@ -31,29 +31,20 @@ for i=1:rows
                 
                 point1 = patchLines{i,j}(k).point1;
                 point1 = point1 + [xshift yshift];
-                %patchLines{i,j}(k).point1 = point1;
                 lines(m).point1 = point1;
                 
-                %point1y = patchLines{i,j}.point1(2);
-                %point1y = point1y + yshift;
-                %patchLines{i,j}.point1(2) = point1(2);
   
                 point2 = patchLines{i,j}(k).point2;
                 point2 = point2 + [xshift yshift];
-                %patchLines{i,j}(k).point2 = point2;
                 lines(m).point2 = point2;
-                
-                %point2y = patchLines{i,j}.point2(2);
-                %point2y = point2y + yshift;
-                %patchLines{i,j}.point2(2) = point2(2);                
-
+                               
                 % shift rho
                 rho = patchLines{i,j}(k).rho;
                 theta = patchLines{i,j}(k).theta;
                 xr = rho*cosd(theta) + (j-1)*(bb-slidingDist);
                 yr = rho*sind(theta) + (i-1)*(bb-slidingDist);
                 newRho = sqrt(xr^2 + yr^2);
-                %patchLines{i,j}(k).rho = newRho;
+
                 lines(m).rho = newRho;
                 lines(m).theta = theta;
                 m = m + 1;          
