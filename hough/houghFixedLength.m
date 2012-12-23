@@ -1,7 +1,7 @@
 function [houghSpace,theta,rho] = houghFixedLength(theImage,rhoResolution,theta)
  
     %Define the hough space
-    theImage = flipud(theImage);
+    %theImage = flipud(theImage);
     [width,height] = size(theImage);
  
     rhoLimit = norm([width height]);

@@ -14,14 +14,14 @@ gaussianFiltering = 0;      % 1 if gaussian filtering should be performed on the
 sigma = 1;
 maskSize = 5;
 
-bb = 16;                    % patch size
-slidingDist = 8;            % sliding distance for the overlap of patches
+bb = 24;                    % patch size
+slidingDist = 0;            % sliding distance for the overlap of patches
 
-maxLinesPerPatch = 4;
-thresholdFraction = 0.5;           % fraction of max(H) to be used as a threshold for peaks
+maxLinesPerPatch = 20;
+thresholdFraction = 0.5;    % fraction of max(H) to be used as a threshold for peaks
 houghSupNHood = [5 5];      % suppression neighborhood at each identified peak
 fillGap = 2;                % fill gaps smaller than this to combine two collinear lines    
-minLength = 6;              % minimum length of lines to be detected
+minLength = 4;              % minimum length of lines to be detected
 
 %% input preprocessing
 imgIn = double(imread(imagePath))/255;
@@ -79,7 +79,7 @@ patchLines = localHoughLines(localHoughSpaces,R,T,imgInv,bb,maxLinesPerPatch,...
 % patchLines is a cell array
         
 %% Reconstruct local patches from the patch lines
-localPatches = reconstructLocalPatches(patchLines,bb);
+%localPatches = reconstructLocalPatches(patchLines,bb);
 
 %% Reconstruct the image
 patchLinesGlobal = patchLinesToGlobal(patchLines,slidingDist,bb);

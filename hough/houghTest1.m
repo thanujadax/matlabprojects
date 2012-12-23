@@ -6,10 +6,11 @@ imagePath = '/home/thanuja/matlabprojects/data/mitoData/stem1_48.png';
 houghSupNHood = [5 5];
 rhoResolution = 1;
 thetaRange = -90:0.5:89.5;
-houghThresh = 0.9;          % fraction of max(H)
-maxLines = 500;
+
+houghThresh = 0.5;          % fraction of max(H)
+maxLines = 100;
 fillGap = 2;                % line segments with a gap less than this will be merged
-minLength = 20;              % lines with length below this will be discarded
+minLength = 6;              % lines with length below this will be discarded
 
 gaussianFiltering = 0;      % 1 if gaussian filtering should be performed on the input image
 sigma = 1;
@@ -20,13 +21,14 @@ grayThreshold = 0.5;
 
 edgeDetection = 0;          % 1 if edge detection should be performed
 
-gaussSmoothH = 0;       % 1 if H should be smoothed by Gaussian
+gaussSmoothH = 0;           % 1 if H should be smoothed by Gaussian
 sigmaH = 2;
 maskSizeH = 5;
 % read image
 
 %% input 
 imgIn = double(imread(imagePath))/255;
+%imgIn = imgIn1(1:16,1:16);
 if(size(size(imgIn),2)>2)
     img = imgIn(:,:,1);
 else
