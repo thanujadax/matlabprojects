@@ -8,7 +8,7 @@ h = figure(200);
 
 for i=1:rows
     startRow = (i-1)*(bb-slidingDist) + 1;
-    stopRow = startRow + bb;
+    stopRow = startRow + bb -1;
     for j=1:cols
         % extract lines from this houghSpace i,j
         H = cell2mat(localHoughSpaces(i,j));
@@ -18,7 +18,7 @@ for i=1:rows
        lines = houghlines(img,T,R,P,'FillGap',fillGap,'MinLength',minLength); 
        % corresponding patch in real image
        startCol = (j-1)*(bb-slidingDist) + 1;
-       stopCol = startCol + bb;
+       stopCol = startCol + bb -1;
        imgPatch = img(startRow:stopRow,startCol:stopCol);
        
        subplot(rows,cols,idx); 

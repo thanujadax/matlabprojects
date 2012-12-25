@@ -2,6 +2,7 @@
 % segments
 
 %% parameters
+displayIntermediateFigures=0;
 imagePath = '/home/thanuja/matlabprojects/data/mitoData/stem1_48.png';
 % imagePath = '/home/thanuja/matlabprojects/data/mitoData/stem1_256by256.png';
 rhoResolution = 1;
@@ -15,11 +16,11 @@ sigma = 1;
 maskSize = 5;
 
 bb = 24;                    % patch size
-slidingDist = 0;            % sliding distance for the overlap of patches
+slidingDist = 0;            % the number of overlapping pixels
 
 maxLinesPerPatch = 20;
 thresholdFraction = 0.5;    % fraction of max(H) to be used as a threshold for peaks
-houghSupNHood = [5 5];      % suppression neighborhood at each identified peak
+houghSupNHood = [2 2];      % suppression neighborhood at each identified peak
 fillGap = 2;                % fill gaps smaller than this to combine two collinear lines    
 minLength = 4;              % minimum length of lines to be detected
 
@@ -30,36 +31,42 @@ if(size(size(imgIn),2)>2)
 else
     img = imgIn;
 end
-figure(1);
-imagesc(img);
-colormap('gray');
-title('original')
+if(displayIntermediateFigures)
+    figure(1);
+    imagesc(img);
+    colormap('gray');
+    title('original')
+end
 % invert
 imgInv = invertImage(img);
 % rescale 0 - 1
 imgInv = imgInv/max(max(imgInv));
-
-figure(2);
-imagesc(imgInv);
-title('inverted input')
-colormap('gray');
-
+if(displayIntermediateFigures)
+    figure(2);
+    imagesc(imgInv);
+    title('inverted input')
+    colormap('gray');
+end
 % thresholding
 if(grayThresholding == 1)
  imgInv = simpleThreshold(imgInv,grayThreshold);
- figure(8);
- imagesc(imgInv);
- title('inverted input after thresholding')
- colormap('gray');
+ if(displayIntermediateFigures)
+     figure(8);
+     imagesc(imgInv);
+     title('inverted input after thresholding')
+     colormap('gray');
+ end
 end
 
 % gaussian smoothening
 if(gaussianFiltering==1)
     imgInv = gaussianFilter(imgInv,sigma,maskSize);
-    figure(5);
-    imagesc(imgInv);
-    title('gaussian smoothening');
-    colormap('gray');
+    if(displayIntermediateFigures)
+        figure(5);
+        imagesc(imgInv);
+        title('gaussian smoothening');
+        colormap('gray');
+    end
 end
 
 %% Localized Hough transform

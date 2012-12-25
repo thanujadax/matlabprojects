@@ -1,6 +1,7 @@
 % Hough transformation based analysis
 
 %% parameters
+displayIntermediateFigures = 0;
 imagePath = '/home/thanuja/matlabprojects/data/mitoData/stem1_48.png';
 % imagePath = '/home/thanuja/matlabprojects/data/mitoData/stem1_256by256.png';
 houghSupNHood = [5 5];
@@ -34,35 +35,41 @@ if(size(size(imgIn),2)>2)
 else
     img = imgIn;
 end
-figure(1);
-imagesc(img);
-colormap('gray');
-title('original')
+if(displayIntermediateFigures)
+    figure(1);
+    imagesc(img);
+    colormap('gray');
+    title('original')
+end
 % invert
 imgInv = invertImage(img);
 % rescale 0 - 1
 imgInv = imgInv/max(max(imgInv));
-
-figure(2);
-imagesc(imgInv);
-title('inverted input')
-colormap('gray');
-
+if(displayIntermediateFigures)
+    figure(2);
+    imagesc(imgInv);
+    title('inverted input')
+    colormap('gray');
+end
 % thresholding
 if(grayThresholding == 1)
  imgInv = simpleThreshold(imgInv,grayThreshold);
- figure(8);
- imagesc(imgInv);
- title('inverted input after thresholding')
- colormap('gray');
+ if(displayIntermediateFigures)
+    figure(8);
+    imagesc(imgInv);
+    title('inverted input after thresholding')
+    colormap('gray');
+ end
 end
 %% gaussian smoothening
 if(gaussianFiltering==1)
-    imgInv = gaussianFilter(imgInv,sigma,maskSize);
-    figure(5);
-    imagesc(imgInv);
-    title('gaussian smoothening');
-    colormap('gray');
+    if(displayIntermediateFigures)
+        imgInv = gaussianFilter(imgInv,sigma,maskSize);
+        figure(5);
+        imagesc(imgInv);
+        title('gaussian smoothening');
+        colormap('gray');
+    end
 end
 
 %% edge detection - canny
@@ -71,21 +78,25 @@ if(edgeDetection==0)
     BW = imgInv;
 else
     BW = edge(imgInv,'canny');
-    figure(3); 
-    imagesc(BW);
-    title('edge detection - canny')
-    colormap('gray');
+    if(displayIntermediateFigures)
+        figure(3); 
+        imagesc(BW);
+        title('edge detection - canny')
+        colormap('gray');
+    end
 end
 
 %% Hough transform
 % [H,T,R] = hough(BW,'RhoResolution',rhoResolution,'Theta',thetaRange);
 [H,T,R] = hough2(BW,rhoResolution,thetaRange);
-figure(4)
-imshow(H,[],'XData',T,'YData',R,...
-            'InitialMagnification','fit');
-title('Hough transform');
-xlabel('theta');
-ylabel('rho');
+if(displayIntermediateFigures)
+    figure(4)
+    imshow(H,[],'XData',T,'YData',R,...
+                'InitialMagnification','fit');
+    title('Hough transform');
+    xlabel('theta');
+    ylabel('rho');
+end
 
 %% gaussian smoothening H
 if(gaussSmoothH==1)
@@ -101,13 +112,14 @@ end
 % get hough peaks
 P  = houghpeaks(H,maxLines,'threshold',ceil(0.4*max(H(:))),'NHoodSize',houghSupNHood);
 % P = [(row,col), ...]
-
-% plot the hough space
-axis on, axis normal, hold on;
-plot(T(P(:,2)),R(P(:,1)),'s','color','white');
-% plot the maxima
-x = T(P(:,2)); y = R(P(:,1));
-plot(x,y,'s','color','green');
+if(displayIntermediateFigures)
+    % plot the hough space
+    axis on, axis normal, hold on;
+    plot(T(P(:,2)),R(P(:,1)),'s','color','white');
+    % plot the maxima
+    x = T(P(:,2)); y = R(P(:,1));
+    plot(x,y,'s','color','green');
+end
 
 %% inverse Hough - finding the lines 
 lines = houghlines(BW,T,R,P,'FillGap',fillGap,'MinLength',minLength);
