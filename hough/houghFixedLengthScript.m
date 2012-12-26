@@ -16,11 +16,11 @@ sigma = 1;
 maskSize = 5;
 
 bb = 24;                    % patch size
-slidingDist = 0;            % the number of overlapping pixels
+slidingDist = 12;            % the number of overlapping pixels
 
 maxLinesPerPatch = 20;
 thresholdFraction = 0.5;    % fraction of max(H) to be used as a threshold for peaks
-houghSupNHood = [2 2];      % suppression neighborhood at each identified peak
+houghSupNHood = [3 3];      % suppression neighborhood at each identified peak
 fillGap = 2;                % fill gaps smaller than this to combine two collinear lines    
 minLength = 4;              % minimum length of lines to be detected
 

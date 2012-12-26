@@ -10,17 +10,16 @@ for i=1:rows
     startRow = (i-1)*(bb-slidingDist) + 1;
     stopRow = startRow + bb -1;
     for j=1:cols
+        startCol = (j-1)*(bb-slidingDist) + 1;
+        stopCol = startCol + bb -1;
+        imgPatch = img(startRow:stopRow,startCol:stopCol);
         % extract lines from this houghSpace i,j
         H = cell2mat(localHoughSpaces(i,j));
         P  = houghpeaks(H,maxLocalLines,...
             'threshold',thresholdFraction*max(max(H)),...
             'NHoodSize',houghSupNHood);
-       lines = houghlines(img,T,R,P,'FillGap',fillGap,'MinLength',minLength); 
-       % corresponding patch in real image
-       startCol = (j-1)*(bb-slidingDist) + 1;
-       stopCol = startCol + bb -1;
-       imgPatch = img(startRow:stopRow,startCol:stopCol);
-       
+       lines = houghlines(imgPatch,T,R,P,'FillGap',fillGap,'MinLength',minLength); 
+       % corresponding patch in real image       
        subplot(rows,cols,idx); 
        imagesc(imgPatch);
        hold on

@@ -11,7 +11,7 @@ thetaRange = -90:0.5:89.5;
 houghThresh = 0.5;          % fraction of max(H)
 maxLines = 100;
 fillGap = 2;                % line segments with a gap less than this will be merged
-minLength = 6;              % lines with length below this will be discarded
+minLength = 4;              % lines with length below this will be discarded
 
 gaussianFiltering = 0;      % 1 if gaussian filtering should be performed on the input image
 sigma = 1;
@@ -28,8 +28,8 @@ maskSizeH = 5;
 % read image
 
 %% input 
-imgIn = double(imread(imagePath))/255;
-%imgIn = imgIn1(1:16,1:16);
+imgIn1 = double(imread(imagePath))/255;
+imgIn = imgIn1(1:24,1:16);
 if(size(size(imgIn),2)>2)
     img = imgIn(:,:,1);
 else

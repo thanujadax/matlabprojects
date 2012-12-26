@@ -15,12 +15,12 @@ function [localHoughSpaces,patchLocations, rho, theta,maxHoughPeak] = getLocalHo
 
 imgIn = flipud(imgIn);  % no need to flip upside down
 imgSize = size(imgIn);
-numRowPatch = floor((imgSize(2) - slidingDist)/(bb-slidingDist)); % num patches per row
-numColPatch = floor((imgSize(1) - slidingDist)/(bb-slidingDist)); % num patches per column
+cols = floor((imgSize(2) - slidingDist)/(bb-slidingDist)); % num patches per row
+rows = floor((imgSize(1) - slidingDist)/(bb-slidingDist)); % num patches per column
 
 % initialize cell array
-localHoughSpaces = cell(numColPatch,numRowPatch);
-patchLocations = cell(numColPatch,numRowPatch);
+localHoughSpaces = cell(rows,cols);
+patchLocations = cell(rows,cols);
 % initialize struct
 %s = struct('H',houghSpace,'origin',[patchOriginY patchOriginX]);
 
@@ -28,10 +28,10 @@ maxHoughPeak = 0; % init
 
 % TODO: parallelize by storing the starting points in a different data
 % structure
-for i=1:numColPatch
-    for j=1:numRowPatch
-        patchOriginX = (mod(j,numRowPatch)-1)*slidingDist + 1;
-        patchOriginY = (mod(i,numColPatch)-1)*slidingDist + 1;
+for i=1:rows
+    for j=1:cols
+        patchOriginX = (j-1)*(bb-slidingDist) + 1;
+        patchOriginY = (i-1)*(bb-slidingDist) + 1;
         
         if(patchOriginY+bb-1<=imgSize(1) && patchOriginX+bb-1<=imgSize(2))
             localPatch = imgIn(patchOriginY:patchOriginY+bb-1,...
