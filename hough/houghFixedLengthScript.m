@@ -3,10 +3,15 @@
 
 %% parameters
 displayIntermediateFigures=0;
-imagePath = '/home/thanuja/matlabprojects/data/mitoData/stem1_48.png';
+%imagePath = '/home/thanuja/matlabprojects/data/mitoData/stem1_48.png';
 % imagePath = '/home/thanuja/matlabprojects/data/mitoData/stem1_256by256.png';
-rhoResolution = 1;
-thetaRange = -90:0.5:89.5;
+imagePath = 'testImgLines.png';
+ 
+invertImg = 0;      % 1 for membrane images that have to be inverted for Hough transform calculation
+
+rhoResolution = 0.5;
+%thetaRange = -90:0.25:89.75;
+thetaRange = 0:0.5:90.0;
 
 grayThresholding = 1;       % 1 if the inverted image should be thresholded
 grayThreshold = 0.5;
@@ -38,7 +43,11 @@ if(displayIntermediateFigures)
     title('original')
 end
 % invert
-imgInv = invertImage(img);
+if(invertImg)
+    imgInv = invertImage(img);
+else
+    imgInv = img;
+end
 % rescale 0 - 1
 imgInv = imgInv/max(max(imgInv));
 if(displayIntermediateFigures)
@@ -73,7 +82,8 @@ end
 
 % for each image block (overlapping)
 % calculate the Hough space and store it in a structure
-[localHoughSpaces,patchLocations,R,T,maxHoughPeak] = getLocalHoughSpaces(imgInv,rhoResolution,thetaRange,bb,slidingDist);
+[localHoughSpaces,patchLocations,R,T,maxHoughPeak] ...
+    = getLocalHoughSpaces(imgInv,rhoResolution,thetaRange,bb,slidingDist);
 
 % Plot the lines from localHoughSpaces
 plotLocalHoughSpaces(imgInv,localHoughSpaces,T,R,maxLinesPerPatch,...

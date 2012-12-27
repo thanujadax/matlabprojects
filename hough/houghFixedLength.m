@@ -24,8 +24,8 @@ function [houghSpace,theta,rho] = houghFixedLength(theImage,rhoResolution,theta)
     %the pixel number and the columns will be indexed by the thetas.
     %Example: cosine(3,:) is 2*cosine(0 to pi)
     %         cosine(:,1) is (0 to width of image)*cosine(0)
-    cosine = (0:width-1)'*cos(theta); % Matrix Outerproduct  
-    sine = (0:height-1)'*sin(theta); % Matrix Outerproduct
+    cosine = (0:rhoResolution:width-1)'*cosd(theta); % Matrix Outerproduct  
+    sine = (0:rhoResolution:height-1)'*sind(theta); % Matrix Outerproduct
  
     accumulator((1:numEdgePixels),:) = cosine(xIndicies,:) + sine(yIndicies,:);
  

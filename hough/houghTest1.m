@@ -110,7 +110,7 @@ if(gaussSmoothH==1)
 end
 
 % get hough peaks
-P  = houghpeaks(H,maxLines,'threshold',ceil(0.4*max(H(:))),'NHoodSize',houghSupNHood);
+P  = houghpeaks(H,maxLines,'threshold',ceil(0.4*max(max(H)),'NHoodSize',houghSupNHood);
 % P = [(row,col), ...]
 if(displayIntermediateFigures)
     % plot the hough space

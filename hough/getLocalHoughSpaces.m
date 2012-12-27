@@ -13,7 +13,7 @@ function [localHoughSpaces,patchLocations, rho, theta,maxHoughPeak] = getLocalHo
 %       s.H - Hough space for the patch
 %       s.origin - (row,col) of the origin relative to the entire image
 
-imgIn = flipud(imgIn);  % no need to flip upside down
+imgIn = flipud(imgIn);  % flip upside down. therefore, flipping is disabled in houghFixedLength ~ hough2.
 imgSize = size(imgIn);
 cols = floor((imgSize(2) - slidingDist)/(bb-slidingDist)); % num patches per row
 rows = floor((imgSize(1) - slidingDist)/(bb-slidingDist)); % num patches per column
@@ -29,24 +29,27 @@ maxHoughPeak = 0; % init
 % TODO: parallelize by storing the starting points in a different data
 % structure
 for i=1:rows
-    for j=1:cols
-        patchOriginX = (j-1)*(bb-slidingDist) + 1;
-        patchOriginY = (i-1)*(bb-slidingDist) + 1;
-        
-        if(patchOriginY+bb-1<=imgSize(1) && patchOriginX+bb-1<=imgSize(2))
-            localPatch = imgIn(patchOriginY:patchOriginY+bb-1,...
-                                        patchOriginX:patchOriginX+bb-1);
-            [houghSpace,theta,rho] = houghFixedLength(localPatch,rhoResolution,theta);
-            
-            localHoughSpaces{i,j} = houghSpace;
-            maxVal = max(max(houghSpace));
-            if(maxVal>maxHoughPeak)
-                maxHoughPeak = maxVal;
+    patchOriginY = (i-1)*(bb-slidingDist) + 1;
+    if(patchOriginY+bb-1<=imgSize(1))
+        for j=1:cols
+            patchOriginX = (j-1)*(bb-slidingDist) + 1;
+
+            if(patchOriginX+bb-1<=imgSize(2))
+                localPatch = imgIn(patchOriginY:patchOriginY+bb-1,...
+                                            patchOriginX:patchOriginX+bb-1);
+                [houghSpace,theta,rho] = houghFixedLength(localPatch,rhoResolution,theta);
+                %[houghSpace,theta,rho] = hough(localPatch,'RhoResolution',rhoResolution,'Theta',theta);
+
+                localHoughSpaces{i,j} = houghSpace;
+                maxVal = max(max(houghSpace));
+                if(maxVal>maxHoughPeak)
+                    maxHoughPeak = maxVal;
+                end
+                patchLocations{i,j} = [patchOriginY patchOriginX];
+            else
+                localHoughSpaces{i,j} = 0;
             end
-            patchLocations{i,j} = [patchOriginY patchOriginX];
-        else
-            localHoughSpaces{i,j} = 0;
         end
-    end 
+    end
 end
 
