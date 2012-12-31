@@ -13,7 +13,7 @@ function [localHoughSpaces,patchLocations, rho, theta,maxHoughPeak] = getLocalHo
 %       s.H - Hough space for the patch
 %       s.origin - (row,col) of the origin relative to the entire image
 
-imgIn = flipud(imgIn);  % flip upside down. therefore, flipping is disabled in houghFixedLength ~ hough2.
+% imgIn = flipud(imgIn);  % flip upside down. therefore, flipping is disabled in houghFixedLength ~ hough2.
 imgSize = size(imgIn);
 cols = floor((imgSize(2) - slidingDist)/(bb-slidingDist)); % num patches per row
 rows = floor((imgSize(1) - slidingDist)/(bb-slidingDist)); % num patches per column
@@ -37,8 +37,8 @@ for i=1:rows
             if(patchOriginX+bb-1<=imgSize(2))
                 localPatch = imgIn(patchOriginY:patchOriginY+bb-1,...
                                             patchOriginX:patchOriginX+bb-1);
-                [houghSpace,theta,rho] = houghFixedLength(localPatch,rhoResolution,theta);
-                %[houghSpace,theta,rho] = hough(localPatch,'RhoResolution',rhoResolution,'Theta',theta);
+                %[houghSpace,theta,rho] = houghFixedLength(localPatch,rhoResolution,theta);
+                [houghSpace,theta,rho] = hough(localPatch,'RhoResolution',rhoResolution,'Theta',theta);
 
                 localHoughSpaces{i,j} = houghSpace;
                 maxVal = max(max(houghSpace));

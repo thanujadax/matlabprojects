@@ -10,8 +10,8 @@ imagePath = 'testImgLines.png';
 invertImg = 0;      % 1 for membrane images that have to be inverted for Hough transform calculation
 
 rhoResolution = 0.5;
-%thetaRange = -90:0.25:89.75;
-thetaRange = 0:0.5:90.0;
+thetaRange = -90:0.5:89.5;
+%thetaRange = 0:0.5:90.0;
 
 grayThresholding = 1;       % 1 if the inverted image should be thresholded
 grayThreshold = 0.5;
@@ -21,7 +21,7 @@ sigma = 1;
 maskSize = 5;
 
 bb = 24;                    % patch size
-slidingDist = 12;            % the number of overlapping pixels
+slidingDist = 12;           % the number of overlapping pixels
 
 maxLinesPerPatch = 20;
 thresholdFraction = 0.5;    % fraction of max(H) to be used as a threshold for peaks
