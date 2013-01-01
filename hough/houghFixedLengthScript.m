@@ -92,7 +92,7 @@ plotLocalHoughSpaces(imgInv,localHoughSpaces,T,R,maxLinesPerPatch,...
 %% Inverse Hough transform
 % Reconstruct the global line sketch using the local Hough spaces
 patchLines = localHoughLines(localHoughSpaces,R,T,imgInv,bb,maxLinesPerPatch,...
-            thresholdFraction,houghSupNHood,fillGap,minLength,maxHoughPeak);
+            thresholdFraction,houghSupNHood,fillGap,minLength,maxHoughPeak,slidingDist);
 % patchLines is a cell array
         
 %% Reconstruct local patches from the patch lines

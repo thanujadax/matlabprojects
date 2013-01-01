@@ -1,5 +1,5 @@
 function patchLines = localHoughLines(localHoughSpaces,R,T,imgIn,bb,maxLinesPerPatch,...
-            peakThresh,houghSupNHood,fillGap,minLength,maxHoughPeak)
+            peakThresh,houghSupNHood,fillGap,minLength,maxHoughPeak,slidingDist)
 % inputs:
 % localHoughSpaces -
 % R - rho values
@@ -30,7 +30,7 @@ patchLines = cell(rows,cols);
         
 
 for i = 1:rows
-    startRow = (i-1)*bb +1;
+    startRow = (i-1)*(bb-slidingDist) +1;
     if(startRow==imgRows)
         break;
     end
@@ -43,7 +43,7 @@ for i = 1:rows
         P  = houghpeaks(localHoughSpaces{i,j},maxLinesPerPatch,'threshold',ceil(peakThresh*maxHoughPeak),...
             'NHoodSize',houghSupNHood);
         
-        startCol = (j-1)*bb +1;       
+        startCol = (j-1)*(bb-slidingDist) +1;       
         stopCol = startCol + bb -1;
         if(startCol==imgCols)
             break
