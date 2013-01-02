@@ -1,5 +1,5 @@
 function [localHoughSpaces,patchLocations, rho, theta,maxHoughPeak] = getLocalHoughSpaces(imgIn,rhoResolution,...
-                        theta,bb,slidingDist)
+                        theta,bb,slidingDist,smoothenH,sigmaH,maskSizeH)
                     
 % for each patch
 % calculate the hough space
@@ -39,7 +39,10 @@ for i=1:rows
                                             patchOriginX:patchOriginX+bb-1);
                 %[houghSpace,theta,rho] = houghFixedLength(localPatch,rhoResolution,theta);
                 [houghSpace,theta,rho] = hough(localPatch,'RhoResolution',rhoResolution,'Theta',theta);
-
+                if(smoothenH)
+                    houghSpace = gaussianFilter(houghSpace,sigmaH,maskSizeH);
+                    houghSpace = ceil(houghSpace);
+                end
                 localHoughSpaces{i,j} = houghSpace;
                 maxVal = max(max(houghSpace));
                 if(maxVal>maxHoughPeak)

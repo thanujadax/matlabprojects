@@ -3,11 +3,11 @@
 
 %% parameters
 displayIntermediateFigures=0;
-%imagePath = '/home/thanuja/matlabprojects/data/mitoData/stem1_48.png';
-% imagePath = '/home/thanuja/matlabprojects/data/mitoData/stem1_256by256.png';
-imagePath = 'testImgLines.png';
+% imagePath = '/home/thanuja/matlabprojects/data/mitoData/stem1_48.png';
+imagePath = '/home/thanuja/matlabprojects/data/mitoData/stem1_256by256.png';
+% imagePath = 'testImgLines.png';
  
-invertImg = 0;      % 1 for membrane images that have to be inverted for Hough transform calculation
+invertImg = 1;      % 1 for membrane images that have to be inverted for Hough transform calculation
 
 rhoResolution = 0.5;
 thetaRange = -90:0.5:89.5;
@@ -23,16 +23,20 @@ maskSize = 5;
 bb = 24;                    % patch size
 slidingDist = 12;           % the number of overlapping pixels
 
-maxLinesPerPatch = 4;
-thresholdFraction = 0.7;    % fraction of max(H) to be used as a threshold for peaks
+maxLinesPerPatch = 5;
+thresholdFraction = 0.5;    % fraction of max(H) to be used as a threshold for peaks
                     % consider the fact that max(H) refers to a global
                     % maximum of H which might overlook smaller line
                     % segments in some patches with less support. 0.5 is
                     % recommended
                     
-houghSupNHood = [7 7];      % suppression neighborhood at each identified peak
+houghSupNHood = [3 3];      % suppression neighborhood at each identified peak
 fillGap = 2;                % fill gaps smaller than this to combine two collinear lines    
 minLength = 4;              % minimum length of lines to be detected
+
+smoothenH = 1;      % if each local H should be smoothened using a gaussian filter
+sigmaH = 0.3;
+maskSizeH = 3;
 
 %% input preprocessing
 imgIn = double(imread(imagePath))/255;
@@ -88,7 +92,8 @@ end
 % for each image block (overlapping)
 % calculate the Hough space and store it in a structure
 [localHoughSpaces,patchLocations,R,T,maxHoughPeak] ...
-    = getLocalHoughSpaces(imgInv,rhoResolution,thetaRange,bb,slidingDist);
+    = getLocalHoughSpaces(imgInv,rhoResolution,thetaRange,bb,slidingDist...
+            ,smoothenH,sigmaH,maskSizeH);
 
 % Plot the lines from localHoughSpaces
 plotLocalHoughSpaces(imgInv,localHoughSpaces,T,R,maxLinesPerPatch,...
