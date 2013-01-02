@@ -23,9 +23,14 @@ maskSize = 5;
 bb = 24;                    % patch size
 slidingDist = 12;           % the number of overlapping pixels
 
-maxLinesPerPatch = 20;
-thresholdFraction = 0.5;    % fraction of max(H) to be used as a threshold for peaks
-houghSupNHood = [3 3];      % suppression neighborhood at each identified peak
+maxLinesPerPatch = 4;
+thresholdFraction = 0.7;    % fraction of max(H) to be used as a threshold for peaks
+                    % consider the fact that max(H) refers to a global
+                    % maximum of H which might overlook smaller line
+                    % segments in some patches with less support. 0.5 is
+                    % recommended
+                    
+houghSupNHood = [7 7];      % suppression neighborhood at each identified peak
 fillGap = 2;                % fill gaps smaller than this to combine two collinear lines    
 minLength = 4;              % minimum length of lines to be detected
 
@@ -91,6 +96,8 @@ plotLocalHoughSpaces(imgInv,localHoughSpaces,T,R,maxLinesPerPatch,...
                     bb,slidingDist);
 %% Inverse Hough transform
 % Reconstruct the global line sketch using the local Hough spaces
+% maxHoughPeak is already detected globally from the previous step and is
+% used as a reference for peak detection in individual patches
 patchLines = localHoughLines(localHoughSpaces,R,T,imgInv,bb,maxLinesPerPatch,...
             thresholdFraction,houghSupNHood,fillGap,minLength,maxHoughPeak,slidingDist);
 % patchLines is a cell array

@@ -40,8 +40,12 @@ for i = 1:rows
     end
     for j = 1:cols
         % for the H of the (i,j)th patch 
-        P  = houghpeaks(localHoughSpaces{i,j},maxLinesPerPatch,'threshold',ceil(peakThresh*maxHoughPeak),...
+        H = cell2mat(localHoughSpaces(i,j));
+        P  = houghpeaks(H,maxLinesPerPatch,'threshold',ceil(peakThresh*maxHoughPeak),...
             'NHoodSize',houghSupNHood);
+        if(isempty(P))
+            continue
+        end
         
         startCol = (j-1)*(bb-slidingDist) +1;       
         stopCol = startCol + bb -1;
