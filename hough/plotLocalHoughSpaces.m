@@ -24,12 +24,16 @@ for i=1:rows
        imagesc(imgPatch);
        hold on
        for k = 1:length(lines)
-           xy = [lines(k).point1; lines(k).point2];
-           plot(xy(:,1),xy(:,2),'LineWidth',2,'Color','green');
+           if(isfield(lines(k),'point1'))
+               xy = [lines(k).point1; lines(k).point2];
+               plot(xy(:,1),xy(:,2),'LineWidth',2,'Color','green');
 
-           % Plot beginnings and ends of lines
-           plot(xy(1,1),xy(1,2),'x','LineWidth',2,'Color','yellow');
-           plot(xy(2,1),xy(2,2),'x','LineWidth',2,'Color','red');
+               % Plot beginnings and ends of lines
+               plot(xy(1,1),xy(1,2),'x','LineWidth',2,'Color','yellow');
+               plot(xy(2,1),xy(2,2),'x','LineWidth',2,'Color','red');
+           else
+               continue;
+           end
         end
         hold off
        
