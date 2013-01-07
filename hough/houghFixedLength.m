@@ -12,8 +12,9 @@ function [houghSpace,theta,rho] = houghFixedLength(theImage,rhoResolution,theta)
     houghSpace = zeros(numel(rho),numThetas);
  
     %Find the "edge" pixels
-    [xIndicies,yIndicies] = find(theImage>0.3);
- 
+    %[xIndicies,yIndicies] = find(theImage>0.3);
+    [yIndicies,xIndicies] = find(theImage>0.3);
+
     %Preallocate space for the accumulator array
     numEdgePixels = numel(xIndicies);
     accumulator = zeros(numEdgePixels,numThetas);
