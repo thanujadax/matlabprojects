@@ -23,7 +23,7 @@ for orientationInd=1:numOrientations
         for c=colMargin:slidingDist:numCols-colMargin
             % for the current center (r,c) get the pixel count
             houghSpace3D(r,c,orientationInd) = pixelCountInBar(img,r,c,orientations(orientationInd)...
-                    ,barLength,barWidth);
+                    ,barLength,barWidth,grayThresh);
             
         end
     end
