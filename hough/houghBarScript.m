@@ -96,6 +96,9 @@ end
 houghSpace3D = houghBars(img,barLength,barWidth,orientations,slidingDist);
 % houghSpace3D [row col orientation]
 
+peaks3D = houghBarPeaks(houghSpace3D,orientations,thresholdFraction...
+                            ,slidingDist,barLength,barWidth);  
 % peak detection & line extraction
+
 
 
