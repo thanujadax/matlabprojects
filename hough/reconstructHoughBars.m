@@ -30,8 +30,9 @@ for i=1:numOrientations
    
    for j=1:numPeaks
        % place a bar on each peak as described above
-       
-
+       barInd = getBar(numRows,numCols,peaksInd(j),barLength,barWidth,orientation);
+       barVote = voteMat(peaksInd(j));
+       output(barInd) = barVote;       
    end
        
 end
