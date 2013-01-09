@@ -19,16 +19,18 @@ maxVote = max(max(voteMat));
 
 numPixels = numel(r);
 
+[numRows numCols] = size(voteMat);
+
 for j=1:numPixels
     % get neighbor hood of (r(i),c(i))
     if(orientation==0)
         % horizontal bar
-        startRow = r - ceil(barWidth/2);
+        startRow = r(j) - ceil(barWidth/2);
         stopRow = startRow + barWidth;
-        startCol = c - ceil(barLength/2);
+        startCol = c(j) - ceil(barLength/2);
         stopCol = startCol + barLength;
 
-        [pxlR, pxlC] = find(voteMat>=vote(j)); % pixels having a higher vote    
+        [pxlR, pxlC] = find(voteMat>vote(j)); % pixels having a higher vote    
 
         rowIndInd = intersect(find(pxlR>startRow),find(pxlR<stopRow));    
         colIndInd = intersect(find(pxlC>startCol),find(pxlC<stopCol));    
@@ -42,12 +44,12 @@ for j=1:numPixels
         
     elseif(orientation==90)
         % vertical bar
-        startRow = r - ceil(barLength/2);
+        startRow = r(j) - ceil(barLength/2);
         stopRow = startRow + barLength;
-        startCol = c - ceil(barWidth/2);
+        startCol = c(j) - ceil(barWidth/2);
         stopCol = startCol + barWidth;
 
-        [pxlR, pxlC] = find(voteMat>=vote(j)); % pixels having a higher vote   
+        [pxlR, pxlC] = find(voteMat>vote(j)); % pixels having a higher vote   
 
         rowIndInd = intersect(find(pxlR>startRow),find(pxlR<stopRow));    
         colIndInd = intersect(find(pxlC>startCol),find(pxlC<stopCol));  
@@ -62,9 +64,9 @@ for j=1:numPixels
     elseif(orientation==45)
         % get the list of all pixels in the bar
         % 1: the line through (c,r)    
-        b = r-c;        % b is the y-intercept of the straight line y=ax+b going through (c,r)
-        cStart = c - floor(cosd(orientation)*barLength/2);
-        cEnd = c + floor(cosd(orientation)*barLength/2);
+        b = r(j)-c(j);        % b is the y-intercept of the straight line y=ax+b going through (c,r)
+        cStart = c(j) - floor(cosd(orientation)*barLength/2);
+        cEnd = c(j) + floor(cosd(orientation)*barLength/2);
 
         cRange = cStart:cEnd;
         rRange = cRange + b;    % from the eqn of the straight line
@@ -73,15 +75,15 @@ for j=1:numPixels
         % for each additional line
         nLinePairs = (barWidth-1)/2; % number of additional pairs of lines
         for i = 1:nLinePairs
-            rUp = r-i;
-            bUp = rUp-c;
+            rUp = r(j)-i;
+            bUp = rUp-c(j);
             cStartUp = cStart+i;
             cEndUp = cEnd+i;
             cRangeUp = cStartUp:cEndUp;
             rRangeUp = cRangeUp + bUp;
 
-            rDown = r+i;
-            bDown = rDown-c;
+            rDown = r(j)+i;
+            bDown = rDown-c(j);
             cStartDown = cStart-i;
 
             cEndDown = cEnd-i;
@@ -106,9 +108,9 @@ for j=1:numPixels
     elseif(orientation==135)
         % get the list of all pixels in the bar
         % 1: the line through (c,r)    
-        b = c+r;        % b is the y-intercept of the straight line y=ax+b going through (c,r)
-        cStart = c + ceil(cosd(orientation)*barLength/2);
-        cEnd = c - ceil(cosd(orientation)*barLength/2);
+        b = c(j)+r(j);        % b is the y-intercept of the straight line y=ax+b going through (c,r)
+        cStart = c(j) + ceil(cosd(orientation)*barLength/2);
+        cEnd = c(j) - ceil(cosd(orientation)*barLength/2);
 
         cRange = cStart:cEnd;
         rRange = b - cRange;    % from the eqn of the straight line
@@ -117,15 +119,15 @@ for j=1:numPixels
         % for each additional line
         nLinePairs = (barWidth-1)/2; % number of additional pairs of lines
         for i = 1:nLinePairs
-            rUp = r-i;
-            bUp = c+rUp;
+            rUp = r(j)-i;
+            bUp = c(j)+rUp;
             cStartUp = cStart-i;
             cEndUp = cEnd-i;
             cRangeUp = cStartUp:cEndUp;
             rRangeUp = bUp-cRangeUp;
 
-            rDown = r+i;
-            bDown = c+rDown;
+            rDown = r(j)+i;
+            bDown = c(j)+rDown;
             cStartDown = cStart+i;
             cEndDown = cEnd+i;
             cRangeDown = cStartDown:cEndDown;

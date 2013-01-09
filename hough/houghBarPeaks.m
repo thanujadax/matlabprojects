@@ -29,10 +29,12 @@ for i = 1:numOrientations
     % get max vote for this orientation
     maxVote = max(max(houghSpace3D(:,:,i)));
     thresh = maxVote*thresholdFraction;
-    [r,c,vote] = find(houghSpace3D(:,:,i)>thresh);
+    votes = houghSpace3D(:,:,i);
+    [r,c] = find(votes>thresh);
     voteInd = sub2ind([numRows numCols],r,c);
     voteMat = zeros(numRows,numCols);
-    voteMat(voteInd) = vote;
+    
+    voteMat(voteInd) = votes(voteInd);
     
     peaks3D(:,:,i) = NMS_bars(voteMat,orientations(i),barLength,barWidth);
     
