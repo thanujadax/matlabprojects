@@ -103,5 +103,5 @@ peaks3D = houghBarPeaks(houghSpace3D,orientations,thresholdFraction...
                             ,slidingDist,barLength,barWidth);  
 
 % draw the detected bars on the image
-%plotHoughBars(peaks3D,img,withBackground);
+output = reconstructHoughBars(peaks3D,orientations,barLength,barWidth);
 

@@ -26,6 +26,9 @@ listEl = 1:totEl;
 matIndexed = reshape(listEl,numRows,numCols);
 
 for j=1:numPixels
+    if(voteMat(r(j),c(j))==0)
+        continue;
+    end
     % get neighbor hood of (r(i),c(i))
     if(orientation==0)
         % horizontal bar
@@ -67,9 +70,7 @@ for j=1:numPixels
         
     elseif(orientation==90)
         % vertical bar
-        if(voteMat(r(j),c(j))==0)
-            continue;
-        end
+
         startRow = r(j) - ceil(barLength/2);
         stopRow = startRow + barLength;
         startCol = c(j) - ceil(barWidth/2);
@@ -145,6 +146,14 @@ for j=1:numPixels
 
         if(pcount>0) 
             voteMat(r(j),c(j)) = 0;         % NMS        
+        else
+            % is a maximum
+            % if this point is a maximum but there are other pixels in the
+            % neighborhood with non-zero votes, make them zero.
+            thisInd = sub2ind([numRows numCols],r(j),c(j));
+            pixInd = pixInd(pixInd~=thisInd);
+            voteMat(pixInd)=0;     % suppress all other neighbors
+
         end
  
     elseif(orientation==135)
