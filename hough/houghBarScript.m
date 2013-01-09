@@ -41,6 +41,8 @@ barLength = 10;
 barWidth = 3;
 orientations = [0 45 90 135];    % can either be 4 or 8
 
+withBackground = 1;     % plot the detected bars with the original image in the background
+
 %% input preprocessing
 imgIn = double(imread(imagePath))/255;
 %imgIn = imgIn(1:128,1:128);
@@ -93,12 +95,13 @@ if(gaussianFiltering==1)
 end
 %% Hough
 % perform Hough type processing (voting) for oriented bars
-houghSpace3D = houghBars(img,barLength,barWidth,orientations,slidingDist);
+houghSpace3D = houghBars(imgInv,barLength,barWidth,orientations,slidingDist);
 % houghSpace3D [row col orientation]
 
+% peak detection
 peaks3D = houghBarPeaks(houghSpace3D,orientations,thresholdFraction...
                             ,slidingDist,barLength,barWidth);  
-% peak detection & line extraction
 
-
+% draw the detected bars on the image
+%plotHoughBars(peaks3D,img,withBackground);
 

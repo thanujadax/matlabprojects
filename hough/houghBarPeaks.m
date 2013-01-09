@@ -1,7 +1,10 @@
 function peaks3D = houghBarPeaks(houghSpace3D,orientations,thresholdFraction...
                     ,slidingDist,barLength,barWidth)
 
-% TODO: parallelize                
+% TODO: parallelize    
+% TODO: how to handle equally high peaks in the suppression neighborhood.
+% at the moment they are left alone allowing muliple equally high peaks
+% next to each other.
                 
 % output:
 %   peaks3D - [row col orientation] 3D array containing the votes for the

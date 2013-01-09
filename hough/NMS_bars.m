@@ -21,44 +21,86 @@ numPixels = numel(r);
 
 [numRows numCols] = size(voteMat);
 
+totEl = numRows*numCols;
+listEl = 1:totEl;
+matIndexed = reshape(listEl,numRows,numCols);
+
 for j=1:numPixels
     % get neighbor hood of (r(i),c(i))
     if(orientation==0)
         % horizontal bar
+        if(voteMat(r(j),c(j))==0)
+            continue;
+        end
         startRow = r(j) - ceil(barWidth/2);
         stopRow = startRow + barWidth;
         startCol = c(j) - ceil(barLength/2);
         stopCol = startCol + barLength;
 
-        [pxlR, pxlC] = find(voteMat>vote(j)); % pixels having a higher vote    
+        pxls = find(voteMat>vote(j)); % pixels having a higher vote    
 
-        rowIndInd = intersect(find(pxlR>startRow),find(pxlR<stopRow));    
-        colIndInd = intersect(find(pxlC>startCol),find(pxlC<stopCol));    
-
-        pixInd = intersect(rowIndInd,colIndInd);
+ 
+        allowedInd = matIndexed(startRow:stopRow,startCol:stopCol);
+        numAllowed = numel(allowedInd);
+        allowedIndList = reshape(allowedInd,numAllowed,1);
+        
+        pixInd = intersect(pxls,allowedIndList);
         
         if(numel(pixInd)>0)
             % this point is not a maximum. set it to zero
             voteMat(r(j),c(j)) = 0;
+        else
+            % if this pixel is a maximum and,
+            % if there're any pixels having an equal vote inside the
+            % neighborhood, make them zero    
+            pxls = find(voteMat==vote(j));
+            %[row col] = ind2sub([numRows numCols],pxls);            
+            pixInd = intersect(pxls,allowedIndList);
+            % remove the current pixel from this list
+            thisInd = sub2ind([numRows numCols],r(j),c(j));
+            pixInd = pixInd(pixInd~=thisInd);
+            % pixInd = intersect(rowInd,colInd);
+            if(numel(pixInd)>0)
+                voteMat(pixInd)=0;
+            end
         end
         
     elseif(orientation==90)
         % vertical bar
+        if(voteMat(r(j),c(j))==0)
+            continue;
+        end
         startRow = r(j) - ceil(barLength/2);
         stopRow = startRow + barLength;
         startCol = c(j) - ceil(barWidth/2);
         stopCol = startCol + barWidth;
 
-        [pxlR, pxlC] = find(voteMat>vote(j)); % pixels having a higher vote   
+        pxls = find(voteMat>vote(j)); % pixels having a higher vote    
 
-        rowIndInd = intersect(find(pxlR>startRow),find(pxlR<stopRow));    
-        colIndInd = intersect(find(pxlC>startCol),find(pxlC<stopCol));  
-
-        pixInd = intersect(rowIndInd,colIndInd);   
+ 
+        allowedInd = matIndexed(startRow:stopRow,startCol:stopCol);
+        numAllowed = numel(allowedInd);
+        allowedIndList = reshape(allowedInd,numAllowed,1);
+        
+        pixInd = intersect(pxls,allowedIndList);
         
         if(numel(pixInd)>0)
             % this point is not a maximum. set it to zero
             voteMat(r(j),c(j)) = 0;
+        else
+            % if this pixel is a maximum and,
+            % if there're any pixels having an equal vote inside the
+            % neighborhood, make them zero    
+            pxls = find(voteMat==vote(j));
+            %[row col] = ind2sub([numRows numCols],pxls);            
+            pixInd = intersect(pxls,allowedIndList);
+            % remove the current pixel from this list
+            thisInd = sub2ind([numRows numCols],r(j),c(j));
+            pixInd = pixInd(pixInd~=thisInd);
+            % pixInd = intersect(rowInd,colInd);
+            if(numel(pixInd)>0)
+                voteMat(pixInd)=0;
+            end
         end   
         
     elseif(orientation==45)
