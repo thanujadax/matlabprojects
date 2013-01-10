@@ -14,16 +14,16 @@ if(orientation==0)
     % TODO: alternatively, aggregate the weighted sum of all pixels based
     % on their intensities
     
-    startRow = r - ceil(barWidth/2);
-    stopRow = startRow + barWidth;
-    startCol = c - ceil(barLength/2);
-    stopCol = startCol + barLength;
-    
-    pxls = find(img>grayThresh); % non-zero pixels    
-    
-    allowedInd = matIndexed(startRow:stopRow,startCol:stopCol);
-    numAllowed = numel(allowedInd);
-    allowedIndList = reshape(allowedInd,numAllowed,1);
+%     startRow = r - ceil(barWidth/2);
+%     stopRow = startRow + barWidth;
+%     startCol = c - ceil(barLength/2);
+%     stopCol = startCol + barLength;
+%     
+%     pxls = find(img>grayThresh); % non-zero pixels    
+%     
+%     allowedInd = matIndexed(startRow:stopRow,startCol:stopCol);
+%     numAllowed = numel(allowedInd);
+%     allowedIndList = reshape(allowedInd,numAllowed,1);
     
     allowedIndList = getBarPixInd(r,c,orientation,barLength,barWidth,numRows,numCols);
 

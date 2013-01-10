@@ -3,10 +3,10 @@
 %% parameters
 displayIntermediateFigures=0;
 % imagePath = '/home/thanuja/matlabprojects/data/mitoData/stem1_48.png';
-imagePath = '/home/thanuja/matlabprojects/data/mitoData/stem1_256by256.png';
-%imagePath = 'testImgLines.png';
+% imagePath = '/home/thanuja/matlabprojects/data/mitoData/stem1_256by256.png';
+imagePath = 'testImgLines.png';
  
-invertImg = 1;      % 1 for membrane images that have to be inverted for Hough transform calculation
+invertImg = 0;      % 1 for membrane images that have to be inverted for Hough transform calculation
 
 rhoResolution = 0.5;
 thetaRange = -90:0.5:89.5;
@@ -40,7 +40,7 @@ smoothenH = 1;      % if each local H should be smoothened using a gaussian filt
 sigmaH = 0.3;
 maskSizeH = 3;
 
-barLength = 50;
+barLength = 9;
 barWidth = 3;
 orientations = [0 45 90 135];    % can either be 4 or 8
 
@@ -48,7 +48,7 @@ withBackground = 0;     % plot the detected bars with the original image in the 
 
 %% input preprocessing
 imgIn = double(imread(imagePath))/255;
-imgIn = imgIn(1:128,1:128);
+% imgIn = imgIn(1:128,1:128);
 
 if(size(size(imgIn),2)>2)
     img = imgIn(:,:,1);
