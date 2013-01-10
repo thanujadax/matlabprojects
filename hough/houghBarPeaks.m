@@ -33,8 +33,9 @@ for i = 1:numOrientations
     maxVote = max(max(houghSpace3D(:,:,i)));
     thresh = maxVote*thresholdFraction;
     votes = houghSpace3D(:,:,i);
-    [r,c] = find(votes>thresh);
-    voteInd = sub2ind([numRows numCols],r,c);
+%     [r,c] = find(votes>thresh);
+%     voteInd = sub2ind([numRows numCols],r,c);
+    voteInd = find(votes>thresh);
     voteMat = zeros(numRows,numCols);
     
     voteMat(voteInd) = votes(voteInd);

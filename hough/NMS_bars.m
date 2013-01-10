@@ -52,19 +52,19 @@ for j=1:numPixels
             % this point is not a maximum. set it to zero
             voteMat(r(j),c(j)) = 0;
         else
-            % if this pixel is a maximum and,
-            % if there're any pixels having an equal vote inside the
-            % neighborhood, make them zero    
-            pxls = find(voteMat==vote(j));
-            
-            pixInd = intersect(pxls,allowedIndList);
-            % remove the current pixel from this list
-            thisInd = sub2ind([numRows numCols],r(j),c(j));
-            pixInd = pixInd(pixInd~=thisInd);
-
-            if(numel(pixInd)>0)
-                voteMat(pixInd)=0;
-            end
+%             % if this pixel is a maximum and,
+%             % if there're any pixels having an equal vote inside the
+%             % neighborhood, make them zero    
+%             pxls = find(voteMat==vote(j));
+%             
+%             pixInd = intersect(pxls,allowedIndList);
+%             % remove the current pixel from this list
+%             thisInd = sub2ind([numRows numCols],r(j),c(j));
+%             pixInd = pixInd(pixInd~=thisInd);
+% 
+%             if(numel(pixInd)>0)
+%                 voteMat(pixInd)=0;
+%             end
         end
         
     elseif(orientation==90)
@@ -88,19 +88,19 @@ for j=1:numPixels
             % this point is not a maximum. set it to zero
             voteMat(r(j),c(j)) = 0;
         else
-            % if this pixel is a maximum and,
-            % if there're any pixels having an equal vote inside the
-            % neighborhood, make them zero    
-            pxls = find(voteMat==vote(j));
-            
-            pixInd = intersect(pxls,allowedIndList);
-            % remove the current pixel from this list
-            thisInd = sub2ind([numRows numCols],r(j),c(j));
-            pixInd = pixInd(pixInd~=thisInd);
-
-            if(numel(pixInd)>0)
-                voteMat(pixInd)=0;
-            end
+%             % if this pixel is a maximum and,
+%             % if there're any pixels having an equal vote inside the
+%             % neighborhood, make them zero    
+%             pxls = find(voteMat==vote(j));
+%             
+%             pixInd = intersect(pxls,allowedIndList);
+%             % remove the current pixel from this list
+%             thisInd = sub2ind([numRows numCols],r(j),c(j));
+%             pixInd = pixInd(pixInd~=thisInd);
+% 
+%             if(numel(pixInd)>0)
+%                 voteMat(pixInd)=0;
+%             end
         end   
         
     elseif(orientation==45)

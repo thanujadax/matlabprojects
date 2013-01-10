@@ -32,7 +32,11 @@ for i=1:numOrientations
        % place a bar on each peak as described above
        barInd = getBar(numRows,numCols,peaksInd(j),barLength,barWidth,orientation);
        barVote = voteMat(peaksInd(j));
-       output(barInd) = barVote;       
+       % assign barVote to the barPixels only if the current value of
+       % each barPixel is lower than barVote 
+       % output(barInd) = barVote;   
+       barPixIndToUpdate = find(output(barInd)<barVote);
+       output(barInd(barPixIndToUpdate)) = barVote;
    end
        
 end

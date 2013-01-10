@@ -2,8 +2,8 @@
 
 %% parameters
 displayIntermediateFigures=0;
-imagePath = '/home/thanuja/matlabprojects/data/mitoData/stem1_48.png';
-%imagePath = '/home/thanuja/matlabprojects/data/mitoData/stem1_256by256.png';
+% imagePath = '/home/thanuja/matlabprojects/data/mitoData/stem1_48.png';
+imagePath = '/home/thanuja/matlabprojects/data/mitoData/stem1_256by256.png';
 % imagePath = 'testImgLines.png';
  
 invertImg = 1;      % 1 for membrane images that have to be inverted for Hough transform calculation
@@ -23,11 +23,14 @@ bb = 32;                    % patch size
 slidingDist = 1;           % the number of pixels to jump
 
 maxLinesPerPatch = 20;
-thresholdFraction = 0.8;    % fraction of max(H) to be used as a threshold for peaks
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% very important tuning parameter
+thresholdFraction = 0.65;    % fraction of max(H) to be used as a threshold for peaks
                     % consider the fact that max(H) refers to a global
                     % maximum of H which might overlook smaller line
                     % segments in some patches with less support. 0.5 is
                     % recommended
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
                     
 houghSupNHood = [5 5];      % suppression neighborhood at each identified peak
 fillGap = 2;                % fill gaps smaller than this to combine two collinear lines    
@@ -45,7 +48,7 @@ withBackground = 0;     % plot the detected bars with the original image in the 
 
 %% input preprocessing
 imgIn = double(imread(imagePath))/255;
-%imgIn = imgIn(1:128,1:128);
+imgIn = imgIn(1:128,1:128);
 
 if(size(size(imgIn),2)>2)
     img = imgIn(:,:,1);
