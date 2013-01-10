@@ -12,8 +12,8 @@ grayThresh = 0.3;
 numOrientations = size(orientations,2);
 houghSpace3D = zeros(numRows,numCols,numOrientations);
 
-rowMargin = ceil(barLength/2);   % allowing a margin in the image
-colMargin = ceil(barLength/2);
+rowMargin = ceil(barLength/2)+1;   % allowing a margin in the image
+colMargin = ceil(barLength/2)+1;
 
 % first implementation for 4 orientations each 45 degrees apart (default)
 

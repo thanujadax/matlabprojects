@@ -2,11 +2,11 @@
 
 %% parameters
 displayIntermediateFigures=0;
-% imagePath = '/home/thanuja/matlabprojects/data/mitoData/stem1_48.png';
+imagePath = '/home/thanuja/matlabprojects/data/mitoData/stem1_48.png';
 %imagePath = '/home/thanuja/matlabprojects/data/mitoData/stem1_256by256.png';
-imagePath = 'testImgLines.png';
+% imagePath = 'testImgLines.png';
  
-invertImg = 0;      % 1 for membrane images that have to be inverted for Hough transform calculation
+invertImg = 1;      % 1 for membrane images that have to be inverted for Hough transform calculation
 
 rhoResolution = 0.5;
 thetaRange = -90:0.5:89.5;
@@ -23,7 +23,7 @@ bb = 32;                    % patch size
 slidingDist = 1;           % the number of pixels to jump
 
 maxLinesPerPatch = 20;
-thresholdFraction = 0.5;    % fraction of max(H) to be used as a threshold for peaks
+thresholdFraction = 0.8;    % fraction of max(H) to be used as a threshold for peaks
                     % consider the fact that max(H) refers to a global
                     % maximum of H which might overlook smaller line
                     % segments in some patches with less support. 0.5 is
@@ -37,11 +37,11 @@ smoothenH = 1;      % if each local H should be smoothened using a gaussian filt
 sigmaH = 0.3;
 maskSizeH = 3;
 
-barLength = 10;
+barLength = 6;
 barWidth = 3;
 orientations = [0 45 90 135];    % can either be 4 or 8
 
-withBackground = 1;     % plot the detected bars with the original image in the background
+withBackground = 0;     % plot the detected bars with the original image in the background
 
 %% input preprocessing
 imgIn = double(imread(imagePath))/255;
@@ -104,4 +104,5 @@ peaks3D = houghBarPeaks(houghSpace3D,orientations,thresholdFraction...
 
 % draw the detected bars on the image
 output = reconstructHoughBars(peaks3D,orientations,barLength,barWidth);
+figure(101);imagesc(output);title('reconstruction using oriented bars')
 

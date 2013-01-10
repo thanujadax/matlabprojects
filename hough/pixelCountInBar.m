@@ -1,6 +1,12 @@
 function pcount = pixelCountInBar(img,r,c,orientation,barLength,barWidth,grayThresh)
 pcount = 0; % init
 
+[numRows numCols] = size(img);
+
+totEl = numRows*numCols;
+listEl = 1:totEl;
+matIndexed = reshape(listEl,numRows,numCols);
+
 if(orientation==0)
     % horizontal bar
     startRow = r - ceil(barWidth/2);
@@ -8,12 +14,13 @@ if(orientation==0)
     startCol = c - ceil(barLength/2);
     stopCol = startCol + barLength;
     
-    [pxlR, pxlC] = find(img>grayThresh); % non-zero pixels    
+    pxls = find(img>grayThresh); % non-zero pixels    
     
-    rowIndInd = intersect(find(pxlR>startRow),find(pxlR<stopRow));    
-    colIndInd = intersect(find(pxlC>startCol),find(pxlC<stopCol));    
-    
-    pixInd = intersect(rowIndInd,colIndInd);
+    allowedInd = matIndexed(startRow:stopRow,startCol:stopCol);
+    numAllowed = numel(allowedInd);
+    allowedIndList = reshape(allowedInd,numAllowed,1);
+
+    pixInd = intersect(pxls,allowedIndList);
     
     pcount = length(pixInd);    
     
@@ -24,12 +31,14 @@ elseif(orientation==90)
     startCol = c - ceil(barWidth/2);
     stopCol = startCol + barWidth;
     
-    [pxlR, pxlC] = find(img>grayThresh); % non-zero pixels   
+    pxls = find(img>grayThresh); % non-zero pixels
     
-    rowIndInd = intersect(find(pxlR>startRow),find(pxlR<stopRow));    
-    colIndInd = intersect(find(pxlC>startCol),find(pxlC<stopCol));  
-    
-    pixInd = intersect(rowIndInd,colIndInd);
+    allowedInd = matIndexed(startRow:stopRow,startCol:stopCol);
+    numAllowed = numel(allowedInd);
+    allowedIndList = reshape(allowedInd,numAllowed,1);
+
+    pixInd = intersect(pxls,allowedIndList);    
+
     
     pcount = length(pixInd);
 

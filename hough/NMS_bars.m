@@ -42,7 +42,6 @@ for j=1:numPixels
 
         pxls = find(voteMat>vote(j)); % pixels having a higher vote    
 
- 
         allowedInd = matIndexed(startRow:stopRow,startCol:stopCol);
         numAllowed = numel(allowedInd);
         allowedIndList = reshape(allowedInd,numAllowed,1);
@@ -57,12 +56,12 @@ for j=1:numPixels
             % if there're any pixels having an equal vote inside the
             % neighborhood, make them zero    
             pxls = find(voteMat==vote(j));
-            %[row col] = ind2sub([numRows numCols],pxls);            
+            
             pixInd = intersect(pxls,allowedIndList);
             % remove the current pixel from this list
             thisInd = sub2ind([numRows numCols],r(j),c(j));
             pixInd = pixInd(pixInd~=thisInd);
-            % pixInd = intersect(rowInd,colInd);
+
             if(numel(pixInd)>0)
                 voteMat(pixInd)=0;
             end
@@ -93,12 +92,12 @@ for j=1:numPixels
             % if there're any pixels having an equal vote inside the
             % neighborhood, make them zero    
             pxls = find(voteMat==vote(j));
-            %[row col] = ind2sub([numRows numCols],pxls);            
+            
             pixInd = intersect(pxls,allowedIndList);
             % remove the current pixel from this list
             thisInd = sub2ind([numRows numCols],r(j),c(j));
             pixInd = pixInd(pixInd~=thisInd);
-            % pixInd = intersect(rowInd,colInd);
+
             if(numel(pixInd)>0)
                 voteMat(pixInd)=0;
             end
