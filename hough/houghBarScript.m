@@ -4,7 +4,7 @@
 displayIntermediateFigures=0;
 % imagePath = '/home/thanuja/matlabprojects/data/mitoData/stem1_48.png';
 imagePath = '/home/thanuja/matlabprojects/data/mitoData/stem1_256by256.png';
-% imagePath = 'testImgLines.png';
+%imagePath = 'testImgLines.png';
  
 invertImg = 1;      % 1 for membrane images that have to be inverted for Hough transform calculation
 
@@ -25,7 +25,7 @@ slidingDist = 1;           % the number of pixels to jump
 maxLinesPerPatch = 20;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % very important tuning parameter
-thresholdFraction = 0.65;    % fraction of max(H) to be used as a threshold for peaks
+thresholdFraction = 0.8;    % fraction of max(H) to be used as a threshold for peaks
                     % consider the fact that max(H) refers to a global
                     % maximum of H which might overlook smaller line
                     % segments in some patches with less support. 0.5 is
@@ -40,7 +40,7 @@ smoothenH = 1;      % if each local H should be smoothened using a gaussian filt
 sigmaH = 0.3;
 maskSizeH = 3;
 
-barLength = 6;
+barLength = 50;
 barWidth = 3;
 orientations = [0 45 90 135];    % can either be 4 or 8
 
