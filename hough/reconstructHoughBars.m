@@ -4,7 +4,7 @@ function output = reconstructHoughBars(peaks3D,orientations,barLength,barWidth)
 
 % Inputs:
 %   peaks3D - a 3D array [row col orientation] containing the votes
-%   orientations - e.g. [0 45 90 135]
+%   orientations - e.g. [0 45 90 135]. can be any value from 1 to 180.
 %   barLength - 
 %   barWidth -
 
@@ -30,7 +30,10 @@ for i=1:numOrientations
    
    for j=1:numPeaks
        % place a bar on each peak as described above
-       barInd = getBar(numRows,numCols,peaksInd(j),barLength,barWidth,orientation);
+       % barInd = getBar(numRows,numCols,peaksInd(j),barLength,barWidth,orientation);
+       [r,c] = ind2sub([numRows,numCols],peaksInd(j));
+       barInd = getBarPixInd(r,c,orientation,barLength,barWidth,numRows,numCols);
+       
        barVote = voteMat(peaksInd(j));
        % assign barVote to the barPixels only if the current value of
        % each barPixel is lower than barVote 

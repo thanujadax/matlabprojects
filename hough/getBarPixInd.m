@@ -1,4 +1,5 @@
 function pixelInd = getBarPixInd(r,c,orientation,barLength,barWidth,numRows,numCols)
+% works for any orientation given in degrees
 
 % define bar with 1,1 as one corner
 barOn = ones(barWidth,barLength);

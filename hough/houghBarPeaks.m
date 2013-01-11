@@ -5,6 +5,9 @@ function peaks3D = houghBarPeaks(houghSpace3D,orientations,thresholdFraction...
 % TODO: how to handle equally high peaks in the suppression neighborhood.
 % at the moment they are left alone allowing muliple equally high peaks
 % next to each other.
+
+% NB. At the moment, only thresholiding is used for peak detection. No NMS
+% etc.
                 
 % output:
 %   peaks3D - [row col orientation] 3D array containing the votes for the
@@ -16,7 +19,7 @@ function peaks3D = houghBarPeaks(houghSpace3D,orientations,thresholdFraction...
 %   orientations - vector of the orientations e.g. [0 45 90 135]
 %   thresholdFraction - what fraction of max(HoughVote) should be used for
 %   thresholding the peaks
-%   slidingDist - spacing between pixels for voting 
+%   slidingDist - spacing between pixels for voting. not used at the moment. i.e = 1. 
 %   barLength -
 %   barWidth - 
 
@@ -40,6 +43,7 @@ for i = 1:numOrientations
     
     voteMat(voteInd) = votes(voteInd);
     
-    peaks3D(:,:,i) = NMS_bars(voteMat,orientations(i),barLength,barWidth);
+    % peaks3D(:,:,i) = NMS_bars(voteMat,orientations(i),barLength,barWidth);
+    peaks3D(:,:,i) = voteMat;
     
 end
