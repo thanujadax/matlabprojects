@@ -17,6 +17,10 @@ colMargin = ceil(barLength-1/2)+2;
 
 % first implementation for 4 orientations each 45 degrees apart (default)
 
+totIter = (numRows - 2*rowMargin)*numOrientations; % for the progress bar
+counter = 0; % for the progress bar
+progressbar('Calculating 3D Hough space') % Create figure and set starting time
+
 for orientationInd=1:numOrientations
     orientation = orientations(orientationInd);
     for r=rowMargin:slidingDist:numRows-rowMargin
@@ -27,5 +31,7 @@ for orientationInd=1:numOrientations
             
         end
     end
-    
+    counter = counter + 1;    
+    progressbar(counter/totIter) % Update progress bar 
 end
+progressbar(1);

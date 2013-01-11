@@ -20,7 +20,7 @@ slidingDist = 1;           % the number of pixels to jump
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % very important tuning parameter
-thresholdFraction = 0.8;    % fraction of max(H) to be used as a threshold for peaks
+thresholdFraction = 0.5;    % fraction of max(H) to be used as a threshold for peaks
                     % consider the fact that max(H) refers to a global
                     % maximum of H which might overlook smaller line
                     % segments in some patches with less support. 0.5 is
@@ -29,13 +29,12 @@ thresholdFraction = 0.8;    % fraction of max(H) to be used as a threshold for p
 
 barLength = 9;
 barWidth = 3;
-orientations = 0:20:160;    % can either be 4 or 8
-
+orientations = 0:22.5:157.5;    
 withBackground = 0;     % plot the detected bars with the original image in the background
 
 %% input preprocessing
 imgIn = double(imread(imagePath))/255;
-% imgIn = imgIn(1:128,1:128);
+imgIn = imgIn(1:128,1:128);
 
 if(size(size(imgIn),2)>2)
     img = imgIn(:,:,1);
@@ -86,10 +85,8 @@ end
 %% Hough
 % perform Hough type processing (voting) for oriented bars
 display('Computing 3D hough space...');
-tic
 houghSpace3D = houghBars_P(imgInv,barLength,barWidth,orientations,slidingDist);
 display('3D hough space computed!');
-toc
 % houghSpace3D [row col orientation]
 
 % peak detection
@@ -98,9 +95,7 @@ peaks3D = houghBarPeaks(houghSpace3D,orientations,thresholdFraction...
 
 % draw the detected bars on the image
 display('Reconstructing interpreted outline of the image...');
-tic
-output = reconstructHoughBars(peaks3D,orientations,barLength,barWidth);
+output = reconstructHoughBars_P(peaks3D,orientations,barLength,barWidth);
 display('Reconstruction completed!');
-toc
 figure(101);imagesc(output);title('reconstruction using oriented bars')
 
