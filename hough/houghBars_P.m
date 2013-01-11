@@ -38,5 +38,5 @@ for i=1:numOrientations
     end
 end
 
-%progressbar(1);
+progressbar(1);
    

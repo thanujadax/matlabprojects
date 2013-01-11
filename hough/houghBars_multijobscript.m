@@ -1,9 +1,10 @@
 % Hough: detecting oriented bars
 
 %% parameters
+savefilepath = '/home/thanuja/Dropbox/RESULTS/hough/houghBars/multijob/';
 displayIntermediateFigures=1;
-%imagePath = '/home/thanuja/matlabprojects/data/mitoData/stem1_48.png';
-imagePath = '/home/thanuja/matlabprojects/data/mitoData/stem1_256by256.png';
+imagePath = '/home/thanuja/matlabprojects/data/mitoData/stem1_48.png';
+%imagePath = '/home/thanuja/matlabprojects/data/mitoData/stem1_256by256.png';
 % imagePath = 'testImgLines.png';
  
 invertImg = 1;      % 1 for membrane images that have to be inverted for Hough transform calculation
@@ -35,7 +36,7 @@ withBackground = 0;     % plot the detected bars with the original image in the 
 
 %% input preprocessing
 imgIn = double(imread(imagePath))/255;
-imgIn = imgIn(1:128,1:128);
+%imgIn = imgIn(1:128,1:128);
 
 if(size(size(imgIn),2)>2)
     img = imgIn(:,:,1);
@@ -85,27 +86,37 @@ if(gaussianFiltering==1)
 end
 %% Hough
 % perform Hough type processing (voting) for oriented bars
-display('Computing 3D hough space...');
-t0 = cputime;
-houghSpace3D = houghBars_P(imgInv,barLength,barWidth,orientations,slidingDist);
-t1 = cputime;
-display('3D hough space computed!');
-dt = t1 - t0;
-str = sprintf('Time taken for hough space creation = %0.5f s',dt);
-disp(str);
-% houghSpace3D [row col orientation]
+for barWidth = 3:2:5
+    for barLength = 5:2:7
+        str = sprintf('barWidth = %d ; barLength = %d',barWidth,barLength);
+        disp(str);
+        display('Computing 3D hough space...');
+        t0 = cputime;
+        houghSpace3D = houghBars_P(imgInv,barLength,barWidth,orientations,slidingDist);
+        t1 = cputime;
+        display('3D hough space computed!');
+        dt = t1 - t0;
+        str = sprintf('Time taken for hough space creation = %0.5f s',dt);
+        disp(str);
+        % houghSpace3D [row col orientation]
 
-% peak detection
-peaks3D = houghBarPeaks(houghSpace3D,orientations,thresholdFraction...
-                            ,slidingDist,barLength,barWidth);  
+        % peak detection
+        peaks3D = houghBarPeaks(houghSpace3D,orientations,thresholdFraction...
+                                    ,slidingDist,barLength,barWidth);  
 
-% draw the detected bars on the image
-display('Reconstructing interpreted outline of the image...');
-t2 = cputime;
-output = reconstructHoughBars_P(peaks3D,orientations,barLength,barWidth);
-t3 = cputime;
-display('Reconstruction completed!');
-figure(101);imagesc(output);title('reconstruction using oriented bars')
-dt = t3-t2;
-str = sprintf('Time taken for reconstruction = %0.5f s',dt);
-disp(str);
+        % draw the detected bars on the image
+        display('Reconstructing interpreted outline of the image...');
+        t2 = cputime;
+        output = reconstructHoughBars_P(peaks3D,orientations,barLength,barWidth);
+        t3 = cputime;
+        display('Reconstruction completed!');
+        h = figure(101);imagesc(output);title('reconstruction using oriented bars')
+        dt = t3-t2;
+        str = sprintf('Time taken for reconstruction = %0.5f s',dt);
+        disp(str);
+        % save plots
+        savefilename = sprintf('L%d-W%d.png',barLength,barWidth);
+        savefilename = strcat(savefilepath,savefilename);
+        saveas(h,savefilename);
+    end
+end
