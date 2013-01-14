@@ -27,15 +27,15 @@ thresholdFraction = 0.5;    % fraction of max(H) to be used as a threshold for p
                     % recommended
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-barLength = 13; % should be odd
-barWidth = 5; % should be odd
+barLength = 9; % should be odd
+barWidth = 3; % should be odd
 
 orientations = 0:10:170;    
 withBackground = 0;     % plot the detected bars with the original image in the background
 
 %% input preprocessing
 imgIn = double(imread(imagePath))/255;
-imgIn = imgIn(1:128,1:128);
+imgIn = imgIn(1:128,129:256);
 
 if(size(size(imgIn),2)>2)
     img = imgIn(:,:,1);
