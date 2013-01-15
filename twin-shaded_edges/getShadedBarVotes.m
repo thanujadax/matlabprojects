@@ -21,10 +21,10 @@ colMargin = ceil(barLength-1/2)+2;
 
 totIter = (numRows - 2*rowMargin)*numOrientations; % for the progress bar
 counter = 0; % for the progress bar
-progressbar('Calculating 3D Hough space'); % Create figure and set starting time
+progressbar('Calculating 3D vote space'); % Create figure and set starting time
 
     %orientation = orientations(orientationInd);
-display('houghBars_P: parallel computation of the Hough space')
+display('getShadedBarVotes: parallel computation of the 3D vote space')
 for i=1:numOrientations
     for r=rowMargin:numRows-rowMargin
         orientation = orientations(i);

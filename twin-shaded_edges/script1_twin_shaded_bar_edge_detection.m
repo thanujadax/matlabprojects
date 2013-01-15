@@ -27,7 +27,7 @@ thresholdFraction = 0.5;    % fraction of max(H) to be used as a threshold for p
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 barLength = 9; % should be odd
-barWidth = 4; % should be even
+barWidth = 5; % should be odd
 
 orientations = 0:10:170;    
 withBackground = 0;     % plot the detected bars with the original image in the background
@@ -83,7 +83,9 @@ if(gaussianFiltering==1)
     end
 end
 %% Edge detection using twin-shaded bar templates
-barVotes = getShadedBarVotes(imgInv,barLength,barWidth,orientations,slidingDist);
+barVotes3D = getShadedBarVotes(imgInv,barLength,barWidth,orientations,slidingDist);
 
 % Reconstruction of image with bar position, orientation and vote
 % information
+output = reconstructTwinBars(barVotes3D,orientations,barLength,barWidth);
+

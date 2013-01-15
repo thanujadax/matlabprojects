@@ -1,5 +1,7 @@
 function pixelInd = getBarPixInd(r,c,orientation,barLength,barWidth,numRows,numCols)
 % works for any orientation given in degrees
+% gives the indices of the pixels that form a bar of given length and with
+% and orientation, centered around the given point (r,c)
 
 % define bar with 1,1 as one corner
 barOn = ones(barWidth,barLength);

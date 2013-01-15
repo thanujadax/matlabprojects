@@ -1,6 +1,7 @@
-function output = reconstructHoughBars_P(peaks3D,orientations,barLength,barWidth)
+function output = reconstructTwinBars(peaks3D,orientations,barLength,barWidth)
 % reconstructs the original image based on the peaks given for each
-% orientation
+% orientation using the twin shaded bars
+
 % Parallel
 
 % Inputs:
