@@ -20,15 +20,19 @@ function output = reconstructTwinBars(peaks3D,orientations,barLength,barWidth)
 %   preference to decide its intensity when two overlapping bars compete
 %   for the same pixel
 
+% output is a 3 layered matrix [H S V]
+%   H - orientation
+%   S - number of equally high orientations
+%   V - vote
 
 [numRows numCols numOrientations] = size(peaks3D);
 outputs = zeros(numRows,numCols,numOrientations);
 %numBarPix = barLength*barWidth;
-
+maxVote = max(max(max(peaks3D)));
 display('calculating pixel value per each orientation');
 
 parfor i=1:numOrientations
-    orientation = orientations(i);
+    ori = orientations(i);
     voteMat = peaks3D(:,:,i);
     peaksInd = find(voteMat);
     numPeaks = numel(peaksInd);
@@ -39,7 +43,7 @@ parfor i=1:numOrientations
        % place a bar on each peak as described above
        % barInd = getBar(numRows,numCols,peaksInd(j),barLength,barWidth,orientation);
        [r,c] = ind2sub([numRows,numCols],peaksInd(j));
-       barInd = getBarPixInd(r,c,orientation,barLength,barWidth,numRows,numCols);
+       barInd = getBarPixInd(r,c,ori,barLength,barWidth,numRows,numCols);
 
        % a row of barInd corresponds to the peak j of this orientation   
        barVote = voteMat(peaksInd(j));
@@ -59,9 +63,19 @@ end
 % construct the final output so that each pixel displays its maximum vote
 display('Assembling the final output...');
 progressbar('Assembling the final output')
+output = zeros(numRows,numCols,3);
 for r=1:numRows
-    parfor c=1:numCols
-        output(r,c)=max(outputs(r,c,:));
+    for c=1:numCols
+        vote=max(outputs(r,c,:)); % vote stored in layer 3 - H
+        output(r,c,3) = vote/maxVote;
+        ori = find(outputs(r,c,:)==vote);
+        if(numel(ori)>1)
+            ori = 0;
+            output(r,c,2)=numel(ori)/numOrientations;
+        else
+            ori = orientations(ori);
+        end
+        output(r,c,1) = ori/180;           % orientation
     end
     progressbar(r/numRows);
 end

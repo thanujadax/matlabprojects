@@ -12,7 +12,7 @@ grayThreshold = 0.5;
 
 gaussianFiltering = 0;      % 1 if gaussian filtering should be performed on the input image
 sigma = 1;
-maskSize = 5;
+maskSize = 3;
 
 slidingDist = 1;           % the number of pixels to jump
 
@@ -88,4 +88,8 @@ barVotes3D = getShadedBarVotes(imgInv,barLength,barWidth,orientations,slidingDis
 % Reconstruction of image with bar position, orientation and vote
 % information
 output = reconstructTwinBars(barVotes3D,orientations,barLength,barWidth);
+figure(101);
+colormap('hsv')
+imagesc(output);title('Edge reconstruction using twin shaded bars')
+
 

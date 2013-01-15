@@ -16,4 +16,4 @@ function pixWeight = getTwinShadedBarWeight(img,r,c,orientation,barLength,barWid
 pixValsUp = img(pixIndUp); % should contain mostly positive values at the edges
 pixValsDown = img(pixIndDown); % should contain mostly negative values at the edges
 
-pixWeight = sum(pixValsUp) - sum(pixValsDown);
+pixWeight = sum(pixValsUp) - 2*sum(pixValsDown);
