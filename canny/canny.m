@@ -69,9 +69,9 @@ for y=2:1:size(I,1)-1
             if((Mag(y,x)>Mag(y,x+1)) && (Mag(y,x)>Mag(y,x-1)))
                 if(Mag(y,x)>=lthresh)
                     if(Mag(y,x)>=uthresh)
-                gnh(y,x)=1;
+                        gnh(y,x)=1;
                     else
-                    gnl(y,x)=1;
+                        gnl(y,x)=1;
                     end
                 end
             end
@@ -80,9 +80,9 @@ for y=2:1:size(I,1)-1
             if((Mag(y,x)>Mag(y+1,x)) && (Mag(y,x)>Mag(y-1,x)))
                 if(Mag(y,x)>=lthresh)
                     if(Mag(y,x)>=uthresh)
-                gnh(y,x)=1;
+                        gnh(y,x)=1;
                     else
-                    gnl(y,x)=1;
+                        gnl(y,x)=1;
                     end
                 end
             end
@@ -91,9 +91,9 @@ for y=2:1:size(I,1)-1
             if((Mag(y,x)>Mag(y-1,x+1)) && (Mag(y,x)>Mag(y+1,x-1)))
                 if(Mag(y,x)>=lthresh)
                     if(Mag(y,x)>=uthresh)
-                gnh(y,x)=1;
+                        gnh(y,x)=1;
                     else
-                    gnl(y,x)=1;
+                        gnl(y,x)=1;
                     end
                 end
             end
@@ -102,9 +102,9 @@ for y=2:1:size(I,1)-1
             if((Mag(y,x)>Mag(y+1,x+1)) && (Mag(y,x)>Mag(y-1,x-1)))
                 if(Mag(y,x)>=lthresh)
                     if(Mag(y,x)>=uthresh)
-                gnh(y,x)=1;
+                        gnh(y,x)=1;
                     else
-                    gnl(y,x)=1;
+                        gnl(y,x)=1;
                     end
                 end
             end

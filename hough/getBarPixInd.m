@@ -6,8 +6,8 @@ function pixelInd = getBarPixInd(r,c,orientation,barLength,barWidth,numRows,numC
 % define bar with 1,1 as one corner
 barOn = ones(barWidth,barLength);
 % get the center of the bar
-c0 = floor((barLength-1)/2)+1;
-r0 = floor((barWidth-1)/2)+1;
+c0 = floor((barLength+1)/2);
+r0 = floor((barWidth+1)/2);
 % rotate bar around it's mid point
 if(orientation>0)
     orientation = 180 - orientation;

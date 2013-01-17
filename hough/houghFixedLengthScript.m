@@ -20,21 +20,21 @@ gaussianFiltering = 0;      % 1 if gaussian filtering should be performed on the
 sigma = 1;
 maskSize = 5;
 
-bb = 32;                    % patch size
-slidingDist = 16;           % the number of overlapping pixels
+bb = 24;                    % patch size
+slidingDist = 8;           % the number of overlapping pixels
 
-maxLinesPerPatch = 20;
+maxLinesPerPatch = 50;
 thresholdFraction = 0.5;    % fraction of max(H) to be used as a threshold for peaks
                     % consider the fact that max(H) refers to a global
                     % maximum of H which might overlook smaller line
                     % segments in some patches with less support. 0.5 is
                     % recommended
                     
-houghSupNHood = [5 5];      % suppression neighborhood at each identified peak
+houghSupNHood = [3 3];      % suppression neighborhood at each identified peak
 fillGap = 2;                % fill gaps smaller than this to combine two collinear lines    
-minLength = 20;              % minimum length of lines to be detected
+minLength = 10;              % minimum length of lines to be detected
 
-smoothenH = 1;      % if each local H should be smoothened using a gaussian filter
+smoothenH = 0;      % if each local H should be smoothened using a gaussian filter
 sigmaH = 0.3;
 maskSizeH = 3;
 

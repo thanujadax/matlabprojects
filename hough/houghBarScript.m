@@ -35,7 +35,7 @@ withBackground = 0;     % plot the detected bars with the original image in the 
 
 %% input preprocessing
 imgIn = double(imread(imagePath))/255;
-imgIn = imgIn(1:128,129:256);
+imgIn = imgIn(1:128,1:128);
 
 if(size(size(imgIn),2)>2)
     img = imgIn(:,:,1);
