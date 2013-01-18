@@ -2,8 +2,8 @@
 
 %% parameters
 displayIntermediateFigures=1;
-%imagePath = '/home/thanuja/matlabprojects/data/mitoData/stem1_48.png';
-imagePath = '/home/thanuja/matlabprojects/data/mitoData/stem1_256by256.png';
+imagePath = '/home/thanuja/matlabprojects/data/mitoData/stem1_48.png';
+%imagePath = '/home/thanuja/matlabprojects/data/mitoData/stem1_256by256.png';
 % imagePath = 'testImgLines.png';
  
 invertImg = 1;      % 1 for membrane images that have to be inverted for Hough transform calculation
@@ -33,9 +33,11 @@ barWidth = 3; % should be odd
 orientations = 0:10:170;    
 withBackground = 0;     % plot the detected bars with the original image in the background
 
+sigmaDeriv = 0.8;   % for the gaussian derivative (to produce edge map)
+
 %% input preprocessing
 imgIn = double(imread(imagePath))/255;
-imgIn = imgIn(1:128,1:128);
+%imgIn = imgIn(1:128,1:128);
 
 if(size(size(imgIn),2)>2)
     img = imgIn(:,:,1);
@@ -99,13 +101,25 @@ disp(str);
 peaks3D = houghBarPeaks(houghSpace3D,orientations,thresholdFraction...
                             ,slidingDist,barLength,barWidth);  
 
-% draw the detected bars on the image
+% % draw the detected bars on the image
+% display('Reconstructing interpreted outline of the image...');
+% t2 = cputime;
+% output = reconstructHoughBars_P(peaks3D,orientations,barLength,barWidth);
+% t3 = cputime;
+% display('Reconstruction completed!');
+% figure(101);imagesc(output);title('reconstruction using oriented bars')
+% dt = t3-t2;
+% str = sprintf('Time taken for reconstruction = %0.5f s',dt);
+% disp(str);
+%% optimized reconstruction
+gradMap = getGradientMap(imgInv,sigmaDeriv);
 display('Reconstructing interpreted outline of the image...');
 t2 = cputime;
-output = reconstructHoughBars_P(peaks3D,orientations,barLength,barWidth);
+output = reconstructHoughBars_heuristic(peaks3D,orientations,barLength,barWidth,gradMap);
 t3 = cputime;
 display('Reconstruction completed!');
 figure(101);imagesc(output);title('reconstruction using oriented bars')
 dt = t3-t2;
 str = sprintf('Time taken for reconstruction = %0.5f s',dt);
 disp(str);
+

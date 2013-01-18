@@ -23,7 +23,7 @@ function output = reconstructHoughBars_P(peaks3D,orientations,barLength,barWidth
 [numRows numCols numOrientations] = size(peaks3D);
 outputs = zeros(numRows,numCols,numOrientations);
 %numBarPix = barLength*barWidth;
-
+margin = (max(barLength,barWidth)+1)/2;
 display('calculating pixel value per each orientation');
 
 parfor i=1:numOrientations
@@ -38,7 +38,13 @@ parfor i=1:numOrientations
        % place a bar on each peak as described above
        % barInd = getBar(numRows,numCols,peaksInd(j),barLength,barWidth,orientation);
        [r,c] = ind2sub([numRows,numCols],peaksInd(j));
+       if(r<margin||c<margin||r>=(numRows-margin)||c>=(numCols-margin))
+           continue;
+       end
        barInd = getBarPixInd(r,c,orientation,barLength,barWidth,numRows,numCols);
+       if(barInd==-1)
+           continue;
+       end
 
        % a row of barInd corresponds to the peak j of this orientation   
        barVote = voteMat(peaksInd(j));

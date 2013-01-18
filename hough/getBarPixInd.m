@@ -19,6 +19,10 @@ end
 rShift = r - r0;
 cShift = c - c0;
 %[rows cols] = ind2sub([barWidth barLength],barInd);
-rows = rows + rShift;
-cols = cols + cShift;
-pixelInd = sub2ind([numRows numCols],rows,cols);
+rows = rows + rShift
+cols = cols + cShift
+if(numel(rows>numRows)>0 || numel(cols>numCols)>0)
+    pixelInd = -1;
+else
+    pixelInd = sub2ind([numRows numCols],rows,cols);
+end
