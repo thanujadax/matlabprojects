@@ -29,6 +29,10 @@ display('calculating pixel value per each orientation');
 parfor i=1:numOrientations
     orientation = orientations(i);
     voteMat = peaks3D(:,:,i);
+    voteMat(1:margin,:) = 0;
+    voteMat((numRows-margin):numRows,:) = 0;
+    voteMat(:,1:margin) = 0;
+    voteMat(:,(numCols-margin):numCols) = 0;
     peaksInd = find(voteMat);
     numPeaks = numel(peaksInd);
     %barInd = zeros(numPeaks,numBarPix);
@@ -38,9 +42,9 @@ parfor i=1:numOrientations
        % place a bar on each peak as described above
        % barInd = getBar(numRows,numCols,peaksInd(j),barLength,barWidth,orientation);
        [r,c] = ind2sub([numRows,numCols],peaksInd(j));
-       if(r<margin||c<margin||r>=(numRows-margin)||c>=(numCols-margin))
-           continue;
-       end
+%        if(r<margin||c<margin||r>=(numRows-margin)||c>=(numCols-margin))
+%            continue;
+%        end
        barInd = getBarPixInd(r,c,orientation,barLength,barWidth,numRows,numCols);
        if(barInd==-1)
            continue;

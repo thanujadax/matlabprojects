@@ -26,7 +26,13 @@ margin = (max(barLength,barWidth)+1)/2 + 1;
 for i=1:numOrientations
    orientation = orientations(i);
    voteMat = peaks3D(:,:,i);
-   peaksInd = find(voteMat(margin:(numRows-margin),margin:(numCols-margin)));
+   % make sure the margin is set to zero
+    voteMat(1:margin,:) = 0;
+    voteMat((numRows-margin):numRows,:) = 0;
+    voteMat(:,1:margin) = 0;
+    voteMat(:,(numCols-margin):numCols) = 0;
+   % peaksInd = find(voteMat(margin:(numRows-margin),margin:(numCols-margin)));
+   peaksInd = find(voteMat);
    numPeaks = numel(peaksInd);
    
    for j=1:numPeaks

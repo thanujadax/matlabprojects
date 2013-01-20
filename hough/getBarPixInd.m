@@ -19,10 +19,20 @@ end
 rShift = r - r0;
 cShift = c - c0;
 %[rows cols] = ind2sub([barWidth barLength],barInd);
-rows = rows + rShift
-cols = cols + cShift
-if(numel(rows>numRows)>0 || numel(cols>numCols)>0)
+rows = rows + rShift;
+cols = cols + cShift;
+
+% check if there are any elements of 'rows' which is greater than the value
+% of 'numRows'. avoid this situation since it will give a runtime error.
+% the same for 'cols'.
+if(numel(find(rows>numRows))>0 || numel(find(cols>numCols))>0)
     pixelInd = -1;
 else
     pixelInd = sub2ind([numRows numCols],rows,cols);
 end
+% if(numel(find(rows>numRows))==0 || numel(find(cols>numCols))==0 || ...
+%         find(rows<1))
+%     pixelInd = sub2ind([numRows numCols],rows,cols);
+% else
+%     pixelInd = -1;
+% end

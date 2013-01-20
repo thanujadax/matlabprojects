@@ -9,7 +9,13 @@ margin = (max(barLength,barWidth)+1)/2 ;
 [numRows numCols numOrientations] = size(peaks3D);
 % initialize
 gradHarmonizedPeaks3D = zeros(numRows,numCols,numOrientations);
+% remove gradient magnitudes from the image border
 gradMag = gradMap(:,:,1);
+gradMag(1:margin,:) = 0;
+gradMag((numRows-margin):numRows,:) = 0;
+gradMag(:,1:margin) = 0;
+gradMag(:,(numCols-margin):numCols) = 0;
+
 gradMag = gradMag./max(max(gradMag));
 gradOri = gradMap(:,:,2);
 % discretize gradMap(:,:,2) to match the [orientations]
@@ -35,8 +41,8 @@ gradOriPerp(adjInd) = gradOriPerp(adjInd) + 180;
 parfor i=1:numOrientations
     % for each orientation, identify the relevant points from gradMap
     orientation = orientations(i);
-    gradPointInd = getSimilarGradOriPoints(gradOriPerp,orientation,margin); % indices of the points
-            % that are relevant for this orientation
+    gradPointInd = getSimilarGradOriPoints(gradOriPerp,orientation); % indices of the points
+            % that are relevant for this orientation (doesn't consider magnitude)
     gradMag_i = gradMag;
     ind_gradMag_i = find(gradMag_i>gradThresh);
     gradPointInd = intersect(gradPointInd,ind_gradMag_i);

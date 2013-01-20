@@ -32,7 +32,7 @@ output = zeros(numRows,numCols,3);
 % Adjust the votes to reflect the harmony with the gradient of the image
 % (i.e the edge structures)
 gradHarmonizedPeaks3D = gradHarmonizePeaks(peaks3D,orientations,gradMap,barLength,barWidth);
-output = reconstructHoughBars(gradHarmonizedPeaks3D,orientations,barLength,barWidth);
+output = reconstructHoughBars_P(gradHarmonizedPeaks3D,orientations,barLength,barWidth);
 
 %% plots
 % figure(700);imagesc(output);colormap(hsv);

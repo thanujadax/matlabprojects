@@ -2,11 +2,11 @@
 
 %% parameters
 displayIntermediateFigures=1;
-imagePath = '/home/thanuja/matlabprojects/data/mitoData/stem1_48.png';
+%imagePath = '/home/thanuja/matlabprojects/data/mitoData/stem1_48.png';
 %imagePath = '/home/thanuja/matlabprojects/data/mitoData/stem1_256by256.png';
-% imagePath = 'testImgLines.png';
+imagePath = 'testImgLines.png';
  
-invertImg = 1;      % 1 for membrane images that have to be inverted for Hough transform calculation
+invertImg = 0;      % 1 for membrane images that have to be inverted for Hough transform calculation
 
 grayThresholding = 0;       % 1 if the inverted image should be thresholded
 grayThreshold = 0.5;
