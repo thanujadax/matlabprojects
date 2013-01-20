@@ -16,7 +16,7 @@ gradMag((numRows-margin):numRows,:) = 0;
 gradMag(:,1:margin) = 0;
 gradMag(:,(numCols-margin):numCols) = 0;
 
-gradMag = gradMag./max(max(gradMag));
+gradMag = gradMag./max(max(gradMag)); % normalizing gradient magnitudes 0-1
 gradOri = gradMap(:,:,2);
 % discretize gradMap(:,:,2) to match the [orientations]
 %discreteGradOri = discretizeAngles(gradMap(:,:,2),orientations);
@@ -38,7 +38,7 @@ gradOriPerp(adjInd) = gradOriPerp(adjInd) + 180;
 
 % get the points with this orientation from gradMap - GP1
 
-parfor i=1:numOrientations
+for i=1:numOrientations
     % for each orientation, identify the relevant points from gradMap
     orientation = orientations(i);
     gradPointInd = getSimilarGradOriPoints(gradOriPerp,orientation); % indices of the points

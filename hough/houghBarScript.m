@@ -33,7 +33,7 @@ barWidth = 3; % should be odd
 orientations = 0:10:170;    
 withBackground = 0;     % plot the detected bars with the original image in the background
 
-sigmaDeriv = 0.8;   % for the gaussian derivative (to produce edge map)
+sigmaDeriv = 0.5;   % for the gaussian derivative (to produce edge map)
 
 %% input preprocessing
 imgIn = double(imread(imagePath))/255;
