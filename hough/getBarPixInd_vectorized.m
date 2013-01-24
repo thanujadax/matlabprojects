@@ -1,4 +1,7 @@
-function pixelInd = getBarPixInd(r,c,orientation,barLength,barWidth,numRows,numCols)
+function pixelInd = getBarPixInd_vectorized(r,c,orientation,barLength,barWidth,numRows,numCols)
+
+% TODO: vectorize?
+
 % works for any orientation given in degrees
 % gives the indices of the pixels that form a bar of given length and with
 % and orientation, centered around the given point (r,c)

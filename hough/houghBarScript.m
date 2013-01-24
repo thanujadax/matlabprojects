@@ -3,10 +3,10 @@
 %% parameters
 displayIntermediateFigures=1;
 %imagePath = '/home/thanuja/matlabprojects/data/mitoData/stem1_48.png';
-%imagePath = '/home/thanuja/matlabprojects/data/mitoData/stem1_256by256.png';
-imagePath = 'testImgLines.png';
+imagePath = '/home/thanuja/matlabprojects/data/mitoData/stem1_256by256.png';
+%imagePath = 'testImgLines.png';
  
-invertImg = 0;      % 1 for membrane images that have to be inverted for Hough transform calculation
+invertImg = 1;      % 1 for membrane images that have to be inverted for Hough transform calculation
 
 grayThresholding = 0;       % 1 if the inverted image should be thresholded
 grayThreshold = 0.5;
@@ -37,7 +37,7 @@ sigmaDeriv = 0.5;   % for the gaussian derivative (to produce edge map)
 
 %% input preprocessing
 imgIn = double(imread(imagePath))/255;
-%imgIn = imgIn(1:128,1:128);
+imgIn = imgIn(1:128,1:128);
 
 if(size(size(imgIn),2)>2)
     img = imgIn(:,:,1);
@@ -89,7 +89,7 @@ end
 % perform Hough type processing (voting) for oriented bars
 display('Computing 3D hough space...');
 t0 = cputime;
-houghSpace3D = houghBars_P(imgInv,barLength,barWidth,orientations,slidingDist);
+houghSpace3D = houghBars2_P(imgInv,barLength,barWidth,orientations,slidingDist);
 t1 = cputime;
 display('3D hough space computed!');
 dt = t1 - t0;
@@ -101,25 +101,25 @@ disp(str);
 peaks3D = houghBarPeaks(houghSpace3D,orientations,thresholdFraction...
                             ,slidingDist,barLength,barWidth);  
 
-% % draw the detected bars on the image
-% display('Reconstructing interpreted outline of the image...');
-% t2 = cputime;
-% output = reconstructHoughBars_P(peaks3D,orientations,barLength,barWidth);
-% t3 = cputime;
-% display('Reconstruction completed!');
-% figure(101);imagesc(output);title('reconstruction using oriented bars')
-% dt = t3-t2;
-% str = sprintf('Time taken for reconstruction = %0.5f s',dt);
-% disp(str);
-%% optimized reconstruction
-gradMap = getGradientMap(imgInv,sigmaDeriv);
+% draw the detected bars on the image
 display('Reconstructing interpreted outline of the image...');
 t2 = cputime;
-output = reconstructHoughBars_heuristic(peaks3D,orientations,barLength,barWidth,gradMap);
+output = reconstructHoughBars_P(peaks3D,orientations,barLength,barWidth);
 t3 = cputime;
 display('Reconstruction completed!');
 figure(101);imagesc(output);title('reconstruction using oriented bars')
 dt = t3-t2;
 str = sprintf('Time taken for reconstruction = %0.5f s',dt);
 disp(str);
+%% edge optimized reconstruction
+% gradMap = getGradientMap(imgInv,sigmaDeriv);
+% display('Reconstructing interpreted outline of the image...');
+% t2 = cputime;
+% output = reconstructHoughBars_heuristic(peaks3D,orientations,barLength,barWidth,gradMap);
+% t3 = cputime;
+% display('Reconstruction completed!');
+% figure(101);imagesc(output);title('reconstruction using oriented bars')
+% dt = t3-t2;
+% str = sprintf('Time taken for reconstruction = %0.5f s',dt);
+% disp(str);
 

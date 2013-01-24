@@ -8,7 +8,7 @@ function I = displayDictionaryElementsAsImage(D, numRows, numCols,X,Y,sortVarFla
 
 borderSize = 1;
 columnScanFlag = 1;
-strechEachVecFlag = 0;
+strechEachVecFlag = 1;
 showImFlag = 0;
 
 if (length(who('X'))==0)
