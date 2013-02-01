@@ -1,4 +1,4 @@
-function houghSpace3D = houghBars2_P(img,barLength,barWidth,orientations,slidingDist)
+function houghSpace3D = houghBars2_P(img,barLength,barWidth,orientations,slidingDist,thresh)
 
 % inputs: 
 %   img - contains the pixels that should be used for calculating the hough
@@ -24,7 +24,7 @@ margin = ceil(max(barLength,barWidth)+1/2);   % allowing a margin in the image
 
 % progressbar('Calculating 3D Hough space'); % Create figure and set starting time
 % get the indices of the pixels that should be voted with
-inds = find(img>0.4);
+inds = find(img>thresh);
 totPoints = numel(inds);
 
 parfor i=1:numOrientations

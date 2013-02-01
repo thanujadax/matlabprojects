@@ -22,7 +22,7 @@ maxNumBlocksToTrainOn = 10000; %  - the maximal number of blocks
 %                       to train on. The default value for this parameter is
 %                       65000. However, it might not be enough for very large
 %                       images
-maxBlocksToConsider = 60000; % - maximal number of blocks that
+maxBlocksToConsider = 70000; % - maximal number of blocks that
 %                       can be processed. This number is dependent on the memory
 %                       capabilities of the machine, and performances�
 %                       considerations. If the number of available blocks in the
@@ -36,7 +36,8 @@ pathForImages = '/home/thanuja/matlabprojects/data/mitoData/';
 imageName = 'stem1_256by256.png'; % for initial dictionary
 
 % newImagePath = '/home/thanuja/matlabprojects/data/mitoData/stem1_256by256_2.png'; % unseen image
-newImagePath = '/home/thanuja/matlabprojects/data/mitoData/stem1_256by256.png';
+%newImagePath = '/home/thanuja/matlabprojects/data/mitoData/stem1_256by256.png';
+newImagePath = '/home/thanuja/Dropbox/data/em_2013january/raw/01.tif';
 
 IMin_0 = imread(newImagePath);
 % preprocessing (to remove the dark edges at the bottom and to the right)
@@ -54,7 +55,10 @@ end
 if (max(IMin(:))<2)
     IMin = IMin*255;
 end
+%%%%% select only part of the image for training
+IMin = IMin(1:256,1:256);
 
+%%%%%% gaussian filtering
 sigmaGauss = 5.0;
 gaussMaskSize = 5;
 IMin = gaussianFilter(IMin,sigmaGauss,gaussMaskSize);
@@ -71,4 +75,4 @@ reduceDC = 0;
 %     maxBlocksToConsider,sigma,C,slidingDis,waitBarOn,reduceDC,numWords);
 [IOut,sparsecoeff,vecOfMeans] = SparseCodeImageNN(IMin,Dictionary,bb,...
     maxBlocksToConsider,sigma,C,slidingDis,waitBarOn,reduceDC,numWords,numIter);
-imshow(IOut,[]);
+figure;imshow(IOut,[]);

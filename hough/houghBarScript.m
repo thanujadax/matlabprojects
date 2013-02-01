@@ -5,6 +5,8 @@ displayIntermediateFigures=1;
 %imagePath = '/home/thanuja/matlabprojects/data/mitoData/stem1_48.png';
 imagePath = '/home/thanuja/matlabprojects/data/mitoData/stem1_256by256.png';
 %imagePath = 'testImgLines.png';
+
+Hthresh = 0.4; % pixels above this value will be used for hough voting
  
 invertImg = 1;      % 1 for membrane images that have to be inverted for Hough transform calculation
 
@@ -34,6 +36,7 @@ orientations = 0:10:170;
 withBackground = 0;     % plot the detected bars with the original image in the background
 
 sigmaDeriv = 0.5;   % for the gaussian derivative (to produce edge map)
+
 
 %% input preprocessing
 imgIn = double(imread(imagePath))/255;
@@ -89,7 +92,7 @@ end
 % perform Hough type processing (voting) for oriented bars
 display('Computing 3D hough space...');
 t0 = cputime;
-houghSpace3D = houghBars2_P(imgInv,barLength,barWidth,orientations,slidingDist);
+houghSpace3D = houghBars2_P(imgInv,barLength,barWidth,orientations,slidingDist,Hthresh);
 t1 = cputime;
 display('3D hough space computed!');
 dt = t1 - t0;
