@@ -29,12 +29,13 @@ function output = reconstructTwinBars(peaks3D,orientations,barLength,barWidth)
 outputs = zeros(numRows,numCols,numOrientations);
 %numBarPix = barLength*barWidth;
 maxVote = max(max(max(peaks3D)));
+thresh = maxVote*0.7;
 display('calculating pixel value per each orientation');
 
 parfor i=1:numOrientations
     ori = orientations(i);
     voteMat = peaks3D(:,:,i);
-    peaksInd = find(voteMat);
+    peaksInd = find(voteMat>thresh);
     numPeaks = numel(peaksInd);
     %barInd = zeros(numPeaks,numBarPix);
     %barVote = zeros(numPeaks,1);
