@@ -68,15 +68,17 @@ output = zeros(numRows,numCols,3);
 for r=1:numRows
     for c=1:numCols
         vote=max(outputs(r,c,:)); % vote stored in layer 3 - H
-        output(r,c,3) = vote/maxVote;
-        ori = find(outputs(r,c,:)==vote);
-        if(numel(ori)>1)
-            ori = 0;
-            output(r,c,2)=numel(ori)/numOrientations;
-        else
-            ori = orientations(ori);
+        if(vote~=0)
+            output(r,c,3) = vote/maxVote;
+            ori = find(outputs(r,c,:)==vote);
+            if(numel(ori)>1)
+                ori = 0;
+                output(r,c,2)=numel(ori)/numOrientations;
+            else
+                ori = orientations(ori);
+            end
+            output(r,c,1) = ori/180;           % orientation
         end
-        output(r,c,1) = ori/180;           % orientation
     end
     progressbar(r/numRows);
 end
