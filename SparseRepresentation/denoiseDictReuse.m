@@ -37,7 +37,7 @@ imageName = 'stem1_256by256.png'; % for initial dictionary
 
 % newImagePath = '/home/thanuja/matlabprojects/data/mitoData/stem1_256by256_2.png'; % unseen image
 %newImagePath = '/home/thanuja/matlabprojects/data/mitoData/stem1_256by256.png';
-newImagePath = '/home/thanuja/Dropbox/data/em_2013january/raw/01.tif';
+newImagePath = '/home/thanuja/Dropbox/data/em_2013january/raw/10.tif';
 
 IMin_0 = imread(newImagePath);
 % preprocessing (to remove the dark edges at the bottom and to the right)

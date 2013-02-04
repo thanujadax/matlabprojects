@@ -11,8 +11,26 @@
     %requires 2 arguments
     %X: data matrix
     %model: generated via classRF_train function
+    
 ntree = 500;
 
+load /home/thanuja/Dropbox/RESULTS/sparserepresentations/dict/SparseCoeffMat_reconst_01.mat
+load /home/thanuja/Dropbox/RESULTS/sparserepresentations/dict/labels_mem_01_256.mat
+
+data = full(sparsecoeff);
+data = data';
+X = data;
+Y = labelVec;
+
 % train RF    
-model = classRF_train(sparsecoeff',labelVec,ntree);
+t1 = cputime
+model = classRF_train(X,Y,ntree);
+t2 = cputime
+
+timetaken = t2-t1
+
+
+% predict new image labels
+% mem10
+
 

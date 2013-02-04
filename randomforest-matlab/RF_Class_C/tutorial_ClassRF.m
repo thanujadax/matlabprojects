@@ -1,16 +1,16 @@
 % A simple tutorial file to interface with RF
 % Options copied from http://cran.r-project.org/web/packages/randomForest/randomForest.pdf
 
-%run plethora of tests
-clc
-close all
+% %run plethora of tests
+% clc
+% close all
 
-%compile everything
-if strcmpi(computer,'PCWIN') |strcmpi(computer,'PCWIN64')
-   compile_windows
-else
-   compile_linux
-end
+% %compile everything
+% if strcmpi(computer,'PCWIN') |strcmpi(computer,'PCWIN64')
+%    compile_windows
+% else
+%    compile_linux
+% end
 
 total_train_time=0;
 total_test_time=0;

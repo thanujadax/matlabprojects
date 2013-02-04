@@ -1,4 +1,4 @@
-newImagePath = '/home/thanuja/Dropbox/data/em_2013january/membranes/01.tif';
+newImagePath = '/home/thanuja/Dropbox/data/em_2013january/membranes/10.tif';
 bb = 16;
 slidingDist = 1;
 
@@ -12,7 +12,7 @@ IMin2 = IMin2./(max(max(IMin2)));
 % sparse codes
 % i.e for bb=16, take the mode label of the 4 center pixels
 
-numBlocks = prod(floor((size(IMin2)-bb)/slidingDis)+1);
+numBlocks = prod(floor((size(IMin2)-bb)/slidingDist)+1);
 
 labelVec = zeros(numBlocks,1);
 
