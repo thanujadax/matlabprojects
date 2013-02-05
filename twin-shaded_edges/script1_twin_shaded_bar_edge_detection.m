@@ -32,7 +32,7 @@ barLength = 9; % should be odd
 barWidth = 3; % should be odd
 offWidth = 2; % off width for the 010 kernel (3 layers off-on-off)
 % for the reconstruction
-maxLength = 16;
+maxLength = 9;
 lineWidth = 1;
 
 orientations = 0:10:170;    
@@ -40,7 +40,7 @@ withBackground = 0;     % plot the detected bars with the original image in the 
 
 %% input preprocessing
 imgIn = double(imread(imagePath))/255;
-%imgIn = imgIn(1:128,129:256);
+imgIn = imgIn(1:128,129:256);
 
 if(size(size(imgIn),2)>2)
     img = imgIn(:,:,1);

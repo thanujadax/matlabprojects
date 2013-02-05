@@ -1,49 +1,44 @@
 % create test image consisting of line segments
-rows = 48;
-cols = 48;
+numRows = 420;
+numCols = 700;
+barWidth = 3;
+barLength = 15;
+img = zeros(numRows,numCols);
 
-img = zeros(rows,cols);
+bar = ones(barWidth,barLength);
+orientations = 0:10:170;
+colshift = 0;
+rshift = 0;
+c0 = floor((barLength+1)/2);
+r0 = floor((barWidth+1)/2);
 
-startRow = 1;
-stopRow = 24;
-startCol = 1;
-stopCol = 24;
+r = 24;
+c = 12;
 
-% block 1: vertical line in the center
-img(25:48,12:13) = 1;
-
-% block 2: horizontal line in the center
-img(36:37,25:48) = 1;
-
-% block 3: diagonal from bottom left
-j=1;
-for i=1:24
-    img(i,j)=1;
-    if(j>1)
-        img(i,j-1)=1;
+for i = 1:numel(orientations)
+    orientation = orientations(i);
+    % rotate
+    if(orientation>0)
+        orientation = 180 - orientation;
+        bar = imrotate(bar,orientation);
     end
-    if(j<24)
-        img(i,j+1)=1;
-    end
-    j=j+1;
-end
 
-% block 4: diagonal from bottom right
-j=25;
-for i=24:-1:1
-    img(i,j)=1;
-    if(j>1)
-        img(i,j-1)=1;
-    end
-    if(j<48)
-        img(i,j+1)=1;
-    end
-    j=j+1;
+    [rows cols] = find(bar);
+    rShift = r - r0;
+    cShift = c - c0;
+
+    % shift and place in img
+    rows = rows + rShift
+    cols = cols + cShift
+    pixelInd = sub2ind([numRows numCols],rows,cols);
+    img(pixelInd) = 1;
+    
+    c = c + 15;
 end
 
 figure(22)
 imagesc(img)
 colormap('gray')
 
-imwrite(img,'testImgLines.png','png')
+% imwrite(img,'testImgLines2.png','png')
 
