@@ -60,14 +60,27 @@ for r=1:numRows
             %output(r,c,3) = vote/maxVote;  % stores normalized vote
             output(r,c,3) = 1; % V - stores only if the point should be displayed
             output(r,c,2) = 1; % S
-            ori = find(threshVotes3D(r,c,:)==vote);
-            if(numel(ori)>1)
-                ori = ori(1);
-                output(r,c,2)=numel(ori)/numOrientations;
-            elseif(numel(ori)==1)
-                ori = orientations(ori);
-            end
-            output(r,c,1) = ori/180;           % H - orientation
+            % get the weighted orientation as the vote. 
+            % weighted according to the vote fraction
+            
+            votes = zeros(1,numOrientations);
+            votes(1,:) = threshVotes3D(r,c,:);
+            totVote = sum(votes);
+            w_votes = votes/totVote; 
+            w_orientations = orientations/180;
+            w_ori = w_votes.*w_orientations;
+            w_ori = sum(w_ori);
+            
+%             ori = find(threshVotes3D(r,c,:)==vote);
+%             if(numel(ori)>1)
+%                 ori = ori(1);
+%                 output(r,c,2)=numel(ori)/numOrientations;
+%             elseif(numel(ori)==1)
+%                 ori = orientations(ori);
+%             end
+            
+%             output(r,c,1) = ori/180;           % H - orientation
+            output(r,c,1) = w_ori;           % H - orientation
         end
     end
     progressbar(r/numRows);
