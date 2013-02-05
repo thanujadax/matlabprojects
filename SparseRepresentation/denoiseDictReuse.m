@@ -10,6 +10,7 @@
 %Dictionary = Dictionary2;  % copy the dictionary from 'output' struct loaded
 %clear Dictionary2;           % output from KSVD is no more required
 %% Parameters
+gaussianFilt = 0;
 LearnNewDictionaryN = 0;
 LearnNewDictionary0 = 0;
 numIter = 20;           % number of iterations of NN_BP - not used anymore
@@ -22,7 +23,7 @@ maxNumBlocksToTrainOn = 10000; %  - the maximal number of blocks
 %                       to train on. The default value for this parameter is
 %                       65000. However, it might not be enough for very large
 %                       images
-maxBlocksToConsider = 70000; % - maximal number of blocks that
+maxBlocksToConsider = 280000; % - maximal number of blocks that
 %                       can be processed. This number is dependent on the memory
 %                       capabilities of the machine, and performances�
 %                       considerations. If the number of available blocks in the
@@ -37,7 +38,7 @@ imageName = 'stem1_256by256.png'; % for initial dictionary
 
 % newImagePath = '/home/thanuja/matlabprojects/data/mitoData/stem1_256by256_2.png'; % unseen image
 %newImagePath = '/home/thanuja/matlabprojects/data/mitoData/stem1_256by256.png';
-newImagePath = '/home/thanuja/Dropbox/data/em_2013january/raw/10.tif';
+newImagePath = '/home/thanuja/Dropbox/data/em_2013january/raw/01.tif';
 
 IMin_0 = imread(newImagePath);
 % preprocessing (to remove the dark edges at the bottom and to the right)
@@ -56,12 +57,14 @@ if (max(IMin(:))<2)
     IMin = IMin*255;
 end
 %%%%% select only part of the image for training
-IMin = IMin(1:256,1:256);
+IMin = IMin(1:512,1:512);
 
 %%%%%% gaussian filtering
-sigmaGauss = 5.0;
-gaussMaskSize = 5;
-IMin = gaussianFilter(IMin,sigmaGauss,gaussMaskSize);
+if(gaussianFilt)
+    sigmaGauss = 5.0;
+    gaussMaskSize = 5;
+    IMin = gaussianFilter(IMin,sigmaGauss,gaussMaskSize);
+end
 % imageIn = strcat([pathForImages,imageName]);
 C = 1.15;  % error factor: to control the weight on sigma for denoising the noisy image to learn the dictionary
 slidingDis = 1; % the gap between two blocks considered in the sliding window

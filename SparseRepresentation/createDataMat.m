@@ -1,9 +1,9 @@
-newImagePath = '/home/thanuja/Dropbox/data/em_2013january/membranes/10.tif';
+newImagePath = '/home/thanuja/Dropbox/data/em_2013january/membranes/01.tif';
 bb = 16;
 slidingDist = 1;
 
 IMin2 = imread(newImagePath);
-IMin2 = IMin2(1:256,1:256);
+IMin2 = IMin2(1:512,1:512);
 [numRows numCols] = size(IMin2);
 % normalize
 IMin2 = IMin2./(max(max(IMin2)));

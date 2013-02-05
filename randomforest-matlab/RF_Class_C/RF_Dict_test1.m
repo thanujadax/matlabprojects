@@ -14,8 +14,8 @@
     
 ntree = 500;
 
-load /home/thanuja/Dropbox/RESULTS/sparserepresentations/dict/SparseCoeffMat_reconst_01.mat
-load /home/thanuja/Dropbox/RESULTS/sparserepresentations/dict/labels_mem_01_256.mat
+% load /home/thanuja/Dropbox/RESULTS/sparserepresentations/dict/SparseCoeffMat_reconst_01.mat
+% load /home/thanuja/Dropbox/RESULTS/sparserepresentations/dict/labels_mem_01_256.mat
 
 data = full(sparsecoeff);
 data = data';
