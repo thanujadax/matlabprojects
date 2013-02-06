@@ -7,8 +7,8 @@ barLength = 29;
 img = zeros(numRows,numCols);
 
 bar = zeros(barWidth,barLength);
-sigX = 30;
-sigY = 4;
+sigX = 40;
+sigY = 6;
 centerR = (barWidth+1)/2;
 centerC = (barLength+1)/2;
 
@@ -30,8 +30,8 @@ for i = 1:numel(orientations)
         gaussBar = imrotate(gaussBar,orientation);
     end
     
-    [rows cols] = find(gaussBar>0.1);
-    barInd = find(gaussBar>0.1);
+    [rows cols] = find(gaussBar>0);
+    barInd = find(gaussBar>0);
     numel(rows)
     rShift = r - r0;
     cShift = c - c0;
@@ -50,4 +50,4 @@ figure(22)
 imshow(img)
 colormap('gray')
 
-imwrite(img,'testImgLines3.png','png')
+%imwrite(img,'testImgLines3.png','png')
