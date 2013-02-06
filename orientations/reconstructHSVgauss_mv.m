@@ -35,8 +35,8 @@ for r=1:numRows
             end
             ori = orientations(ori);                        
             output(r,c,1) = ori/180;           % H - orientation
-            % output(r,c,3) = vote/maxVote;       % V - score
-            output(r,c,3) = 1;       % V - score
+            output(r,c,3) = vote/maxVote;       % V - score
+            %output(r,c,3) = 1;       % V - score
         end
     end
     progressbar(r/numRows);

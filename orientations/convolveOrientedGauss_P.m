@@ -19,6 +19,9 @@ centerR = (barWidth+1)/2;
 centerC = (barLength+1)/2;
 
 gaussBar = gauss2d(bar,[sigX sigY],[centerC centerR]);
+% rescale to -1 to +1
+gaussBar = 2*gaussBar/max(max(gaussBar)) -1;
+
 % init
 orientationScoreSpace3D = zeros(numRows,numCols,numOrientations);
 

@@ -6,8 +6,8 @@ displayIntermediateFigures=1;
 % imagePath = '/home/thanuja/matlabprojects/data/mitoData/stem1_256by256.png';
 % imagePath = '/home/thanuja/Dropbox/data/em_2013january/samples/raw00_256.png';
 %imagePath = 'testImgLines.png';
-imagePath = 'testImgLines3.png';
-% imagePath = 'testImgGauss.png';
+% imagePath = 'testImgLines3.png';
+imagePath = 'testImgGauss.png';
 % imagePath = 'testCirc.png';
 Hthresh = 0.4; % pixels above this value will be used for hough voting
  
@@ -24,10 +24,10 @@ slidingDist = 1;           % the number of pixels to jump
 
 lineWidth = 1;
 
-threshFrac = 0.65;
+threshFrac = 0.6;
 
-barLength = 17; % should be odd
-barWidth = 5; % should be odd
+barLength = 23; % should be odd
+barWidth = 7; % should be odd
 
 orientations = 0:5:175;    
 withBackground = 0;     % plot the detected bars with the original image in the background
@@ -35,8 +35,8 @@ withBackground = 0;     % plot the detected bars with the original image in the 
 sigmaDeriv = 0.5;   % for the gaussian derivative (to produce edge map)
 
 % for gaussian kernel
-sigX = 20;
-sigY = 4;
+sigX = 40;
+sigY = 6;
 
 %% input preprocessing
 imgIn = double(imread(imagePath))/255;
@@ -104,8 +104,8 @@ disp(str);
 
 
 %%
-[output3 RGBimg3] = reconstructHSVbars_mv(orientedScoreSpace3D,orientations,barLength,barWidth,threshFrac);
-% [output RGBimg] = reconstructHSVbars(orientedScoreSpace3D,orientations,barLength,barWidth,threshFrac);
+[output3 RGBimg3] = reconstructHSVgauss_mv(orientedScoreSpace3D,orientations,barLength,barWidth,threshFrac);
+[output RGBimg] = reconstructHSVbars(orientedScoreSpace3D,orientations,barLength,barWidth,threshFrac);
 % writeFile1 = '/home/thanuja/Dropbox/RESULTS/hough/orientations/reconst_hough256raw00_L11_1.png';
 % imwrite(RGBimg,writeFile1,'png');
 % [output2 RGBimg2] = reconstructHSVlines(houghSpace3D,orientations,barLength,lineWidth,threshFrac);
