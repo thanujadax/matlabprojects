@@ -1,6 +1,6 @@
 % create test image consisting of line segments
-numRows = 600;
-numCols = 1000;
+numRows = 50;
+numCols = 400;
 barWidth = 3;
 barLength = 15;
 img = zeros(numRows,numCols);
@@ -13,31 +13,34 @@ c0 = floor((barLength+1)/2);
 r0 = floor((barWidth+1)/2);
 
 r = 24;
-c = 12;
+c = 25;
 
 for i = 1:numel(orientations)
-    orientation = orientations(i);
+    orientation = orientations(i)
     % rotate
+    bar = ones(barWidth,barLength);
     if(orientation>0)
         orientation = 180 - orientation;
         bar = imrotate(bar,orientation);
     end
-
-    [rows cols] = find(bar);
+    
+    [rows cols] = find(bar>0);
+    numel(rows)
     rShift = r - r0;
     cShift = c - c0;
 
     % shift and place in img
-    rows = rows + rShift
-    cols = cols + cShift
+    rows = rows + rShift;
+    cols = cols + cShift;
     pixelInd = sub2ind([numRows numCols],rows,cols);
     img(pixelInd) = 1;
+   % figure(110);imshow(bar)
     
-    c = c + 15;
+   c = c + 20;
 end
 
 figure(22)
-imagesc(img)
+imshow(img)
 colormap('gray')
 
-imwrite(img,'testImgLines2.png','png')
+imwrite(img,'testImgLines3.png','png')
