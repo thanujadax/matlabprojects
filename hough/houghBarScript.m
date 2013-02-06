@@ -30,7 +30,7 @@ lineWidth = 1;
 %                     % recommended
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-threshFrac = 0.5;
+threshFrac = 0.6;
 
 barLength = 9; % should be odd
 barWidth = 3; % should be odd

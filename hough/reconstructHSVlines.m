@@ -69,13 +69,47 @@ for r=1:numRows
 %             end
 %             output(r,c,1) = ori/180;           % H - orientation
         
+%             votes = zeros(1,numOrientations);
+%             votes(1,:) = threshVotes3D(r,c,:);
+%             totVote = sum(votes);
+%             w_votes = votes/totVote; 
+%             w_orientations = orientations/180;
+%             w_ori = w_votes.*w_orientations;
+%             w_ori = sum(w_ori);
+
             votes = zeros(1,numOrientations);
             votes(1,:) = threshVotes3D(r,c,:);
-            totVote = sum(votes);
-            w_votes = votes/totVote; 
-            w_orientations = orientations/180;
-            w_ori = w_votes.*w_orientations;
-            w_ori = sum(w_ori);
+            votestmp = zeros(1,numOrientations);
+            votestmp(1,:) = threshVotes3D(r,c,:);
+            % totVote = sum(votes);
+            %w_votes = votes/totVote; % normalize votes
+            % normalize orientations
+            % account for the circularity of the scale 0-90-0
+            [maxVote1, maxOriInd1] = max(votes);
+            maxVoteOri1 = orientations(maxOriInd1);
+            votestmp(maxOriInd1)=0;
+            [maxVote2, maxOriInd2] = max(votestmp);
+            maxVoteOri2 = orientations(maxOriInd2);
+            sumVote = maxVote1 + maxVote2; 
+            
+            diffOri = maxVoteOri1-maxVoteOri2;
+            if(diffOri>0 && diffOri<=120)
+                %
+                w_ori = (maxVote1*maxVoteOri1 + maxVote2*maxVoteOri2)/(180*sumVote);
+            elseif(diffOri<0 && diffOri>=-120)
+                %
+                w_ori = (maxVote1*maxVoteOri1 + maxVote2*maxVoteOri2)/(180*sumVote);
+            elseif(diffOri>120)
+                maxVoteOri2 = maxVoteOri2 + 180;
+                w_ori = mod((maxVote1*maxVoteOri1 + maxVote2*maxVoteOri2),180);
+                w_ori = w_ori/(180*sumVote);
+            elseif(diffOri<-120)
+                maxVoteOri1 = maxVoteOri1 + 180;
+                w_ori = mod((maxVote1*maxVoteOri1 + maxVote2*maxVoteOri2),180);
+                w_ori = w_ori/(180*sumVote);
+            else
+                w_ori = (maxVote1*maxVoteOri1 + maxVote2*maxVoteOri2)/(180*sumVote);
+            end
             
             output(r,c,1) = w_ori;           % H - orientation
         
@@ -88,4 +122,4 @@ end
 hsvImage = cat(3,output(:,:,1),output(:,:,2),output(:,:,3));
 % convert it to an RGB image
 RGBimg = hsv2rgb(hsvImage);
-figure;imagesc(RGBimg)
+figure;imshow(RGBimg)
