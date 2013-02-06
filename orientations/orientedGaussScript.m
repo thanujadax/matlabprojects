@@ -4,14 +4,16 @@
 displayIntermediateFigures=1;
 %imagePath = '/home/thanuja/matlabprojects/data/mitoData/stem1_48.png';
 % imagePath = '/home/thanuja/matlabprojects/data/mitoData/stem1_256by256.png';
-% imagePath = '/home/thanuja/Dropbox/data/em_2013january/samples/raw00_256.png';
+%imagePath = '/home/thanuja/Dropbox/data/em_2013january/samples/raw00_256.png';
+imagePath = '/home/thanuja/Dropbox/data/mitoData/stem1_512.png';
+% imagePath = '/home/thanuja/Dropbox/data/em_2013january/samples/raw00_512.png';
 %imagePath = 'testImgLines.png';
 % imagePath = 'testImgLines3.png';
-imagePath = 'testImgGauss.png';
-% imagePath = 'testCirc.png';
+% imagePath = 'testImgGauss.png';
+%imagePath = 'testCirc.png';
 Hthresh = 0.4; % pixels above this value will be used for hough voting
  
-invertImg = 0;      % 1 for membrane images that have to be inverted for Hough transform calculation
+invertImg = 1;      % 1 for membrane images that have to be inverted for Hough transform calculation
 
 grayThresholding = 0;       % 1 if the inverted image should be thresholded
 grayThreshold = 0.5;
@@ -24,12 +26,18 @@ slidingDist = 1;           % the number of pixels to jump
 
 lineWidth = 1;
 
-threshFrac = 0.6;
+threshFrac = 0.3;
 
-barLength = 23; % should be odd
-barWidth = 7; % should be odd
+% for Gaussian kernel
+% barLength = 23; % should be odd
+% barWidth = 7; % should be odd
 
-orientations = 0:5:175;    
+% for bars
+barLength = 11; % should be odd
+barWidth = 6; % 
+negLines = 3; % number of negative lines per side
+
+orientations = 0:10:170;    
 withBackground = 0;     % plot the detected bars with the original image in the background
 
 sigmaDeriv = 0.5;   % for the gaussian derivative (to produce edge map)
@@ -92,10 +100,10 @@ end
 % convolution using oriented gaussian kernels
 display('Computing 3D orientation score space...');
 t0 = cputime;
-orientedScoreSpace3D = convolveOrientedGauss_P(imgInv,barLength,barWidth,...
-            orientations,sigX,sigY);
-% orientedScoreSpace3D = convolveOrientedBars_P(imgInv,barLength,barWidth,...
-%             orientations);
+% orientedScoreSpace3D = convolveOrientedGauss_P(imgInv,barLength,barWidth,...
+%             orientations,sigX,sigY);
+orientedScoreSpace3D = convolveOrientedBars_P(imgInv,barLength,barWidth,...
+            orientations,negLines);
 t1 = cputime;
 display('3D orientation score space computed!');
 dt = t1 - t0;
@@ -105,7 +113,7 @@ disp(str);
 
 %%
 [output3 RGBimg3] = reconstructHSVgauss_mv(orientedScoreSpace3D,orientations,barLength,barWidth,threshFrac);
-[output RGBimg] = reconstructHSVbars(orientedScoreSpace3D,orientations,barLength,barWidth,threshFrac);
+% [output RGBimg] = reconstructHSVbars(orientedScoreSpace3D,orientations,barLength,barWidth,threshFrac);
 % writeFile1 = '/home/thanuja/Dropbox/RESULTS/hough/orientations/reconst_hough256raw00_L11_1.png';
 % imwrite(RGBimg,writeFile1,'png');
 % [output2 RGBimg2] = reconstructHSVlines(houghSpace3D,orientations,barLength,lineWidth,threshFrac);
