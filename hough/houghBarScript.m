@@ -4,9 +4,10 @@
 displayIntermediateFigures=1;
 %imagePath = '/home/thanuja/matlabprojects/data/mitoData/stem1_48.png';
 % imagePath = '/home/thanuja/matlabprojects/data/mitoData/stem1_256by256.png';
+% imagePath = '/home/thanuja/Dropbox/data/em_2013january/samples/raw00_256.png';
 %imagePath = 'testImgLines.png';
 imagePath = 'testImgLines3.png';
-%imagePath = 'testCirc.png';
+% imagePath = 'testCirc.png';
 Hthresh = 0.4; % pixels above this value will be used for hough voting
  
 invertImg = 0;      % 1 for membrane images that have to be inverted for Hough transform calculation
@@ -30,7 +31,7 @@ lineWidth = 1;
 %                     % recommended
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-threshFrac = 0.6;
+threshFrac = 0.5;
 
 barLength = 9; % should be odd
 barWidth = 3; % should be odd
@@ -131,5 +132,10 @@ disp(str);
 % str = sprintf('Time taken for reconstruction = %0.5f s',dt);
 % disp(str);
 %%
-[output RGBimg] = reconstructHSVbars(houghSpace3D,orientations,barLength,barWidth,threshFrac);
-[output2 RGBimg2] = reconstructHSVlines(houghSpace3D,orientations,barLength,lineWidth,threshFrac);
+[output3 RGBimg3] = reconstructHSVbars_mv(houghSpace3D,orientations,barLength,barWidth,threshFrac);
+% [output RGBimg] = reconstructHSVbars(houghSpace3D,orientations,barLength,barWidth,threshFrac);
+% writeFile1 = '/home/thanuja/Dropbox/RESULTS/hough/orientations/reconst_hough256raw00_L11_1.png';
+% imwrite(RGBimg,writeFile1,'png');
+% [output2 RGBimg2] = reconstructHSVlines(houghSpace3D,orientations,barLength,lineWidth,threshFrac);
+% writeFile2 = '/home/thanuja/Dropbox/RESULTS/hough/orientations/reconst_hough256raw00_L11_lines_1.png';
+% imwrite(RGBimg,writeFile2,'png');
