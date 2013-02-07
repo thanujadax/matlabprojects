@@ -118,19 +118,19 @@ disp(str);
 [output3 RGBimg3] = reconstructHSVgauss_mv(orientedScoreSpace3D,orientations,barLength,barWidth,threshFrac);
 titlestr = sprintf('threshold percentage = %f',threshFrac);
 figure;imshow(RGBimg3);title(titlestr)
-% % batch processing
-% savefilepath = '/home/thanuja/Dropbox/RESULTS/orientations/thresholding2/';
-% for i=0:5:99
-%     % run reconstruction for threshold = i/100
-%     threshFrac = i/100;
-%     [output3 RGBimg3] = reconstructHSVgauss_mv(orientedScoreSpace3D,orientations,barLength,barWidth,threshFrac);
-%     % save it in a folder
-%     savefilename = sprintf('threshPercent%d.png',i);
-%     savefilename = strcat(savefilepath,savefilename);
-%     titlestr = sprintf('threshold = %f',threshFrac);
-%     h = figure;imshow(RGBimg3);title(titlestr);    
-%     saveas(h,savefilename);
-% end
+% batch processing
+savefilepath = '/home/thanuja/Dropbox/RESULTS/orientations/thresholding2/';
+for i=0:5:99
+    % run reconstruction for threshold = i/100
+    threshFrac = i/100;
+    [output3 RGBimg3] = reconstructHSVgauss_mv(orientedScoreSpace3D,orientations,barLength,barWidth,threshFrac);
+    % save it in a folder
+    savefilename = sprintf('threshPercent%d.png',i);
+    savefilename = strcat(savefilepath,savefilename);
+    titlestr = sprintf('threshold = %f',threshFrac);
+    h = figure;imshow(RGBimg3);title(titlestr);    
+    saveas(h,savefilename);
+end
 
 
 % [output RGBimg] = reconstructHSVbars(orientedScoreSpace3D,orientations,barLength,barWidth,threshFrac);
