@@ -46,4 +46,4 @@ end
 hsvImage = cat(3,output(:,:,1),output(:,:,2),output(:,:,3));
 % convert it to an RGB image
 RGBimg = hsv2rgb(hsvImage);
-figure;imshow(RGBimg)
+%figure;imshow(RGBimg)

@@ -29,7 +29,7 @@ slidingDist = 1;           % the number of pixels to jump
 
 lineWidth = 1;
 
-threshFrac = 0.2;
+threshFrac = 0.3;
 
 % for Gaussian kernel
 % barLength = 23; % should be odd
@@ -116,6 +116,23 @@ disp(str);
 
 %%
 [output3 RGBimg3] = reconstructHSVgauss_mv(orientedScoreSpace3D,orientations,barLength,barWidth,threshFrac);
+titlestr = sprintf('threshold percentage = %f',threshFrac);
+figure;imshow(RGBimg3);title(titlestr)
+% % batch processing
+% savefilepath = '/home/thanuja/Dropbox/RESULTS/orientations/thresholding2/';
+% for i=0:5:99
+%     % run reconstruction for threshold = i/100
+%     threshFrac = i/100;
+%     [output3 RGBimg3] = reconstructHSVgauss_mv(orientedScoreSpace3D,orientations,barLength,barWidth,threshFrac);
+%     % save it in a folder
+%     savefilename = sprintf('threshPercent%d.png',i);
+%     savefilename = strcat(savefilepath,savefilename);
+%     titlestr = sprintf('threshold = %f',threshFrac);
+%     h = figure;imshow(RGBimg3);title(titlestr);    
+%     saveas(h,savefilename);
+% end
+
+
 % [output RGBimg] = reconstructHSVbars(orientedScoreSpace3D,orientations,barLength,barWidth,threshFrac);
 % writeFile1 = '/home/thanuja/Dropbox/RESULTS/hough/orientations/reconst_hough256raw00_L11_1.png';
 % imwrite(RGBimg,writeFile1,'png');

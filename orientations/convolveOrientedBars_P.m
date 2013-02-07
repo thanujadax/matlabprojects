@@ -47,5 +47,12 @@ parfor i=1:numOrientations
     orientationScoreSpace3D(:,:,i) = convResult(startR:stopR,startC:stopC);
   % progressbar(j/totPoints); % update progress bar
 end
+% remove the border of size barWidth from the score
+orientationScoreSpace3D(1:barWidth,:,:) = 0;
+orientationScoreSpace3D((numRows-barWidth):numRows,:,:) = 0;
+orientationScoreSpace3D(:,1:barWidth,:) = 0;
+orientationScoreSpace3D(:,(numCols-barWidth):numCols,:) = 0;
+
+% normalize the score
 orientationScoreSpace3D = orientationScoreSpace3D./...
         (max(max(max(orientationScoreSpace3D))));
