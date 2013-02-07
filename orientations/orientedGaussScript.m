@@ -11,6 +11,9 @@ imagePath = '/home/thanuja/Dropbox/data/mitoData/stem1_512.png';
 % imagePath = 'testImgLines3.png';
 % imagePath = 'testImgGauss.png';
 %imagePath = 'testCirc.png';
+%imagePath = 'testImgGauss.png';
+%imagePath = 'testCirc.png';
+
 Hthresh = 0.4; % pixels above this value will be used for hough voting
  
 invertImg = 1;      % 1 for membrane images that have to be inverted for Hough transform calculation
@@ -26,7 +29,7 @@ slidingDist = 1;           % the number of pixels to jump
 
 lineWidth = 1;
 
-threshFrac = 0.3;
+threshFrac = 0.2;
 
 % for Gaussian kernel
 % barLength = 23; % should be odd
