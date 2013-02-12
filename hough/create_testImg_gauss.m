@@ -2,13 +2,13 @@
 numRows = 100;
 numCols = 620;
 
-barWidth = 9;
-barLength = 29;
+barWidth = 13;
+barLength = 35;
 img = zeros(numRows,numCols);
 
 bar = zeros(barWidth,barLength);
-sigX = 40;
-sigY = 6;
+sigX = 50;
+sigY = 8;
 centerR = (barWidth+1)/2;
 centerC = (barLength+1)/2;
 
@@ -32,7 +32,6 @@ for i = 1:numel(orientations)
     
     [rows cols] = find(gaussBar>0);
     barInd = find(gaussBar>0);
-    numel(rows)
     rShift = r - r0;
     cShift = c - c0;
 

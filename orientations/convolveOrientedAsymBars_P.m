@@ -1,4 +1,4 @@
-function orientationScoreSpace3D = convolveOrientedBars_P(img,barLength,barWidth,orientations,negLines)
+function orientationScoreSpace3D = convolveOrientedAsymBars_P(img,barLength,barWidth,orientations,negLines)
 
 % inputs: 
 %   img - contains the pixels that should be used for calculating the hough
@@ -19,7 +19,7 @@ bar = ones(barWidth,barLength);
 % halfW = floor(barWidth/2);
 % bar(1:halfW,:) = -1;
 negLine = ones(negLines,barLength).*-1;
-bar = [negLine;bar;negLine];
+bar = [bar;negLine];
 
 % init
 orientationScoreSpace3D = zeros(numRows,numCols,numOrientations);
@@ -31,7 +31,6 @@ parfor i=1:numOrientations
     % rotate appropriately
     orientation = orientations(i);
     if(orientation>0)
-        orientation = 180 - orientation;
         bar_i = imrotate(bar_i,orientation);
     end
     % convolve to get the orientation score map for this orientation i

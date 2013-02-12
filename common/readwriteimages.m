@@ -7,8 +7,8 @@ A = imread(filename, fmt);
 % C = rgb2gray(A);
 % write to another file
 % writefile = '/home/thanuja/Dropbox/data/em_2013january/samples/raw00_512.png';
-writefile = '/home/thanuja/Dropbox/data/mitoData/stem1_512.png';
-B = A(1:512,1:512,1);
+writefile = '/home/thanuja/Dropbox/data/mitoData/stem1_128.png';
+B = A(1:128,1:128,1);
 imwrite(B,writefile,'png')
-
+figure;imshow(B);
 

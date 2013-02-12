@@ -6,6 +6,7 @@ displayIntermediateFigures=1;
 % imagePath = '/home/thanuja/matlabprojects/data/mitoData/stem1_256by256.png';
 %imagePath = '/home/thanuja/Dropbox/data/em_2013january/samples/raw00_256.png';
 imagePath = '/home/thanuja/Dropbox/data/mitoData/stem1_512.png';
+%imagePath = '/home/thanuja/Dropbox/data/mitoData/stem1_128.png';
 % imagePath = '/home/thanuja/Dropbox/data/em_2013january/samples/raw00_512.png';
 %imagePath = 'testImgLines.png';
 % imagePath = 'testImgLines3.png';
@@ -29,18 +30,25 @@ slidingDist = 1;           % the number of pixels to jump
 
 lineWidth = 1;
 
-threshFrac = 0.3;
+threshFrac = 0.4;
 
 % for Gaussian kernel
 % barLength = 23; % should be odd
 % barWidth = 7; % should be odd
 
-% for bars
-barLength = 11; % should be odd
-barWidth = 6; % 
-negLines = 3; % number of negative lines per side
+% % for asym bars
+% barLength = 11; % should be odd
+% barWidth = 3; % 
+% negLines = 2; % number of negative lines per side
+% orientations = 0:10:350;    
 
+% for asym bars
+barLength = 11; % should be odd
+barWidth = 4; % 
+negLines = 2; % number of negative lines per side
 orientations = 0:10:170;    
+
+
 withBackground = 0;     % plot the detected bars with the original image in the background
 
 sigmaDeriv = 0.5;   % for the gaussian derivative (to produce edge map)
@@ -107,6 +115,8 @@ t0 = cputime;
 %             orientations,sigX,sigY);
 orientedScoreSpace3D = convolveOrientedBars_P(imgInv,barLength,barWidth,...
             orientations,negLines);
+% orientedScoreSpace3D = convolveOrientedAsymBars_P(imgInv,barLength,barWidth,...
+%             orientations,negLines);
 t1 = cputime;
 display('3D orientation score space computed!');
 dt = t1 - t0;
@@ -116,21 +126,22 @@ disp(str);
 
 %%
 [output3 RGBimg3] = reconstructHSVgauss_mv(orientedScoreSpace3D,orientations,barLength,barWidth,threshFrac);
-titlestr = sprintf('threshold percentage = %f',threshFrac);
-figure;imshow(RGBimg3);title(titlestr)
-% batch processing
-savefilepath = '/home/thanuja/Dropbox/RESULTS/orientations/thresholding2/';
-for i=0:5:99
-    % run reconstruction for threshold = i/100
-    threshFrac = i/100;
-    [output3 RGBimg3] = reconstructHSVgauss_mv(orientedScoreSpace3D,orientations,barLength,barWidth,threshFrac);
-    % save it in a folder
-    savefilename = sprintf('threshPercent%d.png',i);
-    savefilename = strcat(savefilepath,savefilename);
-    titlestr = sprintf('threshold = %f',threshFrac);
-    h = figure;imshow(RGBimg3);title(titlestr);    
-    saveas(h,savefilename);
-end
+% titlestr = sprintf('threshold percentage = %f',threshFrac);
+figure;imshow(RGBimg3);
+% title(titlestr)
+% % batch processing
+% savefilepath = '/home/thanuja/Dropbox/RESULTS/orientations/thresholding4/';
+% for i=20:5:75
+%     % run reconstruction for threshold = i/100
+%     threshFrac = i/100;
+%     [output3 RGBimg3] = reconstructHSVgauss_mv(orientedScoreSpace3D,orientations,barLength,barWidth,threshFrac);
+%     % save it in a folder
+%     savefilename = sprintf('threshPercent%d.png',i);
+%     savefilename = strcat(savefilepath,savefilename);
+%     titlestr = sprintf('threshold = %f',threshFrac);
+%     h = figure;imshow(RGBimg3);title(titlestr);    
+%     saveas(h,savefilename);
+% end
 
 
 % [output RGBimg] = reconstructHSVbars(orientedScoreSpace3D,orientations,barLength,barWidth,threshFrac);
