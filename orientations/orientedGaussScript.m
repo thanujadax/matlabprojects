@@ -3,9 +3,9 @@
 %% parameters
 displayIntermediateFigures=1;
 %imagePath = '/home/thanuja/matlabprojects/data/mitoData/stem1_48.png';
-% imagePath = '/home/thanuja/matlabprojects/data/mitoData/stem1_256by256.png';
+imagePath = '/home/thanuja/matlabprojects/data/mitoData/stem1_256by256.png';
 %imagePath = '/home/thanuja/Dropbox/data/em_2013january/samples/raw00_256.png';
-imagePath = '/home/thanuja/Dropbox/data/mitoData/stem1_512.png';
+% imagePath = '/home/thanuja/Dropbox/data/mitoData/stem1_512.png';
 %imagePath = '/home/thanuja/Dropbox/data/mitoData/stem1_128.png';
 % imagePath = '/home/thanuja/Dropbox/data/em_2013january/samples/raw00_512.png';
 %imagePath = 'testImgLines.png';
@@ -15,7 +15,9 @@ imagePath = '/home/thanuja/Dropbox/data/mitoData/stem1_512.png';
 %imagePath = 'testImgGauss.png';
 %imagePath = 'testCirc.png';
 
-Hthresh = 0.4; % pixels above this value will be used for hough voting
+medianFilterH = 1;  % H is median filtered to remove salt and pepper noise in a 3x3 neighborhood 
+
+% Hthresh = 0.4; % pixels above this value will be used 
  
 invertImg = 1;      % 1 for membrane images that have to be inverted for Hough transform calculation
 
@@ -30,23 +32,23 @@ slidingDist = 1;           % the number of pixels to jump
 
 lineWidth = 1;
 
-threshFrac = 0.4;
+threshFrac = 0.45;
 
 % for Gaussian kernel
 % barLength = 23; % should be odd
 % barWidth = 7; % should be odd
 
-% % for asym bars
-% barLength = 11; % should be odd
-% barWidth = 3; % 
-% negLines = 2; % number of negative lines per side
-% orientations = 0:10:350;    
-
-% for asym bars
+% for asymmetric bars
 barLength = 11; % should be odd
-barWidth = 4; % 
-negLines = 2; % number of negative lines per side
-orientations = 0:10:170;    
+barWidth = 3; % 
+negLines = 3; % number of negative lines per side
+orientations = 0:10:350;    
+
+% % for symmetric bars
+% barLength = 11; % should be odd
+% barWidth = 4; % 
+% negLines = 2; % number of negative lines per side
+% orientations = 0:10:170;    
 
 
 withBackground = 0;     % plot the detected bars with the original image in the background
@@ -113,10 +115,10 @@ display('Computing 3D orientation score space...');
 t0 = cputime;
 % orientedScoreSpace3D = convolveOrientedGauss_P(imgInv,barLength,barWidth,...
 %             orientations,sigX,sigY);
-orientedScoreSpace3D = convolveOrientedBars_P(imgInv,barLength,barWidth,...
-            orientations,negLines);
-% orientedScoreSpace3D = convolveOrientedAsymBars_P(imgInv,barLength,barWidth,...
-%             orientations,negLines);
+% orientedScoreSpace3D = convolveOrientedBars_P(imgInv,barLength,barWidth,...
+%            orientations,negLines);
+orientedScoreSpace3D = convolveOrientedAsymBars_P(imgInv,barLength,barWidth,...
+             orientations,negLines);
 t1 = cputime;
 display('3D orientation score space computed!');
 dt = t1 - t0;
@@ -125,7 +127,8 @@ disp(str);
 
 
 %%
-[output3 RGBimg3] = reconstructHSVgauss_mv(orientedScoreSpace3D,orientations,barLength,barWidth,threshFrac);
+[output3 RGBimg3] = reconstructHSVgauss_mv(orientedScoreSpace3D,orientations,...
+            barLength,barWidth,threshFrac,medianFilterH);
 % titlestr = sprintf('threshold percentage = %f',threshFrac);
 figure;imshow(RGBimg3);
 % title(titlestr)

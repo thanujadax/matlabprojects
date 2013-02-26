@@ -1,9 +1,11 @@
-function [output RGBimg] = reconstructHSVgauss_mv(peaks3D,orientations,barLength,barWidth,threshFrac)
+function [output RGBimg] = reconstructHSVgauss_mv(peaks3D,orientations,...
+                barLength,barWidth,threshFrac,medianFilterH)
 % output is a 3 layered matrix [H S V]
 %   H - orientation
 %   S - number of equally high orientations
 %   V - vote
-
+stepSize = orientations(2) - orientations(1);
+maxOrientation = numel(orientations)*stepSize;
 [numRows numCols numOrientations] = size(peaks3D);
 maxVote = max(max(max(peaks3D)));
 thresh = maxVote*threshFrac;
@@ -34,13 +36,22 @@ for r=1:numRows
                 %disp('multiple max votes found for point %d,%d',r,c);
             end
             ori = orientations(ori);                        
-            output(r,c,1) = ori/180;           % H - orientation
+            output(r,c,1) = ori/maxOrientation;           % H - orientation
             output(r,c,3) = vote/maxVote;       % V - score
             %output(r,c,3) = 1;       % V - score
         end
     end
     progressbar(r/numRows);
 end
+
+% median filtering of H to remove salt pepper type of noise in the
+% orientation response H (Hue)
+if(medianFilterH)
+    H = output(:,:,1);
+    H = medfilt2(H);
+    output(:,:,1) = H;
+end
+
 
 % create HSV image
 hsvImage = cat(3,output(:,:,1),output(:,:,2),output(:,:,3));
