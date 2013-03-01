@@ -1,0 +1,45 @@
+% watershed segmentation
+% inputfile = '/home/thanuja/Dropbox/data/testImg/testMembrane2.png';
+% I=imread(inputfile);
+% I=rgb2gray(I);
+thresh = 0.5;
+threshImg = output3(:,:,3);
+maxResp = max(max(threshImg));
+lowInd = threshImg<thresh*maxResp;
+threshImg(lowInd) = 0;
+%I = rgb2gray(RGBimg3);
+I = threshImg;
+
+hy = fspecial('sobel');
+hx = hy';
+Iy = imfilter(double(I), hy, 'replicate');
+Ix = imfilter(double(I), hx, 'replicate');
+gradmag = sqrt(Ix.^2 + Iy.^2);
+
+
+%# Normalize.
+g = gradmag - min(gradmag(:));
+g = g / max(g(:));
+
+th = graythresh(g); %# Otsu's method.
+a = imhmax(g,th/2); %# Conservatively remove local maxima.
+th = graythresh(a);
+% b = a > th/4; %# Conservative global threshold.
+% c = imclose(b,ones(6)); %# Try to close contours.
+c = imclose(a,ones(6));
+d = imfill(c,'holes'); %# Not a bad segmentation by itself.
+%# Use the rough segmentation to define markers.
+% g2 = imimposemin(g, ~ imdilate( bwperim(a), ones(1) ));
+g2 = imimposemin(g, ~ imdilate( bwperim(threshImg), ones(3) ));
+L = watershed(g2);
+
+
+
+figure, imshow(gradmag,[]), title('Gradient magnitude (gradmag)')
+% L = watershed(gradmag);
+% Lrgb = label2rgb(L);
+figure, imagesc(L), title('Watershed transform of gradient magnitude (Lrgb)')
+figure, imshow(L), title('Watershed transform of gradient magnitude (Lrgb)')
+
+% L2(lowInd) = 0;
+% figure, imshow(L2), title('Watershed transform of gradient magnitude (Lrgb)')
