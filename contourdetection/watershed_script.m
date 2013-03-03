@@ -22,16 +22,18 @@ g = gradmag - min(gradmag(:));
 g = g / max(g(:));
 
 th = graythresh(g); %# Otsu's method.
-a = imhmax(g,th/2); %# Conservatively remove local maxima.
-th = graythresh(a);
+% a = imhmax(g,th/2); %# Conservatively remove local maxima.
+a = imhmax(g,th/2);
+% th = graythresh(a);
 % b = a > th/4; %# Conservative global threshold.
 % c = imclose(b,ones(6)); %# Try to close contours.
-c = imclose(a,ones(6));
+c = imclose(a,ones(3));
 d = imfill(c,'holes'); %# Not a bad segmentation by itself.
 %# Use the rough segmentation to define markers.
-% g2 = imimposemin(g, ~ imdilate( bwperim(a), ones(1) ));
-g2 = imimposemin(g, ~ imdilate( bwperim(threshImg), ones(3) ));
-L = watershed(g2);
+% g2 = imimposemin(g, ~ imdilate( bwperim(a), ones(3) ));
+% g2 = imimposemin(g, ~a);
+% L = watershed(g2);
+L = watershed(a);
 
 
 
