@@ -1,12 +1,17 @@
 % watershed segmentation
-% inputfile = '/home/thanuja/Dropbox/data/testImg/testMembrane2.png';
-% I=imread(inputfile);
+inputfile = '/home/thanuja/Dropbox/data/testImg/stem_256x_t02_V.png';
+% inputfile = '/home/thanuja/Dropbox/data/testImg/testMem1_V.png';
+I=imread(inputfile);
+
 % I=rgb2gray(I);
-thresh = 0.5;
-threshImg = output3(:,:,3);
+thresh = 0.3;
+% threshImg = output3(:,:,3);
+threshImg = I;
 maxResp = max(max(threshImg));
 lowInd = threshImg<thresh*maxResp;
+highInd = threshImg>=thresh*maxResp;
 threshImg(lowInd) = 0;
+threshImg(highInd) = 1;
 %I = rgb2gray(RGBimg3);
 I = threshImg;
 
@@ -30,18 +35,17 @@ a = imhmax(g,th/2);
 c = imclose(a,ones(3));
 d = imfill(c,'holes'); %# Not a bad segmentation by itself.
 %# Use the rough segmentation to define markers.
-% g2 = imimposemin(g, ~ imdilate( bwperim(a), ones(3) ));
+g2 = imimposemin(g, ~ imdilate( bwperim(a), ones(3) ));
 % g2 = imimposemin(g, ~a);
 % L = watershed(g2);
 L = watershed(a);
 
 
-
 figure, imshow(gradmag,[]), title('Gradient magnitude (gradmag)')
 % L = watershed(gradmag);
 % Lrgb = label2rgb(L);
-figure, imagesc(L), title('Watershed transform of gradient magnitude (Lrgb)')
-figure, imshow(L), title('Watershed transform of gradient magnitude (Lrgb)')
+figure, imagesc(L), title('Watershed transform of gradient magnitude')
+figure, imshow(L), title('Watershed transform of gradient magnitude')
 
 % L2(lowInd) = 0;
 % figure, imshow(L2), title('Watershed transform of gradient magnitude (Lrgb)')

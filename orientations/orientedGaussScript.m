@@ -14,7 +14,7 @@ displayIntermediateFigures=1;
 %imagePath = 'testCirc.png';
 %imagePath = 'testImgGauss.png';
 %imagePath = 'testCirc.png';
-imagePath = '/home/thanuja/Dropbox/data/testImg/testMembrane2.png';
+imagePath = '/home/thanuja/Dropbox/data/testImg/testMembrane3.png';
 
 medianFilterH = 1;  % H is median filtered to remove salt and pepper noise in a 3x3 neighborhood 
 
@@ -33,7 +33,7 @@ slidingDist = 1;           % the number of pixels to jump
 
 lineWidth = 1;
 
-threshFrac = 0.45;
+threshFrac = 0.2;
 
 % for Gaussian kernel
 % barLength = 23; % should be odd
