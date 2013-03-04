@@ -1,11 +1,11 @@
-function L = getWatershedSegmentation(inputfilename,thresh)
+function L = getWatershedSegmentation(inputImg,thresh)
 % Inputs:
 %   inputfilename - path of the input file to be segmented
 %   thresh - pixel values above this would be considered as 1 when
 %   converted into binary
 
-I=imread(inputfilename);
-threshImg = I;
+
+threshImg = inputImg;
 maxResp = max(max(threshImg));
 
 % converting image to binary
