@@ -73,7 +73,12 @@ edgePixColors = edgePixLabels;
 edgePixColors(:,2) = mod(edgePixColors(:,2),100);
 wsEdges2 = wsBoundaries;
 wsEdges2(edgePixColors(:,1)) = edgePixColors(:,2);
-figure;imagesc(wsEdges2)
+figure;imagesc(wsEdges2);title('edges between junctions labeled separately')
+
+%% Build the adjacency matrix of the junction nodes
+% for each node, get a list of edge IDs connected to it
+nodeEdges = getNodeEdges(ind4J,edgePixLabels,sizeR,sizeC);
+adjacencyMat = getAdjacencyMat(nodeEdges);
 
 
 
