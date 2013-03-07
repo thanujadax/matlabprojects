@@ -39,7 +39,7 @@ for i=1:numBoundaryPixels
     fourNH(ind) = sum(nh);
 end
 % get the pixels which are having a 4NH > 2
-ind4J = find(fourNH>2);
+ind4J = find(fourNH>2);         % indices of junctions
 % visualize junctions
 wsJ = zeros(sizeR,sizeC);
 wsJ(ind4J) = 1;
@@ -48,6 +48,33 @@ wsVis(:,:,3) = wsBoundaries;
 wsVis(:,:,1) = wsJ;
 figure;imshow(wsVis);
 title('Junctions from WS')
+
+%% extracting edges connecting junctions
+% assign unique labels for edges
+% all the pixels in each edge should have the same label
+wsEdges = wsBoundaries;
+wsEdges(ind4J) = 0;         % setting junctions to zero. only edges are 1
+pixList = find(wsEdges);
+edgePixLabels = zeros(numel(pixList),2); % 2nd column stores the edge label
+edgePixLabels(:,1) = pixList;
+currentLabel = 0;
+for i=1:numel(pixList)
+    if(edgePixLabels(i,2)==0)
+        % assign label
+        currentLabel = currentLabel + 1;
+        edgePixLabels = labelPixelNeighbors(edgePixLabels,pixList(i),currentLabel,...
+                sizeR,sizeC);
+    else
+        continue
+    end
+end
+% assign random colors to edges
+edgePixColors = edgePixLabels;
+edgePixColors(:,2) = mod(edgePixColors(:,2),100);
+wsEdges2 = wsBoundaries;
+wsEdges2(edgePixColors(:,1)) = edgePixColors(:,2);
+figure;imagesc(wsEdges2)
+
 
 
 
