@@ -1,4 +1,4 @@
-function nodeEdges = getNodeEdges(nodeInd,edgePixLabels,sizeR,sizeC)
+function nodeEdges = getNodeEdges(nodeInds,edgePixLabels,sizeR,sizeC)
 % Inputs:
 %   nodeInd - array of junction indices
 %   edgePixLabels - N-by-2 array of edge labels for each pixel, given by
@@ -10,12 +10,13 @@ function nodeEdges = getNodeEdges(nodeInd,edgePixLabels,sizeR,sizeC)
 
 % for each node, get the neighbors
 % get the edgeID of the neighbors
-nodeEdges = zeros(numel(nodeInd),4);
+nodeEdges = zeros(numel(nodeInds),5);
+nodeEdges(:,1) = nodeInds;
 
-for i=1:numel(nodeInd)
-    neighborInd = getNeighbors(nodeInd(i),sizeR,sizeC);
+for i=1:numel(nodeInds)
+    neighborInd = getNeighbors(nodeInds(i),sizeR,sizeC);
     numNeighbors = numel(neighborInd);
-    k = 0;
+    k = 1;
     for j=1:numNeighbors
         neighborListInd = find(edgePixLabels(:,1)==neighborInd(j));
         if(~isempty(neighborListInd))

@@ -39,7 +39,7 @@ for i=1:numBoundaryPixels
     fourNH(ind) = sum(nh);
 end
 % get the pixels which are having a 4NH > 2
-ind4J = find(fourNH>2);         % indices of junctions
+ind4J = find(fourNH>2);         % indices of junctions wrt to ws segmentation
 % visualize junctions
 wsJ = zeros(sizeR,sizeC);
 wsJ(ind4J) = 1;
@@ -79,7 +79,10 @@ figure;imagesc(wsEdges2);title('edges between junctions labeled separately')
 % for each node, get a list of edge IDs connected to it
 nodeEdges = getNodeEdges(ind4J,edgePixLabels,sizeR,sizeC);
 adjacencyMat = getAdjacencyMat(nodeEdges);
-
-
+% visualize graph
+% binary adjacency matrix
+[r,c] = ind2sub([sizeR sizeC],ind4J);
+xy = [c r];
+figure;gplot(adjacencyMat,xy);
 
 
