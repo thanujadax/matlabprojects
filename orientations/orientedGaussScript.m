@@ -14,7 +14,7 @@ displayIntermediateFigures=1;
 %imagePath = 'testCirc.png';
 %imagePath = 'testImgGauss.png';
 %imagePath = 'testCirc.png';
-imagePath = '/home/thanuja/Dropbox/data/testImg/testMembrane3.png';
+imagePath = '/home/thanuja/Dropbox/data/testImg/testMembrane4.png';
 
 medianFilterH = 1;  % H is median filtered to remove salt and pepper noise in a 3x3 neighborhood 
 
