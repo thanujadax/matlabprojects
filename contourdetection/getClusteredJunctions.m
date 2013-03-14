@@ -12,6 +12,7 @@ function connectedJunctionIDs = getClusteredJunctions(wsJ)
 % wsJ contains 1 for junction nodes, others zero.
 
 [sizeR,sizeC] = size(wsJ);
+ind4J = find(wsJ);
 
 eightNH_J = zeros(sizeR,sizeC);
 numJunctionPixels = numel(ind4J);  % watershed junction pixels (3 and 4 Js)
