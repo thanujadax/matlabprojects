@@ -62,15 +62,16 @@ indJClusterPixels = find(eightNH_J>0);  % gets junction pixels which has neighbo
 numJunctionClustPix = numel(indJClusterPixels);
 connectedJunctionIDs = zeros(numJunctionClustPix,2);
 connectedJunctionIDs(:,1) = indJClusterPixels;
-junctionID = 0;
+junctionLabel = 0;
 for i=1:numJunctionClustPix
     % look for the neighbors and give them the same label
     jLabelCurrent = connectedJunctionIDs(i,2);
     if(jLabelCurrent==0)
-        junctionID = junctionID + 1;
+        junctionLabel = junctionLabel + 1;
         % assign label to this junction and to its neighbors and its
         % neighbors neighbors
-        connectedJunctionIDs = labelJunctionClusterNeighbors(i,connectedJunctionIDs,junctionID,...
+        junctionInd = connectedJunctionIDs(i,1);
+        connectedJunctionIDs = labelJunctionClusterNeighbors(junctionInd,connectedJunctionIDs,junctionLabel,...
                     sizeR,sizeC,eightNH_J);
     end
 end
