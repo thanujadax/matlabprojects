@@ -1,7 +1,7 @@
 function adjacencyMat = getAdjacencyMat(nodeEdges)
 % Input:
 %   nodeEdges: gives the list of edgeIDs connected to each junction node
-%       each row is -> junctionInd,edge1, edge2, edge3, edge4
+%       each row is -> junctionInd,edge1, edge2, edge3, edge4, ..
 [numNodes, numEdgesPerNode] = size(nodeEdges);
 adjacencyMat = zeros(numNodes);
 

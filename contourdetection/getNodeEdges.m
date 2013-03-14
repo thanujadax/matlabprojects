@@ -1,4 +1,4 @@
-function nodeEdges = getNodeEdges(nodeInds,edgePixLabels,connectedJunctionIDs,sizeR,sizeC)
+function [nodeEdges,nodeIndsNoDuplicates] = getNodeEdges(nodeInds,edgePixLabels,connectedJunctionIDs,sizeR,sizeC)
 % Inputs:
 %   nodeInd - array of junction indices
 %   edgePixLabels - N-by-2 array of edge labels for each pixel, given by
@@ -16,11 +16,22 @@ numClusteredNodes = size(connectedJunctionIDs,1);
 numNodes0 = numel(nodeInds);
 numNodesCombined = numNodes0 - numClusteredNodes + numClusters;
 
+% create a list of nodeInds without duplicates
+nodeIndsNoDuplicates = nodeInds;
+for i=1:numClusters
+    cNodesListInd = find(connectedJunctionIDs(:,2)==i);
+    cNodes_i = connectedJunctionIDs(cNodesListInd,1);
+    numCnodes_i = numel(cNodes_i);
+    for j=2:numCnodes_i
+        nodeIndsNoDuplicates = nodeIndsNoDuplicates(nodeIndsNoDuplicates(:,1)~=cNodes_i(j),:);
+    end    
+end
+
 nodeEdges = zeros(numNodesCombined,5);
 % nodeEdges(:,1) = nodeInds;
 
-for i=1:numel(nodeInds)
-    thisNodeIndex = nodeInds(i);
+for i=1:numNodesCombined
+    thisNodeIndex = nodeIndsNoDuplicates(i);
     neighborInd = getNeighbors(thisNodeIndex,sizeR,sizeC);
     numNeighbors = numel(neighborInd);
     nodeEdges(i,1) = thisNodeIndex;
@@ -30,7 +41,8 @@ for i=1:numel(nodeInds)
         if(~isempty(neighborListInd))
             % there's an edge for this neighbor
             k = k + 1;
-            nodeEdges(i,k) = edgePixLabels(neighborListInd,2);
+            edgeId = edgePixLabels(neighborListInd,2);
+            nodeEdges(i,k) = edgeId;
         end
     end
     % check if it has directly neighboring nodes
@@ -38,26 +50,32 @@ for i=1:numel(nodeInds)
     if(~isempty(connectedJInd))
         % this junction has other directly neighboring junctions
         duplicateLabel = connectedJunctionIDs(connectedJInd,2);
-        neighboringCJListInd = find(connectedJunctionIDs(:,2)==duplicateLabel);
+        neighboringCJListInd = find(connectedJunctionIDs(:,2)==duplicateLabel(1));
         
         numNeighJ = numel(neighboringCJListInd);
-        for m=1:numNeighJ
+        for m=2:numNeighJ      % start with 2 to skip the current junction node
             % for each neighboring junction,
             neighJ_ind = connectedJunctionIDs(neighboringCJListInd(m),1);
             % get its edges and,
             % add its edges to the list of edges under 'thisNodeIndex'
             jNeighborInd = getNeighbors(neighJ_ind,sizeR,sizeC);
+            jNeighborInd = jNeighborInd(jNeighborInd~=thisNodeIndex);
             numJNeighbors = numel(jNeighborInd);
             for j=1:numJNeighbors
                 jNeighborListInd = find(edgePixLabels(:,1)==jNeighborInd(j));
                 if(~isempty(jNeighborListInd))
                     % there's an edge for this neighbor
-                    k = k + 1;
-                    nodeEdges(i,k) = edgePixLabels(jNeighborListInd,2);
+                    % check first, if this edge is already in the list for
+                    % thisNodeIndex
+                    edgeId = edgePixLabels(jNeighborListInd,2);
+                    if(isempty(find(nodeEdges(i,:)==edgeId)))
+                        k = k + 1;
+                        nodeEdges(i,k) = edgeId;
+                    end
                 end
-                % remove the duplicate junction from nodeInds
-                % b = a(a~=3);
-                nodeInds = nodeInds(nodeInds(:,1)~=jNeighborInd(j),:);
+%                 % remove the duplicate junction from nodeInds
+%                 % b = a(a~=3);
+%                 nodeInds = nodeInds(nodeInds(:,1)~=jNeighborInd(j),:);
             end
             
             
