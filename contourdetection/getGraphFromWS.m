@@ -1,13 +1,14 @@
-% extracting edges and junctions from WS
-% imIn = imread('stem_256x_t02_V.png');
-imIn = imread('testMem4_V.png');
-[sizeR,sizeC] = size(imIn);
-ws = watershed(imIn);
-%figure;imagesc(ws)
+function [adjacencyMat,nodeEdges,edges2nodes,edges2pixels] = getGraphFromWS(ws)
+% % extracting edges and junctions from WS
+% % imIn = imread('stem_256x_t02_V.png');
+% imIn = imread('testMem4_V.png');
+% [sizeR,sizeC] = size(imIn);
+% ws = watershed(imIn);
+% %figure;imagesc(ws)
 
 % % test input ws
 % ws = imread('toyWS.png');
-% [sizeR,sizeC] = size(ws);
+[sizeR,sizeC] = size(ws);
 
 % the edges (watershed boundaries) are labeled 0
 % extract those
@@ -89,17 +90,12 @@ connectedJunctionIDs = getClusteredJunctions(wsJ);
 % for each node, get a list of edge IDs connected to it
 [nodeEdges,nodeInds] = getNodeEdges(ind4J,edgePixLabels,connectedJunctionIDs,sizeR,sizeC);
 [adjacencyMat,edges2nodes] = getAdjacencyMat(nodeEdges);
-% visualize graph
-% binary adjacency matrix
-% [r,c] = ind2sub([sizeR sizeC],ind4J);
-% k = 1:30;
-% [B,XY] = bucky;
-% gplot(B(k,k),XY(k,:),'-*')
-% axis square
 
 % edge to pixel correspondence
 % edges2pixels = getEdges2Pixels(edgePixLabels);
+edges2pixels = 0;
 
+% visualize graph
 [r,c] = ind2sub([sizeR sizeC],nodeInds);
 xy = [c r];
 figure;gplot(adjacencyMat,xy,'-*');

@@ -1,4 +1,4 @@
-function adjacencyMat = getAdjacencyMat(nodeEdges)
+function [adjacencyMat, edges2nodes] = getAdjacencyMat(nodeEdges)
 % Input:
 %   nodeEdges: gives the list of edgeIDs connected to each junction node
 %       each row is -> junctionInd,edge1, edge2, edge3, edge4, ..
@@ -6,6 +6,7 @@ function adjacencyMat = getAdjacencyMat(nodeEdges)
 adjacencyMat = zeros(numNodes);
 
 numEdges = max(max(nodeEdges(:,2:numEdgesPerNode)));
+edges2nodes = zeros(numEdges,2);
 
 for i=1:numEdges
     % for each edge, find the two corresponding nodes at its ends
@@ -18,6 +19,9 @@ for i=1:numEdges
         j2 = find(nodeEdges(:,1)==nodeInd(2));
         adjacencyMat(j1,j2) = i; % assign edgeId to the adjMat
         adjacencyMat(j2,j1) = i;
+        % also add the entries to edges2nodes
+        edges2nodes(i,1) = j1;
+        edges2nodes(i,2) = j2;
     else
         i
         numel(R)
