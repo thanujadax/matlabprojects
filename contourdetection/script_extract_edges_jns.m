@@ -1,13 +1,13 @@
-% % extracting edges and junctions from WS
-% % imIn = imread('stem_256x_t02_V.png');
-% imIn = imread('testMem4_V.png');
-% [sizeR,sizeC] = size(imIn);
-% ws = watershed(imIn);
-% %figure;imagesc(ws)
+% extracting edges and junctions from WS
+% imIn = imread('stem_256x_t02_V.png');
+imIn = imread('testMem4_V.png');
+[sizeR,sizeC] = size(imIn);
+ws = watershed(imIn);
+%figure;imagesc(ws)
 
-% test input ws
-ws = imread('toyWS.png');
-[sizeR,sizeC] = size(ws);
+% % test input ws
+% ws = imread('toyWS.png');
+% [sizeR,sizeC] = size(ws);
 
 % the edges (watershed boundaries) are labeled 0
 % extract those
@@ -92,9 +92,18 @@ adjacencyMat = getAdjacencyMat(nodeEdges);
 % visualize graph
 % binary adjacency matrix
 % [r,c] = ind2sub([sizeR sizeC],ind4J);
+% k = 1:30;
+% [B,XY] = bucky;
+% gplot(B(k,k),XY(k,:),'-*')
+% axis square
 [r,c] = ind2sub([sizeR sizeC],nodeInds);
 xy = [c r];
-figure;gplot(adjacencyMat,xy);
+figure;gplot(adjacencyMat,xy,'-*');
 set(gca,'YDir','reverse');
 
+% n = size(adjacencyMat,1);
+% k = 1:n;
+% figure;gplot(adjacencyMat(k,k),xy(k,:),'-*')
+% set(gca,'YDir','reverse');
+% axis square
 
