@@ -6,7 +6,7 @@ function edges2pixels = getEdges2Pixels(edgePixLabels)
 %   edgePixLabels - N-by-2 array. each row is for one pixel with its edge
 %   label in the 2nd col
 
-numPixels = size(edgePixLabels,2);
+% numPixels = size(edgePixLabels,2);
 numEdges = max(edgePixLabels(:,2));
 edges2pixels = zeros(numEdges,1);
 
@@ -14,7 +14,12 @@ for i=1:numEdges
     pixInd = find(edgePixLabels(:,2)==i);
     if(~isempty(pixInd))
         pixInd = edgePixLabels(pixInd,1);
-        edges2pixels(i) = pixInd;
+        % edges2pixels(i) = pixInd;
+        if(~isempty(pixInd))
+            for j=1:numel(pixInd)
+                edges2pixels(i,j)=pixInd(j);
+            end
+        end
     end
 end
 

@@ -98,7 +98,7 @@ connectedJunctionIDs = getClusteredJunctions(wsJ);
 % axis square
 
 % edge to pixel correspondence
-% edges2pixels = getEdges2Pixels(edgePixLabels);
+edges2pixels = getEdges2Pixels(edgePixLabels);
 
 [r,c] = ind2sub([sizeR sizeC],nodeInds);
 xy = [c r];

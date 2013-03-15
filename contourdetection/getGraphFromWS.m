@@ -92,8 +92,8 @@ connectedJunctionIDs = getClusteredJunctions(wsJ);
 [adjacencyMat,edges2nodes] = getAdjacencyMat(nodeEdges);
 
 % edge to pixel correspondence
-% edges2pixels = getEdges2Pixels(edgePixLabels);
-edges2pixels = 0;
+edges2pixels = getEdges2Pixels(edgePixLabels);
+
 
 % visualize graph
 [r,c] = ind2sub([sizeR sizeC],nodeInds);
