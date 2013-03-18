@@ -62,6 +62,7 @@ numJunctions = numJ3 + numJ4;
 % coeff for turning on J4-config(1 to 6): j4NodeAngleCost
 f = getILPcoefficientVector(edgePriors,j3NodeAngleCost,j4NodeAngleCost);
 % constraints
-
+% equality constraints and closedness constrains in Aeq matrix
+[Aeq,beq] = getEqConstraints(numEdges,j3Edges,j4Edges);
 % ILP
     
