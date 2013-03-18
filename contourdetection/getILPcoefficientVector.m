@@ -9,13 +9,24 @@ f = zeros(numElements,1);
 %[{edgeInactive},{edgeActive},{J3inactive},{J3Active_3},{J4inactive},{J4Active_6}]
 
 % edge variables
-f(1:numEdges) = edgePriors;
-f((numEdges+1):(2*numEdges)) = -edgePriors;
+for i=1:2:2*numEdges
+    f(i) = edgePriors(i);       % inactivation cost
+    f(i+1) = -edgePriors(i+1);  % activation cost for the same edge
+end
 
 % junction variables - J3
 maxJ3cost = max(j3NodeAngleCost,[],2);
 j3NodeAngleCost = -j3NodeAngleCost;
-j3NodeAngleCost = [maxJ3cost j3NodeAngleCost];
-for i=(2*numEdges+1):(2*numEdges+numJ3)
-    
-end
+j3NodeAngleCost = [maxJ3cost j3NodeAngleCost]; % first column: inactivation cost
+
+numJ3Coeff = numel(j3NodeAngleCost);
+f((2*numEdges+1):(2*numEdges+numJ3Coeff)) = j3NodeAngleCost(1:numJ3Coeff);
+
+% junction variables - J4
+maxJ4cost = max(j4NodeAngleCost,[],2);
+j4NodeAngleCost = -j4NodeAngleCost;
+j4NodeAngleCost = [maxJ4cost j4NodeAngleCost]; % first column: inactivation cost
+
+numJ4Coeff = numel(j4NodeAngleCost);
+f((2*numEdges+numJ3Coeff+1):(2*numEdges+numJ3Coeff+numJ4Coeff)) = ...
+                j4NodeAngleCost(1:numJ4Coeff);
