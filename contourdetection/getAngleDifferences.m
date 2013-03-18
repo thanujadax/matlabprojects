@@ -28,8 +28,8 @@ elseif(numTheta==4)
     dTheta(:,5) = abs(angles(:,2) - angles(:,4));
     % t3 - t4
     dTheta(:,6) = abs(angles(:,3) - angles(:,4));
-    
 else
     % not defined for any other number of angles. return error.
     dTheta = -1;
+    disp('Error:getAngleDifferences: number of edges per node is not 3 or 4');
 end

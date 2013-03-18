@@ -6,6 +6,9 @@ imFilePath = 'testMem4_V.png';
 load('orientedScoreSpace3D.mat') % loads the orientation filter scores
 angleStep = 10; % 10 degrees discretization step of orientations
 
+% param
+cNode = 1;          % scaling factor for the node cost coming from gaussian normal distr.
+
 imIn = imread(imFilePath);
 % watershed segmentation
 ws = watershed(imIn);
@@ -33,6 +36,10 @@ j3Edges = nodeEdges(j3Ind,2:4);             % order of indices given by j3Ind
 % angles
 j3Angles = getNodeAngles(j3Ind,j3Edges,edges2pixels,orientedScoreSpace3D,...
                             sizeR,sizeC,angleStep);
+                        
+j3dTheta = getAngleDifferences(j3Angles);
+% calculate the cost for the angle differences
+j3NodeAngleCost = getNodeAngleCost(j3dTheta,sigma,cNode);
 
 % J4
 j4Edges = zeros(numJ4,4);
