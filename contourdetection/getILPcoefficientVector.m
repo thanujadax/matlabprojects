@@ -9,9 +9,11 @@ f = zeros(numElements,1);
 %[{edgeInactive},{edgeActive},{J3inactive},{J3Active_3},{J4inactive},{J4Active_6}]
 
 % edge variables
+j=1;
 for i=1:2:2*numEdges
-    f(i) = edgePriors(i);       % inactivation cost
-    f(i+1) = -edgePriors(i+1);  % activation cost for the same edge
+    f(i) = edgePriors(j);       % inactivation cost
+    f(i+1) = -edgePriors(j);  % activation cost for the same edge
+    j = j+1;
 end
 
 % junction variables - J3
