@@ -10,17 +10,18 @@ imIn = imread(imFilePath);
 % watershed segmentation
 ws = watershed(imIn);
 [sizeR,sizeC] = size(ws);
-% generate graph from the watershed edges
+%% generate graph from the watershed edges
 [adjacencyMat,nodeEdges,edges2nodes,edges2pixels] = getGraphFromWS(ws);
 
 % state vector x: {edges}{J3}{J4}
 numEdges = size(edges2nodes,1);
 numJunctions = size(nodeEdges,1);
 
-% priors
+%% Edge priors
 % edge priors - from orientation filters
 edgePriors = getEdgePriors(orientedScoreSpace3D,edges2pixels);
-% J
+
+%% Edge pairs - Junction costs
 nodeInds = nodeEdges(:,1);
 j4Ind = nodeInds((nodeEdges(:,5))>0);       % indices of J4 in order
 j3Ind = nodeInds((nodeEdges(:,5))==0);      % indices of J3 in order

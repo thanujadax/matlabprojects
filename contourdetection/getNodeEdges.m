@@ -68,14 +68,11 @@ for i=1:numNodesCombined
                     % check first, if this edge is already in the list for
                     % thisNodeIndex
                     edgeId = edgePixLabels(jNeighborListInd,2);
-                    if(isempty(find(nodeEdges(i,:)==edgeId)))
+                    if(isempty(find(nodeEdges(i,:)==edgeId)) )
                         k = k + 1;
                         nodeEdges(i,k) = edgeId;
                     end
                 end
-%                 % remove the duplicate junction from nodeInds
-%                 % b = a(a~=3);
-%                 nodeInds = nodeInds(nodeInds(:,1)~=jNeighborInd(j),:);
             end
             
             
