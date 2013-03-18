@@ -31,13 +31,15 @@ numJ3 = numel(j3Ind);
 j3Edges = zeros(numJ3,3);
 j3Edges = nodeEdges(j3Ind,2:4);             % order of indices given by j3Ind
 % angles
-j3Angles = getNodeAngles(j3Ind,j3Edges,edges2pixels,orientedScoreSpace3D,sizeR,sizeC,angleStep);
+j3Angles = getNodeAngles(j3Ind,j3Edges,edges2pixels,orientedScoreSpace3D,...
+                            sizeR,sizeC,angleStep);
 
 % J4
 j4Edges = zeros(numJ4,4);
 j4Edges = nodeEdges(j4Ind,2:5);             % order of indices given by j4Ind
 % angles
-j4Angles = getNodeAngles(j4Ind,j4Edges,edges2pixels,orientedScoreSpace3D,sizeR,sizeC,angleStep);
+j4Angles = getNodeAngles(j4Ind,j4Edges,edges2pixels,orientedScoreSpace3D,...
+                            sizeR,sizeC,angleStep);
 
 
 

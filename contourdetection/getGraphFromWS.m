@@ -87,12 +87,12 @@ connectedJunctionIDs = getClusteredJunctions(wsJ);
 % together with zero length edges
 % nodeZeroEdges - store node - edge1,edge2 etc for these zero length edge
 %% Build the adjacency matrix of the junction nodes
+% edge to pixel correspondence
+edges2pixels = getEdges2Pixels(edgePixLabels);
+% edges2ignore = getEdgesToIgnore(edges2pixels,connectedJunctionIDs,sizeR,sizeC);
 % for each node, get a list of edge IDs connected to it
 [nodeEdges,nodeInds] = getNodeEdges(ind4J,edgePixLabels,connectedJunctionIDs,sizeR,sizeC);
 [adjacencyMat,edges2nodes] = getAdjacencyMat(nodeEdges);
-
-% edge to pixel correspondence
-edges2pixels = getEdges2Pixels(edgePixLabels);
 
 
 % visualize graph
