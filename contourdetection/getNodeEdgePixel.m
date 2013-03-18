@@ -1,15 +1,24 @@
-function nodePixel = getNodeEdgePixel(nodeInd,edgePixelInds,sizeR,sizeC)
+function nodePixels = getNodeEdgePixel(nodeInd,edgePixelInds,sizeR,sizeC)
 % nodeInd contains the pixel index of a junction node
 % edgePixelInds contains a set of pixel indices of an edge attached to the
 % given node
-% nodePixel (output) is the edge pixel index which is closest to the node
-% pixel
+% nodePixels (output) are the 3 edge pixel indices which are closest to the node
+% pixel. If there are less than 3 such pixels, only those are returned.
 
 [nodeR,nodeC] = ind2sub([sizeR sizeC],nodeInd);
 [pixR,pixC] = ind2sub([sizeR sizeC],edgePixelInds);
+numEdgePixels = numel(pixR);
 
-distance = (pixR-nodeR).^2 + (pixC-nodeC).^2;
-minDistance = min(distance);
-nodePixListInd = find(distance==minDistance);
-nodePixel = edgePixelInds(nodePixListInd);
-
+if(numEdgePixels>3)
+    % select the 3 pixels which are closest to the junction node
+    distance = (pixR-nodeR).^2 + (pixC-nodeC).^2;
+    sortedDistance = sort(distance);
+    minDist3 = sortedDistance(3);
+    nodePixels = edgePixelInds(distance<=minDist3);
+%     minDistance = min(distance);
+%     nodePixListInd = find(distance==minDistance);
+%     nodePixels = edgePixelInds(nodePixListInd);
+else
+    % there are only 3 or less number of pixels.
+    nodePixels = edgePixelInds;
+end

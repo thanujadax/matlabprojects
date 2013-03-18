@@ -1,4 +1,5 @@
-function jAngles = getNodeAngles(jInd,jEdges,edges2pixels,orientedScoreSpace3D,sizeR,sizeC,angleStep)
+function jAngles = getNodeAngles(jInd,nodeInds,jEdges,edges2pixels,orientedScoreSpace3D,...
+                    sizeR,sizeC,angleStep)
 % returns an N-by-n array of angles. N = number of nodes, n = number of
 % edges per node. The order is determined by jInd which contains the
 % indices of the nodes (junctions)
@@ -17,21 +18,29 @@ function jAngles = getNodeAngles(jInd,jEdges,edges2pixels,orientedScoreSpace3D,s
 
 [numJ,degree] = size(jEdges);
 jAngles = zeros(numJ,degree);
-
+numOrientations = size(orientedScoreSpace3D,3);
 for i=1:numJ
     % for each node
     edges_i = jEdges(i,:);
-    nodeInd = jInd(i);
+    nodeInd = nodeInds(jInd(i));
     for j=1:degree
         % for each edge of this node
         edgeID = edges_i(j);
         edgePixelInds = edges2pixels(edgeID,:);
-        % get the pixel which is closest to the node i
-        nodePixel = getNodeEdgePixel(nodeInd,edgePixelInds,sizeR,sizeC);
-        % get its orientation
-        [r,c] = ind2sub([sizeR sizeC],nodePixel);
-        [~,orientationIndex] = max(orientedScoreSpace3D(r,c,:));
-        edgeAngle = (orientationIndex-1)*angleStep;
-        jAngles(i,j) = edgeAngle;
+        edgePixelInds = edgePixelInds(edgePixelInds>0);
+        % get the edge pixels(3) which are closest to the node i
+        nodePixels = getNodeEdgePixel(nodeInd,edgePixelInds,sizeR,sizeC);
+        % get their orientation
+        [r,c] = ind2sub([sizeR sizeC],nodePixels');
+        numEdgePix = numel(nodePixels);
+        orientations = zeros(numEdgePix,numOrientations);
+        for k=1:numEdgePix
+            orientations(k,1:numOrientations) = orientedScoreSpace3D(r(k),c(k),:);
+            [~,orientationIndex(k)] = max(orientations(k,:));
+        end
+%         [~,orientationIndex] = max(orientedScoreSpace3D(r,c,:),3);
+        edgeAngles = (orientationIndex-1).*angleStep;
+        avgEdgeAngle = median(edgeAngles);
+        jAngles(i,j) = avgEdgeAngle;
     end
 end
