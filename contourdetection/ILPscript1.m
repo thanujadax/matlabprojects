@@ -65,4 +65,4 @@ f = getILPcoefficientVector(edgePriors,j3NodeAngleCost,j4NodeAngleCost);
 % equality constraints and closedness constrains in Aeq matrix
 [Aeq,beq] = getEqConstraints(numEdges,j3Edges,j4Edges);
 % ILP
-    
+x0 = getInitValues(numEdges,numJ3,numJ4);    
