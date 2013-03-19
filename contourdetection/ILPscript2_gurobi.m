@@ -88,6 +88,8 @@ if(useGurobi)
     
     params.LogFile = 'gurobi.log';
     
+    resultGurobi = gurobi(model,params);
+    x = result.x;
     
     
 else
