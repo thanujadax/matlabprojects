@@ -17,7 +17,7 @@ end
 angleStep = 10; % 10 degrees discretization step of orientations
 
 % param
-cNode = 1;          % scaling factor for the node cost coming from gaussian normal distr.
+cNode = 3;          % scaling factor for the node cost coming from gaussian normal distr.
 sig = 45;          % standard deviation(degrees) for the node cost function's gaussian distr.
 midPoint = 180;     % angle difference of an edge pair (in degrees) for maximum cost 
 
@@ -89,7 +89,7 @@ if(useGurobi)
     params.LogFile = 'gurobi.log';
     
     resultGurobi = gurobi(model,params);
-    x = result.x;
+    x = resultGurobi.x;
     
     
 else
@@ -119,4 +119,4 @@ offEdgeStates = x(offStateEdgeXind);
 offEdgeInd = find(offEdgeStates==1);
 offPixelInds = getPixSetFromEdgeIDset(offEdgeInd,edges2pixels);
 wsBoundaries(offPixelInds)=0;
-figure;imagesc(wsBoundaries)
+figure;imagesc(wsBoundaries);title('ILP segmentation')

@@ -18,7 +18,7 @@ end
 
 % junction variables - J3
 maxJ3cost = max(j3NodeAngleCost,[],2);
-j3NodeAngleCost = -j3NodeAngleCost;
+% j3NodeAngleCost = -j3NodeAngleCost;
 j3NodeAngleCost = [maxJ3cost j3NodeAngleCost]; % first column: inactivation cost
 
 numJ3Coeff = numel(j3NodeAngleCost);
