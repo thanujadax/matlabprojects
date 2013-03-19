@@ -17,7 +17,7 @@ end
 angleStep = 10; % 10 degrees discretization step of orientations
 
 % param
-cNode = 3;          % scaling factor for the node cost coming from gaussian normal distr.
+cNode = 1;          % scaling factor for the node cost coming from gaussian normal distr.
 sig = 45;          % standard deviation(degrees) for the node cost function's gaussian distr.
 midPoint = 180;     % angle difference of an edge pair (in degrees) for maximum cost 
 
@@ -108,15 +108,29 @@ else
     t2 = cputime;
     timetaken = t2-t1
 end
-%% Visualize output
-% get inactive edgeIDs from x
-% disable these edges in the wsBoundaries
-ind0 = find(ws==0);
-wsBoundaries = zeros(sizeR,sizeC);
-wsBoundaries(ws==0) = 1;
-offStateEdgeXind = 1:2:(numEdges*2-1);
-offEdgeStates = x(offStateEdgeXind);
-offEdgeInd = find(offEdgeStates==1);
-offPixelInds = getPixSetFromEdgeIDset(offEdgeInd,edges2pixels);
-wsBoundaries(offPixelInds)=0;
-figure;imagesc(wsBoundaries);title('ILP segmentation')
+
+
+%% visualize
+% get active edges and active nodes from x
+ilpSegmentation = zeros(sizeR,sizeC);
+% active edges
+onStateEdgeXind = 2:2:(numEdges*2);
+onEdgeStates = x(onStateEdgeXind);
+onEdgeInd = find(onEdgeStates==1);
+onEdgePixelInds = getPixSetFromEdgeIDset(onEdgeInd,edges2pixels);
+ilpSegmentation(onEdgePixelInds) = 1;
+
+% active J3 nodes
+offStateJ3Xind = (numEdges*2+1):4:(numEdges*2+numJ3*4-1);
+offJ3PixStates = x(offStateJ3Xind);
+onJ3PixInd = nodeInds(j3ListInd(offJ3PixStates==0));
+ilpSegmentation(onJ3PixInd) = 1;
+% active J4 nodes
+offStateJ4Xind = (numEdges*2+numJ3*4+1):7:(numEdges*2+numJ3*4+numJ4*7-1);
+offJ4PixStates = x(offStateJ4Xind);
+onJ4PixInd = nodeInds(j4ListInd(offJ4PixStates==0));
+ilpSegmentation(onJ4PixInd) = 1;
+
+%onPixelInds = [onEdgePixelInds; onJ3PixInd; onJ4PixInd];
+%ilpSegmentation(onPixelInds) = 1;
+figure;imagesc(ilpSegmentation);title('ILP contours');
