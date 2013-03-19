@@ -1,9 +1,11 @@
 % ILP script 1
 
 % max vote response image of the orientation filters
-imFilePath = 'testMem4_V.png';
+% imFilePath = 'testMem4_V.png';
+imIn = imread('stem_256x_t02_V.png');
 % votes for each orientation for each edge
-load('orientedScoreSpace3D.mat') % loads the orientation filter scores
+%load('orientedScoreSpace3D.mat') % loads the orientation filter scores
+load('orientedScoreSpace3D_stem256x.mat') % loads the orientation filter scores
 angleStep = 10; % 10 degrees discretization step of orientations
 
 % param
@@ -11,7 +13,7 @@ cNode = 1;          % scaling factor for the node cost coming from gaussian norm
 sig = 45;          % standard deviation(degrees) for the node cost function's gaussian distr.
 midPoint = 180;     % angle difference of an edge pair (in degrees) for maximum cost 
 
-imIn = imread(imFilePath);
+% imIn = imread(imFilePath);
 % watershed segmentation
 ws = watershed(imIn);
 [sizeR,sizeC] = size(ws);
