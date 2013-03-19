@@ -2,9 +2,9 @@
 
 % max vote response image of the orientation filters
 % imFilePath = 'testMem4_V.png';
-imIn = imread('stem_256x_t02_V.png');
+imFilePath = 'stem_256x_t02_V.png';
 % votes for each orientation for each edge
-%load('orientedScoreSpace3D.mat') % loads the orientation filter scores
+% load('orientedScoreSpace3D.mat') % loads the orientation filter scores
 load('orientedScoreSpace3D_stem256x.mat') % loads the orientation filter scores
 angleStep = 10; % 10 degrees discretization step of orientations
 
@@ -13,13 +13,15 @@ cNode = 1;          % scaling factor for the node cost coming from gaussian norm
 sig = 45;          % standard deviation(degrees) for the node cost function's gaussian distr.
 midPoint = 180;     % angle difference of an edge pair (in degrees) for maximum cost 
 
-% imIn = imread(imFilePath);
+imIn = imread(imFilePath);
 % watershed segmentation
 ws = watershed(imIn);
 [sizeR,sizeC] = size(ws);
 %% generate graph from the watershed edges
+disp('creating graph from watershed boundaries...');
 [adjacencyMat,nodeEdges,edges2nodes,edges2pixels] = getGraphFromWS(ws);
-
+disp('graph created!')
+disp('preparing coefficients for ILP solver...')
 %% Edge priors
 % edge priors - from orientation filters
 edgePriors = getEdgePriors(orientedScoreSpace3D,edges2pixels);
@@ -67,9 +69,18 @@ f = getILPcoefficientVector(edgePriors,j3NodeAngleCost,j4NodeAngleCost);
 % equality constraints and closedness constrains in Aeq matrix
 [Aeq,beq] = getEqConstraints(numEdges,j3Edges,j4Edges);
 % Initial values for the state variables
-x0 = getInitValues(numEdges,numJ3,numJ4);  % TODO: infeasible!!
+% x0 = getInitValues(numEdges,numJ3,numJ4);  % TODO: infeasible!!
+numStates = size(f,1);
+maxIterationsILP = numStates * 1000000;
+options = optimoptions('bintprog','MaxIter',maxIterationsILP,...
+                'MaxTime',5000000);
+% options = struct('MaxTime', 5000000);
 % ILP
-x = bintprog(f,[],[],Aeq,beq);
+disp('running ILP...');
+t1 = cputime;
+[x,fval,exitflag,optOutput] = bintprog(f,[],[],Aeq,beq,[],options);
+t2 = cputime;
+timetaken = t2-t1
 %% Visualize output
 % get inactive edgeIDs from x
 % disable these edges in the wsBoundaries
