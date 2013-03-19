@@ -68,3 +68,15 @@ f = getILPcoefficientVector(edgePriors,j3NodeAngleCost,j4NodeAngleCost);
 x0 = getInitValues(numEdges,numJ3,numJ4);  % TODO: infeasible!!
 % ILP
 x = bintprog(f,[],[],Aeq,beq);
+%% Visualize output
+% get inactive edgeIDs from x
+% disable these edges in the wsBoundaries
+ind0 = find(ws==0);
+wsBoundaries = zeros(sizeR,sizeC);
+wsBoundaries(ws==0) = 1;
+offStateEdgeXind = 1:2:(numEdges*2-1);
+offEdgeStates = x(offStateEdgeXind);
+offEdgeInd = find(offEdgeStates==1);
+offPixelInds = getPixSetFromEdgeIDset(offEdgeInd,edges2pixels);
+wsBoundaries(offPixelInds)=0;
+figure;imagesc(wsBoundaries)
