@@ -1,7 +1,7 @@
 function [Aeq,beq] = getEqConstraints(numEdges,j3Edges,j4Edges)
 numJ3 = size(j3Edges,1);
 numJ4 = size(j4Edges,1);
-numCols = numEdges*2 + numJ3*4*2 + numJ4*7*2;
+numCols = numEdges*2 + numJ3*4 + numJ4*7;
 numRows = numEdges + numJ3*2 + numJ4*2;
 
 Aeq = zeros(numRows,numCols);
@@ -36,7 +36,7 @@ j3ActiveEdgeColInds = j3Edges .*2;
 j4ActiveEdgeColInds = j4Edges .*2;
 
 % J3
-jColId = numEdges*2 + numJ3*4 + numJ4*7;
+jColId = numEdges*2;
 k = 1;
 for i=(numEdges+numJ3+numJ4+1):(numEdges+numJ3*2+numJ4)
    Aeq(i,j3ActiveEdgeColInds(k,:)) = 1;          % marks active edges for junction i
@@ -49,7 +49,7 @@ for i=(numEdges+numJ3+numJ4+1):(numEdges+numJ3*2+numJ4)
 end
 
 % J4
-jColId = numEdges*2 + numJ3*4*2 + numJ4*7;
+jColId = numEdges*2 + numJ3*4;
 k = 1;
 for i=(numEdges+numJ3*2+numJ4+1):(numEdges+numJ3*2+numJ4*2)
    Aeq(i,j4ActiveEdgeColInds(k,:)) = 1;          % marks active edges for junction i

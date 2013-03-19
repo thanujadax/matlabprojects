@@ -64,5 +64,7 @@ f = getILPcoefficientVector(edgePriors,j3NodeAngleCost,j4NodeAngleCost);
 % constraints
 % equality constraints and closedness constrains in Aeq matrix
 [Aeq,beq] = getEqConstraints(numEdges,j3Edges,j4Edges);
+% Initial values for the state variables
+x0 = getInitValues(numEdges,numJ3,numJ4);  % TODO: infeasible!!
 % ILP
-x0 = getInitValues(numEdges,numJ3,numJ4);    
+x = bintprog(f,[],[],Aeq,beq);
