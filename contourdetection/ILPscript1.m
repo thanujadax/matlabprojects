@@ -72,7 +72,7 @@ f = getILPcoefficientVector(edgePriors,j3NodeAngleCost,j4NodeAngleCost);
 % x0 = getInitValues(numEdges,numJ3,numJ4);  % TODO: infeasible!!
 numStates = size(f,1);
 maxIterationsILP = numStates * 1000000;
-options = optimoptions('bintprog','MaxIter',maxIterationsILP,...
+options = optimset('MaxIter',maxIterationsILP,...
                 'MaxTime',5000000);
 % options = struct('MaxTime', 5000000);
 % ILP
