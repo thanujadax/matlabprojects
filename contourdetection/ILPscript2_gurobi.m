@@ -27,17 +27,24 @@ ws = watershed(imIn);
 [sizeR,sizeC] = size(ws);
 %% generate graph from the watershed edges
 disp('creating graph from watershed boundaries...');
-[adjacencyMat,nodeEdges,edges2nodes,edges2pixels] = getGraphFromWS(ws);
+[adjacencyMat,nodeEdges,edges2nodes,edges2pixels,connectedJunctionIDs] = getGraphFromWS(ws);
+nodeInds = nodeEdges(:,1);                  % indices of the junction nodes
+j4ListInd = find((nodeEdges(:,5))>0);       % nodeInds list indices of J4 in order
+j3ListInd = find((nodeEdges(:,5))==0);      % nodeInds list indices of J3 in order
+clusterNodeIDs = connectedJunctionIDs(:,1); % indices of the clustered junction nodes
 disp('graph created!')
+wsBoundariesFromGraph = zeros(sizeR,sizeC);
+wsBoundariesFromGraph(nodeInds(j3ListInd)) = 0.7;    % j3 nodes
+wsBoundariesFromGraph(nodeInds(j4ListInd)) = 0.4;    % j4 nodes
+wsBoundariesFromGraph(clusterNodeIDs) = 0.5;    % j4 nodes
+wsBoundariesFromGraph(edges2pixels(edges2pixels>0)) = 1; % edge pixels
+figure;imagesc(wsBoundariesFromGraph);title('boundaries from graph') 
 disp('preparing coefficients for ILP solver...')
 %% Edge priors
 % edge priors - from orientation filters
 edgePriors = getEdgePriors(orientedScoreSpace3D,edges2pixels);
 
 %% Edge pairs - Junction costs
-nodeInds = nodeEdges(:,1);
-j4ListInd = find((nodeEdges(:,5))>0);       % indices of J4 in order
-j3ListInd = find((nodeEdges(:,5))==0);      % indices of J3 in order
 numJ4 = numel(j4ListInd);
 numJ3 = numel(j3ListInd);
 % J3
@@ -124,13 +131,26 @@ ilpSegmentation(onEdgePixelInds) = 1;
 offStateJ3Xind = (numEdges*2+1):4:(numEdges*2+numJ3*4-1);
 offJ3PixStates = x(offStateJ3Xind);
 onJ3PixInd = nodeInds(j3ListInd(offJ3PixStates==0));
-ilpSegmentation(onJ3PixInd) = 1;
+ilpSegmentation(onJ3PixInd) = 0.7;
 % active J4 nodes
 offStateJ4Xind = (numEdges*2+numJ3*4+1):7:(numEdges*2+numJ3*4+numJ4*7-1);
 offJ4PixStates = x(offStateJ4Xind);
 onJ4PixInd = nodeInds(j4ListInd(offJ4PixStates==0));
-ilpSegmentation(onJ4PixInd) = 1;
-
+ilpSegmentation(onJ4PixInd) = 0.3;
+% active clustered nodes
+activeNodesJ3J4 = [onJ3PixInd; onJ4PixInd];
+numJ3J4Active = numel(activeNodesJ3J4);
+activeClustNodeInd = 0;
+for i=1:numJ3J4Active
+    clustLabel = connectedJunctionIDs((connectedJunctionIDs(:,1)==activeNodesJ3J4(i)),2);
+    clustNodeInd = connectedJunctionIDs((connectedJunctionIDs(:,2)==clustLabel),1);
+    foundClustNode = find(activeNodesJ3J4==clustNodeInd);
+    if(isempty(foundClustNode))
+        activeClustNodeInd = [activeClustNodeInd; clustNodeInd];
+    end
+end
+activeClustNodeInd = activeClustNodeInd(activeClustNodeInd~=0);
+ilpSegmentation(activeClustNodeInd) = 0.5;
 %onPixelInds = [onEdgePixelInds; onJ3PixInd; onJ4PixInd];
 %ilpSegmentation(onPixelInds) = 1;
 figure;imagesc(ilpSegmentation);title('ILP contours');

@@ -3,10 +3,14 @@ function [nodeEdges,nodeIndsNoDuplicates] = getNodeEdges(nodeInds,edgePixLabels,
 %   nodeInd - array of junction indices
 %   edgePixLabels - N-by-2 array of edge labels for each pixel, given by
 %   the index wrt the original image (watershed)
+%   connectedJunctionIDs - list of clusterd junction indices with the associated
+%   cluster label.
 
 % Output:
 %   nodeEdges - array with edge labels corresponding to each junction. each
 %   row -> jn,edge1,edge2,edge3,edge4
+%   nodeIndsNoDuplicates - list of the pixel indices of the nodes provided
+%   in nodeEdges. For the detected clustered nodes in connectedJunctions 
 
 % for each node, get the neighbors
 % get the edgeID of the neighbors
@@ -23,12 +27,12 @@ for i=1:numClusters
     cNodes_i = connectedJunctionIDs(cNodesListInd,1);
     numCnodes_i = numel(cNodes_i);
     for j=2:numCnodes_i
-        nodeIndsNoDuplicates = nodeIndsNoDuplicates(nodeIndsNoDuplicates(:,1)~=cNodes_i(j),:);
+        nodeIndsNoDuplicates = nodeIndsNoDuplicates...
+                    (nodeIndsNoDuplicates(:,1)~=cNodes_i(j),:);
     end    
 end
 
 nodeEdges = zeros(numNodesCombined,5);
-% nodeEdges(:,1) = nodeInds;
 
 for i=1:numNodesCombined
     thisNodeIndex = nodeIndsNoDuplicates(i);

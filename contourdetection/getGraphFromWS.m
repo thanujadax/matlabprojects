@@ -1,4 +1,4 @@
-function [adjacencyMat,nodeEdges,edges2nodes,edges2pixels] = getGraphFromWS(ws)
+function [adjacencyMat,nodeEdges,edges2nodes,edges2pixels,connectedJunctionIDs] = getGraphFromWS(ws)
 % % extracting edges and junctions from WS
 % % imIn = imread('stem_256x_t02_V.png');
 % imIn = imread('testMem4_V.png');
@@ -74,6 +74,7 @@ for i=1:numel(pixList)
         continue
     end
 end
+%% visualization
 % assign random colors to edges
 % TODO: assign colors from the OFR to each edge
 edgePixColors = edgePixLabels;
@@ -92,8 +93,27 @@ edges2pixels = getEdges2Pixels(edgePixLabels);
 % edges2ignore = getEdgesToIgnore(edges2pixels,connectedJunctionIDs,sizeR,sizeC);
 % for each node, get a list of edge IDs connected to it
 [nodeEdges,nodeInds] = getNodeEdges(ind4J,edgePixLabels,connectedJunctionIDs,sizeR,sizeC);
-[adjacencyMat,edges2nodes] = getAdjacencyMat(nodeEdges);
 
+[adjacencyMat,edges2nodes,selfEdgeIDs] = getAdjacencyMat(nodeEdges);
+
+% remove selfEdges from nodeEdges, edges2nodes and edges2pixels
+
+% edges2nodes
+edges2nodes = edges2nodes((edges2nodes(:,1)~=0),:);
+
+[nodeEdgeRows,nodeEdgeCols] = size(nodeEdges);
+numSelfEdges = numel(selfEdgeIDs);
+for i=1:numSelfEdges
+    % nodeEdges
+    [rx,cx] = find(nodeEdges(:,2:nodeEdgeCols)==selfEdgeIDs(i));
+    cx = cx + 1;
+    nodeEdges(rx,cx)=0;
+    
+    % edges2pixels
+    edges2pixels(selfEdgeIDs(i),1) = 0;  % set the self edge pixel to zero
+end
+% from edges2pixels, remove the rows who's first column has a zero
+edges2pixels = edges2pixels((edges2pixels(:,1)~=0),:);
 
 % visualize graph
 [r,c] = ind2sub([sizeR sizeC],nodeInds);

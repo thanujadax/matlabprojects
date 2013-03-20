@@ -1,4 +1,4 @@
-function [adjacencyMat, edges2nodes] = getAdjacencyMat(nodeEdges)
+function [adjacencyMat, edges2nodes,selfEdgeIDs] = getAdjacencyMat(nodeEdges)
 % Input:
 %   nodeEdges: gives the list of edgeIDs connected to each junction node
 %       each row is -> junctionInd,edge1, edge2, edge3, edge4, ..
@@ -7,6 +7,8 @@ adjacencyMat = zeros(numNodes);
 
 numEdges = max(max(nodeEdges(:,2:numEdgesPerNode)));
 edges2nodes = zeros(numEdges,2);
+
+sid = 0;
 
 for i=1:numEdges
     % for each edge, find the two corresponding nodes at its ends
@@ -22,8 +24,15 @@ for i=1:numEdges
         % also add the entries to edges2nodes
         edges2nodes(i,1) = j1;
         edges2nodes(i,2) = j2;
+    elseif(numel(R)==1)
+        % if 1, it contains a self edge.
+        sid = sid + 1;
+        selfEdgeIDs(sid) = i;
+        
     else
+        disp('warning:getAdjacencyMat - edge skipped')
         i
         numel(R)
+        
     end
 end

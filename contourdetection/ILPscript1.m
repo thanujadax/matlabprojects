@@ -19,17 +19,24 @@ ws = watershed(imIn);
 [sizeR,sizeC] = size(ws);
 %% generate graph from the watershed edges
 disp('creating graph from watershed boundaries...');
-[adjacencyMat,nodeEdges,edges2nodes,edges2pixels] = getGraphFromWS(ws);
+[adjacencyMat,nodeEdges,edges2nodes,edges2pixels,connectedJunctionIDs] = getGraphFromWS(ws);
+nodeInds = nodeEdges(:,1);                  % indices of the junction nodes
+j4ListInd = find((nodeEdges(:,5))>0);       % nodeInds list indices of J4 in order
+j3ListInd = find((nodeEdges(:,5))==0);      % nodeInds list indices of J3 in order
+clusterNodeIDs = connectedJunctionIDs(:,1); % indices of the clustered junction nodes
 disp('graph created!')
+wsBoundariesFromGraph = zeros(sizeR,sizeC);
+wsBoundariesFromGraph(nodeInds(j3ListInd)) = 0.7;    % j3 nodes
+wsBoundariesFromGraph(nodeInds(j4ListInd)) = 0.4;    % j4 nodes
+wsBoundariesFromGraph(clusterNodeIDs) = 0.5;    % j4 nodes
+wsBoundariesFromGraph(edges2pixels(edges2pixels>0)) = 1; % edge pixels
+figure;imagesc(wsBoundariesFromGraph);title('boundaries from graph') 
 disp('preparing coefficients for ILP solver...')
 %% Edge priors
 % edge priors - from orientation filters
 edgePriors = getEdgePriors(orientedScoreSpace3D,edges2pixels);
 
 %% Edge pairs - Junction costs
-nodeInds = nodeEdges(:,1);
-j4ListInd = find((nodeEdges(:,5))>0);       % indices of J4 in order
-j3ListInd = find((nodeEdges(:,5))==0);      % indices of J3 in order
 numJ4 = numel(j4ListInd);
 numJ3 = numel(j3ListInd);
 % J3

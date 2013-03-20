@@ -22,12 +22,16 @@ for i=1:numEdges
     % for each edge, get the pixel indices
     edgePixelInds = edges2pixels(i,:);              % list indices
     edgePixelInds = edgePixelInds(edgePixelInds>0); % indices of edge pixels wrt image
-    % for each orientation take the average over all pixels
-    for j=1:nOrientations
-        % get the total response for all edge pixels for this dimension
-        orientationResp_j = orientedScoreSpace3D(:,:,j);
-        meanEdgePixResp_j = mean(orientationResp_j(edgePixelInds));
-        edgePriors_all(i,j) = meanEdgePixResp_j;
+    if(~isempty(edgePixelInds))
+        % for each orientation take the average over all pixels
+        for j=1:nOrientations
+            % get the total response for all edge pixels for this dimension
+            orientationResp_j = orientedScoreSpace3D(:,:,j);
+            meanEdgePixResp_j = mean(orientationResp_j(edgePixelInds));
+            edgePriors_all(i,j) = meanEdgePixResp_j;
+        end
+        edgePriors(i) = max(edgePriors_all(i,:)); 
+    else
+        edgePriors(i) = 0;  % self edge
     end
-    edgePriors(i) = max(edgePriors_all(i,:));     
 end
