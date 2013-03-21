@@ -97,7 +97,6 @@ edges2pixels = getEdges2Pixels(edgePixLabels);
 [adjacencyMat,edges2nodes,selfEdgeIDs] = getAdjacencyMat(nodeEdges);
 
 % remove selfEdges from nodeEdges, edges2nodes and edges2pixels
-
 % edges2nodes
 edges2nodes = edges2nodes((edges2nodes(:,1)~=0),:);
 
@@ -107,15 +106,30 @@ for i=1:numSelfEdges
     % nodeEdges
     [rx,cx] = find(nodeEdges(:,2:nodeEdgeCols)==selfEdgeIDs(i));
     cx = cx + 1;
-    nodeEdges(rx,cx)=0;
-    
+    nodeEdges(rx,cx)=0;    
     % edges2pixels
     edges2pixels(selfEdgeIDs(i),1) = 0;  % set the self edge pixel to zero
 end
 % from edges2pixels, remove the rows who's first column has a zero
 edges2pixels = edges2pixels((edges2pixels(:,1)~=0),:);
+% nodeEdges may contain zeros for edgeIDs among nonzero entries. get rid of
+% the zeros
+numNodes = size(nodeEdges,1);
+for i=1:numNodes
+   nodeEdgesList_i = nodeEdges(i,(nodeEdges(i,:)>0)); 
+   numEdges = numel(nodeEdgesList_i);
+   for j=1:numEdges
+      nodeEdges2(i,j) = nodeEdgesList_i(j); 
+   end
+end
+nodeEdges = nodeEdges2;
+clear nodeEdges2;
+% Now, after removing the self edges, the graph contains some junctions
+% with only two edges connecting to them. i.e. they are not junctions
+% anymore but just edges. At the moment we just keep them. and treat them
+% as 2 edge junctions.
 
-% visualize graph
+%% visualize graph
 [r,c] = ind2sub([sizeR sizeC],nodeInds);
 xy = [c r];
 figure;gplot(adjacencyMat,xy,'-*');
