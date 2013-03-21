@@ -57,7 +57,20 @@ jEdges = getEdgesForAllNodeTypes(nodeEdges,junctionTypeListInds);
 % junction of type 1 (= J2)
 jAnglesAll = getNodeAnglesForAllJtypes(junctionTypeListInds,...
     nodeInds,jEdges,edges2pixels,orientedScoreSpace3D,sizeR,sizeC,angleStep);
+% jAnglesAll(:,:,1) - each row corresponds to the set of angles for each
+% edge at each junction of type 1 (= J2)
 
+% angle differences for all edge combinations of all the junction types
+% % for the time being, calculate it separately
+% dTheta.J2 = getAngleDifferences(jAnglesAll(:,:,1));
+% dTheta.J3 = getAngleDifferences(jAnglesAll(:,:,2));
+% dTheta.J4 = getAngleDifferences(jAnglesAll(:,:,3));
+% dTheta.J5 = getAngleDifferences(jAnglesAll(:,:,4));
+% dTheta.J6 = getAngleDifferences(jAnglesAll(:,:,5));
+dTheta = cell(1,numJtypes);
+for i=1:numJtypes
+    dTheta{i} = getAngleDifferences(jAnglesAll(:,:,i));
+end
 % J3
 % j3Edges = zeros(numJ3,3);
 j3Edges = nodeEdges(j3ListInd,2:4);             % order of indices given by j3Ind
