@@ -8,8 +8,6 @@ function dTheta = getAngleDifferences(angles0)
 angles = angles0(angles0>0);
 if(~isempty(angles))
     [numNodes,numTheta] = size(angles);
-
-
     edgeOrder = 1:numTheta;
     numCombinations = nchoosek(numTheta,2);
     combinationsArray = nchoosek(edgeOrder,2);

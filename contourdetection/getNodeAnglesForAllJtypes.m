@@ -1,15 +1,25 @@
 function jAnglesAll = getNodeAnglesForAllJtypes(junctionTypeListInds,...
     nodeInds,jEdgesAll,edges2pixels,orientedScoreSpace3D,sizeR,sizeC,angleStep)
-% returns a 3D array.
-% jAngles(:,:,1) - each row corresponds to the set of angles for each
-% junction of type 1 (= J2)
+% returns a cell array.
+% jAnglesAll{i} - each row corresponds to the set of angles for each
+% junction of type i (type 1 = J2)
+
+% Inputs:
+%   ...
+%   jEdgesAll - cell array with jEdgesAll{i} corresponding the edgeSet of
+%   junction type i. each row in the edge set corresponds to a junction
+%   instance of that type
+
+
 [maxNodesPerJtype, numJtypes] = size(junctionTypeListInds);
 maxNumEdgesPerNode = numJtypes + 1;     % list starts with J2 (= two edges)
 
-jAnglesAll = zeros(maxNodesPerJtype,maxNumEdgesPerNode,numJtypes);
+% jAnglesAll = zeros(maxNodesPerJtype,maxNumEdgesPerNode,numJtypes);
+jAnglesAll = cell(1,numJtypes);
 
 for dim=1:numJtypes
-    jEdges0 = jEdgesAll(:,:,dim);
+    
+    jEdges0 = cell2mat(jEdgesAll{dim});
     jEdges = jEdges0(jEdges0>0);
     [numJ,degree] = size(jEdges);
     jAngles = zeros(numJ,degree);
@@ -37,9 +47,10 @@ for dim=1:numJtypes
             edgeAngles = (orientationIndex-1).*angleStep;
             avgEdgeAngle = median(edgeAngles);
 %             jAngles(i,j) = avgEdgeAngle;
-            jAnglesAll(i,j,dim) = avgEdgeAngle;
+            jAngles(i,j) = avgEdgeAngle;
         end
     end
     % assign the jAngles for this Jtype into jAnglesAll(:,:,Jtype)
+    jAnglesAll{dim} = jAngles;
     
 end

@@ -1,7 +1,7 @@
 function jEdges = getEdgesForAllNodeTypes(nodeEdges,junctionTypeListInds)
-% returns a 3D array.
-% jEdges(:,:,1) - each row corresponds to the set of edges for each
-% junction of type 1 (= J2)
+% returns a cell array.
+% jEdges{i} - each row corresponds to the set of edges for each
+% junction of type i (type1 = J2)
 
 % Inputs:
 %   nodeEdges -
@@ -12,17 +12,16 @@ function jEdges = getEdgesForAllNodeTypes(nodeEdges,junctionTypeListInds)
 maxNumEdgesPerNode = numJtypes + 1;     % list starts with J2 (= two edges)
 [numNodes,numColNodeEdges] = size(nodeEdges);
 
-jEdges = zeros(maxNodesPerJtype,maxNumEdgesPerNode,numJtypes);
+% jEdges = zeros(maxNodesPerJtype,maxNumEdgesPerNode,numJtypes);
+jEdges = cell(1,numJtypes);
 
 for jType=1:numJtypes
-    listInds = junctionTypeListInds(junctionTypeListInds(:,jType)>0);
-    edgeSet = nodeEdges(listInds,2:numColNodeEdges);
-    edgeSetNoZeros = edgeSet(edgeSet>0);
-    [rows cols] = size(edgeSetNoZeros);
-    for i=1:rows
-        for j=1:cols
-            jEdges(i,j,jType) = edgeSetNoZeros(i,j);                
-        end
+    listInds = junctionTypeListInds((junctionTypeListInds(:,jType)>0),jType);
+    if(~isempty(listInds))
+        edgeSet = nodeEdges(listInds,2:numColNodeEdges);
+        edgeSetNoZeros = edgeSet(edgeSet>0);
+        jEdges{jType} = edgeSetNoZeros;
+    else
+        jEdges{jType} = 0;
     end
-    
 end

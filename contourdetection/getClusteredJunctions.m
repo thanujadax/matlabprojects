@@ -60,21 +60,26 @@ indJClusterPixels = find(eightNH_J>0);  % gets junction pixels which has neighbo
 % make a N-by-2 array of such junction pixels having immediate neighboring
 % junctions
 numJunctionClustPix = numel(indJClusterPixels);
-connectedJunctionIDs = zeros(numJunctionClustPix,2);
-connectedJunctionIDs(:,1) = indJClusterPixels;
-junctionLabel = 0;
-for i=1:numJunctionClustPix
-    % look for the neighbors and give them the same label
-    jLabelCurrent = connectedJunctionIDs(i,2);
-    if(jLabelCurrent==0)
-        junctionLabel = junctionLabel + 1;
-        % assign label to this junction and to its neighbors and its
-        % neighbors neighbors
-        junctionInd = connectedJunctionIDs(i,1);
-        connectedJunctionIDs = labelJunctionClusterNeighbors(junctionInd,connectedJunctionIDs,junctionLabel,...
-                    sizeR,sizeC,eightNH_J);
+if(numJunctionClustPix==0)
+    % no clustered junction nodes
+    connectedJunctionIDs = 0;
+else
+    connectedJunctionIDs = zeros(numJunctionClustPix,2);
+    connectedJunctionIDs(:,1) = indJClusterPixels;
+    junctionLabel = 0;
+    for i=1:numJunctionClustPix
+        % look for the neighbors and give them the same label
+        jLabelCurrent = connectedJunctionIDs(i,2);
+        if(jLabelCurrent==0)
+            junctionLabel = junctionLabel + 1;
+            % assign label to this junction and to its neighbors and its
+            % neighbors neighbors
+            junctionInd = connectedJunctionIDs(i,1);
+            connectedJunctionIDs = labelJunctionClusterNeighbors(junctionInd,connectedJunctionIDs,junctionLabel,...
+                        sizeR,sizeC,eightNH_J);
+        end
     end
+    % connectedJunctionIDs contain the same ID for each node that is connected
+    % together with zero length edges
+    % nodeZeroEdges - store node - edge1,edge2 etc for these zero length edges
 end
-% connectedJunctionIDs contain the same ID for each node that is connected
-% together with zero length edges
-% nodeZeroEdges - store node - edge1,edge2 etc for these zero length edges

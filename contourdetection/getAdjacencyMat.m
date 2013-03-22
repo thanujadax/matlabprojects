@@ -36,3 +36,7 @@ for i=1:numEdges
         
     end
 end
+
+if(sid==0)
+    selfEdgeIDs = 0;
+end

@@ -1,6 +1,6 @@
 % ILP script 3
 
-isToyProb = 0;
+isToyProb = 1;
 useGurobi = 1;
 
 % max vote response image of the orientation filters
@@ -29,8 +29,6 @@ ws = watershed(imIn);
 disp('creating graph from watershed boundaries...');
 [adjacencyMat,nodeEdges,edges2nodes,edges2pixels,connectedJunctionIDs] = getGraphFromWS(ws);
 nodeInds = nodeEdges(:,1);                  % indices of the junction nodes
-% j4ListInd = find((nodeEdges(:,5))>0);       % nodeInds list indices of J4 in order
-% j3ListInd = find((nodeEdges(:,5))==0);      % nodeInds list indices of J3 in order
 junctionTypeListInds = getJunctionTypeListInds(nodeEdges);
 % col1 has the listInds of type J2, col2: J3 etc. listInds are wrt
 % nodeInds list of pixel indices of the detected junctions
@@ -53,43 +51,27 @@ for i=1:numJtypes
 end
 
 jEdges = getEdgesForAllNodeTypes(nodeEdges,junctionTypeListInds);
-% jEdges(:,:,1) - each row corresponds to the set of edges for each
-% junction of type 1 (= J2)
+% jEdges{i} - cell array. each cell corresponds to the set of edges for the
+% junction of type i (type1 = J2). A row of a cell corresponds to a node of
+% that type of junction.
 jAnglesAll = getNodeAnglesForAllJtypes(junctionTypeListInds,...
     nodeInds,jEdges,edges2pixels,orientedScoreSpace3D,sizeR,sizeC,angleStep);
-% jAnglesAll(:,:,1) - each row corresponds to the set of angles for each
+% jAnglesAll{i} - cell array. each row of a cell corresponds to the set of angles for each
 % edge at each junction of type 1 (= J2)
 
 % angle differences for all edge combinations of all the junction types
-% % for the time being, calculate it separately
-% dTheta.J2 = getAngleDifferences(jAnglesAll(:,:,1));
-% dTheta.J3 = getAngleDifferences(jAnglesAll(:,:,2));
-% dTheta.J4 = getAngleDifferences(jAnglesAll(:,:,3));
-% dTheta.J5 = getAngleDifferences(jAnglesAll(:,:,4));
-% dTheta.J6 = getAngleDifferences(jAnglesAll(:,:,5));
 dTheta = cell(1,numJtypes);
 for i=1:numJtypes
-    dTheta{i} = getAngleDifferences(jAnglesAll(:,:,i));
+    jAngles_i = cell2mat(jAnglesAll{i});
+    dTheta{i} = getAngleDifferences(jAngles_i);
 end
-% J3
-% j3Edges = zeros(numJ3,3);
-j3Edges = nodeEdges(j3ListInd,2:4);             % order of indices given by j3Ind
-% angles
-j3Angles = getNodeAngles(j3ListInd,nodeInds,j3Edges,edges2pixels,orientedScoreSpace3D,...
-                            sizeR,sizeC,angleStep);                        
-j3dTheta = getAngleDifferences(j3Angles);
-% calculate the cost for the angle differences
-j3NodeAngleCost = getNodeAngleCost(j3dTheta,midPoint,sig,cNode);
+% angle costs
+nodeAngleCosts = cell(1,numJtypes);
+for i=1:numJtypes
+    dTheta_i = cell2mat(dTheta{i});
+    nodeAngleCosts{i} = getNodeAngleCost(dTheta_i,midPoint,sig,cNode);
+end
 
-% J4
-% j4Edges = zeros(numJ4,4);
-j4Edges = nodeEdges(j4ListInd,2:5);             % order of indices given by j4Ind
-% angles
-j4Angles = getNodeAngles(j4ListInd,nodeInds,j4Edges,edges2pixels,orientedScoreSpace3D,...
-                            sizeR,sizeC,angleStep);
-j4dTheta = getAngleDifferences(j4Angles);
-% calculate the cost for the angle differences
-j4NodeAngleCost = getNodeAngleCost(j4dTheta,midPoint,sig,cNode);
 
 %% ILP
 % cost function to minimize
@@ -103,10 +85,12 @@ numJunctions = numel(nodeInds);
 % coeff for turning on J3-config(1 to 3): j3NodeAngleCost
 % coeff for turning off J4s: max(j3NodeAngleCost)
 % coeff for turning on J4-config(1 to 6): j4NodeAngleCost
-f = getILPcoefficientVector(edgePriors,j3NodeAngleCost,j4NodeAngleCost);
+
+% f = getILPcoefficientVector(edgePriors,j3NodeAngleCost,j4NodeAngleCost);
+f = getILPcoefficientVector2(edgePriors,nodeAngleCosts);
 % constraints
 % equality constraints and closedness constrains in Aeq matrix
-[Aeq,beq] = getEqConstraints(numEdges,j3Edges,j4Edges);
+[Aeq,beq] = getEqConstraints2(numEdges,jEdges);
 %% solver
 if(useGurobi)
     disp('using Gurobi ILP solver...');
@@ -151,30 +135,29 @@ onEdgeInd = find(onEdgeStates==1);
 onEdgePixelInds = getPixSetFromEdgeIDset(onEdgeInd,edges2pixels);
 ilpSegmentation(onEdgePixelInds) = 1;
 
-% active J3 nodes
-offStateJ3Xind = (numEdges*2+1):4:(numEdges*2+numJ3*4-1);
-offJ3PixStates = x(offStateJ3Xind);
-onJ3PixInd = nodeInds(j3ListInd(offJ3PixStates==0));
-ilpSegmentation(onJ3PixInd) = 0.7;
-% active J4 nodes
-offStateJ4Xind = (numEdges*2+numJ3*4+1):7:(numEdges*2+numJ3*4+numJ4*7-1);
-offJ4PixStates = x(offStateJ4Xind);
-onJ4PixInd = nodeInds(j4ListInd(offJ4PixStates==0));
-ilpSegmentation(onJ4PixInd) = 0.3;
-% active clustered nodes
-activeNodesJ3J4 = [onJ3PixInd; onJ4PixInd];
-numJ3J4Active = numel(activeNodesJ3J4);
-activeClustNodeInd = 0;
-for i=1:numJ3J4Active
-    clustLabel = connectedJunctionIDs((connectedJunctionIDs(:,1)==activeNodesJ3J4(i)),2);
-    clustNodeInd = connectedJunctionIDs((connectedJunctionIDs(:,2)==clustLabel),1);
-    foundClustNode = find(activeNodesJ3J4==clustNodeInd);
-    if(isempty(foundClustNode))
-        activeClustNodeInd = [activeClustNodeInd; clustNodeInd];
-    end
-end
-activeClustNodeInd = activeClustNodeInd(activeClustNodeInd~=0);
-ilpSegmentation(activeClustNodeInd) = 0.5;
-%onPixelInds = [onEdgePixelInds; onJ3PixInd; onJ4PixInd];
-%ilpSegmentation(onPixelInds) = 1;
+% % active J3 nodes
+% offStateJ3Xind = (numEdges*2+1):4:(numEdges*2+numJ3*4-1);
+% offJ3PixStates = x(offStateJ3Xind);
+% onJ3PixInd = nodeInds(j3ListInd(offJ3PixStates==0));
+% ilpSegmentation(onJ3PixInd) = 0.7;
+% % active J4 nodes
+% offStateJ4Xind = (numEdges*2+numJ3*4+1):7:(numEdges*2+numJ3*4+numJ4*7-1);
+% offJ4PixStates = x(offStateJ4Xind);
+% onJ4PixInd = nodeInds(j4ListInd(offJ4PixStates==0));
+% ilpSegmentation(onJ4PixInd) = 0.3;
+% % active clustered nodes
+% activeNodesJ3J4 = [onJ3PixInd; onJ4PixInd];
+% numJ3J4Active = numel(activeNodesJ3J4);
+% activeClustNodeInd = 0;
+% for i=1:numJ3J4Active
+%     clustLabel = connectedJunctionIDs((connectedJunctionIDs(:,1)==activeNodesJ3J4(i)),2);
+%     clustNodeInd = connectedJunctionIDs((connectedJunctionIDs(:,2)==clustLabel),1);
+%     foundClustNode = find(activeNodesJ3J4==clustNodeInd);
+%     if(isempty(foundClustNode))
+%         activeClustNodeInd = [activeClustNodeInd; clustNodeInd];
+%     end
+% end
+% activeClustNodeInd = activeClustNodeInd(activeClustNodeInd~=0);
+% ilpSegmentation(activeClustNodeInd) = 0.5;
+
 figure;imagesc(ilpSegmentation);title('ILP contours');
