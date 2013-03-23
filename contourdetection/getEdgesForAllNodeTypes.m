@@ -19,7 +19,8 @@ for jType=1:numJtypes
     listInds = junctionTypeListInds((junctionTypeListInds(:,jType)>0),jType);
     if(~isempty(listInds))
         edgeSet = nodeEdges(listInds,2:numColNodeEdges);
-        edgeSetNoZeros = edgeSet(edgeSet>0);
+        [r c] = find(edgeSet>0);
+        edgeSetNoZeros(r,c) = edgeSet(r,c);
         jEdges{jType} = edgeSetNoZeros;
     else
         jEdges{jType} = 0;
