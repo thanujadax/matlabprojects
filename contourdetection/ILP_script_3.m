@@ -62,13 +62,13 @@ jAnglesAll = getNodeAnglesForAllJtypes(junctionTypeListInds,...
 % angle differences for all edge combinations of all the junction types
 dTheta = cell(1,numJtypes);
 for i=1:numJtypes
-    jAngles_i = cell2mat(jAnglesAll{i});
+    jAngles_i = jAnglesAll{i};
     dTheta{i} = getAngleDifferences(jAngles_i);
 end
 % angle costs
 nodeAngleCosts = cell(1,numJtypes);
 for i=1:numJtypes
-    dTheta_i = cell2mat(dTheta{i});
+    dTheta_i = dTheta{i};
     nodeAngleCosts{i} = getNodeAngleCost(dTheta_i,midPoint,sig,cNode);
 end
 

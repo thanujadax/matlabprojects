@@ -5,19 +5,24 @@ function dTheta = getAngleDifferences(angles0)
 % for nodes with any degree (i.e. for any number of columns in 'angles' the
 % necessary combinations are calculated
 
-angles = angles0(angles0>0);
-if(~isempty(angles))
-    [numNodes,numTheta] = size(angles);
-    edgeOrder = 1:numTheta;
-    numCombinations = nchoosek(numTheta,2);
-    combinationsArray = nchoosek(edgeOrder,2);
-
-    dTheta = zeros(numNodes,numCombinations);
-
-    for i=1:numCombinations
-       dTheta(:,i) = abs(angles(:,combinationsArray(i,1)) - angles(:,combinationsArray(i,2)));
-    end
+if(numel(angles0)==1 && angles0(1)==0)
+    dTheta = -1;
 else
-    angles = -1;  % no angles for this junction type
-end
+    % angles = angles0(angles0>0);
+    [r,c] = find(angles0>0);
+    angles(r,c) = angles0(r,c);
+    if(~isempty(angles))
+        [numNodes,numTheta] = size(angles);
+        edgeOrder = 1:numTheta;
+        numCombinations = nchoosek(numTheta,2);
+        combinationsArray = nchoosek(edgeOrder,2);
 
+        dTheta = zeros(numNodes,numCombinations);
+
+        for i=1:numCombinations
+           dTheta(:,i) = abs(angles(:,combinationsArray(i,1)) - angles(:,combinationsArray(i,2)));
+        end
+    else
+        dTheta = -1;  % no angles for this junction type
+    end
+end

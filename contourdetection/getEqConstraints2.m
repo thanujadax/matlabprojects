@@ -8,7 +8,7 @@ nodeTypeStats = zeros(numJtypes,2);
 % column 2: n.o. edge pair combinations to be activated
 totJunctionVar = zeros(numJtypes,1); % stores the number of coefficients for each type of J
 for i=1:numJtypes
-    jEdges_i = cell2mat(jEdges{i});
+    jEdges_i = jEdges{i};
     [numJ_i,numEdges_i] = size(jEdges_i);
     nodeTypeStats(i,1) = numJ_i;
     nodeTypeStats(i,2) = numEdges_i;

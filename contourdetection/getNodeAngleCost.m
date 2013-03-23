@@ -6,4 +6,9 @@ function nodeAngleCost = getNodeAngleCost(dTheta,midpoint,sigma,C)
 % C - parameter to scale the cost
 
 % [numNodes,numAngles] = size(dTheta);
-nodeAngleCost = gauss1d(dTheta,midpoint,sigma) .*C;
+if(dTheta<0)
+    % invalid angle difference
+    nodeAngleCost = 0;
+else
+    nodeAngleCost = gauss1d(dTheta,midpoint,sigma) .*C;
+end
