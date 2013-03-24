@@ -9,16 +9,21 @@ nodeTypeStats = zeros(numJtypes,2);
 totJunctionVar = zeros(numJtypes,1); % stores the number of coefficients for each type of J
 for i=1:numJtypes
     jEdges_i = jEdges{i};
-    [numJ_i,numEdges_i] = size(jEdges_i);
-    nodeTypeStats(i,1) = numJ_i;
-    nodeTypeStats(i,2) = numEdges_i;
-    numEdgeCombinations = nchoosek(numEdges_i,2);
-    totJunctionVar(i) = numJ_i.*(numEdgeCombinations + 1); % 1 for the inactive node
-    clear nodeAngleCost_i
+    if(jEdges_i==0)
+        % no junctions of this type
+        nodeTypeStats(i,1) = 0;
+        nodeTypeStats(i,2) = 0;
+        totJunctionVar(i) = 0;
+    else
+        [numJ_i,numEdges_i] = size(jEdges_i);
+        nodeTypeStats(i,1) = numJ_i;
+        nodeTypeStats(i,2) = numEdges_i;
+        numEdgeCombinations = nchoosek(numEdges_i,2);
+        totJunctionVar(i) = numJ_i.*(numEdgeCombinations + 1); % 1 for the inactive node
+        % clear nodeAngleCost_i
+    end
 end
 
-numJ3 = size(j3Edges,1);
-numJ4 = size(j4Edges,1);
 
 % num cols of Aeq = 2*numEdges + sum_j(numNodes_j*numCombinations+1)
 numCols_Aeq = 2*numEdges + sum(totJunctionVar); 
@@ -75,7 +80,7 @@ jColIdStop = numEdges*2;
 for jType=1:numJtypes
     % for each junction type
     % for each node, get the indices of the activeState edge variables
-    jEdges_j = cell2mat(jEdges{jType});
+    jEdges_j = jEdges{jType};
     numNodes_j = nodeTypeStats(jType,1);
     activeEdgeColInds = jEdges_j*2;     % edges are represented in pairs of state variables
                                         % the second element corresponds to

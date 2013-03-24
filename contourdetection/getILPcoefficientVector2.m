@@ -11,8 +11,9 @@ totJunctionVar = zeros(numJtypes,1); % stores the number of coefficients for eac
 for i=1:numJtypes
     nodeAngleCost_i = nodeAngleCosts{i};
     [numJ_i,numCombinations] = size(nodeAngleCost_i);
+    numCombinations = numCombinations + 1;  % 1 for the inactive junction
     nodeTypeStats(i,1) = numJ_i;
-    nodeTypeStats(i,2) = numCombinations;
+    nodeTypeStats(i,2) = numCombinations; 
     totJunctionVar(i) = nodeTypeStats(i,1).*nodeTypeStats(i,2);
     clear nodeAngleCost_i
 end

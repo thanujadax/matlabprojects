@@ -69,7 +69,11 @@ end
 nodeAngleCosts = cell(1,numJtypes);
 for i=1:numJtypes
     dTheta_i = dTheta{i};
-    nodeAngleCosts{i} = getNodeAngleCost(dTheta_i,midPoint,sig,cNode);
+    if(dTheta_i<0)
+        % no such angles for this type of junction
+    else
+        nodeAngleCosts{i} = getNodeAngleCost(dTheta_i,midPoint,sig,cNode);
+    end
 end
 
 
@@ -108,15 +112,15 @@ if(useGurobi)
     
     
 else
-    % Matlab ILP solver
+    Matlab ILP solver
     disp('using MATLAB ILP solver...');
-    % Initial values for the state variables
-    % x0 = getInitValues(numEdges,numJ3,numJ4);  % TODO: infeasible!!
+    Initial values for the state variables
+    x0 = getInitValues(numEdges,numJ3,numJ4);  % TODO: infeasible!!
     numStates = size(f,1);
     maxIterationsILP = numStates * 1000000;
-    options = optimoptions('bintprog','MaxIter',maxIterationsILP,...
+    options = optimset('MaxIter',maxIterationsILP,...
                     'MaxTime',5000000);
-    % options = struct('MaxTime', 5000000);
+    options = struct('MaxTime', 5000000);
     disp('running ILP...');
     t1 = cputime;
     [x,fval,exitflag,optOutput] = bintprog(f,[],[],Aeq,beq,[],options);
