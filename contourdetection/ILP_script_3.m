@@ -1,7 +1,7 @@
 % ILP script 3
 
 isToyProb = 0;
-useGurobi = 1;
+useGurobi = 0;
 
 % max vote response image of the orientation filters
 if(isToyProb)

@@ -16,10 +16,15 @@ maxNumEdgesPerNode = numJtypes + 1;     % list starts with J2 (= two edges)
 jEdges = cell(1,numJtypes);
 
 for jType=1:numJtypes
-    listInds = junctionTypeListInds((junctionTypeListInds(:,jType)>0),jType);
-    if(~isempty(listInds))
+    % listInds = junctionTypeListInds((junctionTypeListInds(:,jType)>0),jType);
+    [rL,cL] = find(junctionTypeListInds(:,jType)>0);
+    if(~isempty(rL))
+        listInds = junctionTypeListInds(rL,jType);
         edgeSet = nodeEdges(listInds,2:numColNodeEdges);
         [r c] = find(edgeSet>0);
+        rmax = max(r);
+        cmax = max(c);
+        edgeSetNoZeros = zeros(rmax,cmax);
         edgeSetNoZeros(r,c) = edgeSet(r,c);
         jEdges{jType} = edgeSetNoZeros;
     else

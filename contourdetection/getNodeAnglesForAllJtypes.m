@@ -34,13 +34,19 @@ for dim=1:numJtypes
         for i=1:numJ
             % for each node
             edges_i = jEdges(i,:);
-            nodeInd = nodeInds(i);
+            nodeListInd = junctionTypeListInds(i,dim);% get the index of the node in concern
+            nodeInd = nodeInds(nodeListInd); 
             for j=1:degree
                 % for each edge of this node
                 edgeID = edges_i(j);
                 if(edgeID~=0)
-                    edgePixelInds = edges2pixels(edgeID,:);
-                    edgePixelInds = edgePixelInds(edgePixelInds>0);
+                    edgePixelInds0 = edges2pixels(edgeID,:);
+                    %edgePixelInds = edgePixelInds(edgePixelInds>0);
+                    [r1,c1] = find(edgePixelInds0>0);
+                    rmax = max(r1);
+                    cmax = max(c1);
+                    edgePixelInds = zeros(rmax,cmax);
+                    edgePixelInds(r1,c1) = edgePixelInds0(r1,c1);
                     % get the edge pixels(3) which are closest to the node i
                     nodePixels = getNodeEdgePixel(nodeInd,edgePixelInds,sizeR,sizeC);
                     % get their orientation
