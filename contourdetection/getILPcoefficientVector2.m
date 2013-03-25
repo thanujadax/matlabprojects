@@ -43,6 +43,7 @@ for i=1:numJtypes
     f_start_ind = f_stop_ind + 1;
     f_stop_ind = f_start_ind + numCoeff_i - 1;
     % assign coefficients to vector f
-    f(f_start_ind:f_stop_ind) = nodeAngleCost_i(1:numCoeff_i);
+    angleCostMat_i = nodeAngleCost_i';
+    f(f_start_ind:f_stop_ind) = angleCostMat_i(1:numCoeff_i);
 end
 

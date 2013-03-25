@@ -1,4 +1,4 @@
-function [Aeq,beq] = getEqConstraints2(numEdges,jEdges)
+function [Aeq,beq] = getEqConstraints2(numEdges,jEdges,edges2pixels)
 
 [~, numJtypes] = size(jEdges);
 % type 1 is J2 - junction with just 2 edges
@@ -81,22 +81,47 @@ for jType=1:numJtypes
     % for each junction type
     % for each node, get the indices of the activeState edge variables
     jEdges_j = jEdges{jType};
+    jEdgesOrderedInd_j = jEdges_j;
+    % jEdges_j: the edge labels here follow the initial indexing. However,
+    % the order of edges considered is slightly different to that due to
+    % the removal of self edges and dangling edges. the edgeID->colInd of
+    % the edge should be determined using the entries of the 1st column of
+    % edges2pixels. This row number gives the edgeId to be used here.
+    
     numNodes_j = nodeTypeStats(jType,1);
-    activeEdgeColInds = jEdges_j*2;     % edges are represented in pairs of state variables
-                                        % the second element corresponds to
-                                        % the active state
-    % for each junction for type j
-    rowStart = rowStop + 1;
-    rowStop = rowStart - 1 + numNodes_j;
-    k = 1;
-    for row=rowStart:rowStop
-        Aeq(row,activeEdgeColInds(k,:)) = 1; 
-        k = k + 1;
-        numEdges_i = nodeTypeStats(jType,2);
-        numEdgeCombinations_j = nchoosek(numEdges_i,2);
-        jIds = (jColIdStop+2):(jColIdStop+numEdgeCombinations_j);
-        Aeq(row,jIds) = -2;               % refer closedness constraint formulation
-        jColIdStop = jColIdStop + numEdgeCombinations_j;
+    if(numNodes_j~=0)
+        for i=1:numNodes_j
+            % for each node, get the edges fron jEdges_j
+            % for each edge, get the row number from edges2pixels
+            % add to jEdgesInd_j
+            edgeIDs = jEdges_j(i,:);
+            for m=1:numel(edgeIDs)
+               edgeOrderInd = find(edges2pixels(:,1)==edgeIDs(m)); 
+               jEdgesOrderedInd_j(i,m) = edgeOrderInd; 
+            end
+
+
+        end
+    
+    
+        activeEdgeColInds = jEdgesOrderedInd_j.*2;     % edges are represented in pairs of state variables
+                                            % the second element corresponds to
+                                            % the active state
+        % for each junction for type j
+        rowStart = rowStop + 1;
+        rowStop = rowStart - 1 + numNodes_j;
+        k = 1;
+        for row=rowStart:rowStop
+            Aeq(row,activeEdgeColInds(k,:)) = 1; 
+            k = k + 1;
+            numEdges_i = nodeTypeStats(jType,2);
+            numEdgeCombinations_j = nchoosek(numEdges_i,2);
+            jColIdStart = jColIdStop + 2;
+            jColIdStop = jColIdStart + numEdgeCombinations_j - 1;
+            jIds = jColIdStart:jColIdStop;
+            Aeq(row,jIds) = -2;               % refer closedness constraint formulation
+            % jColIdStop = jColIdStop + numEdgeCombinations_j;
+        end
     end
         
 end

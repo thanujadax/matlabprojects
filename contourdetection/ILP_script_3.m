@@ -96,7 +96,7 @@ numJunctions = numel(nodeInds);
 f = getILPcoefficientVector2(edgePriors,nodeAngleCosts);
 % constraints
 % equality constraints and closedness constrains in Aeq matrix
-[Aeq,beq] = getEqConstraints2(numEdges,jEdges);
+[Aeq,beq] = getEqConstraints2(numEdges,jEdges,edges2pixels);
 %% solver
 if(useGurobi)
     disp('using Gurobi ILP solver...');
@@ -114,7 +114,7 @@ if(useGurobi)
     
     
 else
-    Matlab ILP solver
+    % Matlab ILP solver
     disp('using MATLAB ILP solver...');
     Initial values for the state variables
     x0 = getInitValues(numEdges,numJ3,numJ4);  % TODO: infeasible!!
@@ -135,35 +135,48 @@ end
 % get active edges and active nodes from x
 ilpSegmentation = zeros(sizeR,sizeC);
 % active edges
+% consider the edgeID given in the first col of edges2pixels?? no need for
+% this since we use edgepixels array which is already sans the skipped
+% edges
 onStateEdgeXind = 2:2:(numEdges*2);
 onEdgeStates = x(onStateEdgeXind);
 onEdgeInd = find(onEdgeStates==1);
 onEdgePixelInds = getPixSetFromEdgeIDset(onEdgeInd,edgepixels);
 ilpSegmentation(onEdgePixelInds) = 1;
-
-% % active J3 nodes
-% offStateJ3Xind = (numEdges*2+1):4:(numEdges*2+numJ3*4-1);
-% offJ3PixStates = x(offStateJ3Xind);
-% onJ3PixInd = nodeInds(j3ListInd(offJ3PixStates==0));
-% ilpSegmentation(onJ3PixInd) = 0.7;
-% % active J4 nodes
-% offStateJ4Xind = (numEdges*2+numJ3*4+1):7:(numEdges*2+numJ3*4+numJ4*7-1);
-% offJ4PixStates = x(offStateJ4Xind);
-% onJ4PixInd = nodeInds(j4ListInd(offJ4PixStates==0));
-% ilpSegmentation(onJ4PixInd) = 0.3;
-% % active clustered nodes
-% activeNodesJ3J4 = [onJ3PixInd; onJ4PixInd];
-% numJ3J4Active = numel(activeNodesJ3J4);
-% activeClustNodeInd = 0;
-% for i=1:numJ3J4Active
-%     clustLabel = connectedJunctionIDs((connectedJunctionIDs(:,1)==activeNodesJ3J4(i)),2);
-%     clustNodeInd = connectedJunctionIDs((connectedJunctionIDs(:,2)==clustLabel),1);
-%     foundClustNode = find(activeNodesJ3J4==clustNodeInd);
-%     if(isempty(foundClustNode))
-%         activeClustNodeInd = [activeClustNodeInd; clustNodeInd];
-%     end
-% end
-% activeClustNodeInd = activeClustNodeInd(activeClustNodeInd~=0);
-% ilpSegmentation(activeClustNodeInd) = 0.5;
-
+% active nodes
+fIndStop = 2*numEdges;
+for i=1:numJtypes
+    % for each junction type
+    % get the list of junctions and check their states in vector 'x'
+    junctionNodesListListInds_i = find(junctionTypeListInds(:,i));
+    if(~isempty(junctionNodesListListInds_i))
+        junctionNodesListInds_i = junctionTypeListInds(junctionNodesListListInds_i,i);
+        numJnodes_i = numel(junctionNodesListInds_i);
+        % get the indices (wrt x) for the inactivation of the junctions
+        numEdgePJ_i = i+1;
+        numStatePJ_i = nchoosek(numEdgePJ_i,2)+1; % 1 is for the inactive case
+        fIndStart = fIndStop + 1;
+        fIndStop = fIndStart -1 + numJnodes_i*numStatePJ_i;
+        fIndsToLook = fIndStart:numStatePJ_i:fIndStop; % indices of inactive state
+        inactiveness_nodes_i = x(fIndsToLook);
+        activeStateNodeListInd = find(inactiveness_nodes_i==0);
+        if(~isempty(activeStateNodeListInd))
+            nodeListInd_i = junctionNodesListInds_i(activeStateNodeListInd);
+            nodeIndsActive_i = nodeInds(nodeListInd_i);
+            % if any of the active nodes are in the connectionJunction set,
+            % make the other nodes in the same set active as well.
+            for j=1:numel(nodeIndsActive_i)
+                indx = find(connectedJunctionIDs(:,1)==nodeIndsActive_i(j));
+                if(~isempty(indx))
+                    % this is one of the cluster pixels
+                    clusLabel = connectedJuncitonIDs(indx,2);
+                    clusNodeListInds = find(connectedJunctionIDs(:,2)==clusLabel); 
+                    clusNodes = connectedJunctionIDs(clusNodeListInds,1);
+                    ilpSegmentation(clusNodes) = 0.7;
+                end
+            end
+            ilpSegmentation(nodeIndsActive_i) = 0.4;
+        end
+    end
+end
 figure;imagesc(ilpSegmentation);title('ILP contours');
