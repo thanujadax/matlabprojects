@@ -109,10 +109,10 @@ if(selfEdgeIDs(1)~=0)
         cx = cx + 1;
         nodeEdges(rx,cx)=0;    
         % edges2pixels
-        edges2pixels(selfEdgeIDs(i),1) = 0;  % set the self edge pixel to zero
+        edges2pixels(selfEdgeIDs(i),2) = 0;  % set the self edge 'pixel' to zero
     end
-    % from edges2pixels, remove the rows who's first column has a zero
-    edges2pixels = edges2pixels((edges2pixels(:,1)~=0),:);
+    % from edges2pixels, remove the rows who's second column has a zero
+    edges2pixels = edges2pixels((edges2pixels(:,2)~=0),:);
     % nodeEdges may contain zeros for edgeIDs among nonzero entries. get rid of
     % the zeros
     numNodes = size(nodeEdges,1);

@@ -1,7 +1,7 @@
 % ILP script 3
 
 isToyProb = 0;
-useGurobi = 0;
+useGurobi = 1;
 
 % max vote response image of the orientation filters
 if(isToyProb)
@@ -37,7 +37,9 @@ disp('graph created!')
 wsBoundariesFromGraph = zeros(sizeR,sizeC);
 wsBoundariesFromGraph(nodeInds) = 0.7;          % junction nodes
 wsBoundariesFromGraph(clusterNodeIDs) = 0.5;    % cluster nodes
-wsBoundariesFromGraph(edges2pixels(edges2pixels>0)) = 1; % edge pixels
+[nre,nce] = size(edges2pixels);  % first column is the edgeID
+edgepixels = edges2pixels(:,2:nce);
+wsBoundariesFromGraph(edgepixels(edgepixels>0)) = 1; % edge pixels
 figure;imagesc(wsBoundariesFromGraph);title('boundaries from graph') 
 disp('preparing coefficients for ILP solver...')
 %% Edge priors
@@ -136,7 +138,7 @@ ilpSegmentation = zeros(sizeR,sizeC);
 onStateEdgeXind = 2:2:(numEdges*2);
 onEdgeStates = x(onStateEdgeXind);
 onEdgeInd = find(onEdgeStates==1);
-onEdgePixelInds = getPixSetFromEdgeIDset(onEdgeInd,edges2pixels);
+onEdgePixelInds = getPixSetFromEdgeIDset(onEdgeInd,edgepixels);
 ilpSegmentation(onEdgePixelInds) = 1;
 
 % % active J3 nodes

@@ -10,6 +10,8 @@ function jAnglesAll = getNodeAnglesForAllJtypes(junctionTypeListInds,...
 %   junction type i. each row in the edge set corresponds to a junction
 %   instance of that type
 
+[nre,nce] = size(edges2pixels);  % first column is the edgeID
+edgepixels = edges2pixels(:,2:nce);
 
 [maxNodesPerJtype, numJtypes] = size(junctionTypeListInds);
 maxNumEdgesPerNode = numJtypes + 1;     % list starts with J2 (= two edges)
@@ -40,7 +42,11 @@ for dim=1:numJtypes
                 % for each edge of this node
                 edgeID = edges_i(j);
                 if(edgeID~=0)
-                    edgePixelInds0 = edges2pixels(edgeID,:);
+                    edgeListInd = find(edges2pixels(:,1)==edgeID);  
+                    if(isempty(edgeListInd))
+                        continue;
+                    end
+                    edgePixelInds0 = edgepixels(edgeListInd,:);
                     %edgePixelInds = edgePixelInds(edgePixelInds>0);
                     [r1,c1] = find(edgePixelInds0>0);
                     rmax = max(r1);

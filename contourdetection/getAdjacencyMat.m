@@ -31,8 +31,8 @@ for i=1:numEdges
         
     else
         disp('warning:getAdjacencyMat - edge skipped')
-        i
-        numel(R)
+        sid = sid + 1;
+        selfEdgeIDs(sid) = i;
         
     end
 end

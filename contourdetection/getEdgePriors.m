@@ -9,18 +9,20 @@ function edgePriors = getEdgePriors(orientedScoreSpace3D,edges2pixels)
 % Inputs:
 %   orientedScoreSpace3D - m-by-n-by-nOrientation matrix for the
 %   orientation response for each pixel in the image of size m-by-n
-%   edges2pixels - contains the pixel inds for each edge
+%   edges2pixels - contains the pixel inds for each edge. first col:
+%   edgeIDs
 
 % Output:
 %   edgePriors - N-by-1 array of max responses
-
+[nre,nce] = size(edges2pixels);  % first column is the edgeID
+edgepixels = edges2pixels(:,2:nce);
 [numR,numC,nOrientations] = size(orientedScoreSpace3D); 
-numEdges = size(edges2pixels,1);
+numEdges = size(edgepixels,1);
 edgePriors_all = zeros(numEdges,nOrientations);
 edgePriors = zeros(numEdges,1);
 for i=1:numEdges
     % for each edge, get the pixel indices
-    edgePixelInds = edges2pixels(i,:);              % list indices
+    edgePixelInds = edgepixels(i,:);              % list indices
     edgePixelInds = edgePixelInds(edgePixelInds>0); % indices of edge pixels wrt image
     if(~isempty(edgePixelInds))
         % for each orientation take the average over all pixels
