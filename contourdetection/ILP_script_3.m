@@ -169,7 +169,7 @@ for i=1:numJtypes
                 indx = find(connectedJunctionIDs(:,1)==nodeIndsActive_i(j));
                 if(~isempty(indx))
                     % this is one of the cluster pixels
-                    clusLabel = connectedJuncitonIDs(indx,2);
+                    clusLabel = connectedJunctionIDs(indx,2);
                     clusNodeListInds = find(connectedJunctionIDs(:,2)==clusLabel); 
                     clusNodes = connectedJunctionIDs(clusNodeListInds,1);
                     ilpSegmentation(clusNodes) = 0.7;
