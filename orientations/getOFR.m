@@ -1,3 +1,4 @@
+function [orientedScoreSpace3D,output3,RGBimg3] = getOFR(imgIn,barLength,barWidth,invertImg) 
 % orientation filter response
 
 %% parameters
@@ -15,7 +16,7 @@ displayIntermediateFigures=0;
 %imagePath = 'testImgGauss.png';
 %imagePath = 'testCirc.png';
 % imagePath = '/home/thanuja/Dropbox/data/testImg/testMembrane4.png';
-imagePath = '/home/thanuja/Dropbox/data/mitoData/gettheorientations.png';
+% imagePath = '/home/thanuja/Dropbox/data/mitoData/gettheorientations.png';
 
 medianFilterH = 0;  % H is median filtered to remove salt and pepper noise in a 3x3 neighborhood 
 
@@ -63,7 +64,7 @@ sigX = 40;
 sigY = 6;
 
 %% input preprocessing
-imgIn = double(imread(imagePath))/255;
+% imgIn = double(imread(imagePath))/255;
 % imgIn = imgIn(1:128,1:128);
 
 if(size(size(imgIn),2)>2)
@@ -134,7 +135,7 @@ disp(str);
 [output3 RGBimg3] = reconstructHSVgauss_mv(orientedScoreSpace3D,orientations,...
             barLength,barWidth,threshFrac,medianFilterH);
 % titlestr = sprintf('threshold percentage = %f',threshFrac);
-figure;imshow(RGBimg3);
+% figure;imshow(RGBimg3);
 % title(titlestr)
 % % batch processing
 % savefilepath = '/home/thanuja/Dropbox/RESULTS/orientations/thresholding4/';

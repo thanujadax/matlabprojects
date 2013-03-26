@@ -172,10 +172,10 @@ for i=1:numJtypes
                     clusLabel = connectedJunctionIDs(indx,2);
                     clusNodeListInds = find(connectedJunctionIDs(:,2)==clusLabel); 
                     clusNodes = connectedJunctionIDs(clusNodeListInds,1);
-                    ilpSegmentation(clusNodes) = 0.7;
+                    ilpSegmentation(clusNodes) = 1;
                 end
             end
-            ilpSegmentation(nodeIndsActive_i) = 0.4;
+            ilpSegmentation(nodeIndsActive_i) = 1;
         end
     end
 end

@@ -18,9 +18,10 @@ bar = ones(barWidth,barLength);
 % twin shaded kernel
 % halfW = floor(barWidth/2);
 % bar(1:halfW,:) = -1;
-negLine = ones(negLines,barLength).*-1;
-bar = [negLine;bar;negLine];
-
+if(negLines~=0)
+    negLine = ones(negLines,barLength).*-1;
+    bar = [negLine;bar;negLine];
+end
 % init
 orientationScoreSpace3D = zeros(numRows,numCols,numOrientations);
 
