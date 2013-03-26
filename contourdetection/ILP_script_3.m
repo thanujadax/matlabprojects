@@ -23,9 +23,12 @@ end
 angleStep = 10; % 10 degrees discretization step of orientations
 
 % param
-cNode = 100000000;          % scaling factor for the node cost coming from gaussian normal distr.
+cNode = 1000;          % scaling factor for the node cost coming from gaussian normal distr.
 sig = 50;          % standard deviation(degrees) for the node cost function's gaussian distr.
 midPoint = 180;     % angle difference of an edge pair (in degrees) for maximum cost 
+% param for exp cost function
+decayRate = 0.05;
+
 
 imIn = imread(imFilePath);
 % watershed segmentation
@@ -80,7 +83,8 @@ for i=1:numJtypes
     if(dTheta_i<0)
         % no such angles for this type of junction
     else
-        nodeAngleCosts{i} = getNodeAngleCost(dTheta_i,midPoint,sig,cNode);
+        %nodeAngleCosts{i} = getNodeAngleCost(dTheta_i,midPoint,sig,cNode);
+        nodeAngleCost{i} = getNodeAngleCostExp(dTheta_i,midPoint,decayRate,cNode);
     end
 end
 
