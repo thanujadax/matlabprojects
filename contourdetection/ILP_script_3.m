@@ -3,6 +3,12 @@
 isToyProb = 0;
 useGurobi = 1;
 
+
+orientations = 0:10:350;
+barLength = 11; % should be odd
+barWidth = 3; %
+threshFrac = 0;
+medianFilterH = 0;
 % max vote response image of the orientation filters
 if(isToyProb)
     imFilePath = 'testMem4_V.png';
@@ -17,8 +23,8 @@ end
 angleStep = 10; % 10 degrees discretization step of orientations
 
 % param
-cNode = 1;          % scaling factor for the node cost coming from gaussian normal distr.
-sig = 45;          % standard deviation(degrees) for the node cost function's gaussian distr.
+cNode = 100000000;          % scaling factor for the node cost coming from gaussian normal distr.
+sig = 50;          % standard deviation(degrees) for the node cost function's gaussian distr.
 midPoint = 180;     % angle difference of an edge pair (in degrees) for maximum cost 
 
 imIn = imread(imFilePath);
@@ -180,3 +186,14 @@ for i=1:numJtypes
     end
 end
 figure;imagesc(ilpSegmentation);title('ILP contours');
+% reconstruct the edges with the values from the orientation filters (HSV)
+[output rgbimg] = reconstructHSVgauss_mv(orientedScoreSpace3D,orientations,...
+            barLength,barWidth,threshFrac,medianFilterH);
+% get the active pixels
+output(:,:,3) = ilpSegmentation;
+% create HSV image
+hsvImage = cat(3,output(:,:,1),output(:,:,2),output(:,:,3));
+% convert it to an RGB image
+RGBimg = hsv2rgb(hsvImage);
+titleStr = sprintf('C = %d : sigma = %d',cNode,sig);
+figure;imshow(RGBimg);title(titleStr)

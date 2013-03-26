@@ -1,10 +1,10 @@
 
 % batch processing
-savefilepath = '/home/thanuja/Dropbox/RESULTS/Jan/groundTruth1/';
-inputImagePath = '/home/thanuja/Dropbox/data/mitoData/07.tif';
-% inputImagePath = '/home/thanuja/Dropbox/data/mitoData/gettheorientations.png';
+savefilepath = '/home/thanuja/Dropbox/RESULTS/Jan/groundTruth1/gettheorientations/';
+% inputImagePath = '/home/thanuja/Dropbox/data/mitoData/07.tif';
+inputImagePath = '/home/thanuja/Dropbox/data/mitoData/gettheorientations.png';
 % read tiff image
-inputImageStack = imread(inputImagePath,'tif');
+inputImageStack = imread(inputImagePath,'png');
 % numImg = size(inputImageStack,3);
 numImg = 1; % just for testing
 barLength = 15;

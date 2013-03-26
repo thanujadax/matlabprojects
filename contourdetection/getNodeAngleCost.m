@@ -8,7 +8,7 @@ function nodeAngleCost = getNodeAngleCost(dTheta,midpoint,sigma,C)
 % [numNodes,numAngles] = size(dTheta);
 if(dTheta<0)
     % invalid angle difference
-    nodeAngleCost = 0;
+    nodeAngleCost = 1;
 else
     nodeAngleCost = gauss1d(dTheta,midpoint,sigma) .*C;
 end

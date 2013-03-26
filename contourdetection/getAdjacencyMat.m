@@ -18,19 +18,27 @@ for i=1:numEdges
         % assign to adjacencyMat
         nodeInd = nodeEdges(R,1);
         j1 = find(nodeEdges(:,1)==nodeInd(1));
-        j2 = find(nodeEdges(:,1)==nodeInd(2));
-        adjacencyMat(j1,j2) = i; % assign edgeId to the adjMat
-        adjacencyMat(j2,j1) = i;
-        % also add the entries to edges2nodes
-        edges2nodes(i,1) = j1;
-        edges2nodes(i,2) = j2;
+        j2 = find(nodeEdges(:,1)==nodeInd(2));        
+        if(j1~=j2)
+            % assign edgeId to the adjMat
+            adjacencyMat(j1,j2) = i; 
+            adjacencyMat(j2,j1) = i;
+            % also add the entries to edges2nodes
+            edges2nodes(i,1) = j1;
+            edges2nodes(i,2) = j2;
+        else
+            sid = sid + 1;
+            selfEdgeIDs(sid) = i;
+        end
     elseif(numel(R)==1)
         % if 1, it contains a self edge.
+        disp('warning:getAdjacencyMat - edge skipped')       
         sid = sid + 1;
         selfEdgeIDs(sid) = i;
         
     else
         disp('warning:getAdjacencyMat - edge skipped')
+        i
         sid = sid + 1;
         selfEdgeIDs(sid) = i;
         
