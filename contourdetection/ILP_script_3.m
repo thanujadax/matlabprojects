@@ -23,11 +23,12 @@ end
 angleStep = 10; % 10 degrees discretization step of orientations
 
 % param
+cEdge = 10;
 cNode = 100;          % scaling factor for the node cost coming from gaussian normal distr.
 sig = 50;          % standard deviation(degrees) for the node cost function's gaussian distr.
 midPoint = 180;     % angle difference of an edge pair (in degrees) for maximum cost 
 % param for exp cost function
-decayRate = 0.06;
+decayRate = 0.02;
 
 
 imIn = imread(imFilePath);
@@ -103,7 +104,8 @@ numJunctions = numel(nodeInds);
 % coeff for turning on J4-config(1 to 6): j4NodeAngleCost
 
 % f = getILPcoefficientVector(edgePriors,j3NodeAngleCost,j4NodeAngleCost);
-f = getILPcoefficientVector2(edgePriors,nodeAngleCosts);
+scaledEdgePriors = edgePriors.*cEdge;
+f = getILPcoefficientVector2(scaledEdgePriors,nodeAngleCosts);
 % constraints
 % equality constraints and closedness constrains in Aeq matrix
 [Aeq,beq] = getEqConstraints2(numEdges,jEdges,edges2pixels);
