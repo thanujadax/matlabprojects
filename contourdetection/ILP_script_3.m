@@ -27,7 +27,7 @@ cNode = 10000;          % scaling factor for the node cost coming from gaussian 
 sig = 50;          % standard deviation(degrees) for the node cost function's gaussian distr.
 midPoint = 180;     % angle difference of an edge pair (in degrees) for maximum cost 
 % param for exp cost function
-decayRate = 0.05;
+decayRate = 0.06;
 
 
 imIn = imread(imFilePath);
