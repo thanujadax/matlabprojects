@@ -23,7 +23,7 @@ end
 angleStep = 10; % 10 degrees discretization step of orientations
 
 % param
-cNode = 10000;          % scaling factor for the node cost coming from gaussian normal distr.
+cNode = 100;          % scaling factor for the node cost coming from gaussian normal distr.
 sig = 50;          % standard deviation(degrees) for the node cost function's gaussian distr.
 midPoint = 180;     % angle difference of an edge pair (in degrees) for maximum cost 
 % param for exp cost function

@@ -38,7 +38,10 @@ for i=1:numJtypes
     % for each junction type
     nodeAngleCost_i = nodeAngleCosts{i};
     maxJcost = max(nodeAngleCost_i,[],2);          % inactivation cost
-    nodeAngleCost_i = [maxJcost nodeAngleCost_i];
+    minJcost = max(nodeAngleCost_i,[],2);
+    avgJcost = (minJcost + maxJcost)/2;
+%     nodeAngleCost_i = [maxJcost nodeAngleCost_i];
+    nodeAngleCost_i = [avgJcost nodeAngleCost_i];
     numCoeff_i = totJunctionVar(i);
     f_start_ind = f_stop_ind + 1;
     f_stop_ind = f_start_ind + numCoeff_i - 1;
