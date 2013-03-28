@@ -1,5 +1,5 @@
-function jAngles = getNodeAngles_fromGraph(jInd,nodeInds,jEdges,edges2pixels,orientedScoreSpace3D,...
-                    sizeR,sizeC,angleStep)
+function jAngles_alpha = getNodeAngles_fromGraph(jInd,nodeInds,jEdges,edges2pixels,...
+                    sizeR,sizeC)
 % returns an N-by-n array of angles (alphas). N = number of nodes, n = number of
 % edges per node. The order is determined by jInd which contains the
 % indices of the nodes (junctions).
@@ -20,8 +20,7 @@ function jAngles = getNodeAngles_fromGraph(jInd,nodeInds,jEdges,edges2pixels,ori
 %       segmentation.
 
 [numJ,degree] = size(jEdges);
-jAngles = zeros(numJ,degree);
-numOrientations = size(orientedScoreSpace3D,3);
+jAngles_alpha = zeros(numJ,degree);
 for i=1:numJ
     % for each node
     edges_i = jEdges(i,:);
@@ -49,6 +48,6 @@ for i=1:numJ
         end
 
         medianAlpha = median(orientations);
-        jAngles(i,j) = medianAlpha;
+        jAngles_alpha(i,j) = medianAlpha;
     end
 end

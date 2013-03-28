@@ -10,7 +10,7 @@ function nodeAngleCost = getNodeAngleCost_directional(theta,alpha,C)
 
 [numNodes,numEdgesPerNode] = size(theta);
 numCombinations = nchoosek(numEdgesPerNode,2);
-edgeIDvect = 1:numNodes;
+edgeIDvect = 1:numEdgesPerNode;
 combinations = nchoosek(edgeIDvect,2);
 
 % get the outwardness score for all the edge for all the nodes
