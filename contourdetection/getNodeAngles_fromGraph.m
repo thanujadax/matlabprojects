@@ -1,8 +1,10 @@
-function jAngles = getNodeAngles(jInd,nodeInds,jEdges,edges2pixels,orientedScoreSpace3D,...
+function jAngles = getNodeAngles_fromGraph(jInd,nodeInds,jEdges,edges2pixels,orientedScoreSpace3D,...
                     sizeR,sizeC,angleStep)
-% returns an N-by-n array of angles. N = number of nodes, n = number of
+% returns an N-by-n array of angles (alphas). N = number of nodes, n = number of
 % edges per node. The order is determined by jInd which contains the
-% indices of the nodes (junctions)
+% indices of the nodes (junctions).
+% Here, the angle of an edge at a node is the actual orientation of an edge
+% based on its physical location in the graph obtained from the watershed segmentation. 
 
 % Inputs:
 %   jInd = list of node indices considered in order
@@ -13,8 +15,9 @@ function jAngles = getNodeAngles(jInd,nodeInds,jEdges,edges2pixels,orientedScore
 
 % Output:
 %   jAngles = angles corresponding to the edges of each node as row vectors
-%       the angle is determined by the maximum response obtained by the
-%       oriented filter bank
+%       the angle is determined by the actual physical orientation of the
+%       edge according to the graph obtained from the watershed
+%       segmentation.
 
 [numJ,degree] = size(jEdges);
 jAngles = zeros(numJ,degree);
@@ -23,6 +26,7 @@ for i=1:numJ
     % for each node
     edges_i = jEdges(i,:);
     nodeInd = nodeInds(jInd(i));
+    [rNode,cNode] = ind2sub([sizeR sizeC],nodeInd);
     for j=1:degree
         % for each edge of this node
         edgeID = edges_i(j);
@@ -31,16 +35,20 @@ for i=1:numJ
         % get the edge pixels(3) which are closest to the node i
         nodePixels = getNodeEdgePixel(nodeInd,edgePixelInds,sizeR,sizeC);
         % get their orientation
-        [r,c] = ind2sub([sizeR sizeC],nodePixels');
+        [rP,cP] = ind2sub([sizeR sizeC],nodePixels');
         numEdgePix = numel(nodePixels);
-        orientations = zeros(numEdgePix,numOrientations);
+        orientations = zeros(numEdgePix,1);
         for k=1:numEdgePix
-            orientations(k,1:numOrientations) = orientedScoreSpace3D(r(k),c(k),:);
-            [~,orientationIndex(k)] = max(orientations(k,:));
+            y = rP(k) - rNode;
+            x = cP(k) - cNode;
+            alpha = atan2d(y,x);
+            if(alpha<0)
+                alpha = alpha + 360;
+            end
+            orientations(k) = alpha;
         end
-%         [~,orientationIndex] = max(orientedScoreSpace3D(r,c,:),3);
-        edgeAngles = (orientationIndex-1).*angleStep;
-        medianEdgeAngle = median(edgeAngles);
-        jAngles(i,j) = medianEdgeAngle;
+
+        medianAlpha = median(orientations);
+        jAngles(i,j) = medianAlpha;
     end
 end

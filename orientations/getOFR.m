@@ -35,7 +35,7 @@ slidingDist = 1;           % the number of pixels to jump
 
 % lineWidth = 1;
 
-threshFrac = 0;
+threshFrac = 0.5;
 
 % for Gaussian kernel
 % barLength = 23; % should be odd
@@ -52,7 +52,8 @@ threshFrac = 0;
 barLength = 15; % should be odd
 barWidth = 7; % 
 negLines = 0; % number of negative lines per side
-orientations = 0:45:135;    
+% orientations = 0:45:135;
+orientations = 0:22.5:157.5;
 
 
 withBackground = 0;     % plot the detected bars with the original image in the background
