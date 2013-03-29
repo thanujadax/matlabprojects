@@ -31,7 +31,7 @@ sig = 50;          % standard deviation(degrees) for the node cost function's ga
 midPoint = 180;     % angle difference of an edge pair (in degrees) for maximum cost 
 % param for exp cost function
 decayRate = 0.02;
-maxCost_direction = 10;
+maxCost_direction = 10000;  % C for the directional cost function
 
 
 imIn = imread(imFilePath);
@@ -203,5 +203,6 @@ output(:,:,3) = ilpSegmentation;
 hsvImage = cat(3,output(:,:,1),output(:,:,2),output(:,:,3));
 % convert it to an RGB image
 RGBimg = hsv2rgb(hsvImage);
-titleStr = sprintf('C = %d : lambda = %d',cNode,decayRate);
+% titleStr = sprintf('C = %d : lambda = %d',cNode,decayRate);
+titleStr = sprintf('C = %d',maxCost_direction);
 figure;imshow(RGBimg);title(titleStr)
