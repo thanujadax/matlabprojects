@@ -31,7 +31,7 @@ sig = 50;          % standard deviation(degrees) for the node cost function's ga
 midPoint = 180;     % angle difference of an edge pair (in degrees) for maximum cost 
 % param for exp cost function
 decayRate = 0.02;
-maxCost_direction = 10000;  % C for the directional cost function
+maxCost_direction = 10;  % C for the directional cost function
 
 
 imIn = imread(imFilePath);
@@ -83,7 +83,7 @@ nodeAngleCosts = cell(1,numJtypes);
 for i=1:numJtypes
     theta_i = jAnglesAll{i};
     alpha_i = jAnglesAll_alpha{i};
-    if(dTheta_i<0)
+    if(theta_i<0)
         % no such angles for this type of junction
     else
         %nodeAngleCosts{i} = getNodeAngleCost(dTheta_i,midPoint,sig,cNode);
