@@ -62,13 +62,13 @@ for dim=1:numJtypes
                     if(numEdgePix==1)
                         % just one edge pixel
                         % get the 2 junction nodes
-                        [ren,cen] = find(edges2nodes==nodeListInd);
-                        if(cen==1)
-                            node2ListInd = edges2nodes(ren,2);
-                        elseif(cen==2)
-                            node2ListInd = edges2nodes(ren,1);
+                        edgeNodes = edges2nodes(edgeListInd,:);
+                        if(edgeNodes(1)==nodeListInd)
+                            node2ListInd = edgeNodes(2);
+                        elseif(edgeNodes(2)==nodeListInd)
+                            node2ListInd = edgeNodes(1);
                         else
-                            disp('ERROR: getNodeAngles_fromGraph_allJtypes. node ind mismatch')
+                            disp('ERROR: getNodeAngles_fromGraph_allJtypes. node mismatch');
                         end
                         % calculate alpha based on these 2
                         nodeInd2 = nodeInds(node2ListInd); 
