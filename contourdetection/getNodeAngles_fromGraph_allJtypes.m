@@ -1,5 +1,5 @@
 function jAnglesAll_alpha = getNodeAngles_fromGraph_allJtypes(junctionTypeListInds,...
-    nodeInds,jEdgesAll,edges2pixels,sizeR,sizeC)
+    nodeInds,jEdgesAll,edges2pixels,sizeR,sizeC,edges2nodes)
 % returns a cell array.
 % jAnglesAll{i} - each row corresponds to the set of angles for each
 % junction of type i (type 1 = J2)
@@ -58,18 +58,49 @@ for dim=1:numJtypes
                     % get their orientation
                     [rP,cP] = ind2sub([sizeR sizeC],nodePixels');
                     numEdgePix = numel(nodePixels);
-                    orientations = zeros(numEdgePix,1);
-                    for k=1:numEdgePix
-                        y = rP(k) - rNode;
-                        x = cP(k) - cNode;
-                        alpha = atan2d(y,x);
-                        if(alpha<0)
-                            alpha = alpha + 360;
+%                     orientations = zeros(numEdgePix,1);
+                    if(numEdgePix==1)
+                        % just one edge pixel
+                        % get the 2 junction nodes
+                        [ren,cen] = find(edges2nodes==nodeListInd);
+                        if(cen==1)
+                            node2ListInd = edges2nodes(ren,2);
+                        elseif(cen==2)
+                            node2ListInd = edges2nodes(ren,1);
+                        else
+                            disp('ERROR: getNodeAngles_fromGraph_allJtypes. node ind mismatch')
                         end
-                    orientations(k) = alpha;
+                        % calculate alpha based on these 2
+                        nodeInd2 = nodeInds(node2ListInd); 
+                        [rNode2,cNode2] = ind2sub([sizeR sizeC],nodeInd2);
+                        y = rNode2 - rNode;
+                        x = cNode2 - cNode;
+                    else
+                        % get alpha wrt the end edge pixels
+%                         for k=1:numEdgePix
+%                             y = rP(k) - rNode;
+%                             x = cP(k) - cNode;
+%                             alpha = atan2d(y,x);
+%                             if(alpha<0)
+%                                 alpha = alpha + 360;
+%                             end
+%                         orientations(k) = alpha;
+%                         end
+                        % get the first in the list
+                        rp1 = rP(1);
+                        rp2 = rP(end);
+                        cp1 = cP(1);
+                        cp2 = cP(end);
+                        y = rp2 - rp1;
+                        x = cp2 - cp1;
                     end
-                    medianAlpha = median(orientations);
-                    jAngles(i,j) = medianAlpha;
+                    alpha = atan2d(y,x);
+                    if(alpha<0)
+                        alpha = alpha + 360;
+                    end
+%                         medianAlpha = median(orientations);
+                    
+                    jAngles(i,j) = alpha;
                 end
                     
             end
