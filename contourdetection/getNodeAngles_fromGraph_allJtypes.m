@@ -99,8 +99,12 @@ for dim=1:numJtypes
                         alpha = alpha + 360;
                     end
 %                         medianAlpha = median(orientations);
-                    
+%                     if(numel(alpha)>1)
+%                         % prob
+%                         alpha
+%                     else
                     jAngles(i,j) = alpha;
+%                     end
                 end
                     
             end
