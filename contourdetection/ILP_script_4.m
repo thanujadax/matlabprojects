@@ -25,13 +25,13 @@ end
 angleStep = 10; % 10 degrees discretization step of orientations
 
 % param
-cEdge = 10;
+cEdge = 2;
 cNode = 100;          % scaling factor for the node cost coming from gaussian normal distr.
 sig = 50;          % standard deviation(degrees) for the node cost function's gaussian distr.
 midPoint = 180;     % angle difference of an edge pair (in degrees) for maximum cost 
 % param for exp cost function
 decayRate = 0.02;
-maxCost_direction = 2;  % C for the directional cost function
+maxCost_direction = 3;  % C for the directional cost function
 
 
 imIn = imread(imFilePath);

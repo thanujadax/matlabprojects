@@ -31,7 +31,7 @@ parfor i=1:numOrientations
     % rotate appropriately
     orientation = orientations(i);
     if(orientation>0)
-        bar_i = imrotate(bar_i,orientation);
+        bar_i = imrotate(bar_i,-orientation);
     end
     % convolve to get the orientation score map for this orientation i
     % convResult = conv2(img_i,bar_i);
