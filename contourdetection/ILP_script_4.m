@@ -31,7 +31,7 @@ sig = 50;          % standard deviation(degrees) for the node cost function's ga
 midPoint = 180;     % angle difference of an edge pair (in degrees) for maximum cost 
 % param for exp cost function
 decayRate = 0.02;
-maxCost_direction = 3;  % C for the directional cost function
+maxCost_direction = 1000;  % C for the directional cost function
 
 
 imIn = imread(imFilePath);
