@@ -7,4 +7,4 @@ function outwardness = getOutwardness(theta,alpha,C)
 %   C - scaling factor
 
 dta = alpha - theta;
-outwardness = cos(dta).*C;
+outwardness = cosd(dta).*C;
