@@ -1,4 +1,4 @@
-function outwardness = getOutwardness(theta,alpha,C)
+function outwardness = getOutwardness(theta,alpha)
 % returns the degree of outwardness for an edge, scaled by parameter C
 
 % Inputs:
@@ -7,4 +7,4 @@ function outwardness = getOutwardness(theta,alpha,C)
 %   C - scaling factor
 
 dta = alpha - theta;
-outwardness = cosd(dta).*C;
+outwardness = cosd(dta);

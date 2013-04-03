@@ -1,4 +1,4 @@
-function nodeAngleCost = getNodeAngleCost_directional(theta,alpha,C)
+function nodeAngleCost = getNodeAngleCost_directional(theta,alpha,cPos,cNeg)
 % calculate the cost for each active configuration of a node given the edge
 % angles according to the OFR (theta) and the edge position of the graph
 % relative the current node (anlpha)
@@ -14,7 +14,7 @@ edgeIDvect = 1:numEdgesPerNode;
 combinations = nchoosek(edgeIDvect,2);
 
 % get the outwardness score for all the edge for all the nodes
-outwardnessScores = getOutwardness(theta,alpha,C);
+outwardnessScores = getOutwardness(theta,alpha);
 
 % calculate the cost for each pair of edge combinations - nodeAngleCost
 % = multiplication of the outwardness scores of the two edges
@@ -27,4 +27,17 @@ for i=1:numNodes
                             outwardnessScores(i,edge2LInd);  
         
    end
+end
+ind_neg = (nodeAngleCost<0);
+if(~isempty(ind_neg))
+    negCosts = nodeAngleCost(ind_neg);
+    negCosts = negCosts .* cNeg;
+    nodeAngleCost(ind_neg) = negCosts;
+end
+
+ind_pos = (nodeAngleCost>0);
+if(~isempty(ind_pos))
+    posCosts = nodeAngleCost(ind_pos);
+    posCosts = posCosts .* cPos;
+    nodeAngleCost(ind_pos) = posCosts;
 end

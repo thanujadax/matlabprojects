@@ -32,6 +32,8 @@ midPoint = 180;     % angle difference of an edge pair (in degrees) for maximum 
 % param for exp cost function
 decayRate = 0.02;
 maxCost_direction = 1000;  % C for the directional cost function
+cPos = 10000;
+cNeg = 10;
 
 
 imIn = imread(imFilePath);
@@ -61,9 +63,6 @@ edgePriors = getEdgePriors(orientedScoreSpace3D,edges2pixels);
 
 %% Edge pairs - Junction costs
 [maxNodesPerJtype, numJtypes] = size(junctionTypeListInds);
-for i=1:numJtypes
-    numJ(i) = sum(junctionTypeListInds(:,i)>0);
-end
 
 jEdges = getEdgesForAllNodeTypes(nodeEdges,junctionTypeListInds);
 % jEdges{i} - cell array. each cell corresponds to the set of edges for the
@@ -87,7 +86,7 @@ for i=1:numJtypes
         % no such angles for this type of junction
     else
         %nodeAngleCosts{i} = getNodeAngleCost(dTheta_i,midPoint,sig,cNode);
-        nodeAngleCosts{i} = getNodeAngleCost_directional(theta_i,alpha_i,maxCost_direction);
+        nodeAngleCosts{i} = getNodeAngleCost_directional(theta_i,alpha_i,cPos,cNeg);
     end
 end
 
