@@ -35,7 +35,7 @@ slidingDist = 1;           % the number of pixels to jump
 
 % lineWidth = 1;
 
-threshFrac = 0.5;
+threshFrac = 0;
 
 % for Gaussian kernel
 % barLength = 23; % should be odd

@@ -1,6 +1,6 @@
 
 % batch processing
-savefilepath = '/home/thanuja/Dropbox/RESULTS/Jan/membraneOrientations_8_thresh/';
+savefilepath = '/home/thanuja/Dropbox/RESULTS/Jan/membraneOrientations_8_v2/';
 % inputImagePath = '/home/thanuja/Dropbox/data/mitoData/07.tif';
 inputImageDirPath = '/home/thanuja/Dropbox/data/membranes/';
 % read tiff image
