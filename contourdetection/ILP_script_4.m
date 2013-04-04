@@ -32,7 +32,7 @@ midPoint = 180;     % angle difference of an edge pair (in degrees) for maximum 
 % param for exp cost function
 decayRate = 0.02;
 maxCost_direction = 1000;  % C for the directional cost function
-cPos = 10000;
+cPos = 1000000;
 cNeg = 10;
 
 
@@ -86,7 +86,8 @@ for i=1:numJtypes
         % no such angles for this type of junction
     else
         %nodeAngleCosts{i} = getNodeAngleCost(dTheta_i,midPoint,sig,cNode);
-        nodeAngleCosts{i} = getNodeAngleCost_directional(theta_i,alpha_i,cPos,cNeg);
+        nodeAngleCosts{i} = getNodeAngleCost_directional(theta_i,alpha_i,...
+                                edgePriors,cPos,cNeg);
     end
 end
 
