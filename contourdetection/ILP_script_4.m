@@ -110,14 +110,18 @@ scaledEdgePriors = edgePriors.*cEdge;
 f = getILPcoefficientVector2(scaledEdgePriors,nodeAngleCosts);
 % constraints
 % equality constraints and closedness constrains in Aeq matrix
-[Aeq,beq] = getEqConstraints2(numEdges,jEdges,edges2pixels);
+% [Aeq,beq] = getEqConstraints2(numEdges,jEdges,edges2pixels);
+[Aeq,beq,numEq,numLt] = getConstraints(numEdges,jEdges,edges2pixels,nodeAngleCosts);
+senseArray(1:numEq) = '=';
+senseArray((numEq+1):(numEq+numLt)) = '<';
 %% solver
 if(useGurobi)
     disp('using Gurobi ILP solver...');
     model.A = sparse(Aeq);
     model.rhs = beq;
     model.obj = f';
-    model.sense = '=';  % for the constraints given in A
+%     model.sense = '=';  % for the constraints given in A
+    model.sense = senseArray;
     model.vtype = 'B';  % binary variables
     model.modelname = 'contourDetectionILP1';
     
