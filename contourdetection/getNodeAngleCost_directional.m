@@ -1,4 +1,5 @@
-function nodeAngleCost = getNodeAngleCost_directional(theta,alpha,edgePriors,cPos,cNeg)
+function nodeAngleCost = getNodeAngleCost_directional(theta,alpha,edgePriors_j,...
+                        cPos,cNeg)
 % calculate the cost for each active configuration of a node given the edge
 % angles according to the OFR (theta) and the edge position of the graph
 % relative the current node (anlpha)
@@ -7,6 +8,9 @@ function nodeAngleCost = getNodeAngleCost_directional(theta,alpha,edgePriors,cPo
 % of edges connected to a node. this gives rise to a combination of the
 % pairs of edges we can pick - nchoosek(n,2). in the output: nodeAngleCost,
 % we have a number of columns equal to the number of such combinations
+
+% edgePriors_j contains the edge priors for all the nodes in the junction
+% type in concern, in the order considered in theta and alpha
 
 [numNodes,numEdgesPerNode] = size(theta);
 numCombinations = nchoosek(numEdgesPerNode,2);
@@ -23,7 +27,7 @@ for i=1:numNodes
    for j=1:numCombinations
         edge1LInd = combinations(j,1);
         edge2LInd = combinations(j,2);
-        edgePriorFactor = edgePriors(edge1LInd) * edgePriors(edge2LInd)*100;
+        edgePriorFactor = edgePriors_j(i,edge1LInd) * edgePriors_j(i,edge2LInd)*100;
         nodeAngleCost(i,j) = outwardnessScores(i,edge1LInd) *...
                             outwardnessScores(i,edge2LInd) * edgePriorFactor;  
         

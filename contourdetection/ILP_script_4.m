@@ -25,7 +25,7 @@ end
 angleStep = 10; % 10 degrees discretization step of orientations
 
 % param
-cEdge = 2;
+cEdge = 0.5;
 cNode = 100;          % scaling factor for the node cost coming from gaussian normal distr.
 sig = 50;          % standard deviation(degrees) for the node cost function's gaussian distr.
 midPoint = 180;     % angle difference of an edge pair (in degrees) for maximum cost 
@@ -44,6 +44,7 @@ ws = watershed(imIn);
 disp('creating graph from watershed boundaries...');
 [adjacencyMat,nodeEdges,edges2nodes,edges2pixels,connectedJunctionIDs] = getGraphFromWS(ws);
 nodeInds = nodeEdges(:,1);                  % indices of the junction nodes
+edgeListInds = edges2pixels(:,1);
 junctionTypeListInds = getJunctionTypeListInds(nodeEdges);
 % col1 has the listInds of type J2, col2: J3 etc. listInds are wrt
 % nodeInds list of pixel indices of the detected junctions
@@ -86,8 +87,10 @@ for i=1:numJtypes
         % no such angles for this type of junction
     else
         %nodeAngleCosts{i} = getNodeAngleCost(dTheta_i,midPoint,sig,cNode);
+        edgePriors_i = getOrderedEdgePriorsForJ(i,junctionTypeListInds,...
+                    nodeEdges,edgePriors,edgeListInds);
         nodeAngleCosts{i} = getNodeAngleCost_directional(theta_i,alpha_i,...
-                                edgePriors,cPos,cNeg);
+                                edgePriors_i,cPos,cNeg);
     end
 end
 
@@ -135,7 +138,7 @@ else
     % Matlab ILP solver
     disp('using MATLAB ILP solver...');
     Initial values for the state variables
-    x0 = getInitValues(numEdges,numJ3,numJ4);  % TODO: infeasible!!
+    x0 = getInitValues(numEdges,numJ3,numJ4);  % TODO: infeasible. fix it!!
     numStates = size(f,1);
     maxIterationsILP = numStates * 1000000;
     options = optimset('MaxIter',maxIterationsILP,...
