@@ -142,6 +142,7 @@ for jType=1:numJtypes
 end
 %% Inequality constraint - enforcing inEdge+outEdge at active junctions
 jColIdStop = numEdges*2; % next, start with the first inactive node state
+rowStop = numEdges + numNodesTot*2;
 for jType=1:numJtypes
     % for each junction type, get the indices of the junction variables
     % set inactiveState variable to -1
@@ -162,9 +163,46 @@ for jType=1:numJtypes
         end
     end
 end
+%% for each active configuration of a node enforcing the activation of the
+%%  corresponding 2 edges
+jConfStateInd = numEdges*2;
+for jType=1:numJtypes
+    numNodes_j = nodeTypeStats(jType,1); % number of nodes of this ty
+    if(numNodes_j~=0)
+        numEdgesPerNode = jType + 1;
+        edgeNumVec = 1:numEdgesPerNode;
+        edgeCombinationVec = nchoosek(edgeNumVec,2);
+        numActiveCombinations = size(edgeCombinationVec,1); 
+        jEdges_j = jEdges{jType};
+        jEdgesOrderedInd_j = jEdges_j; % initializing - to store the edgeListIDs
+        for i=1:numNodes_j
+            % for each node of this junction type
+            edgeIDs = jEdges_j(i,:);
+            for m=1:numel(edgeIDs)
+                % for each edge connected to this node
+                edgeOrderInd = find(edges2pixels(:,1)==edgeIDs(m));  % edgeListIDs
+                jEdgesOrderedInd_j(i,m) = edgeOrderInd; 
+            end
+            edgeActiveStatesInd_i = jEdgesOrderedInd_j(i,:) .*2;
+            edgeInactiveStatesInd_i = edgeActiveStatesInd_i - 1;
+            % entry for the inactive state of the node
+            % nothing
+            % for the active states of the node
+            jConfStateInd = jConfStateInd + 1; % now points to the inactive state
+            for m=1:numActiveCombinations
+                % for each active configuration of this node
+                jConfStateInd = jConfStateInd + 1;
+                rowStop = rowStop + 1;
+                A(rowStop,jConfStateInd) = -2;
+                % TODO: implement
+            end
+            
+        end
+    end
+end
 
 
-% % for all nodes, get the active edge state variable indices
+%% for all nodes, get the active edge state variable indices
 % j3ActiveEdgeColInds = j3Edges .*2;
 % j4ActiveEdgeColInds = j4Edges .*2;
 % 
