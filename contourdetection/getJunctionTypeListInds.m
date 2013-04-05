@@ -11,7 +11,7 @@ function junctionTypeListInds = getJunctionTypeListInds(nodeEdges)
 %       ...
 
 [numJunctions numMaxEdgesPJn] = size(nodeEdges);
-numJunctionTypes = numMaxEdgesPJn - 3;
+numJunctionTypes = numMaxEdgesPJn - 2;
 
 for i=1:numJunctions
     % get the number of edges at each junction i
