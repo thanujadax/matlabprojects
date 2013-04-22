@@ -52,7 +52,7 @@ A = zeros(totRows_A,numCols_Aeq);
 b = zeros(totRows_A,1);
 b(1:(numEdges + sum(nodeTypeStats(:,1)))) = 1;
 b((numEdges + sum(nodeTypeStats(:,1))*2 + 1):(numRows_Aeq)) = 1; % edge and nodeActiveStateCoherence
-b((numRows_Aeq+1):(numRows_Aeq+numRows_AInEq)) = 0; % less than zero 
+b((numRows_Aeq+1):(numRows_Aeq+numRows_AInEq)) = 0.01; % less than zero 
 %% activation/inactivation constraints for each edge
 j = 1;
 for i=1:numEdges
@@ -145,6 +145,8 @@ for jType=1:numJtypes
         
 end
 %% coherence between activeNodeStates and the corresponding active edges - equality constraint
+% this is required since only a particular pair of edges out of all the
+% possible edges connected to a node should be activated, if the node is active 
 jConfStateInd = numEdges*2;
 for jType=1:numJtypes
     numNodes_j = nodeTypeStats(jType,1); % number of nodes of this ty

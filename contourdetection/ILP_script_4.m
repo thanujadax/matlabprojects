@@ -13,9 +13,11 @@ threshFrac = 0;
 medianFilterH = 0;
 % max vote response image of the orientation filters
 if(isToyProb)
-    imFilePath = 'testMem4_V.png';
+%     imFilePath = 'testMem4_V.png';
+    imFilePath = 'circle1_V.png';
     % votes for each orientation for each edge
-    load('orientedScoreSpace3D.mat') % loads the orientation filter scores
+%     load('orientedScoreSpace3D.mat') % loads the orientation filter scores
+    load('orientedScoreSpace3D_circle1.mat') % loads the orientation filter scores
 else
     % imFilePath = 'stem_256x_t02_V.png';
     imFilePath = '/home/thanuja/Dropbox/data/mitoData/emJ_00_350x_V.png';
@@ -131,6 +133,7 @@ if(useGurobi)
     model.modelname = 'contourDetectionILP1';
     
     params.LogFile = 'gurobi.log';
+    params.Presolve = 0;
     
     resultGurobi = gurobi(model,params);
     x = resultGurobi.x;
