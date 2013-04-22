@@ -19,6 +19,7 @@ nodeTypeStats = zeros(numJtypes,2);
 % column 1: n.o. junction nodes of this type
 % column 2: n.o. edge pair combinations to be activated
 totJunctionVar = zeros(numJtypes,1); % stores the number of coefficients for each type of J
+totActiveJunctionConfs = zeros(numJtypes,1);
 for i=1:numJtypes
     jEdges_i = jEdges{i};
     if(jEdges_i==0)
@@ -26,12 +27,14 @@ for i=1:numJtypes
         nodeTypeStats(i,1) = 0;
         nodeTypeStats(i,2) = 0;
         totJunctionVar(i) = 0;
+        totActiveJunctionConfs(i) = 0;
     else
         [numJ_i,numEdges_i] = size(jEdges_i);
         nodeTypeStats(i,1) = numJ_i;
         nodeTypeStats(i,2) = numEdges_i;
         numEdgeCombinations = nchoosek(numEdges_i,2);
         totJunctionVar(i) = numJ_i.*(numEdgeCombinations + 1); % 1 for the inactive node
+        totActiveJunctionConfs(i) = numJ_i.*numEdgeCombinations;
         % clear nodeAngleCost_i
     end
 end
@@ -40,7 +43,7 @@ end
 % num cols of Aeq = 2*numEdges + sum_j(numNodes_j*numCombinations+1)
 numCols_Aeq = 2*numEdges + sum(totJunctionVar); 
 % num rows of Aeq = numEdges + 2*numJ
-numRows_Aeq = numEdges + sum(nodeTypeStats(:,1))*2;
+numRows_Aeq = numEdges + sum(nodeTypeStats(:,1))*2 + sum(totActiveJunctionConfs);
 % num rows of inequality constraints = number of junctions
 numRows_AInEq = sum(nodeTypeStats(:,1));
 totRows_A = numRows_Aeq + numRows_AInEq;
@@ -48,6 +51,7 @@ totRows_A = numRows_Aeq + numRows_AInEq;
 A = zeros(totRows_A,numCols_Aeq);
 b = zeros(totRows_A,1);
 b(1:(numEdges + sum(nodeTypeStats(:,1)))) = 1;
+b((numEdges + sum(nodeTypeStats(:,1))*2 + 1):(numRows_Aeq)) = 1; % edge and nodeActiveStateCoherence
 b((numRows_Aeq+1):(numRows_Aeq+numRows_AInEq)) = 0; % less than zero 
 %% activation/inactivation constraints for each edge
 j = 1;
@@ -89,8 +93,8 @@ end
 %% closedness constraints
 % for each node, either exactly two edges should be active (active node) or
 % all the edges should be inactive (inactive node)
-numNodesTot = sum(nodeTypeStats(:,1));
-rowStop = numEdges + numNodesTot;
+% numNodesTot = sum(nodeTypeStats(:,1));
+% rowStop = numEdges + numNodesTot;
 jColIdStop = numEdges*2;
 for jType=1:numJtypes
     % for each junction type
@@ -140,9 +144,51 @@ for jType=1:numJtypes
     end
         
 end
+%% coherence between activeNodeStates and the corresponding active edges - equality constraint
+jConfStateInd = numEdges*2;
+for jType=1:numJtypes
+    numNodes_j = nodeTypeStats(jType,1); % number of nodes of this ty
+    if(numNodes_j~=0)
+        numEdgesPerNode = jType + 1;
+        edgeNumVec = 1:numEdgesPerNode;
+        edgeCombinationVec = nchoosek(edgeNumVec,2);
+        numActiveCombinations = size(edgeCombinationVec,1); 
+        jEdges_j = jEdges{jType};
+        jEdgesOrderedInd_j = jEdges_j; % initializing - to store the edgeListIDs
+        for i=1:numNodes_j
+            % for each node of this junction type
+            edgeIDs = jEdges_j(i,:);
+            for m=1:numel(edgeIDs)
+                % for each edge connected to this node
+                edgeOrderInd = find(edges2pixels(:,1)==edgeIDs(m));  % edgeListIDs
+                jEdgesOrderedInd_j(i,m) = edgeOrderInd; 
+            end
+            edgeActiveStatesInd_i = jEdgesOrderedInd_j(i,:) .*2;
+            %edgeInactiveStatesInd_i = edgeActiveStatesInd_i - 1;
+            % entry for the inactive state of the node
+            % nothing
+            % for the active states of the node
+            jConfStateInd = jConfStateInd + 1; % now points to the inactive state
+            for m=1:numActiveCombinations
+                % for each active configuration of this node
+                jConfStateInd = jConfStateInd + 1;
+                rowStop = rowStop + 1;
+                A(rowStop,jConfStateInd) = -1;  % coefficient for the node active state
+                % edge coefficients
+                edge1id = edgeCombinationVec(m,1);
+                edge1_activeStateInd = edgeActiveStatesInd_i(edge1id);
+                A(rowStop,edge1_activeStateInd) = 1;
+                edge2id = edgeCombinationVec(m,2);
+                edge2_activeStateInd = edgeActiveStatesInd_i(edge2id);
+                A(rowStop,edge2_activeStateInd) = 1;
+            end
+            
+        end
+    end
+end
 %% Inequality constraint - enforcing inEdge+outEdge at active junctions
 jColIdStop = numEdges*2; % next, start with the first inactive node state
-rowStop = numEdges + numNodesTot*2;
+% rowStop = numEdges + numNodesTot*2;
 for jType=1:numJtypes
     % for each junction type, get the indices of the junction variables
     % set inactiveState variable to -1
@@ -163,43 +209,7 @@ for jType=1:numJtypes
         end
     end
 end
-%% for each active configuration of a node enforcing the activation of the
-%%  corresponding 2 edges
-jConfStateInd = numEdges*2;
-for jType=1:numJtypes
-    numNodes_j = nodeTypeStats(jType,1); % number of nodes of this ty
-    if(numNodes_j~=0)
-        numEdgesPerNode = jType + 1;
-        edgeNumVec = 1:numEdgesPerNode;
-        edgeCombinationVec = nchoosek(edgeNumVec,2);
-        numActiveCombinations = size(edgeCombinationVec,1); 
-        jEdges_j = jEdges{jType};
-        jEdgesOrderedInd_j = jEdges_j; % initializing - to store the edgeListIDs
-        for i=1:numNodes_j
-            % for each node of this junction type
-            edgeIDs = jEdges_j(i,:);
-            for m=1:numel(edgeIDs)
-                % for each edge connected to this node
-                edgeOrderInd = find(edges2pixels(:,1)==edgeIDs(m));  % edgeListIDs
-                jEdgesOrderedInd_j(i,m) = edgeOrderInd; 
-            end
-            edgeActiveStatesInd_i = jEdgesOrderedInd_j(i,:) .*2;
-            edgeInactiveStatesInd_i = edgeActiveStatesInd_i - 1;
-            % entry for the inactive state of the node
-            % nothing
-            % for the active states of the node
-            jConfStateInd = jConfStateInd + 1; % now points to the inactive state
-            for m=1:numActiveCombinations
-                % for each active configuration of this node
-                jConfStateInd = jConfStateInd + 1;
-                rowStop = rowStop + 1;
-                A(rowStop,jConfStateInd) = -2;
-                % TODO: implement
-            end
-            
-        end
-    end
-end
+
 
 
 %% for all nodes, get the active edge state variable indices

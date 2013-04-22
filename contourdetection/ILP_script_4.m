@@ -2,7 +2,7 @@
 % with the new cost calculation at the junctions, incorporating the
 % directionality of the 
 
-isToyProb = 0;
+isToyProb = 1;
 useGurobi = 1;
 
 
@@ -17,9 +17,11 @@ if(isToyProb)
     % votes for each orientation for each edge
     load('orientedScoreSpace3D.mat') % loads the orientation filter scores
 else
-    imFilePath = 'stem_256x_t02_V.png';
+    % imFilePath = 'stem_256x_t02_V.png';
+    imFilePath = '/home/thanuja/Dropbox/data/mitoData/emJ_00_350x_V.png';
     % votes for each orientation for each edge
-    load('orientedScoreSpace3D_stem256x.mat') % loads the orientation filter scores
+    % load('orientedScoreSpace3D_stem256x.mat') % loads the orientation filter scores
+    load('orientedScoreSpace3D_emJ350x.mat')
 end
 
 angleStep = 10; % 10 degrees discretization step of orientations

@@ -10,12 +10,19 @@ nodeTypeStats = zeros(numJtypes,2);
 totJunctionVar = zeros(numJtypes,1); % stores the number of coefficients for each type of J
 for i=1:numJtypes
     nodeAngleCost_i = nodeAngleCosts{i};
-    [numJ_i,numCombinations] = size(nodeAngleCost_i);
-    numCombinations = numCombinations + 1;  % 1 for the inactive junction
-    nodeTypeStats(i,1) = numJ_i;
-    nodeTypeStats(i,2) = numCombinations; 
-    totJunctionVar(i) = nodeTypeStats(i,1).*nodeTypeStats(i,2);
-    clear nodeAngleCost_i
+    if(nodeAngleCost_i == 0)
+        % ignore - no such junctions of this type
+        nodeTypeStats(i,1) = 0;
+        nodeTypeStats(i,2) = 0; 
+        totJunctionVar(i) = 0;
+    else
+        [numJ_i,numCombinations] = size(nodeAngleCost_i);
+        numCombinations = numCombinations + 1;  % 1 for the inactive junction
+        nodeTypeStats(i,1) = numJ_i;
+        nodeTypeStats(i,2) = numCombinations; 
+        totJunctionVar(i) = nodeTypeStats(i,1).*nodeTypeStats(i,2);
+        clear nodeAngleCost_i
+    end
 end
 
 
@@ -37,16 +44,18 @@ f_stop_ind = numEdges*2;
 for i=1:numJtypes
     % for each junction type
     nodeAngleCost_i = nodeAngleCosts{i};
-    maxJcost = max(nodeAngleCost_i,[],2);          % inactivation cost
-    minJcost = max(nodeAngleCost_i,[],2);
-    avgJcost = (minJcost + maxJcost)/2;
-%     nodeAngleCost_i = [maxJcost nodeAngleCost_i];
-    nodeAngleCost_i = [avgJcost nodeAngleCost_i];
-    numCoeff_i = totJunctionVar(i);
-    f_start_ind = f_stop_ind + 1;
-    f_stop_ind = f_start_ind + numCoeff_i - 1;
-    % assign coefficients to vector f
-    angleCostMat_i = nodeAngleCost_i';
-    f(f_start_ind:f_stop_ind) = angleCostMat_i(1:numCoeff_i);
+    if(nodeAngleCost_i~=0)
+        maxJcost = max(nodeAngleCost_i,[],2);          % inactivation cost
+        minJcost = max(nodeAngleCost_i,[],2);
+        avgJcost = (minJcost + maxJcost)/2;
+    %     nodeAngleCost_i = [maxJcost nodeAngleCost_i];
+        nodeAngleCost_i = [avgJcost nodeAngleCost_i];
+        numCoeff_i = totJunctionVar(i);
+        f_start_ind = f_stop_ind + 1;
+        f_stop_ind = f_start_ind + numCoeff_i - 1;
+        % assign coefficients to vector f
+        angleCostMat_i = nodeAngleCost_i';
+        f(f_start_ind:f_stop_ind) = angleCostMat_i(1:numCoeff_i);
+    end
 end
 

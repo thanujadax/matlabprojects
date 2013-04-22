@@ -3,7 +3,7 @@
 %% parameters
 displayIntermediateFigures=0;
 %imagePath = '/home/thanuja/matlabprojects/data/mitoData/stem1_48.png';
-imagePath = '/home/thanuja/matlabprojects/data/mitoData/stem1_256by256.png';
+% imagePath = '/home/thanuja/matlabprojects/data/mitoData/stem1_256by256.png';
 %imagePath = '/home/thanuja/Dropbox/data/em_2013january/samples/raw00_256.png';
 % imagePath = '/home/thanuja/Dropbox/data/mitoData/stem1_512.png';
 %imagePath = '/home/thanuja/Dropbox/data/mitoData/stem1_128.png';
@@ -16,6 +16,7 @@ imagePath = '/home/thanuja/matlabprojects/data/mitoData/stem1_256by256.png';
 %imagePath = 'testCirc.png';
 % imagePath = '/home/thanuja/Dropbox/data/testImg/testMembrane4.png';
 % imagePath = '/home/thanuja/Dropbox/data/mitoData/gettheorientations.png';
+imagePath = '/home/thanuja/Dropbox/data/mitoData/emJ_00_350x.png';
 
 medianFilterH = 0;  % H is median filtered to remove salt and pepper noise in a 3x3 neighborhood 
 
