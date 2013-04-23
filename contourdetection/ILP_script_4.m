@@ -14,16 +14,16 @@ medianFilterH = 0;
 % max vote response image of the orientation filters
 if(isToyProb)
 %     imFilePath = 'testMem4_V.png';
-    imFilePath = 'circle1_V.png';
+    % imFilePath = 'circle1_V.png';
     % votes for each orientation for each edge
 %     load('orientedScoreSpace3D.mat') % loads the orientation filter scores
     load('orientedScoreSpace3D_circle1.mat') % loads the orientation filter scores
 else
     % imFilePath = 'stem_256x_t02_V.png';
-    imFilePath = '/home/thanuja/Dropbox/data/mitoData/emJ_00_350x_V.png';
+    % imFilePath = '/home/thanuja/Dropbox/data/mitoData/emJ_00_350x_V.png';
     % votes for each orientation for each edge
-    % load('orientedScoreSpace3D_stem256x.mat') % loads the orientation filter scores
-    load('orientedScoreSpace3D_emJ350x.mat')
+    load('orientedScoreSpace3D_stem256x.mat') % loads the orientation filter scores
+    % load('orientedScoreSpace3D_emJ350x.mat')
 end
 
 angleStep = 10; % 10 degrees discretization step of orientations
@@ -39,10 +39,15 @@ maxCost_direction = 1000;  % C for the directional cost function
 cPos = 1000000;
 cNeg = 10;
 
+% generate hsv outputs using the orientation information
+% output(:,:,1) contains the hue (orinetation) information
+[output rgbimg] = reconstructHSVgauss_mv(orientedScoreSpace3D,orientations,...
+            barLength,barWidth,threshFrac,medianFilterH);
 
-imIn = imread(imFilePath);
+% imIn = imread(imFilePath);
 % watershed segmentation
-ws = watershed(imIn);
+% ws = watershed(imIn);
+ws = watershed(output(:,:,3));
 [sizeR,sizeC] = size(ws);
 %% generate graph from the watershed edges
 disp('creating graph from watershed boundaries...');
@@ -209,8 +214,8 @@ for i=1:numJtypes
 end
 figure;imagesc(ilpSegmentation);title('ILP contours');
 % reconstruct the edges with the values from the orientation filters (HSV)
-[output rgbimg] = reconstructHSVgauss_mv(orientedScoreSpace3D,orientations,...
-            barLength,barWidth,threshFrac,medianFilterH);
+% [output rgbimg] = reconstructHSVgauss_mv(orientedScoreSpace3D,orientations,...
+%             barLength,barWidth,threshFrac,medianFilterH);
 % get the active pixels
 output(:,:,3) = ilpSegmentation;
 % create HSV image
