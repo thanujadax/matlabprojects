@@ -120,7 +120,9 @@ f = getILPcoefficientVector2(scaledEdgePriors,nodeAngleCosts);
 % [Aeq,beq] = getEqConstraints2(numEdges,jEdges,edges2pixels);
 [Aeq,beq,numEq,numLt] = getConstraints(numEdges,jEdges,edges2pixels,nodeAngleCosts);
 senseArray(1:numEq) = '=';
-senseArray((numEq+1):(numEq+numLt)) = '<';
+if(numLt>0)
+    senseArray((numEq+1):(numEq+numLt)) = '<';
+end
 %% solver
 if(useGurobi)
     disp('using Gurobi ILP solver...');

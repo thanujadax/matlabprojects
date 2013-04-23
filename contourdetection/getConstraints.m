@@ -12,6 +12,8 @@ function [A,b,numRows_Aeq,numRows_AInEq] = getConstraints(numEdges,jEdges,...
 %   multiplication of the outwardness score should be negative i.e. one
 %   edge should be inwards and the other should be outwards
 
+withDirectionalConstraint = 0; % 1 to enable directionality constraint
+
 [~, numJtypes] = size(jEdges);
 % type 1 is J2 - junction with just 2 edges
 nodeTypeStats = zeros(numJtypes,2);
@@ -44,13 +46,19 @@ end
 numCols_Aeq = 2*numEdges + sum(totJunctionVar); 
 % num rows of Aeq = numEdges + 2*numJ
 numRows_Aeq = numEdges + sum(nodeTypeStats(:,1))*2 + sum(totActiveJunctionConfs);
-% num rows of inequality constraints = number of junctions
-numRows_AInEq = sum(nodeTypeStats(:,1));
-totRows_A = numRows_Aeq + numRows_AInEq;
+if(withDirectionalConstraint)
+    % num rows of inequality constraints = number of junctions
+    numRows_AInEq = sum(nodeTypeStats(:,1));
+    % totRows_A = numRows_Aeq + numRows_AInEq;
+else
+    numRows_AInEq = 0;
+    totRows_A = numRows_Aeq + numRows_AInEq;
+end
 
 A = zeros(totRows_A,numCols_Aeq);
+%% b
 b = zeros(totRows_A,1);
-b(1:(numEdges + sum(nodeTypeStats(:,1)))) = 1;
+b(1:(numEdges + sum(nodeTypeStats(:,1)))) = 1; % node and edge activation
 b((numEdges + sum(nodeTypeStats(:,1))*2 + 1):(numRows_Aeq)) = 1; % edge and nodeActiveStateCoherence
 b((numRows_Aeq+1):(numRows_Aeq+numRows_AInEq)) = 0.01; % less than zero 
 %% activation/inactivation constraints for each edge
@@ -189,58 +197,27 @@ for jType=1:numJtypes
     end
 end
 %% Inequality constraint - enforcing inEdge+outEdge at active junctions
-jColIdStop = numEdges*2; % next, start with the first inactive node state
-% rowStop = numEdges + numNodesTot*2;
-for jType=1:numJtypes
-    % for each junction type, get the indices of the junction variables
-    % set inactiveState variable to -1
-    % for each active configuration of the node, get the corresponding
-    % directional score
-    dirScore_j = jDirectionalScores{jType};
-    numNodes_j = nodeTypeStats(jType,1); % number of nodes of this type
-    if(numNodes_j~=0)
-        for i=1:numNodes_j
-            numEdgesPNode = jType + 1;
-            numActiveConfigs = nchoosek(numEdgesPNode,2);
-            rowStop = rowStop + 1;
-            jColIdStart = jColIdStop + 1;
-            A(rowStop,jColIdStart) = -1; % coefficient for node inactive state
-            jColIdStop = jColIdStart + numActiveConfigs;
-            jColIdStart = jColIdStart + 1;            
-            A(rowStop,jColIdStart:jColIdStop) = dirScore_j(i,:);
+if(withDirectionalConstraint)
+    jColIdStop = numEdges*2; % next, start with the first inactive node state
+    % rowStop = numEdges + numNodesTot*2;
+    for jType=1:numJtypes
+        % for each junction type, get the indices of the junction variables
+        % set inactiveState variable to -1
+        % for each active configuration of the node, get the corresponding
+        % directional score
+        dirScore_j = jDirectionalScores{jType};
+        numNodes_j = nodeTypeStats(jType,1); % number of nodes of this type
+        if(numNodes_j~=0)
+            for i=1:numNodes_j
+                numEdgesPNode = jType + 1;
+                numActiveConfigs = nchoosek(numEdgesPNode,2);
+                rowStop = rowStop + 1;
+                jColIdStart = jColIdStop + 1;
+                A(rowStop,jColIdStart) = -1; % coefficient for node inactive state
+                jColIdStop = jColIdStart + numActiveConfigs;
+                jColIdStart = jColIdStart + 1;            
+                A(rowStop,jColIdStart:jColIdStop) = dirScore_j(i,:);
+            end
         end
     end
 end
-
-
-
-%% for all nodes, get the active edge state variable indices
-% j3ActiveEdgeColInds = j3Edges .*2;
-% j4ActiveEdgeColInds = j4Edges .*2;
-% 
-% % J3
-% jColId = numEdges*2;
-% k = 1;
-% for i=(numEdges+numJ3+numJ4+1):(numEdges+numJ3*2+numJ4)
-%    Aeq(i,j3ActiveEdgeColInds(k,:)) = 1;          % marks active edges for junction i
-%    k = k+1;
-%    jIds = (jColId+2):(jColId+4);        % activate the 3 active states coeff for J3
-%    Aeq(i,jIds) = -2;                      % refer closedness constraint formulation
-%    
-%    % finally
-%    jColId = jColId + 4;
-% end
-% 
-% % J4
-% jColId = numEdges*2 + numJ3*4;
-% k = 1;
-% for i=(numEdges+numJ3*2+numJ4+1):(numEdges+numJ3*2+numJ4*2)
-%    Aeq(i,j4ActiveEdgeColInds(k,:)) = 1;          % marks active edges for junction i
-%    k = k+1;
-%    jIds = (jColId+2):(jColId+7);        % activate the 6 active states coeff for J4
-%    Aeq(i,jIds) = -2;                      % refer closedness constraint formulation
-%    
-%    % finally
-%    jColId = jColId + 7;
-% end
-
