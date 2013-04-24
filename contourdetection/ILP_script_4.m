@@ -33,11 +33,13 @@ cEdge = 0.5;
 cNode = 100;          % scaling factor for the node cost coming from gaussian normal distr.
 sig = 50;          % standard deviation(degrees) for the node cost function's gaussian distr.
 midPoint = 180;     % angle difference of an edge pair (in degrees) for maximum cost 
+lenThresh = 10;     % max length of edges to be checked for misorientations
 % param for exp cost function
 decayRate = 0.02;
 maxCost_direction = 1000;  % C for the directional cost function
 cPos = 1000000;
 cNeg = 10;
+
 
 % generate hsv outputs using the orientation information
 % output(:,:,1) contains the hue (orinetation) information
@@ -102,7 +104,9 @@ for i=1:numJtypes
                                 edgePriors_i,cPos,cNeg);
     end
 end
-
+%% Removing misoriented edges
+offEdgeListIDs = getUnOrientedEdgeIDs(edges2pixels,orientedScoreSpace3D,...
+                lenThresh,output(:,:,1));
 
 %% ILP
 % cost function to minimize
