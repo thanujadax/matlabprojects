@@ -1,4 +1,4 @@
-function offEdgeListIDs = getUnOrientedEdgeIDs(edges2pixels,orientedScoreSpace3D,...
+function offEdgeListIDs = getUnOrientedEdgeIDs(edgepixels,orientedScoreSpace3D,...
                 lenThresh,orientationScoresMax)
 % returns the IDs of edges that have sharp changes of orientation (~180)
 % along its pixels
@@ -12,14 +12,14 @@ function offEdgeListIDs = getUnOrientedEdgeIDs(edges2pixels,orientedScoreSpace3D
 % if it has a diff around 180 degrees, discard that edge
 
 %% parameters
-upThresh = 200;
-downThresh = 160;
+upThresh = 260;
+downThresh = 100;
 %%
 offEdgeListIDs = 0;
-[numEdges,maxPixelsPerEdge] = size(edges2pixels);
+[numEdges,maxPixelsPerEdge] = size(edgepixels);
 edgeLengths = zeros(numEdges,1);
 for i = 1:numEdges
-    edgeLengths(i) = sum((edges2pixels(i,:))>0) - 1;
+    edgeLengths(i) = sum((edgepixels(i,:))>0);
 end
 
 edgeListIndToExamine = find(edgeLengths<lenThresh);
@@ -27,13 +27,13 @@ k = 0;
 for i = 1:numel(edgeListIndToExamine)
     clear edgePixels_i;
     edgeListID = edgeListIndToExamine(i); % row number for the edge in edges2pixels
-    edgePixels_i = edges2pixels(edgeListID,2:maxPixelsPerEdge); % set of pixels for 
+    edgePixels_i = edgepixels(edgeListID,:); % set of pixels for 
                 % this edge, padded with zero entries
     edgePixels_i = edgePixels_i(edgePixels_i>0); % remove the zero padding
     pixelOrientations = orientationScoresMax(edgePixels_i).*360; % orientation values for the pixels
     % check if the edge contains a unacceptable set of orientations
     % if yes, add it to the list of offEdgeIDs    
-    pxOri_diff = diff(pixelOrientations);
+    pxOri_diff = abs(diff(pixelOrientations));
     clear misOrientations;
     misOrientations = intersect(pxOri_diff(pxOri_diff>downThresh),pxOri_diff(pxOri_diff<upThresh));
     % misOrientations should contain an element if this edge is

@@ -2,7 +2,7 @@ function nodeAngleCost = getNodeAngleCost_directional(theta,alpha,edgePriors_j,.
                         cPos,cNeg)
 % calculate the cost for each active configuration of a node given the edge
 % angles according to the OFR (theta) and the edge position of the graph
-% relative the current node (anlpha)
+% relative the current node (alpha)
 
 % the number of columns of each theta and alpha corresponds to the number
 % of edges connected to a node. this gives rise to a combination of the
@@ -40,14 +40,14 @@ elseif(~isempty(theta))
         ind_neg = (nodeAngleCost<0);
         if(~isempty(ind_neg))
             negCosts = nodeAngleCost(ind_neg);
-            negCosts = negCosts .* cNeg;
+            negCosts = negCosts .* cNeg;    % further scaling the negative values (only)
             nodeAngleCost(ind_neg) = negCosts;
         end
 
         ind_pos = (nodeAngleCost>0);
         if(~isempty(ind_pos))
             posCosts = nodeAngleCost(ind_pos);
-            posCosts = posCosts .* cPos;
+            posCosts = posCosts .* cPos;    % further scaling of the positive values (only)
             nodeAngleCost(ind_pos) = posCosts;
         end
     else

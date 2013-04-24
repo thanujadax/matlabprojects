@@ -2,7 +2,7 @@
 % with the new cost calculation at the junctions, incorporating the
 % directionality of the 
 
-isToyProb = 1;
+isToyProb = 0;
 useGurobi = 1;
 
 
@@ -19,7 +19,7 @@ if(isToyProb)
 %     load('orientedScoreSpace3D.mat') % loads the orientation filter scores
     load('orientedScoreSpace3D_circle1.mat') % loads the orientation filter scores
 else
-    % imFilePath = 'stem_256x_t02_V.png';
+    imFilePath = 'stem_256x_t02_V.png';
     % imFilePath = '/home/thanuja/Dropbox/data/mitoData/emJ_00_350x_V.png';
     % votes for each orientation for each edge
     load('orientedScoreSpace3D_stem256x.mat') % loads the orientation filter scores
@@ -33,7 +33,7 @@ cEdge = 0.5;
 cNode = 100;          % scaling factor for the node cost coming from gaussian normal distr.
 sig = 50;          % standard deviation(degrees) for the node cost function's gaussian distr.
 midPoint = 180;     % angle difference of an edge pair (in degrees) for maximum cost 
-lenThresh = 10;     % max length of edges to be checked for misorientations
+lenThresh = 47;     % max length of edges to be checked for misorientations
 % param for exp cost function
 decayRate = 0.02;
 maxCost_direction = 1000;  % C for the directional cost function
@@ -46,14 +46,14 @@ cNeg = 10;
 [output rgbimg] = reconstructHSVgauss_mv(orientedScoreSpace3D,orientations,...
             barLength,barWidth,threshFrac,medianFilterH);
 
-% imIn = imread(imFilePath);
+imIn = imread(imFilePath);
 % watershed segmentation
-% ws = watershed(imIn);
-ws = watershed(output(:,:,3));
+ws = watershed(imIn);
+% ws = watershed(output(:,:,3));
 [sizeR,sizeC] = size(ws);
 %% generate graph from the watershed edges
 disp('creating graph from watershed boundaries...');
-[adjacencyMat,nodeEdges,edges2nodes,edges2pixels,connectedJunctionIDs] = getGraphFromWS(ws);
+[adjacencyMat,nodeEdges,edges2nodes,edges2pixels,connectedJunctionIDs] = getGraphFromWS(ws,output);
 nodeInds = nodeEdges(:,1);                  % indices of the junction nodes
 edgeListInds = edges2pixels(:,1);
 junctionTypeListInds = getJunctionTypeListInds(nodeEdges);
@@ -105,8 +105,11 @@ for i=1:numJtypes
     end
 end
 %% Removing misoriented edges
-offEdgeListIDs = getUnOrientedEdgeIDs(edges2pixels,orientedScoreSpace3D,...
+offEdgeListIDs = getUnOrientedEdgeIDs(edgepixels,orientedScoreSpace3D,...
                 lenThresh,output(:,:,1));
+% visualize off edges
+imgOffEdges = visualizeOffEdges(offEdgeListIDs,edgepixels,nodeInds,sizeR,sizeC);
+figure;imshow(imgOffEdges); title('visualization of edges turned off')
 
 %% ILP
 % cost function to minimize

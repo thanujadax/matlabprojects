@@ -1,4 +1,4 @@
-function [adjacencyMat,nodeEdges,edges2nodes,edges2pixels,connectedJunctionIDs] = getGraphFromWS(ws)
+function [adjacencyMat,nodeEdges,edges2nodes,edges2pixels,connectedJunctionIDs] = getGraphFromWS(ws,hsvOutput)
 % % extracting edges and junctions from WS
 % % imIn = imread('stem_256x_t02_V.png');
 % imIn = imread('testMem4_V.png');
@@ -16,7 +16,7 @@ ind0 = find(ws==0);
 % [r0,c0] = ind2sub([sizeR sizeC],ind0);
 wsBoundaries = zeros(sizeR,sizeC);
 wsBoundaries(ind0) = 1;
-figure;imagesc(wsBoundaries);
+figure;imshow(wsBoundaries);
 title('watershed boundaries')
 
 %% extracting junctions
@@ -52,8 +52,16 @@ wsJ(ind4J) = 1;
 wsVis = zeros(sizeR,sizeC,3);
 wsVis(:,:,3) = wsBoundaries;
 wsVis(:,:,1) = wsJ;
-figure;imagesc(wsVis);
+figure;imshow(wsVis);
 title('Junctions from WS')
+% ws edges with OFR color code
+edgepix = zeros(sizeR,sizeC);
+edgepix(wsBoundaries>0) = 1;
+edgepix(wsJ>0) = 1;
+hsvOutput(:,:,3) = edgepix;
+hsvImg = cat(3,hsvOutput(:,:,1),hsvOutput(:,:,2),hsvOutput(:,:,3));
+RGBimg = hsv2rgb(hsvImg);
+figure;imshow(RGBimg);
 
 %% extracting edges connecting junctions
 % assign unique labels for edges
@@ -81,7 +89,7 @@ edgePixColors = edgePixLabels;
 edgePixColors(:,2) = mod(edgePixColors(:,2),100);
 wsEdges2 = wsBoundaries;
 wsEdges2(edgePixColors(:,1)) = edgePixColors(:,2);
-figure;imagesc(wsEdges2);title('edges between junctions labeled separately')
+figure;imshow(wsEdges2);title('edges between junctions labeled separately')
 %% extract edges with zero pixel length
 connectedJunctionIDs = getClusteredJunctions(wsJ);
 % connectedJunctionIDs contain the same ID for each node that is connected
