@@ -1,5 +1,5 @@
 function [A,b,numRows_Aeq,numRows_AInEq] = getConstraints(numEdges,jEdges,...
-                        edges2pixels,jDirectionalScores)
+                        edges2pixels,jDirectionalScores,offEdgeListIDs)
 % returns equality and inequality constraints
 % equality constraints:
 %   each edge should be either active or inactive
@@ -15,6 +15,7 @@ function [A,b,numRows_Aeq,numRows_AInEq] = getConstraints(numEdges,jEdges,...
 withDirectionalConstraint = 1; % 1 to enable directionality constraint
 withClosednessConstraint = 1; % 1 to enable closedness constraint (old)
 withEdgeNodeCoherenceConstraint = 1; % 1 to enable
+withOffEdgesConstraint = 1; % 1 to enable
 
 [~, numJtypes] = size(jEdges);
 % type 1 is J2 - junction with just 2 edges
@@ -51,6 +52,11 @@ if(withClosednessConstraint)
 else
     numClosednessEqns = 0;
 end
+if(withOffEdgesConstraint)
+    numOffEdgesEqns = 1;
+else
+    numOffEdgesEqns = 0;
+end
 if(withEdgeNodeCoherenceConstraint)
     numCoherenceEqns = sum(totActiveJunctionConfs); % num of active jn configs
 else
@@ -80,7 +86,7 @@ numCols_Aeq = 2*numEdges + sum(totJunctionVar);
 %     totRows_A = numRows_Aeq + numRows_AInEq;
 % end
 
-numRows_Aeq = numEdgeActEqns + numJunctionActEquns + numClosednessEqns;
+numRows_Aeq = numEdgeActEqns + numJunctionActEquns + numClosednessEqns + numOffEdgesEqns;
 numRows_AInEq = numCoherenceEqns + numDirectionalEqns;
 totRows_A = numRows_Aeq + numRows_AInEq;
 A = zeros(totRows_A,numCols_Aeq);
@@ -94,15 +100,20 @@ if(withClosednessConstraint)
     rowEnd = rowStart - 1 + numClosednessEqns;
     b(rowStart:rowEnd) = 0;
 end
+if(withOffEdgesConstraint)
+    rowStart = rowEnd + 1;
+    rowEnd = rowStart - 1 + numOffEdgesEqns;
+    b(rowStart:rowEnd) = 0; 
+end
 if(withEdgeNodeCoherenceConstraint)
     rowStart = rowEnd + 1;
     rowEnd = rowStart - 1 + numCoherenceEqns;
-    b(rowStart:rowEnd) = 2;
+    b(rowStart:rowEnd) = 2; % less than
 end
 if(withDirectionalConstraint)
     rowStart = rowEnd + 1;
     rowEnd = rowStart - 1 + numDirectionalEqns;
-    b(rowStart:rowEnd) = 0;    
+    b(rowStart:rowEnd) = 0; % less than    
 end
 %% activation/inactivation constraints for each edge
 j = 1;
@@ -193,7 +204,15 @@ if(withClosednessConstraint)
 
     end
 end
-%% coherence between activeNodeStates and the corresponding active edges - equality constraint
+%% Equality constraint - turn off misoriented edges
+if(withOffEdgesConstraint)
+    % numOffEdges = numel(offEdgeListIDs);        % number of edges to be turned off
+    offEdges_activeStateInd = offEdgeListIDs .* 2;
+    % offEdges_inactiveStateInd = offEdges_activeStateInd - 1;
+    rowStop = rowStop + 1;
+    A(rowStop,offEdges_activeStateInd) = 1; % corresponding b should  be 0
+end
+%% inequality constraint - coherence between activeNodeStates and the corresponding active edges
 % this is required since only a particular pair of edges out of all the
 % possible edges connected to a node should be activated, if the node is active 
 % NB. closed constraint is also implicitly enforced with this.

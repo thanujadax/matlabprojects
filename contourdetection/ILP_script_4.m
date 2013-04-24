@@ -127,7 +127,8 @@ f = getILPcoefficientVector2(scaledEdgePriors,nodeAngleCosts);
 % constraints
 % equality constraints and closedness constrains in Aeq matrix
 % [Aeq,beq] = getEqConstraints2(numEdges,jEdges,edges2pixels);
-[Aeq,beq,numEq,numLt] = getConstraints(numEdges,jEdges,edges2pixels,nodeAngleCosts);
+[Aeq,beq,numEq,numLt] = getConstraints(numEdges,jEdges,edges2pixels,nodeAngleCosts,...
+                    offEdgeListIDs);
 senseArray(1:numEq) = '=';
 if(numLt>0)
     senseArray((numEq+1):(numEq+numLt)) = '<';
