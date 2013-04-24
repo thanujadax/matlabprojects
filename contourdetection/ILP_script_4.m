@@ -34,6 +34,8 @@ cNode = 100;          % scaling factor for the node cost coming from gaussian no
 sig = 50;          % standard deviation(degrees) for the node cost function's gaussian distr.
 midPoint = 180;     % angle difference of an edge pair (in degrees) for maximum cost 
 lenThresh = 47;     % max length of edges to be checked for misorientations
+lenThreshBB = 7;    % min length of edges to be considered for being in the backbone (BB)
+priorThreshFracBB = 0.3; % threshold of edgePrior for an edge to be considered BB
 % param for exp cost function
 decayRate = 0.02;
 maxCost_direction = 1000;  % C for the directional cost function
@@ -105,12 +107,17 @@ for i=1:numJtypes
     end
 end
 %% Removing misoriented edges
-offEdgeListIDs = getUnOrientedEdgeIDs(edgepixels,orientedScoreSpace3D,...
+offEdgeListIDs = getUnOrientedEdgeIDs(edgepixels,...
                 lenThresh,output(:,:,1));
 % visualize off edges
 imgOffEdges = visualizeOffEdges(offEdgeListIDs,edgepixels,nodeInds,sizeR,sizeC);
 figure;imshow(imgOffEdges); title('visualization of edges turned off')
-
+%% Activate backbone
+onEdgeListIDs = getBackboneEdgeIDs(edgepixels,edgePriors,...
+                lenThreshBB,priorThreshFracBB);
+% visualize BB edges
+imgBBEdges = visualizeOffEdges(onEdgeListIDs,edgepixels,nodeInds,sizeR,sizeC);
+figure;imshow(imgBBEdges); title('visualization of backbone')
 %% ILP
 % cost function to minimize
 % state vector x: {edges*2}{J3*4}{J4*7}
