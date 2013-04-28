@@ -73,8 +73,8 @@ figure;imagesc(wsBoundariesFromGraph);title('boundaries from graph')
 disp('preparing coefficients for ILP solver...')
 %% Edge priors
 % edge priors - from orientation filters
-edgePriors = getEdgePriors(orientedScoreSpace3D,edges2pixels);
-
+% edgePriors = getEdgePriors(orientedScoreSpace3D,edges2pixels);
+edgePriors = getEdgeUnaryAbs(edgepixels,output(:,:,3));
 %% Edge pairs - Junction costs
 [maxNodesPerJtype, numJtypes] = size(junctionTypeListInds);
 
