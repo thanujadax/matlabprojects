@@ -34,8 +34,8 @@ cNode = 100;          % scaling factor for the node cost coming from gaussian no
 sig = 50;          % standard deviation(degrees) for the node cost function's gaussian distr.
 midPoint = 180;     % angle difference of an edge pair (in degrees) for maximum cost 
 lenThresh = 47;     % max length of edges to be checked for misorientations
-lenThreshBB = 7;    % min length of edges to be considered for being in the backbone (BB)
-priorThreshFracBB = 0.35; % threshold of edgePrior for an edge to be considered BB
+lenThreshBB = 4;    % min length of edges to be considered for being in the backbone (BB)
+priorThreshFracBB = 0.59; % threshold of edgePrior for an edge to be considered BB
 % param for exp cost function
 decayRate = 0.02;
 maxCost_direction = 1000;  % C for the directional cost function
@@ -75,6 +75,9 @@ disp('preparing coefficients for ILP solver...')
 % edge priors - from orientation filters
 % edgePriors = getEdgePriors(orientedScoreSpace3D,edges2pixels);
 edgePriors = getEdgeUnaryAbs(edgepixels,output(:,:,3));
+% visualize edge unaries
+edgeUnaryMat = visualizeEdgeUnaries(edgepixels,edgePriors,sizeR,sizeC);
+figure;imagesc(edgeUnaryMat)
 %% Edge pairs - Junction costs
 [maxNodesPerJtype, numJtypes] = size(junctionTypeListInds);
 
@@ -107,6 +110,8 @@ for i=1:numJtypes
     end
 end
 %% Removing misoriented edges
+% uses the compatibility of the orientation of the adjoining pixels of each
+% edge
 offEdgeListIDs = getUnOrientedEdgeIDs(edgepixels,...
                 lenThresh,output(:,:,1));
 % visualize off edges
@@ -138,7 +143,7 @@ f = getILPcoefficientVector2(scaledEdgePriors,nodeAngleCosts);
 % equality constraints and closedness constrains in Aeq matrix
 % [Aeq,beq] = getEqConstraints2(numEdges,jEdges,edges2pixels);
 [Aeq,beq,numEq,numLt] = getConstraints(numEdges,jEdges,edges2pixels,nodeAngleCosts,...
-                    offEdgeListIDs);
+                    offEdgeListIDs,onEdgeListIDs);
 senseArray(1:numEq) = '=';
 if(numLt>0)
     senseArray((numEq+1):(numEq+numLt)) = '<';

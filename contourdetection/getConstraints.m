@@ -16,6 +16,7 @@ withDirectionalConstraint = 1; % 1 to enable directionality constraint
 withClosednessConstraint = 1; % 1 to enable closedness constraint (old)
 withEdgeNodeCoherenceConstraint = 1; % 1 to enable
 withOffEdgesConstraint = 1; % 1 to enable
+withOnEdgesConstraint = 1; % 1 to enable
 
 [~, numJtypes] = size(jEdges);
 % type 1 is J2 - junction with just 2 edges
@@ -53,9 +54,26 @@ else
     numClosednessEqns = 0;
 end
 if(withOffEdgesConstraint)
-    numOffEdgesEqns = 1;
+    numOffEdgegs = numel(offEdgeListIDs);
+    if(numOffEdgegs>0)
+        numOffEdgesEqns = 1;
+    else
+        numOffEdgesEqns = 0;
+        withOffEdgesConstraint = 0;
+    end
 else
     numOffEdgesEqns = 0;
+end
+if(withOnEdgesConstraint)
+    numOnEdgegs = numel(onEdgeListIDs);
+    if(numOnEdgegs>0)
+        numOnEdgesEqns = 1;
+    else
+        numOnEdgesEqns = 0;
+        withOnEdgesConstraint = 0;
+    end
+else
+    numOnEdgesEqns = 0;
 end
 if(withEdgeNodeCoherenceConstraint)
     numCoherenceEqns = sum(totActiveJunctionConfs); % num of active jn configs
@@ -86,7 +104,8 @@ numCols_Aeq = 2*numEdges + sum(totJunctionVar);
 %     totRows_A = numRows_Aeq + numRows_AInEq;
 % end
 
-numRows_Aeq = numEdgeActEqns + numJunctionActEquns + numClosednessEqns + numOffEdgesEqns;
+numRows_Aeq = numEdgeActEqns + numJunctionActEquns + numClosednessEqns +...
+                numOffEdgesEqns + numOnEdgesEqns;
 numRows_AInEq = numCoherenceEqns + numDirectionalEqns;
 totRows_A = numRows_Aeq + numRows_AInEq;
 A = zeros(totRows_A,numCols_Aeq);
@@ -103,6 +122,11 @@ end
 if(withOffEdgesConstraint)
     rowStart = rowEnd + 1;
     rowEnd = rowStart - 1 + numOffEdgesEqns;
+    b(rowStart:rowEnd) = 0; 
+end
+if(withOnEdgesConstraint)
+    rowStart = rowEnd + 1;
+    rowEnd = rowStart - 1 + numOnEdgesEqns;
     b(rowStart:rowEnd) = 0; 
 end
 if(withEdgeNodeCoherenceConstraint)
@@ -211,6 +235,12 @@ if(withOffEdgesConstraint)
     % offEdges_inactiveStateInd = offEdges_activeStateInd - 1;
     rowStop = rowStop + 1;
     A(rowStop,offEdges_activeStateInd) = 1; % corresponding b should  be 0
+end
+%% Equality constraint - turn on edges with strong unary OFR
+if(withOnEdgesConstraint)
+    onEdges_inActiveStateInd = onEdgeListIDs .* 2 - 1;
+    rowStop = rowStop + 1;
+    A(rowStop,onEdges_inActiveStateInd) = 1; % corresponding b should  be 0
 end
 %% inequality constraint - coherence between activeNodeStates and the corresponding active edges
 % this is required since only a particular pair of edges out of all the
