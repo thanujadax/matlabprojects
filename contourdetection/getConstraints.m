@@ -1,5 +1,5 @@
 function [A,b,numRows_Aeq,numRows_AInEq] = getConstraints(numEdges,jEdges,...
-                        edges2pixels,jDirectionalScores,offEdgeListIDs)
+                        edges2pixels,jDirectionalScores,offEdgeListIDs,onEdgeListIDs)
 % returns equality and inequality constraints
 % equality constraints:
 %   each edge should be either active or inactive

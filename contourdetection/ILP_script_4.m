@@ -35,7 +35,7 @@ sig = 50;          % standard deviation(degrees) for the node cost function's ga
 midPoint = 180;     % angle difference of an edge pair (in degrees) for maximum cost 
 lenThresh = 47;     % max length of edges to be checked for misorientations
 lenThreshBB = 4;    % min length of edges to be considered for being in the backbone (BB)
-priorThreshFracBB = 0.59; % threshold of edgePrior for an edge to be considered BB
+priorThreshFracBB = 0.6; % threshold of edgePrior for an edge to be considered BB
 % param for exp cost function
 decayRate = 0.02;
 maxCost_direction = 1000;  % C for the directional cost function
@@ -161,6 +161,7 @@ if(useGurobi)
     
     params.LogFile = 'gurobi.log';
     params.Presolve = 0;
+    params.ResultFile = 'modelfile.mps';
     
     resultGurobi = gurobi(model,params);
     x = resultGurobi.x;
