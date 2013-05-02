@@ -233,7 +233,7 @@ for i=1:numJtypes
         end
     end
 end
-figure;imagesc(ilpSegmentation);title('ILP contours');
+% figure;imagesc(ilpSegmentation);title('ILP contours');
 % reconstruct the edges with the values from the orientation filters (HSV)
 % [output rgbimg] = reconstructHSVgauss_mv(orientedScoreSpace3D,orientations,...
 %             barLength,barWidth,threshFrac,medianFilterH);

@@ -50,10 +50,13 @@ numEdgeActEqns = numEdges;
 numJunctionActEquns = sum(nodeTypeStats(:,1));  % number of junctions
 if(withClosednessConstraint)
     numClosednessEqns = sum(nodeTypeStats(:,1));    % num of junctions
+    disp('Closedness constraint - on')
 else
     numClosednessEqns = 0;
+    disp('Closedness constraint - off')
 end
 if(withOffEdgesConstraint)
+    disp('offEdgesConstraint - on')
     numOffEdgegs = numel(offEdgeListIDs);
     if(numOffEdgegs>0)
         numOffEdgesEqns = 1;
@@ -62,9 +65,11 @@ if(withOffEdgesConstraint)
         withOffEdgesConstraint = 0;
     end
 else
+    disp('offEdgesConstraint - off')
     numOffEdgesEqns = 0;
 end
 if(withOnEdgesConstraint)
+    disp('onEdgesConstraint - on')
     numOnEdgegs = numel(onEdgeListIDs);
     if(numOnEdgegs>0)
         numOnEdgesEqns = 1;
@@ -73,16 +78,21 @@ if(withOnEdgesConstraint)
         withOnEdgesConstraint = 0;
     end
 else
+    disp('onEdgesConstraint - off')
     numOnEdgesEqns = 0;
 end
 if(withEdgeNodeCoherenceConstraint)
+    disp('edge node coherence constraint - on')
     numCoherenceEqns = sum(totActiveJunctionConfs); % num of active jn configs
 else
+    disp('edge node coherence constraint - off')
     numCoherenceEqns = 0;
 end
 if(withDirectionalConstraint)
+    disp('directional constraint constraint - on')
     numDirectionalEqns = sum(nodeTypeStats(:,1));    % num of junctions
 else
+    disp('directional constraint constraint - off')
     numDirectionalEqns = 0;
 end
 
@@ -132,7 +142,7 @@ end
 if(withEdgeNodeCoherenceConstraint)
     rowStart = rowEnd + 1;
     rowEnd = rowStart - 1 + numCoherenceEqns;
-    b(rowStart:rowEnd) = 2; % less than
+    b(rowStart:rowEnd) = 1.1; % less than
 end
 if(withDirectionalConstraint)
     rowStart = rowEnd + 1;
@@ -284,7 +294,6 @@ if(withEdgeNodeCoherenceConstraint)
                     edge2_activeStateInd = edgeActiveStatesInd_i(edge2id);
                     A(rowStop,edge2_activeStateInd) = 1;
                 end
-
             end
         end
     end
