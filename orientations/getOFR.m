@@ -1,6 +1,5 @@
-function [orientedScoreSpace3D,output3,RGBimg3] = getOFR(imgIn,barLength,barWidth,invertImg) 
 % orientation filter response
-
+function [output3,RGBimg3,orientedScoreSpace3D] = getOFR(imagePath,barLength,barWidth,invertImg,threshFrac)
 %% parameters
 displayIntermediateFigures=0;
 %imagePath = '/home/thanuja/matlabprojects/data/mitoData/stem1_48.png';
@@ -17,12 +16,14 @@ displayIntermediateFigures=0;
 %imagePath = 'testCirc.png';
 % imagePath = '/home/thanuja/Dropbox/data/testImg/testMembrane4.png';
 % imagePath = '/home/thanuja/Dropbox/data/mitoData/gettheorientations.png';
+% imagePath = '/home/thanuja/Dropbox/data/mitoData/emJ_00_170x.png';
+% imagePath = '/home/thanuja/Dropbox/data/testImg/circle1.png';
 
 medianFilterH = 0;  % H is median filtered to remove salt and pepper noise in a 3x3 neighborhood 
 
 % Hthresh = 0.4; % pixels above this value will be used 
  
-invertImg = 0;      % 1 for membrane images that have to be inverted for Hough transform calculation
+% invertImg = 1;      % 1 for membrane images that have to be inverted for Hough transform calculation
 
 grayThresholding = 0;       % 1 if the inverted image should be thresholded
 grayThreshold = 0.5;
@@ -35,25 +36,24 @@ slidingDist = 1;           % the number of pixels to jump
 
 % lineWidth = 1;
 
-threshFrac = 0;
+% threshFrac = 0;
 
 % for Gaussian kernel
 % barLength = 23; % should be odd
 % barWidth = 7; % should be odd
 
-% % for asymmetric bars
+% for asymmetric bars
 % barLength = 11; % should be odd
 % barWidth = 3; % 
-% negLines = 3; % number of negative lines per side
-% %orientations = 0:10:350;    
+negLines = barWidth; % number of negative lines per side
+orientations = 0:10:350;    
 % orientations = 0:45:315;
 
-% for symmetric bars
-barLength = 15; % should be odd
-barWidth = 7; % 
-negLines = 0; % number of negative lines per side
-% orientations = 0:45:135;
-orientations = 0:22.5:157.5;
+% % for symmetric bars
+% barLength = 15; % should be odd
+% barWidth = 7; % 
+% negLines = 0; % number of negative lines per side
+% orientations = 0:45:135;    
 
 
 withBackground = 0;     % plot the detected bars with the original image in the background
@@ -65,7 +65,7 @@ sigX = 40;
 sigY = 6;
 
 %% input preprocessing
-% imgIn = double(imread(imagePath))/255;
+imgIn = double(imread(imagePath))/255;
 % imgIn = imgIn(1:128,1:128);
 
 if(size(size(imgIn),2)>2)
@@ -79,6 +79,7 @@ if(displayIntermediateFigures)
     colormap('gray');
     title('original')
 end
+figure;imshow(img);title('input image')
 % invert
 if(invertImg)
     imgInv = invertImage(img);
@@ -118,14 +119,15 @@ end
 % convolution using oriented gaussian kernels
 display('Computing 3D orientation score space...');
 t0 = cputime;
+% % gauss
 % orientedScoreSpace3D = convolveOrientedGauss_P(imgInv,barLength,barWidth,...
 %             orientations,sigX,sigY);
-% symmetric bars
-orientedScoreSpace3D = convolveOrientedBars_P(imgInv,barLength,barWidth,...
-           orientations,negLines);
-% % asymmetric
-% orientedScoreSpace3D = convolveOrientedAsymBars_P(imgInv,barLength,barWidth,...
-%              orientations,negLines);
+% % symmetric bars
+% orientedScoreSpace3D = convolveOrientedBars_P(imgInv,barLength,barWidth,...
+%            orientations,negLines);
+% asymmetric
+orientedScoreSpace3D = convolveOrientedAsymBars_P(imgInv,barLength,barWidth,...
+             orientations,negLines);
 t1 = cputime;
 display('3D orientation score space computed!');
 dt = t1 - t0;
@@ -133,10 +135,10 @@ str = sprintf('Time taken for score space creation = %0.5f s',dt);
 disp(str);
 
 %% Visualization
-[output3 RGBimg3] = reconstructHSVgauss_mv(orientedScoreSpace3D,orientations,...
+[output3,RGBimg3] = reconstructHSVgauss_mv(orientedScoreSpace3D,orientations,...
             barLength,barWidth,threshFrac,medianFilterH);
 % titlestr = sprintf('threshold percentage = %f',threshFrac);
-% figure;imshow(RGBimg3);
+figure;imshow(RGBimg3);title('RGB impression of max_OFR')
 % title(titlestr)
 % % batch processing
 % savefilepath = '/home/thanuja/Dropbox/RESULTS/orientations/thresholding4/';

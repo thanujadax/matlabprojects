@@ -16,8 +16,8 @@ displayIntermediateFigures=0;
 %imagePath = 'testCirc.png';
 % imagePath = '/home/thanuja/Dropbox/data/testImg/testMembrane4.png';
 % imagePath = '/home/thanuja/Dropbox/data/mitoData/gettheorientations.png';
-% imagePath = '/home/thanuja/Dropbox/data/mitoData/emJ_00_350x.png';
-imagePath = '/home/thanuja/Dropbox/data/testImg/circle1.png';
+imagePath = '/home/thanuja/Dropbox/data/mitoData/emJ_00_170x.png';
+% imagePath = '/home/thanuja/Dropbox/data/testImg/circle1.png';
 
 medianFilterH = 0;  % H is median filtered to remove salt and pepper noise in a 3x3 neighborhood 
 
@@ -137,7 +137,7 @@ disp(str);
 [output3 RGBimg3] = reconstructHSVgauss_mv(orientedScoreSpace3D,orientations,...
             barLength,barWidth,threshFrac,medianFilterH);
 % titlestr = sprintf('threshold percentage = %f',threshFrac);
-figure;imshow(RGBimg3);
+figure;imshow(RGBimg3);title('RGB impression of max_OFR')
 % title(titlestr)
 % % batch processing
 % savefilepath = '/home/thanuja/Dropbox/RESULTS/orientations/thresholding4/';

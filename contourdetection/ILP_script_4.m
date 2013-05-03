@@ -4,20 +4,29 @@
 
 isToyProb = 0;
 useGurobi = 1;
-
+fromInputImage = 1;
+imagePath = '/home/thanuja/Dropbox/data/mitoData/emJ_00_170x.png';
 
 orientations = 0:10:350;
 barLength = 11; % should be odd
 barWidth = 3; %
-threshFrac = 0;
+threshFrac = 0.2;
 medianFilterH = 0;
+invertImg = 1;      % 1 for EM images when input image is taken from imagePath
 % max vote response image of the orientation filters
 if(isToyProb)
 %     imFilePath = 'testMem4_V.png';
-    % imFilePath = 'circle1_V.png';
+    imFilePath = 'circle1_V.png';
     % votes for each orientation for each edge
 %     load('orientedScoreSpace3D.mat') % loads the orientation filter scores
     load('orientedScoreSpace3D_circle1.mat') % loads the orientation filter scores
+elseif(fromInputImage)
+    % read inputimage and get orientedScoreSpace and max_abs value of OFR
+    disp('using image file:')
+    disp(imagePath);
+    [output,rgbimg,orientedScoreSpace3D] = getOFR(imagePath,...
+                            barLength,barWidth,invertImg,threshFrac);
+    imIn = output(:,:,3);
 else
 %     imFilePath = 'stem_256x_t02_V.png';
     imFilePath = '/home/thanuja/Dropbox/data/mitoData/emJ_00_350x_V.png';
@@ -45,11 +54,13 @@ cNeg = 10;
 
 % generate hsv outputs using the orientation information
 % output(:,:,1) contains the hue (orinetation) information
-[output rgbimg] = reconstructHSVgauss_mv(orientedScoreSpace3D,orientations,...
+if(~fromInputImage)
+    [output rgbimg] = reconstructHSVgauss_mv(orientedScoreSpace3D,orientations,...
             barLength,barWidth,threshFrac,medianFilterH);
+    imIn = imread(imFilePath);
+end
 figure;imshow(rgbimg)
 
-imIn = imread(imFilePath);
 % watershed segmentation
 ws = watershed(imIn);
 % ws = watershed(output(:,:,3));
