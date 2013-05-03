@@ -19,11 +19,11 @@ if(isToyProb)
 %     load('orientedScoreSpace3D.mat') % loads the orientation filter scores
     load('orientedScoreSpace3D_circle1.mat') % loads the orientation filter scores
 else
-    imFilePath = 'stem_256x_t02_V.png';
-    % imFilePath = '/home/thanuja/Dropbox/data/mitoData/emJ_00_350x_V.png';
+%     imFilePath = 'stem_256x_t02_V.png';
+    imFilePath = '/home/thanuja/Dropbox/data/mitoData/emJ_00_350x_V.png';
     % votes for each orientation for each edge
-    load('orientedScoreSpace3D_stem256x.mat') % loads the orientation filter scores
-    % load('orientedScoreSpace3D_emJ350x.mat')
+%     load('orientedScoreSpace3D_stem256x.mat') % loads the orientation filter scores
+    load('orientedScoreSpace3D_emJ350x.mat')
 end
 
 angleStep = 10; % 10 degrees discretization step of orientations
@@ -47,6 +47,7 @@ cNeg = 10;
 % output(:,:,1) contains the hue (orinetation) information
 [output rgbimg] = reconstructHSVgauss_mv(orientedScoreSpace3D,orientations,...
             barLength,barWidth,threshFrac,medianFilterH);
+figure;imshow(rgbimg)
 
 imIn = imread(imFilePath);
 % watershed segmentation
