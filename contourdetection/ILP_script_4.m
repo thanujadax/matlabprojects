@@ -5,7 +5,8 @@
 isToyProb = 0;
 useGurobi = 1;
 fromInputImage = 1;
-imagePath = '/home/thanuja/Dropbox/data/mitoData/emJ_00_170x.png';
+% imagePath = '/home/thanuja/Dropbox/data/mitoData/emJ_00_170x.png';
+imagePath = '/home/thanuja/Dropbox/data/testImg/testCurves1.png';
 
 orientations = 0:10:350;
 barLength = 11; % should be odd
@@ -206,7 +207,7 @@ ilpSegmentation = zeros(sizeR,sizeC);
 % edges
 onStateEdgeXind = 2:2:(numEdges*2);
 onEdgeStates = x(onStateEdgeXind);
-onEdgeInd = find(onEdgeStates==1);
+onEdgeInd = find(onEdgeStates>0);
 onEdgePixelInds = getPixSetFromEdgeIDset(onEdgeInd,edgepixels);
 ilpSegmentation(onEdgePixelInds) = 1;
 % active nodes
