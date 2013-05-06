@@ -1,5 +1,6 @@
 function [A,b,numRows_Aeq,numRows_AInEq] = getConstraints(numEdges,jEdges,...
-                        edges2pixels,jDirectionalScores,offEdgeListIDs,onEdgeListIDs)
+                        edges2pixels,jDirectionalScores,offEdgeListIDs,...
+                        onEdgeListIDs,minNumActEdges)
 % returns equality and inequality constraints
 % equality constraints:
 %   each edge should be either active or inactive
@@ -95,7 +96,13 @@ else
     disp('directional constraint constraint - off')
     numDirectionalEqns = 0;
 end
-
+if(minNumActEdges>0)
+    str1 = sprintf('minimum number of edges to be activated = %d',minNumActEdges);
+    disp(str1)
+    minNumEdgeEqn = 1;
+else
+    minNumEdgeEqn = 0;
+end
 % num cols of Aeq = 2*numEdges + sum_j(numNodes_j*numCombinations+1)
 numCols_Aeq = 2*numEdges + sum(totJunctionVar); 
 % num rows of Aeq = numEdges + 2*numJ
@@ -116,7 +123,7 @@ numCols_Aeq = 2*numEdges + sum(totJunctionVar);
 
 numRows_Aeq = numEdgeActEqns + numJunctionActEquns + numClosednessEqns +...
                 numOffEdgesEqns + numOnEdgesEqns;
-numRows_AInEq = numCoherenceEqns + numDirectionalEqns;
+numRows_AInEq = numCoherenceEqns + numDirectionalEqns + minNumEdgeEqn;
 totRows_A = numRows_Aeq + numRows_AInEq;
 A = zeros(totRows_A,numCols_Aeq);
 %% b
@@ -148,6 +155,11 @@ if(withDirectionalConstraint)
     rowStart = rowEnd + 1;
     rowEnd = rowStart - 1 + numDirectionalEqns;
     b(rowStart:rowEnd) = 0; % less than    
+end
+if(minNumActEdges>0)
+    rowStart = rowEnd + 1;
+    rowEnd = rowStart - 1 + minNumEdgeEqn;
+    b(rowStart:rowEnd) = minNumActEdges * (-1); % less than    
 end
 %% activation/inactivation constraints for each edge
 j = 1;
@@ -322,4 +334,10 @@ if(withDirectionalConstraint)
             end
         end
     end
+end
+%% Inequality constraint - setting the minimum number of edges to be activated
+if(minNumActEdges>0)
+    rowStop = rowStop + 1;
+    allActiveEdgeIDs = 2:2:(numEdges*2);
+    A(rowStop,allActiveEdgeIDs) = -1;
 end

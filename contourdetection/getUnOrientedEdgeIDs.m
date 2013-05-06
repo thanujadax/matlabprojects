@@ -12,8 +12,8 @@ function offEdgeListIDs = getUnOrientedEdgeIDs(edgepixels,...
 % if it has a diff around 180 degrees, discard that edge
 
 %% parameters
-upThresh = 260;
-downThresh = 100;
+upThresh = 260;  % orientation difference upper bound
+downThresh = 100;% orientation difference lower bound
 %%
 offEdgeListIDs = 0;
 [numEdges,maxPixelsPerEdge] = size(edgepixels);

@@ -5,13 +5,15 @@
 isToyProb = 0;
 useGurobi = 1;
 fromInputImage = 1;
-% imagePath = '/home/thanuja/Dropbox/data/mitoData/emJ_00_170x.png';
-imagePath = '/home/thanuja/Dropbox/data/testImg/testCurves1.png';
+imagePath = '/home/thanuja/Dropbox/data/mitoData/emJ_00_170x.png';
+% imagePath = '/home/thanuja/Dropbox/data/testImg/testCurves1.png';
+% imagePath = '/home/thanuja/Dropbox/data/mitoData/stem1_256by256.png';
+% hard coded back bone edge 1962
 
 orientations = 0:10:350;
 barLength = 11; % should be odd
 barWidth = 3; %
-threshFrac = 0.2;
+threshFrac = 0.25;
 medianFilterH = 0;
 invertImg = 1;      % 1 for EM images when input image is taken from imagePath
 % max vote response image of the orientation filters
@@ -39,11 +41,11 @@ end
 angleStep = 10; % 10 degrees discretization step of orientations
 
 % param
-cEdge = 0.5;
+cEdge = 0.5;        % scaling factor for edge priors
 cNode = 100;          % scaling factor for the node cost coming from gaussian normal distr.
 sig = 50;          % standard deviation(degrees) for the node cost function's gaussian distr.
 midPoint = 180;     % angle difference of an edge pair (in degrees) for maximum cost 
-lenThresh = 47;     % max length of edges to be checked for misorientations
+lenThresh = 25;     % max length of edges to be checked for misorientations
 lenThreshBB = 4;    % min length of edges to be considered for being in the backbone (BB)
 priorThreshFracBB = 0.6; % threshold of edgePrior for an edge to be considered BB
 % param for exp cost function
@@ -51,6 +53,7 @@ decayRate = 0.02;
 maxCost_direction = 1000;  % C for the directional cost function
 cPos = 1000000;
 cNeg = 10;
+minNumActEdges = 70;
 
 
 % generate hsv outputs using the orientation information
@@ -90,7 +93,7 @@ disp('preparing coefficients for ILP solver...')
 edgePriors = getEdgeUnaryAbs(edgepixels,output(:,:,3));
 % visualize edge unaries
 edgeUnaryMat = visualizeEdgeUnaries(edgepixels,edgePriors,sizeR,sizeC);
-figure;imagesc(edgeUnaryMat)
+figure;imagesc(edgeUnaryMat);title('abs-max-OFR')
 %% Edge pairs - Junction costs
 [maxNodesPerJtype, numJtypes] = size(junctionTypeListInds);
 
@@ -131,8 +134,9 @@ offEdgeListIDs = getUnOrientedEdgeIDs(edgepixels,...
 imgOffEdges = visualizeOffEdges(offEdgeListIDs,edgepixels,nodeInds,sizeR,sizeC);
 figure;imshow(imgOffEdges); title('visualization of edges turned off')
 %% Activate backbone
-onEdgeListIDs = getBackboneEdgeIDs(edgepixels,edgePriors,...
-                lenThreshBB,priorThreshFracBB);
+% onEdgeListIDs = getBackboneEdgeIDs(edgepixels,edgePriors,...
+%                 lenThreshBB,priorThreshFracBB);
+onEdgeListIDs = [282; 144];
 % visualize BB edges
 imgBBEdges = visualizeOffEdges(onEdgeListIDs,edgepixels,nodeInds,sizeR,sizeC);
 figure;imshow(imgBBEdges); title('visualization of backbone')
@@ -156,7 +160,7 @@ f = getILPcoefficientVector2(scaledEdgePriors,nodeAngleCosts);
 % equality constraints and closedness constrains in Aeq matrix
 % [Aeq,beq] = getEqConstraints2(numEdges,jEdges,edges2pixels);
 [Aeq,beq,numEq,numLt] = getConstraints(numEdges,jEdges,edges2pixels,nodeAngleCosts,...
-                    offEdgeListIDs,onEdgeListIDs);
+                    offEdgeListIDs,onEdgeListIDs,minNumActEdges);
 senseArray(1:numEq) = '=';
 if(numLt>0)
     senseArray((numEq+1):(numEq+numLt)) = '<';
@@ -175,7 +179,8 @@ if(useGurobi)
     params.LogFile = 'gurobi.log';
     params.Presolve = 0;
     params.ResultFile = 'modelfile.mps';
-    
+    params.InfUnbdInfo = 1;
+
     resultGurobi = gurobi(model,params);
     x = resultGurobi.x;
     
