@@ -61,7 +61,7 @@ edgepix(wsJ>0) = 1;
 hsvOutput(:,:,3) = edgepix;
 hsvImg = cat(3,hsvOutput(:,:,1),hsvOutput(:,:,2),hsvOutput(:,:,3));
 RGBimg = hsv2rgb(hsvImg);
-% figure;imshow(RGBimg);
+figure;imshow(RGBimg);
 
 %% extracting edges connecting junctions
 % assign unique labels for edges

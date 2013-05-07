@@ -1,6 +1,6 @@
 function [A,b,numRows_Aeq,numRows_AInEq] = getConstraints(numEdges,jEdges,...
                         edges2pixels,jDirectionalScores,offEdgeListIDs,...
-                        onEdgeListIDs,minNumActEdges)
+                        onEdgeListIDs,minNumActEdgesPercentage)
 % returns equality and inequality constraints
 % equality constraints:
 %   each edge should be either active or inactive
@@ -96,7 +96,8 @@ else
     disp('directional constraint constraint - off')
     numDirectionalEqns = 0;
 end
-if(minNumActEdges>0)
+if(minNumActEdgesPercentage>0)
+    minNumActEdges = ceil(minNumActEdgesPercentage * numEdges / 100);
     str1 = sprintf('minimum number of edges to be activated = %d',minNumActEdges);
     disp(str1)
     minNumEdgeEqn = 1;
@@ -156,7 +157,7 @@ if(withDirectionalConstraint)
     rowEnd = rowStart - 1 + numDirectionalEqns;
     b(rowStart:rowEnd) = 0; % less than    
 end
-if(minNumActEdges>0)
+if(minNumActEdgesPercentage>0)
     rowStart = rowEnd + 1;
     rowEnd = rowStart - 1 + minNumEdgeEqn;
     b(rowStart:rowEnd) = minNumActEdges * (-1); % less than    
@@ -336,7 +337,7 @@ if(withDirectionalConstraint)
     end
 end
 %% Inequality constraint - setting the minimum number of edges to be activated
-if(minNumActEdges>0)
+if(minNumActEdgesPercentage>0)
     rowStop = rowStop + 1;
     allActiveEdgeIDs = 2:2:(numEdges*2);
     A(rowStop,allActiveEdgeIDs) = -1;

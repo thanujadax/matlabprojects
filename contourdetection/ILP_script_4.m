@@ -5,15 +5,15 @@
 isToyProb = 0;
 useGurobi = 1;
 fromInputImage = 1;
-imagePath = '/home/thanuja/Dropbox/data/mitoData/emJ_00_170x.png';
+% imagePath = '/home/thanuja/Dropbox/data/mitoData/emJ_00_170x.png';
 % imagePath = '/home/thanuja/Dropbox/data/testImg/testCurves1.png';
-% imagePath = '/home/thanuja/Dropbox/data/mitoData/stem1_256by256.png';
+imagePath = '/home/thanuja/Dropbox/data/mitoData/stem1_256by256.png';
 % hard coded back bone edge 1962
 
 orientations = 0:10:350;
-barLength = 11; % should be odd
-barWidth = 3; %
-threshFrac = 0.25;
+barLength = 13; % should be odd
+barWidth = 4; %
+threshFrac = 0.20;
 medianFilterH = 0;
 invertImg = 1;      % 1 for EM images when input image is taken from imagePath
 % max vote response image of the orientation filters
@@ -41,7 +41,7 @@ end
 angleStep = 10; % 10 degrees discretization step of orientations
 
 % param
-cEdge = 0.5;        % scaling factor for edge priors
+cEdge = 1;        % scaling factor for edge priors
 cNode = 100;          % scaling factor for the node cost coming from gaussian normal distr.
 sig = 50;          % standard deviation(degrees) for the node cost function's gaussian distr.
 midPoint = 180;     % angle difference of an edge pair (in degrees) for maximum cost 
@@ -53,7 +53,8 @@ decayRate = 0.02;
 maxCost_direction = 1000;  % C for the directional cost function
 cPos = 1000000;
 cNeg = 10;
-minNumActEdges = 70;
+minNumActEdgesPercentage = 0;  % percentage of the tot num edges to retain (min)
+bbEdgeReward = 1000000;
 
 
 % generate hsv outputs using the orientation information
@@ -134,9 +135,10 @@ offEdgeListIDs = getUnOrientedEdgeIDs(edgepixels,...
 imgOffEdges = visualizeOffEdges(offEdgeListIDs,edgepixels,nodeInds,sizeR,sizeC);
 figure;imshow(imgOffEdges); title('visualization of edges turned off')
 %% Activate backbone
-% onEdgeListIDs = getBackboneEdgeIDs(edgepixels,edgePriors,...
-%                 lenThreshBB,priorThreshFracBB);
-onEdgeListIDs = [282; 144];
+onEdgeListIDs = getBackboneEdgeIDs(edgepixels,edgePriors,...
+                lenThreshBB,priorThreshFracBB);
+edgePriors(onEdgeListIDs) = bbEdgeReward;
+% onEdgeListIDs = [282; 144];
 % visualize BB edges
 imgBBEdges = visualizeOffEdges(onEdgeListIDs,edgepixels,nodeInds,sizeR,sizeC);
 figure;imshow(imgBBEdges); title('visualization of backbone')
@@ -160,7 +162,7 @@ f = getILPcoefficientVector2(scaledEdgePriors,nodeAngleCosts);
 % equality constraints and closedness constrains in Aeq matrix
 % [Aeq,beq] = getEqConstraints2(numEdges,jEdges,edges2pixels);
 [Aeq,beq,numEq,numLt] = getConstraints(numEdges,jEdges,edges2pixels,nodeAngleCosts,...
-                    offEdgeListIDs,onEdgeListIDs,minNumActEdges);
+                    offEdgeListIDs,onEdgeListIDs,minNumActEdgesPercentage);
 senseArray(1:numEq) = '=';
 if(numLt>0)
     senseArray((numEq+1):(numEq+numLt)) = '<';
