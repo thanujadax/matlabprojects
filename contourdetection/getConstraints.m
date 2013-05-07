@@ -13,11 +13,11 @@ function [A,b,numRows_Aeq,numRows_AInEq] = getConstraints(numEdges,jEdges,...
 %   multiplication of the outwardness score should be negative i.e. one
 %   edge should be inwards and the other should be outwards
 
-withDirectionalConstraint = 1; % 1 to enable directionality constraint
+withDirectionalConstraint = 0; % 1 to enable directionality constraint
 withClosednessConstraint = 1; % 1 to enable closedness constraint (old)
 withEdgeNodeCoherenceConstraint = 1; % 1 to enable
 withOffEdgesConstraint = 1; % 1 to enable
-withOnEdgesConstraint = 0; % 1 to enable
+withOnEdgesConstraint = 1; % 1 to enable
 
 [~, numJtypes] = size(jEdges);
 % type 1 is J2 - junction with just 2 edges

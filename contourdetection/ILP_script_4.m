@@ -138,10 +138,13 @@ figure;imshow(imgOffEdges); title('visualization of edges turned off')
 onEdgeListIDs = getBackboneEdgeIDs(edgepixels,edgePriors,...
                 lenThreshBB,priorThreshFracBB);
 edgePriors(onEdgeListIDs) = bbEdgeReward;
-% onEdgeListIDs = [282; 144];
 % visualize BB edges
 imgBBEdges = visualizeOffEdges(onEdgeListIDs,edgepixels,nodeInds,sizeR,sizeC);
-figure;imshow(imgBBEdges); title('visualization of backbone')
+figure;imshow(imgBBEdges); title('visualization of backbone 1')
+onEdgeListIDs = 2024;
+% visualize BB edges
+imgBBEdges = visualizeOffEdges(onEdgeListIDs,edgepixels,nodeInds,sizeR,sizeC);
+figure;imshow(imgBBEdges); title('visualization of backbone - constr - 2 ')
 %% ILP
 % cost function to minimize
 % state vector x: {edges*2}{J3*4}{J4*7}
