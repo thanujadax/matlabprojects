@@ -5,9 +5,9 @@
 isToyProb = 0;
 useGurobi = 1;
 fromInputImage = 1;
-% imagePath = '/home/thanuja/Dropbox/data/mitoData/emJ_00_170x.png';
+imagePath = '/home/thanuja/Dropbox/data/mitoData/emJ_00_170x.png';
 % imagePath = '/home/thanuja/Dropbox/data/testImg/testCurves1.png';
-imagePath = '/home/thanuja/Dropbox/data/mitoData/stem1_256by256.png';
+% imagePath = '/home/thanuja/Dropbox/data/mitoData/stem1_256by256.png';
 % hard coded back bone edge 1962
 
 orientations = 0:10:350;
@@ -141,10 +141,10 @@ edgePriors(onEdgeListIDs) = bbEdgeReward;
 % visualize BB edges
 imgBBEdges = visualizeOffEdges(onEdgeListIDs,edgepixels,nodeInds,sizeR,sizeC);
 figure;imshow(imgBBEdges); title('visualization of backbone 1')
-onEdgeListIDs = 2024;
-% visualize BB edges
-imgBBEdges = visualizeOffEdges(onEdgeListIDs,edgepixels,nodeInds,sizeR,sizeC);
-figure;imshow(imgBBEdges); title('visualization of backbone - constr - 2 ')
+% onEdgeListIDs = 2024;
+% % visualize BB edges
+% imgBBEdges = visualizeOffEdges(onEdgeListIDs,edgepixels,nodeInds,sizeR,sizeC);
+% figure;imshow(imgBBEdges); title('visualization of backbone - constr - 2 ')
 %% ILP
 % cost function to minimize
 % state vector x: {edges*2}{J3*4}{J4*7}

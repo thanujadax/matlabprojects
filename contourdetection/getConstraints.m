@@ -17,7 +17,7 @@ withDirectionalConstraint = 1; % 1 to enable directionality constraint
 withClosednessConstraint = 1; % 1 to enable closedness constraint (old)
 withEdgeNodeCoherenceConstraint = 1; % 1 to enable
 withOffEdgesConstraint = 1; % 1 to enable
-withOnEdgesConstraint = 1; % 1 to enable
+withOnEdgesConstraint = 0; % 1 to enable
 
 [~, numJtypes] = size(jEdges);
 % type 1 is J2 - junction with just 2 edges
