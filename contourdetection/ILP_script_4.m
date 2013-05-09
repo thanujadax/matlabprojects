@@ -54,7 +54,7 @@ maxCost_direction = 1000;  % C for the directional cost function
 cPos = 1000000;
 cNeg = 10;
 minNumActEdgesPercentage = 0;  % percentage of the tot num edges to retain (min)
-bbEdgeReward = 1000000;
+bbEdgeReward = 1000;
 
 
 % generate hsv outputs using the orientation information

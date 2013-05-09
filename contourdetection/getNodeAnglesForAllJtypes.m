@@ -35,6 +35,9 @@ for dim=1:numJtypes
         numOrientations = size(orientedScoreSpace3D,3);
         for i=1:numJ
             % for each node
+            if(i==968)
+                a = 22;
+            end
             edges_i = jEdges(i,:);
             nodeListInd = junctionTypeListInds(i,dim);% get the index of the node in concern
             nodeInd = nodeInds(nodeListInd); 
@@ -45,6 +48,10 @@ for dim=1:numJtypes
                     edgeListInd = find(edges2pixels(:,1)==edgeID);  
                     if(isempty(edgeListInd))
                         continue;
+                    end
+                    if(edgeID==1872)
+                        % check
+                        a = 88;
                     end
                     edgePixelInds0 = edgepixels(edgeListInd,:);
                     %edgePixelInds = edgePixelInds(edgePixelInds>0);
@@ -59,6 +66,7 @@ for dim=1:numJtypes
                     [r,c] = ind2sub([sizeR sizeC],nodePixels');
                     numEdgePix = numel(nodePixels);
                     orientations = zeros(numEdgePix,numOrientations);
+                    orientationIndex = zeros(1,numEdgePix);
                     for k=1:numEdgePix
                         orientations(k,1:numOrientations) = orientedScoreSpace3D(r(k),c(k),:);
                         [~,orientationIndex(k)] = max(orientations(k,:));
