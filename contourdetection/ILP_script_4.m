@@ -5,9 +5,9 @@
 isToyProb = 0;
 useGurobi = 1;
 fromInputImage = 1;
-imagePath = '/home/thanuja/Dropbox/data/mitoData/emJ_00_170x.png';
+% imagePath = '/home/thanuja/Dropbox/data/mitoData/emJ_00_170x.png';
 % imagePath = '/home/thanuja/Dropbox/data/testImg/testCurves1.png';
-% imagePath = '/home/thanuja/Dropbox/data/mitoData/stem1_256by256.png';
+imagePath = '/home/thanuja/Dropbox/data/mitoData/stem1_256by256.png';
 % hard coded back bone edge 1962
 
 orientations = 0:10:350;
