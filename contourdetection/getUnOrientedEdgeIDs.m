@@ -1,5 +1,5 @@
 function offEdgeListIDs = getUnOrientedEdgeIDs(edgepixels,...
-                lenThresh,orientationScoresMax)
+                lenThresh,orientationScoresMax,sizeR,sizeC)
 % returns the IDs of edges that have sharp changes of orientation (~180)
 % along its pixels
 
@@ -14,6 +14,9 @@ function offEdgeListIDs = getUnOrientedEdgeIDs(edgepixels,...
 %% parameters
 upThresh = 285;  % orientation difference upper bound
 downThresh = 75;% orientation difference lower bound
+alphaDiffMaxThresh = 1.5;
+upThreshLowAlpha = 315;
+downThreshLowAlpha = 45;
 %%
 offEdgeListIDs = 0;
 [numEdges,maxPixelsPerEdge] = size(edgepixels);
@@ -27,6 +30,9 @@ k = 0;
 for i = 1:numel(edgeListIndToExamine)
     clear edgePixels_i;
     edgeListID = edgeListIndToExamine(i); % row number for the edge in edges2pixels
+    if(edgeListID==789)
+        a = 89;
+    end
     edgePixels_i = edgepixels(edgeListID,:); % set of pixels for 
                 % this edge, padded with zero entries
     edgePixels_i = edgePixels_i(edgePixels_i>0); % remove the zero padding
@@ -34,8 +40,17 @@ for i = 1:numel(edgeListIndToExamine)
     % check if the edge contains a unacceptable set of orientations
     % if yes, add it to the list of offEdgeIDs    
     pxOri_diff = abs(diff(pixelOrientations));
+    % calculate the orientation differences on the actual graph edge
+    [pixr,pixc] = ind2sub([sizeR,sizeC],edgePixels_i);
+    orientations_alpha = atan2d(pixr,pixc);
+    pxOri_alpha_diff = abs(diff(orientations_alpha));
+    maxAlphaDiff = max(pxOri_alpha_diff);
     clear misOrientations;
-    misOrientations = intersect(pxOri_diff(pxOri_diff>downThresh),pxOri_diff(pxOri_diff<upThresh));
+    if(maxAlphaDiff<alphaDiffMaxThresh)
+        misOrientations = intersect(pxOri_diff(pxOri_diff>downThreshLowAlpha),pxOri_diff(pxOri_diff<upThreshLowAlpha));
+    else
+        misOrientations = intersect(pxOri_diff(pxOri_diff>downThresh),pxOri_diff(pxOri_diff<upThresh));
+    end
     % misOrientations should contain an element if this edge is
     % misoriented.
     misOriented = numel(misOrientations);

@@ -54,7 +54,7 @@ maxCost_direction = 1000;  % C for the directional cost function
 cPos = 1000000;
 cNeg = 10;
 minNumActEdgesPercentage = 0;  % percentage of the tot num edges to retain (min)
-bbEdgeReward = 1000;
+bbEdgeReward = 10000;
 
 
 % generate hsv outputs using the orientation information
@@ -130,7 +130,7 @@ end
 % uses the compatibility of the orientation of the adjoining pixels of each
 % edge
 offEdgeListIDs = getUnOrientedEdgeIDs(edgepixels,...
-                lenThresh,output(:,:,1));
+                lenThresh,output(:,:,1),sizeR,sizeC);
 % visualize off edges
 imgOffEdges = visualizeOffEdges(offEdgeListIDs,edgepixels,nodeInds,sizeR,sizeC);
 figure;imshow(imgOffEdges); title('visualization of edges turned off')
