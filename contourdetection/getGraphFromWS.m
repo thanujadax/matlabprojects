@@ -55,8 +55,9 @@ wsVis(:,:,1) = wsJ;
 % figure;imshow(wsVis);
 % title('Junctions from WS')
 % ws edges with OFR color code
+hsvOutput_V = hsvOutput(:,:,3);
 edgepix = zeros(sizeR,sizeC);
-edgepix(wsBoundaries>0) = 1;
+edgepix(wsBoundaries>0) = hsvOutput_V(wsBoundaries>0);
 edgepix(wsJ>0) = 1;
 hsvOutput(:,:,3) = edgepix;
 hsvImg = cat(3,hsvOutput(:,:,1),hsvOutput(:,:,2),hsvOutput(:,:,3));

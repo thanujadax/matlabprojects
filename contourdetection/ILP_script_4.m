@@ -54,8 +54,8 @@ maxCost_direction = 1000;  % C for the directional cost function
 cPos = 1000000;
 cNeg = 10;
 minNumActEdgesPercentage = 0;  % percentage of the tot num edges to retain (min)
-bbEdgeReward = 10000;
-
+bbEdgeReward = 100000;
+bbJunctionCost = 100000;
 
 % generate hsv outputs using the orientation information
 % output(:,:,1) contains the hue (orinetation) information
@@ -134,6 +134,8 @@ offEdgeListIDs = getUnOrientedEdgeIDs(edgepixels,...
 % visualize off edges
 imgOffEdges = visualizeOffEdges(offEdgeListIDs,edgepixels,nodeInds,sizeR,sizeC);
 figure;imshow(imgOffEdges); title('visualization of edges turned off')
+%% Backbone junctions
+bbNodeListInds = getJunctionsForEdges(edges2nodes,offEdgeListIDs);
 %% Activate backbone
 onEdgeListIDs = getBackboneEdgeIDs(edgepixels,edgePriors,...
                 lenThreshBB,priorThreshFracBB);
@@ -160,7 +162,8 @@ numJunctions = numel(nodeInds);
 
 % f = getILPcoefficientVector(edgePriors,j3NodeAngleCost,j4NodeAngleCost);
 scaledEdgePriors = edgePriors.*cEdge;
-f = getILPcoefficientVector2(scaledEdgePriors,nodeAngleCosts);
+f = getILPcoefficientVector2(scaledEdgePriors,nodeAngleCosts,...
+    bbNodeListInds,junctionTypeListInds,bbJunctionCost);
 % constraints
 % equality constraints and closedness constrains in Aeq matrix
 % [Aeq,beq] = getEqConstraints2(numEdges,jEdges,edges2pixels);

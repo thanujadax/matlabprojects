@@ -1,4 +1,5 @@
-function f = getILPcoefficientVector2(edgePriors,nodeAngleCosts)
+function f = getILPcoefficientVector2(edgePriors,nodeAngleCosts,...
+            bbJunctionsListInds,junctionTypeListInds,bbJunctionCost)
 numEdges = size(edgePriors,1);
 
 [~, numJtypes] = size(nodeAngleCosts);
@@ -43,11 +44,23 @@ f_stop_ind = numEdges*2;
 % junction variables
 for i=1:numJtypes
     % for each junction type
+    clear nodeAngleCost_i
     nodeAngleCost_i = nodeAngleCosts{i};
     if(nodeAngleCost_i~=0)
         maxJcost = max(nodeAngleCost_i,[],2);          % inactivation cost
-        minJcost = max(nodeAngleCost_i,[],2);
+        minJcost = min(nodeAngleCost_i,[],2);           % TODO: should this be min???
         avgJcost = (minJcost + maxJcost)/2;
+        
+        % identify the bbJunctions and set a very high inactivation cost
+        clear nodeListInds_i
+        nodeListInds_i = junctionTypeListInds(:,i); % list inds of nodes of type i
+        [bbJunctionListInds_i,bbListInds_i,~] = intersect(nodeListInds_i,bbJunctionsListInds);
+        if(numel(bbJunctionListInds_i)>0)
+            % assign a very high inactivation cost for this nodes
+            % (avgJcost)
+            avgJcost(bbListInds_i) = bbJunctionCost;
+        end
+        
     %     nodeAngleCost_i = [maxJcost nodeAngleCost_i];
         nodeAngleCost_i = [avgJcost nodeAngleCost_i];
         numCoeff_i = totJunctionVar(i);
@@ -58,4 +71,3 @@ for i=1:numJtypes
         f(f_start_ind:f_stop_ind) = angleCostMat_i(1:numCoeff_i);
     end
 end
-
