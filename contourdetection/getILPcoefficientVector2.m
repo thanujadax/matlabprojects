@@ -11,7 +11,7 @@ nodeTypeStats = zeros(numJtypes,2);
 totJunctionVar = zeros(numJtypes,1); % stores the number of coefficients for each type of J
 for i=1:numJtypes
     nodeAngleCost_i = nodeAngleCosts{i};
-    if(nodeAngleCost_i == 0)
+    if(isnan(nodeAngleCost_i))
         % ignore - no such junctions of this type
         nodeTypeStats(i,1) = 0;
         nodeTypeStats(i,2) = 0; 
@@ -46,7 +46,7 @@ for i=1:numJtypes
     % for each junction type
     clear nodeAngleCost_i
     nodeAngleCost_i = nodeAngleCosts{i};
-    if(nodeAngleCost_i~=0)
+    if(~isnan(nodeAngleCost_i))
         maxJcost = max(nodeAngleCost_i,[],2);          % inactivation cost
         minJcost = min(nodeAngleCost_i,[],2);           % TODO: should this be min???
         avgJcost = (minJcost + maxJcost)/2;

@@ -13,7 +13,7 @@ function nodeAngleCost = getNodeAngleCost_directional(theta,alpha,edgePriors_j,.
 % type in concern, in the order considered in theta and alpha
 
 if(theta==0)
-    nodeAngleCost = 0;
+    nodeAngleCost = nan;
 elseif(~isempty(theta))
     [numNodes,numEdgesPerNode] = size(theta);
     if(numEdgesPerNode>0)
@@ -33,7 +33,7 @@ elseif(~isempty(theta))
                 edge2LInd = combinations(j,2);
                 edgePriorFactor = edgePriors_j(i,edge1LInd) * edgePriors_j(i,edge2LInd)*100;
                 nodeAngleCost(i,j) = outwardnessScores(i,edge1LInd) *...
-                                    outwardnessScores(i,edge2LInd) * edgePriorFactor;  
+                                    outwardnessScores(i,edge2LInd) * edgePriorFactor;
 
            end
         end
