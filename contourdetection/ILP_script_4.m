@@ -11,8 +11,9 @@ imagePath = '/home/thanuja/Dropbox/data/mitoData/stem1_256by256.png';
 % hard coded back bone edge 1962
 
 orientations = 0:10:350;
-barLength = 11; % should be odd
+barLength = 13; % should be odd
 barWidth = 4; %
+margin = barLength;
 threshFrac = 0.20;
 medianFilterH = 0;
 invertImg = 1;      % 1 for EM images when input image is taken from imagePath
@@ -88,6 +89,10 @@ edgepixels = edges2pixels(:,2:nce);
 wsBoundariesFromGraph(edgepixels(edgepixels>0)) = 1; % edge pixels
 figure;imagesc(wsBoundariesFromGraph);title('boundaries from graph') 
 disp('preparing coefficients for ILP solver...')
+%% Margins
+junctionPixels = [nodeInds;clusterNodeIDs];
+boundaryJunctions = getBoundaryJunctions(edgepixels,junctionPixels,margin,...
+    sizeR,sizeC);
 %% Edge priors
 % edge priors - from orientation filters
 % edgePriors = getEdgePriors(orientedScoreSpace3D,edges2pixels);
