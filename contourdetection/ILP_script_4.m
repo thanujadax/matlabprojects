@@ -7,14 +7,15 @@ useGurobi = 1;
 fromInputImage = 1;
 % imagePath = '/home/thanuja/Dropbox/data/mitoData/emJ_00_170x.png';
 % imagePath = '/home/thanuja/Dropbox/data/testImg/testCurves1.png';
-imagePath = '/home/thanuja/Dropbox/data/mitoData/stem1_256by256.png';
+% imagePath = '/home/thanuja/Dropbox/data/mitoData/stem1_256by256.png';
+imagePath = '/home/thanuja/Dropbox/data/thanuja/emchallenge-class/competition-final0000.tif';
 % hard coded back bone edge 1962
 
 orientations = 0:10:350;
 barLength = 13; % should be odd
 barWidth = 4; %
 margin = barLength;
-threshFrac = 0.20;
+threshFrac = 0.0;
 medianFilterH = 0;
 invertImg = 1;      % 1 for EM images when input image is taken from imagePath
 % max vote response image of the orientation filters
@@ -66,7 +67,7 @@ if(~fromInputImage)
     imIn = imread(imFilePath);
 end
 figure;imshow(rgbimg)
-
+OFR_abs = output(:,:,3);
 % watershed segmentation
 ws = watershed(imIn);
 % ws = watershed(output(:,:,3));
@@ -93,6 +94,7 @@ disp('preparing coefficients for ILP solver...')
 junctionPixels = [nodeInds;clusterNodeIDs];
 boundaryJunctions = getBoundaryJunctions(edgepixels,junctionPixels,margin,...
     sizeR,sizeC);
+boundaryEdges = getBoundaryEdges(OFR_abs,barLength,edgepixels);
 %% Edge priors
 % edge priors - from orientation filters
 % edgePriors = getEdgePriors(orientedScoreSpace3D,edges2pixels);
