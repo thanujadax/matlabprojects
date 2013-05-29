@@ -35,6 +35,9 @@ for dim=1:numJtypes
         numOrientations = size(orientedScoreSpace3D,3);
         for i=1:numJ
             % for each node
+            if(i==1142)
+                abc = 11;
+            end
             edges_i = jEdges(i,:);
             nodeListInd = junctionTypeListInds(i,dim);% get the index of the node in concern
             nodeInd = nodeInds(nodeListInd); 
@@ -66,7 +69,13 @@ for dim=1:numJtypes
                     end
             %         [~,orientationIndex] = max(orientedScoreSpace3D(r,c,:),3);
                     edgeAngles = (orientationIndex-1).*angleStep;
-                    avgEdgeAngle = median(edgeAngles);
+                    if(numel(edgeAngles)==2)
+                        % get the first angle
+                        avgEdgeAngle = edgeAngles(1);
+                    else
+                        % get median
+                        avgEdgeAngle = median(edgeAngles);
+                    end
         %             jAngles(i,j) = avgEdgeAngle;
                     jAngles(i,j) = avgEdgeAngle;
                 end

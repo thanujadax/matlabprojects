@@ -147,6 +147,10 @@ bbNodeListInds = getJunctionsForEdges(edges2nodes,offEdgeListIDs);
 onEdgeListIDs = getBackboneEdgeIDs(edgepixels,edgePriors,...
                 lenThreshBB,priorThreshFracBB);
 edgePriors(onEdgeListIDs) = bbEdgeReward;
+% test - enforcing some edges to be picked
+clear onEdgeListIDs
+onEdgeListIDs = 2107;
+
 % visualize BB edges
 imgBBEdges = visualizeOffEdges(onEdgeListIDs,edgepixels,nodeInds,sizeR,sizeC);
 figure;imshow(imgBBEdges); title('visualization of backbone 1')
