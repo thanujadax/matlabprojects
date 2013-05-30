@@ -30,8 +30,8 @@ k = 0;
 for i = 1:numel(edgeListIndToExamine)
     clear edgePixels_i;
     edgeListID = edgeListIndToExamine(i); % row number for the edge in edges2pixels
-    if(edgeListID == 3885)
-        abcd = 1;
+    if(edgeListID==2293)
+        abc = 1;
     end
     edgePixels_i = edgepixels(edgeListID,:); % set of pixels for 
                 % this edge, padded with zero entries
@@ -62,8 +62,10 @@ for i = 1:numel(edgeListIndToExamine)
             misOrientations = intersect(pxOri_diff(pxOri_diff>downThreshLowAlpha),...
                 pxOri_diff(pxOri_diff<upThreshLowAlpha));
         else
-            % edge has only 3 pixels. can't apply this exclusion condition.
-            misOrientations = [];
+            % edge has less than 4 pixels. can't apply the above exclusion condition.
+            % misOrientations = [];
+            misOrientations = intersect(pxOri_diff(pxOri_diff>downThreshLowAlpha),...
+                pxOri_diff(pxOri_diff<upThreshLowAlpha));
         end
     else
         misOrientations = intersect(pxOri_diff(pxOri_diff>downThresh),pxOri_diff(pxOri_diff<upThresh));
