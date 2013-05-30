@@ -56,7 +56,8 @@ maxCost_direction = 1000;  % C for the directional cost function
 cPos = 1000000;
 cNeg = 10;
 minNumActEdgesPercentage = 0;  % percentage of the tot num edges to retain (min)
-bbEdgeReward = 100000;
+bbEdgeReward = 1000;
+offEdgeCost = -2000;
 bbJunctionCost = 100000;
 
 % generate hsv outputs using the orientation information
@@ -138,6 +139,8 @@ end
 % edge
 offEdgeListIDs = getUnOrientedEdgeIDs(edgepixels,...
                 lenThresh,output(:,:,1),sizeR,sizeC);
+% setting edgePriors
+edgePriors(offEdgeListIDs) = offEdgeCost;
 % visualize off edges
 imgOffEdges = visualizeOffEdges(offEdgeListIDs,edgepixels,nodeInds,sizeR,sizeC);
 figure;imshow(imgOffEdges); title('visualization of edges turned off')
@@ -275,9 +278,9 @@ end
 % [output rgbimg] = reconstructHSVgauss_mv(orientedScoreSpace3D,orientations,...
 %             barLength,barWidth,threshFrac,medianFilterH);
 % get the active pixels
-output(:,:,3) = ilpSegmentation;
+%output(:,:,3) = ilpSegmentation;
 % create HSV image
-hsvImage = cat(3,output(:,:,1),output(:,:,2),output(:,:,3));
+hsvImage = cat(3,output(:,:,1),output(:,:,2),ilpSegmentation);
 % convert it to an RGB image
 RGBimg = hsv2rgb(hsvImage);
 % titleStr = sprintf('C = %d : lambda = %d',cNode,decayRate);

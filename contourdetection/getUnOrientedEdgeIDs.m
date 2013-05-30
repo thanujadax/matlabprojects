@@ -12,26 +12,26 @@ function offEdgeListIDs = getUnOrientedEdgeIDs(edgepixels,...
 % if it has a diff around 180 degrees, discard that edge
 
 %% parameters
-upThresh = 285;  % orientation difference upper bound
-downThresh = 75;% orientation difference lower bound
-alphaDiffMaxThresh = 1.5;
-upThreshLowAlpha = 315;
-downThreshLowAlpha = 45;
+upThresh = 260;  % orientation difference upper bound
+downThresh = 100;% orientation difference lower bound
+alphaDiffMaxThresh = 1;  % when the difference of alphas for the 2 edges are
+% very small, a stricter range of thresholds are used to improve accuracy
+upThreshLowAlpha = 280;
+downThreshLowAlpha = 80;
 %%
-offEdgeListIDs = 0;
+offEdgeListIDs = [];
 [numEdges,maxPixelsPerEdge] = size(edgepixels);
 edgeLengths = zeros(numEdges,1);
 for i = 1:numEdges
     edgeLengths(i) = sum((edgepixels(i,:))>0);
 end
-
 edgeListIndToExamine = find(edgeLengths<lenThresh);
 k = 0;
 for i = 1:numel(edgeListIndToExamine)
     clear edgePixels_i;
     edgeListID = edgeListIndToExamine(i); % row number for the edge in edges2pixels
-    if(edgeListID==789)
-        a = 89;
+    if(edgeListID == 3885)
+        abcd = 1;
     end
     edgePixels_i = edgepixels(edgeListID,:); % set of pixels for 
                 % this edge, padded with zero entries
@@ -45,9 +45,26 @@ for i = 1:numel(edgeListIndToExamine)
     orientations_alpha = atan2d(pixr,pixc);
     pxOri_alpha_diff = abs(diff(orientations_alpha));
     maxAlphaDiff = max(pxOri_alpha_diff);
+    numDiffs = numel(pxOri_diff);
     clear misOrientations;
     if(maxAlphaDiff<alphaDiffMaxThresh)
-        misOrientations = intersect(pxOri_diff(pxOri_diff>downThreshLowAlpha),pxOri_diff(pxOri_diff<upThreshLowAlpha));
+        % leave out the pixels close to the nodes. 
+        if(numDiffs>4)
+            pxOri_diff(end) = [];
+            pxOri_diff(1) = [];
+            pxOri_diff(end) = [];
+            pxOri_diff(1) = [];
+            misOrientations = intersect(pxOri_diff(pxOri_diff>downThreshLowAlpha),...
+                pxOri_diff(pxOri_diff<upThreshLowAlpha));
+        elseif(numDiffs>2)
+            pxOri_diff(end) = [];
+            pxOri_diff(1) = [];
+            misOrientations = intersect(pxOri_diff(pxOri_diff>downThreshLowAlpha),...
+                pxOri_diff(pxOri_diff<upThreshLowAlpha));
+        else
+            % edge has only 3 pixels. can't apply this exclusion condition.
+            misOrientations = [];
+        end
     else
         misOrientations = intersect(pxOri_diff(pxOri_diff>downThresh),pxOri_diff(pxOri_diff<upThresh));
     end
