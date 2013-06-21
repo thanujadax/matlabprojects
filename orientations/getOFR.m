@@ -2,22 +2,6 @@
 function [output3,RGBimg3,orientedScoreSpace3D] = getOFR(imgIn,barLength,barWidth,invertImg,threshFrac)
 %% parameters
 displayIntermediateFigures=0;
-%imagePath = '/home/thanuja/matlabprojects/data/mitoData/stem1_48.png';
-% imagePath = '/home/thanuja/matlabprojects/data/mitoData/stem1_256by256.png';
-%imagePath = '/home/thanuja/Dropbox/data/em_2013january/samples/raw00_256.png';
-% imagePath = '/home/thanuja/Dropbox/data/mitoData/stem1_512.png';
-%imagePath = '/home/thanuja/Dropbox/data/mitoData/stem1_128.png';
-% imagePath = '/home/thanuja/Dropbox/data/em_2013january/samples/raw00_512.png';
-%imagePath = 'testImgLines.png';
-% imagePath = 'testImgLines3.png';
-% imagePath = 'testImgGauss.png';
-%imagePath = 'testCirc.png';
-%imagePath = 'testImgGauss.png';
-%imagePath = 'testCirc.png';
-% imagePath = '/home/thanuja/Dropbox/data/testImg/testMembrane4.png';
-% imagePath = '/home/thanuja/Dropbox/data/mitoData/gettheorientations.png';
-% imagePath = '/home/thanuja/Dropbox/data/mitoData/emJ_00_170x.png';
-% imagePath = '/home/thanuja/Dropbox/data/testImg/circle1.png';
 
 medianFilterH = 0;  % H is median filtered to remove salt and pepper noise in a 3x3 neighborhood 
 
@@ -67,6 +51,9 @@ sigY = 6;
 %% input preprocessing
 % imgIn = double(imread(imagePath))/255;
 % imgIn = imgIn(1:128,1:128);
+if(max(max(imgIn))>1)
+    imgIn = double(imgIn)/255;
+end
 
 if(size(size(imgIn),2)>2)
     img = imgIn(:,:,1);

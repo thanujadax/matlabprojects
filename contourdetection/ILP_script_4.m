@@ -14,7 +14,9 @@ imagePath = '/home/thanuja/Dropbox/data/mitoData/emJ_00_170x.png';
 orientations = 0:10:350;
 barLength = 13; % should be odd
 barWidth = 4; %
-margin = barLength;
+marginSize = ceil(barLength/2);
+marginPixVal = 0.1;
+addBorder = ceil(barLength/2);
 threshFrac = 0.2;
 medianFilterH = 0;
 invertImg = 1;      % 1 for EM images when input image is taken from imagePath
@@ -29,7 +31,10 @@ elseif(fromInputImage)
     % read inputimage and get orientedScoreSpace and max_abs value of OFR
     disp('using image file:')
     disp(imagePath);
-    [output,rgbimg,orientedScoreSpace3D] = getOFR(imagePath,...
+    imgIn0 = double(imread(imagePath));
+    % add border
+    imgIn = addThickBorder(imgIn0,marginSize,marginPixVal);
+    [output,rgbimg,orientedScoreSpace3D] = getOFR(imgIn,...
                             barLength,barWidth,invertImg,threshFrac);
     imIn = output(:,:,3);
 else
@@ -93,9 +98,9 @@ figure;imagesc(wsBoundariesFromGraph);title('boundaries from graph')
 disp('preparing coefficients for ILP solver...')
 %% Margins
 junctionPixels = [nodeInds;clusterNodeIDs];
-boundaryJunctions = getBoundaryJunctions(edgepixels,junctionPixels,margin,...
-    sizeR,sizeC);
-boundaryEdges = getBoundaryEdges(OFR_abs,barLength,edgepixels);
+% boundaryJunctions = getBoundaryJunctions(edgepixels,junctionPixels,margin,...
+%     sizeR,sizeC);
+% boundaryEdges = getBoundaryEdges(OFR_abs,barLength,edgepixels);
 %% Edge priors
 % edge priors - from orientation filters
 % edgePriors = getEdgePriors(orientedScoreSpace3D,edges2pixels);
