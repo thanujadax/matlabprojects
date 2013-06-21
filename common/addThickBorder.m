@@ -1,5 +1,6 @@
 function outImg = addThickBorder(inImg,margin,val)
 % adds a thick border of pixel value val of size 'margin' to the image
+% input image is in matrix form
 
 [sizeR,sizeC] = size(inImg);
 

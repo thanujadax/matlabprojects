@@ -1,5 +1,5 @@
 % orientation filter response
-function [output3,RGBimg3,orientedScoreSpace3D] = getOFR(imagePath,barLength,barWidth,invertImg,threshFrac)
+function [output3,RGBimg3,orientedScoreSpace3D] = getOFR(imgIn,barLength,barWidth,invertImg,threshFrac)
 %% parameters
 displayIntermediateFigures=0;
 %imagePath = '/home/thanuja/matlabprojects/data/mitoData/stem1_48.png';
@@ -65,7 +65,7 @@ sigX = 40;
 sigY = 6;
 
 %% input preprocessing
-imgIn = double(imread(imagePath))/255;
+% imgIn = double(imread(imagePath))/255;
 % imgIn = imgIn(1:128,1:128);
 
 if(size(size(imgIn),2)>2)
