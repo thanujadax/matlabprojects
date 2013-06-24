@@ -5,11 +5,13 @@ function faceAdj = getFaceAdjFromJnAdjGraph(A,edgeIDs,nodeEdges)
 % draw input graph in XY plane
 % for each node, get (x,y) coordinates
 
-% traverse the graph to pick one cell at a time
-
 % get edge list - keep a count of their usage i.e. the two regions each
 % edge separates
 numEdges = numel(edgeIDs);
+% separately identify edges on the boundary. these edges will only bound
+% one cell
+
+
 
 % create region list - each region stores its bounding set of edges
 

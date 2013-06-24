@@ -22,13 +22,16 @@ edgelist_top = unique(edgelist_top);
 parallelEdgeList_top = [];
 for i = 1:numel(edgelist_top)
     pixind = edgepixels(edgelist_top(i),:);
+    clear pixr
+    clear pixc
     [pixr,pixc] = ind2sub([sizeR sizeC],pixind); 
+    pixr = pixr(pixr>0);
     % how many pixels are on the same row
     clear m
     clear s
     m = mode(pixr);
     s = sum(pixr==m);
-    if(s>1)
+    if(s>2)
         parallelEdgeList_top = [parallelEdgeList_top;edgelist_top(i)];
     end
 end
