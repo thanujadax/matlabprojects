@@ -24,7 +24,6 @@ connectedEdgeIDs_i(1) = []; % first element is the pixel index of the node
 % calculate the angle differences from current edge to other edges
 edgePosThisNode = connectedEdgeIDs_i(connectedEdgeIDs_i==currentEdge);
 angle_thisEdge = connectedEdgeAngles_i(edgePosThisNode);
-numEdges = numel(connectedEdgeAngles_i);
 
 angleDiffVector = connectedEdgeAngles_i - angle_thisEdge;
 % fixing required since alpha ranges between 0 and 360

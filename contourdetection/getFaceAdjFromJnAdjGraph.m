@@ -54,6 +54,7 @@ for i=1:numEdges
         if(nextEdgeUsage_2(1)<MAX_BOUNDARY_EDGE_USAGE)
             edge1ok = 1;
             % TODO: get loop
+            
         else
             edge1ok = 0;
         end
@@ -86,4 +87,23 @@ for i=1:numEdges
             end
         end
     end   
+    
+    % find loops
+    setOfEdges_loop = [];
+    if(edge1ok)
+        % look for loop containing edge1
+        setOfEdges_loop = getEdgeLoop(currentNodeListInds(1),currentEdgeID,nodeEdges,...
+    junctionTypeListInds,jAnglesAll_alpha);
+
+    elseif(edge2ok)
+        % look for loop containing edge2
+        setOfEdges_loop = getEdgeLoop(currentNodeListInds(2),currentEdgeID,nodeEdges,...
+    junctionTypeListInds,jAnglesAll_alpha);
+
+    end
+    
+    if(~isempty(setOfEdges_loop))
+        % TODO: update edge usage
+        % TODO: append to cycle list
+    end
 end
