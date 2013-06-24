@@ -17,4 +17,4 @@ connectedEdgeIDs = nodeEdges(currentNode,:);
 connectedEdgeIDs = connectedEdgeIDs(connectedEdgeIDs>0);
 connectedEdgeIDs(1) = []; % first element is the pixel index of the node
 
-
+% calculate the angle differences from current edge to other edges
