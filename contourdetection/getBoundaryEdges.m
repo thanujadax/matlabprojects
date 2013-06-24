@@ -1,35 +1,35 @@
-function boundaryEdges = getBoundaryEdges(ofr,barLength,ws_edgePixels)
-
+function boundaryEdges = getBoundaryEdges(wsgraph,marginSize,ws_edgePixels)
+% an additional thick margin is already added along the boundary of the
+% image. Once the watershed oversegmentation is performed 
 % Inputs:
-%   ofr - absolute value of OFR
+%   wsgraph - graph obtained from oversegmenting edges from OFR using WS
 %   barLength - 
-%   wsEdgePixels -
+%   wsEdgePixels - 
 
 visualize = 1;
 
-[sizeR,sizeC] = size(ofr);
-marginInd = floor(barLength/2);
+[sizeR,sizeC] = size(wsgraph);
 
 % get all possible boundary pixels from OFR
 % separately for each boundary
-topPixInd_col = find(ofr(marginInd,:)>0);
+topPixInd_col = find(wsgraph(marginSize,:)>0);
 numTopPix = numel(topPixInd_col);
-topPixInd_row = ones(numTopPix,1) .* marginInd;
+topPixInd_row = ones(numTopPix,1) .* marginSize;
 topPixInd = sub2ind([sizeR sizeC],topPixInd_row,topPixInd_col');
 
-botPixInd_col = find(ofr((sizeR-marginInd),:)>0);
+botPixInd_col = find(wsgraph((sizeR-marginSize),:)>0);
 numBotPix = numel(botPixInd_col);
-botPixInd_row = ones(numBotPix,1) .* (sizeR-marginInd);
+botPixInd_row = ones(numBotPix,1) .* (sizeR-marginSize);
 botPixInd = sub2ind([sizeR sizeC],botPixInd_row,botPixInd_col');
 
-leftPixInd_row = find(ofr(:,marginInd)>0);
+leftPixInd_row = find(wsgraph(:,marginSize)>0);
 numLeftPix = numel(leftPixInd_row);
-leftPixInd_col = ones(numLeftPix,1) .* marginInd;
+leftPixInd_col = ones(numLeftPix,1) .* marginSize;
 leftPixInd = sub2ind([sizeR sizeC],leftPixInd_row,leftPixInd_col);
 
-rightPixInd_row = find(ofr(:,(sizeC-marginInd)));
+rightPixInd_row = find(wsgraph(:,(sizeC-marginSize)));
 numRightPix = numel(rightPixInd_row);
-rightPixInd_col = ones(numRightPix,1) .* (sizeC-marginInd);
+rightPixInd_col = ones(numRightPix,1) .* (sizeC-marginSize);
 rightPixInd = sub2ind([sizeR sizeC],rightPixInd_row,rightPixInd_col);
 
 % out of the all possible boundary pixels from OFR, extract the ones that

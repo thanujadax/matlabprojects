@@ -100,7 +100,7 @@ disp('preparing coefficients for ILP solver...')
 junctionPixels = [nodeInds;clusterNodeIDs];
 % boundaryJunctions = getBoundaryJunctions(edgepixels,junctionPixels,margin,...
 %     sizeR,sizeC);
-% boundaryEdges = getBoundaryEdges(OFR_abs,barLength,edgepixels);
+% boundaryEdges = getBoundaryEdges(wsBoundariesFromGraph,marginSize,edgepixels);
 %% Edge priors
 % edge priors - from orientation filters
 % edgePriors = getEdgePriors(orientedScoreSpace3D,edges2pixels);
