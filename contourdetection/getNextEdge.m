@@ -14,7 +14,7 @@ function nextEdgeId = getNextEdge(currentEdge,currentNode,nodeEdges,junctionType
 % get the edges connected to this node and the angles
 % angles
 [jListInd,jType] = find(junctionTypeListInds==currentNode);
-nodeAnglesAll_alpha = jAnglesAll_alpha(jType);
+nodeAnglesAll_alpha = jAnglesAll_alpha{jType};
 connectedEdgeAngles_i = nodeAnglesAll_alpha(jListInd,:);
 % edge IDs
 connectedEdgeIDs_i = nodeEdges(currentNode,:);
@@ -22,8 +22,10 @@ connectedEdgeIDs_i = connectedEdgeIDs_i(connectedEdgeIDs_i>0);
 connectedEdgeIDs_i(1) = []; % first element is the pixel index of the node
 
 % calculate the angle differences from current edge to other edges
-edgePosThisNode = connectedEdgeIDs_i(connectedEdgeIDs_i==currentEdge);
-angle_thisEdge = connectedEdgeAngles_i(edgePosThisNode);
+% edgePosThisNode = find(connectedEdgeIDs_i==currentEdge);
+% angle_thisEdge = connectedEdgeAngles_i(edgePosThisNode);
+
+angle_thisEdge = connectedEdgeAngles_i(connectedEdgeIDs_i==currentEdge);
 
 angleDiffVector = connectedEdgeAngles_i - angle_thisEdge;
 % fixing required since alpha ranges between 0 and 360
