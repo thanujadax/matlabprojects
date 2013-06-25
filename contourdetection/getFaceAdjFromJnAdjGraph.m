@@ -1,4 +1,4 @@
-function [faceAdj,edges2cells,setOfCells] = getFaceAdjFromJnAdjGraph(edgeIDs,nodeEdges,...
+function [faceAdj,edges2cells,setOfCellsMat] = getFaceAdjFromJnAdjGraph(edgeIDs,nodeEdges,...
     junctionTypeListInds,jAnglesAll_alpha,boundaryEdgeIDs,edges2nodes)
 % input: adjacency graph of junctions (planar graph)
 % output: adjacency graph of the faces of the input planar graph
@@ -15,8 +15,8 @@ edgeUsage(:,1) = edgeIDs;
 % separately identify edges on the boundary. these edges will only bound
 % one cell . p.s. there can be a few false negatives.
 
-setOfCells = []; % each row corresponds to a cell i.e. a set of edges enclosing a cell
-
+%setOfCells = []; % each row corresponds to a cell i.e. a set of edges enclosing a cell
+cellInd = 0;
 for i=1:numEdges
     % check usage
     currentEdgeID = edgeIDs(i);
@@ -24,9 +24,11 @@ for i=1:numEdges
     % if boundaryEdge, max usage is 1
     if(max(boundaryEdgeIDs==currentEdgeID))
         % is a boundary edge
-        if(currentEdgeUsage>=MAX_BOUNDARY_EDGE_USAGE)
-            continue
-        end     
+%         if(currentEdgeUsage>=MAX_BOUNDARY_EDGE_USAGE)
+%             continue
+%         end 
+        % we don't want to initialize a loop with a boundary edge.
+        continue
     else
         % most likely, not a boundary edge
         if(currentEdgeUsage>=MAX_EDGE_USAGE)
@@ -37,10 +39,10 @@ for i=1:numEdges
     currentNodeListInds = edges2nodes(i,:);    % row vector containing nodeListInds
     % check usage of next edge (both ends)
     nextEdgeIDs_2 = zeros(1,2);
-    nextEdgeIDs_2(1) = getNextEdge(currentEdgeID,currentNodeListInds(1),nodeEdges...
-        ,junctionTypeListInds,jAnglesAll_alpha);
-    nextEdgeIDs_2(2) = getNextEdge(currentEdgeID,currentNodeListInds(2),nodeEdges...
-        ,junctionTypeListInds,jAnglesAll_alpha);
+    [nextEdgeIDs_2(1),~] = getNextEdge(currentEdgeID,currentNodeListInds(1),nodeEdges...
+        ,junctionTypeListInds,jAnglesAll_alpha,edges2nodes,edgeIDs);
+    [nextEdgeIDs_2(2),~] = getNextEdge(currentEdgeID,currentNodeListInds(2),nodeEdges...
+        ,junctionTypeListInds,jAnglesAll_alpha,edges2nodes,edgeIDs);
     nextEdgeUsage_2 = zeros(1,2);
     nextEdgeUsage_2(1) = edgeUsage((edgeUsage(:,1)==nextEdgeIDs_2(1)),2);
     nextEdgeUsage_2(2) = edgeUsage((edgeUsage(:,1)==nextEdgeIDs_2(2)),2);
@@ -96,25 +98,30 @@ for i=1:numEdges
         % look for loop containing edge1
         [setOfEdges_loop,edgeUsage] = getEdgeLoop(currentNodeListInds(1),...
             currentEdgeID,nodeEdges,junctionTypeListInds,jAnglesAll_alpha,edgeUsage,...
-            boundaryEdgeIDs,MAX_EDGE_USAGE,MAX_BOUNDARY_EDGE_USAGE);
+            boundaryEdgeIDs,MAX_EDGE_USAGE,MAX_BOUNDARY_EDGE_USAGE,...
+            edges2nodes,edgeIDs);
 
     elseif(edge2ok)
         % look for loop containing edge2
         [setOfEdges_loop,edgeUsage] = getEdgeLoop(currentNodeListInds(2),...
             currentEdgeID,nodeEdges,junctionTypeListInds,jAnglesAll_alpha,edgeUsage,...
-            boundaryEdgeIDs,MAX_EDGE_USAGE,MAX_BOUNDARY_EDGE_USAGE);
+            boundaryEdgeIDs,MAX_EDGE_USAGE,MAX_BOUNDARY_EDGE_USAGE,...
+            edges2nodes,edgeIDs);
     end
     
     if(~isempty(setOfEdges_loop) && setOfEdges_loop(1)~=0)
         % TODO: append to cycle list
-        setOfCells = [setOfCells; setOfEdges_loop];
+        cellInd = cellInd + 1;
+        % setOfCells = [setOfCells; setOfEdges_loop];
+        setOfCells{cellInd} = setOfEdges_loop;
     end
 end
 % create adjacency matrix for the cells. The coefficients correspond to the
 % edgeID that connects the corresponding pair of cells
-numCells = size(setOfCells,1);
+setOfCellsMat = setOfCells2Mat(setOfCells);
+numCells = size(setOfCellsMat,1);
 cellList = 1:numCells; % row vector
 % add the cellList (index) as the first col of setOfCells. This is done so
 % that we can reuse getAdjacencyMat() to creage faceAdj.
-setOfCells = [cellList' setOfCells];
-[faceAdj,edges2cells,~] = getAdjacencyMat(setOfCells);
+setOfCellsMat = [cellList' setOfCellsMat];
+[faceAdj,edges2cells,~] = getAdjacencyMat(setOfCellsMat);

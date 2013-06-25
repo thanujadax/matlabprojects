@@ -1,5 +1,5 @@
-function nextEdgeId = getNextEdge(currentEdge,currentNode,nodeEdges,junctionTypeListInds,...
-    jAnglesAll_alpha)
+function [nextEdgeId,nextNodeListInd] = getNextEdge(currentEdge,currentNode,nodeEdges,...
+    junctionTypeListInds,jAnglesAll_alpha,edges2nodes,edgeIDs)
 
 % Inputs:
 %   currentNode - nodeListInd of the current node
@@ -39,3 +39,14 @@ end
 % the edge corresponding to the largest angle difference is the next edge
 [~,maxPos] = max(angleDiffVector);
 nextEdgeId = connectedEdgeIDs_i(maxPos);
+% get the relevant node for the next edge
+% need the edgeListInd to get the proper nodeListInd
+edgeListInd = find(edgeIDs==nextEdgeId);
+nodeInds_nextEdge = edges2nodes(edgeListInd,:);
+currentNode_pos = find(nodeInds_nextEdge==currentNode); % is either 1 or 2
+if(currentNode_pos==1)
+    nextNode_pos = 2;
+else
+    nextNode_pos = 1;
+end
+nextNodeListInd = nodeInds_nextEdge(nextNode_pos);

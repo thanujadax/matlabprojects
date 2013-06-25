@@ -143,7 +143,8 @@ end
 %% visualize graph
 [r,c] = ind2sub([sizeR sizeC],nodeInds);
 xy = [c r];
-figure;gplot(adjacencyMat,xy,'-*');
+% figure;gplot(adjacencyMat,xy,'-*');
+figure;gplotwl(adjacencyMat,xy);
 set(gca,'YDir','reverse');
 axis square
 

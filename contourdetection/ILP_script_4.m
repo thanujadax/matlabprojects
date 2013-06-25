@@ -96,10 +96,6 @@ edgepixels = edges2pixels(:,2:nce);
 wsBoundariesFromGraph(edgepixels(edgepixels>0)) = 1; % edge pixels
 figure;imagesc(wsBoundariesFromGraph);title('boundaries from graph') 
 disp('preparing coefficients for ILP solver...')
-%% Face adjacency graph (between pairs of cells)
-boundaryEdges = getBoundaryEdges(wsBoundariesFromGraph,marginSize,edgepixels);
-[faceAdj,edges2cells,setOfCells] = getFaceAdjFromJnAdjGraph(edgeListInds,nodeEdges,...
-    junctionTypeListInds,jAnglesAll_alpha,boundaryEdges,edges2nodes);
 %% Edge priors
 % edge priors - from orientation filters
 % edgePriors = getEdgePriors(orientedScoreSpace3D,edges2pixels);
@@ -138,6 +134,10 @@ for i=1:numJtypes
                                 edgePriors_i,cPos,cNeg);
     end
 end
+%% Face adjacency graph (between pairs of cells)
+boundaryEdges = getBoundaryEdges(wsBoundariesFromGraph,marginSize,edgepixels);
+[faceAdj,edges2cells,setOfCells] = getFaceAdjFromJnAdjGraph(edgeListInds,nodeEdges,...
+    junctionTypeListInds,jAnglesAll_alpha,boundaryEdges,edges2nodes);
 %% Removing misoriented edges
 % uses the compatibility of the orientation of the adjoining pixels of each
 % edge

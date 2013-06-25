@@ -81,4 +81,4 @@ if(visualize)
     end
     figure;imagesc(imgTmp);title('boundary edges');
 end
-boundaryEdges = 0;
+boundaryEdges = [edgeListInd_top'; edgeListInd_bot'; edgeListInd_left'; edgeListInd_right'];
