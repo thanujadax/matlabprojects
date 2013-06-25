@@ -15,6 +15,8 @@ edgeUsage(:,1) = edgeIDs;
 % separately identify edges on the boundary. these edges will only bound
 % one cell . p.s. there can be a few false negatives.
 
+setOfCells = []; % each row corresponds to a cell i.e. a set of edges enclosing a cell
+
 for i=1:numEdges
     % check usage
     currentEdgeID = edgeIDs(i);
@@ -53,7 +55,7 @@ for i=1:numEdges
         % nextEdge(1) is a boundary edge
         if(nextEdgeUsage_2(1)<MAX_BOUNDARY_EDGE_USAGE)
             edge1ok = 1;
-            % TODO: get loop
+            % flag set. get loop
             
         else
             edge1ok = 0;
@@ -62,7 +64,7 @@ for i=1:numEdges
         % nextEdge(1) is not a boundary edge (most likely)
         if(nextEdgeUsage_2(1)<MAX_EDGE_USAGE)
             edge1ok = 1;
-            % TODO: get loop
+            % flag set. get loop
         else
             edge1ok = 0;
         end
@@ -73,7 +75,7 @@ for i=1:numEdges
         % nextEdge(2) is a boundary edge
             if(nextEdgeUsage_2(2)<MAX_BOUNDARY_EDGE_USAGE)
                 edge2ok = 1;
-                % TODO: get loop
+                % flag set. get loop
             else
                 edge2ok = 0;
             end
@@ -81,7 +83,7 @@ for i=1:numEdges
         % nextEdge(2) is not a boundary edge (most likely)
             if(nextEdgeUsage_2(2)<MAX_EDGE_USAGE)
                 edge2ok = 1;
-                % TODO: get loop
+                % flag set. get loop.
             else
                 edge2ok = 0;
             end
@@ -92,18 +94,19 @@ for i=1:numEdges
     setOfEdges_loop = [];
     if(edge1ok)
         % look for loop containing edge1
-        setOfEdges_loop = getEdgeLoop(currentNodeListInds(1),currentEdgeID,nodeEdges,...
-    junctionTypeListInds,jAnglesAll_alpha);
+        [setOfEdges_loop,edgeUsage] = getEdgeLoop(currentNodeListInds(1),...
+            currentEdgeID,nodeEdges,junctionTypeListInds,jAnglesAll_alpha,edgeUsage,...
+            boundaryEdgeIDs,MAX_EDGE_USAGE,MAX_BOUNDARY_EDGE_USAGE);
 
     elseif(edge2ok)
         % look for loop containing edge2
-        setOfEdges_loop = getEdgeLoop(currentNodeListInds(2),currentEdgeID,nodeEdges,...
-    junctionTypeListInds,jAnglesAll_alpha);
-
+        [setOfEdges_loop,edgeUsage] = getEdgeLoop(currentNodeListInds(2),...
+            currentEdgeID,nodeEdges,junctionTypeListInds,jAnglesAll_alpha,edgeUsage,...
+            boundaryEdgeIDs,MAX_EDGE_USAGE,MAX_BOUNDARY_EDGE_USAGE);
     end
     
     if(~isempty(setOfEdges_loop))
-        % TODO: update edge usage
         % TODO: append to cycle list
+        setOfCells = [setOfCells; setOfEdges_loop];
     end
 end
