@@ -1,5 +1,5 @@
-function faceAdj = getFaceAdjFromJnAdjGraph(A,edgeIDs,nodeEdges,junctionTypeListInds,...
-    jAnglesAll_alpha,boundaryEdgeIDs,edges2nodes)
+function [faceAdj,edges2cells,setOfCells] = getFaceAdjFromJnAdjGraph(edgeIDs,nodeEdges,...
+    junctionTypeListInds,jAnglesAll_alpha,boundaryEdgeIDs,edges2nodes)
 % input: adjacency graph of junctions (planar graph)
 % output: adjacency graph of the faces of the input planar graph
 
@@ -105,8 +105,16 @@ for i=1:numEdges
             boundaryEdgeIDs,MAX_EDGE_USAGE,MAX_BOUNDARY_EDGE_USAGE);
     end
     
-    if(~isempty(setOfEdges_loop))
+    if(~isempty(setOfEdges_loop) && setOfEdges_loop(1)~=0)
         % TODO: append to cycle list
         setOfCells = [setOfCells; setOfEdges_loop];
     end
 end
+% create adjacency matrix for the cells. The coefficients correspond to the
+% edgeID that connects the corresponding pair of cells
+numCells = size(setOfCells,1);
+cellList = 1:numCells; % row vector
+% add the cellList (index) as the first col of setOfCells. This is done so
+% that we can reuse getAdjacencyMat() to creage faceAdj.
+setOfCells = [cellList' setOfCells];
+[faceAdj,edges2cells,~] = getAdjacencyMat(setOfCells);
