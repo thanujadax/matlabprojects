@@ -1,10 +1,12 @@
-function boundaryEdges = getBoundaryEdges2(wsgraph,marginSize,edges2pixels,...
-    edges2nodes,nodeEdges,edgeIDs)
+function boundaryEdges = getBoundaryEdges2(wsgraph,marginSize,edgepixels,...
+    nodeEdges,edgeIDs)
 
 % from each boundary, along perpendicular lines get all the pixels nearest
 % to the edge i.e. along each line given by a set of pixels.
 % Remove the nodeInds from this list of pixels. Then we are left with the
 % edge pixels. Get the boundaryEdgeIDs from these
+
+visualize = 1;
 
 [sizeR, sizeC] = size(wsgraph); % size of the image
 % top edge pixels
@@ -53,7 +55,8 @@ end
 
 allBoundaryEdgePixels = [topEdgePixels; bottomEdgePixels;...
                 leftEdgePixels; rightEdgePixels];
-allBoundaryEdgePixels = unique(allBoundaryEdgePixels);            
+allBoundaryEdgePixels = unique(allBoundaryEdgePixels);   
+allBoundaryEdgePixels = allBoundaryEdgePixels(allBoundaryEdgePixels>0);
 
 % remove the nodeInds
 nodeInds = nodeEdges(:,1);
@@ -62,10 +65,29 @@ boundaryEdgePixels = setdiff(allBoundaryEdgePixels,nodeInds);
 % for each boundaryEdgePixel, get the corresponding edgeID
 numBoundaryEdgePixels = numel(boundaryEdgePixels);
 boundaryEdges = zeros(numBoundaryEdgePixels,1);
+boundaryEdges_listInds = zeros(numBoundaryEdgePixels,1);
 for i=1:numBoundaryEdgePixels
     clear edgeListInd
-    [edgeListInd,~] = find(edges2pixels==boundaryEdgePixels(i));
-    boundaryEdges(i) = edges2pixels(edgeListInd,1);
+    [edgeListInd,~] = find(edgepixels==boundaryEdgePixels(i));
+    boundaryEdges_listInds(i) = edgeListInd;
+    boundaryEdges(i) = edgeIDs(edgeListInd,1);
 end
 
 boundaryEdges = unique(boundaryEdges);
+boundaryEdges_listInds = unique(boundaryEdges_listInds);
+%% visualization
+numBoundaryEdges = numel(boundaryEdges);
+if(visualize)
+    % visualize detected boundary edges
+    imgTmp = zeros(sizeR,sizeC);
+    % color all edge pixels : 1
+    edgepix_all = edgepixels(edgepixels>0);
+    imgTmp(edgepix_all) = 1;
+    % color boundary edges with 0.5
+    for i=1:numBoundaryEdges
+        edgepix_i = edgepixels(boundaryEdges_listInds(i),:);
+        edgepix_i = edgepix_i(edgepix_i>0);
+        imgTmp(edgepix_i) = 0.5;
+    end
+    figure;imagesc(imgTmp);title('boundary edges');
+end
