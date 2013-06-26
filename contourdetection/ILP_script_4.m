@@ -135,7 +135,8 @@ for i=1:numJtypes
     end
 end
 %% Face adjacency graph (between pairs of cells)
-boundaryEdges = getBoundaryEdges(wsBoundariesFromGraph,marginSize,edgepixels);
+boundaryEdges = getBoundaryEdges(wsBoundariesFromGraph,marginSize,edgepixels,...
+    edges2nodes,nodeEdges,edgeListInds);
 [faceAdj,edges2cells,setOfCells] = getFaceAdjFromJnAdjGraph(edgeListInds,nodeEdges,...
     junctionTypeListInds,jAnglesAll_alpha,boundaryEdges,edges2nodes);
 %% Removing misoriented edges
