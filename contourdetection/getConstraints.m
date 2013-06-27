@@ -186,18 +186,6 @@ for jType = 1:numJtypes
     end    
 end
 
-% % J3
-% j = numEdges*2+1;
-% for i=(numEdges+1):(numEdges+numJ3)
-%     Aeq(i,j:(j+3)) = 1;
-%     j = j+4;
-% end
-% % J4
-% j = numEdges*2+numJ3*4+1;
-% for i=(numEdges+numJ3+1):(numEdges+numJ3+numJ4)
-%     Aeq(i,j:(j+6)) = 1;
-%     j = j+7;
-% end
 
 %% closedness constraints
 if(withClosednessConstraint)
