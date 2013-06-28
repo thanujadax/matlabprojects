@@ -23,6 +23,8 @@ normal1 = getNormalToLine(line1,midxy1);
 normal2 = getNormalToLine(line2,midxy2);
 % get the intersection
 [x,y] = getIntersectionOfTwoLines(normal1,normal2);
+x = floor(x);
+y = floor(y);
 end
 
 function midpoint = getMidpoint(edgepixels)
