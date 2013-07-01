@@ -1,7 +1,19 @@
 function [faceAdj,edges2cells,setOfCellsMat] = getFaceAdjFromJnAdjGraph(edgeIDs,nodeEdges,...
     junctionTypeListInds,jAnglesAll_alpha,boundaryEdgeIDs,edges2nodes)
-% input: adjacency graph of junctions (planar graph)
-% output: adjacency graph of the faces of the input planar graph
+% Inputs: adjacency graph of junctions (planar graph)
+%   edgeIDs -
+%   nodeEdges -
+%   junctionTypeListInds -
+%   jAnglesAll_alpha -
+%   boundaryEdgeIDs - 
+%   edges2nodes - 
+
+% Outputs: 
+%   faceAdj - adjacency graph of the faces of the input planar graph
+%   edges2cells - each row corresponds to an edge. the two columns give you
+%   the two cells that are connected by that edge.
+%   setOfCellsMat - each row corresponds to a cell and contains the set of
+%   edges bounding that cell as a row vector with zero padding
 
 MAX_EDGE_USAGE = 2;
 MAX_BOUNDARY_EDGE_USAGE = 1;

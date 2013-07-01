@@ -1,4 +1,4 @@
-function [adjacencyMat, edges2nodes,selfEdgeIDs] = getAdjacencyMat(nodeEdges)
+function [adjacencyMat, edges2nodes,selfEdgeIDs,listOfEdgeIDs] = getAdjacencyMat(nodeEdges)
 % Input:
 %   nodeEdges: gives the list of edgeIDs connected to each junction node
 %       each row is -> junctionInd,edge1, edge2, edge3, edge4, ..
@@ -26,6 +26,8 @@ for i=1:numEdges
             % also add the entries to edges2nodes
             edges2nodes(i,1) = j1;
             edges2nodes(i,2) = j2;
+            % also, add the edgeID to the listOfEdgeIDs
+            listOfEdgeIDs(i) = i;
         else
             sid = sid + 1;
             selfEdgeIDs(sid) = i;
