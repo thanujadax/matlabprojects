@@ -1,5 +1,5 @@
 function [x,y] = getPerpendicularBisectorIntersection(edge1_pixels,edge2_pixels,...
-    edge1_id,edge2_id, sizeR,sizeC,edges2nodes,nodeInds)
+    edge1_id,edge2_id, sizeR,sizeC,edges2nodes,nodeInds,edgeIndsAll)
 
 x = [];
 y = [];
@@ -19,8 +19,8 @@ tangent2 = getTangentAtPoint(edge2_pixels,midpoint2,edges2nodes,edgeIndsAll,...
     sizeR,sizeC,edge2_id,nodeInds);
 
 % draw perpendiculars to the tangents at the midpoints
-normal1 = getNormalToLine(line1,midxy1);
-normal2 = getNormalToLine(line2,midxy2);
+normal1 = getNormalToLine(tangent1,midxy1);
+normal2 = getNormalToLine(tangent2,midxy2);
 % get the intersection
 [x,y] = getIntersectionOfTwoLines(normal1,normal2);
 x = floor(x);
@@ -46,11 +46,12 @@ function lineEqn = getTangentAtPoint(edgepixels,midpoint,edges2nodes,edgeIndsAll
     else
         % there're only 2 or 1 pixels for this edge. then we need the nodepixels
         % on either side
-        edgeNodes_listInds = edges2nodes(edgeIndsAll==edgeID);
+        edgeNodes_listInds = edges2nodes(edgeIndsAll==edgeID,:);
+        
         pt1 = nodeInds(edgeNodes_listInds(1));
         pt2 = nodeInds(edgeNodes_listInds(2));        
     end
-    pt3 = edgespixels(midpos);
+    pt3 = edgepixels(midpos);
     
     % create structure array to contain the 3 points
     p = struct([]);
@@ -63,13 +64,25 @@ function lineEqn = getTangentAtPoint(edgepixels,midpoint,edges2nodes,edgeIndsAll
 end
 
 function lineEqn = getStraightLineEqn(p)
-    % p contains 3 points. solve ax + by + c = 0 to find a, b, c.
+    % p contains 3 points. but we need just 2.
     syms a b c x y eq1 eq2 eq3 eq
     eq = a*x + b*y + c;
-    eq1 = subs(eq,[x,y],[p(1).x,p(1).y]);
-    eq2 = subs(eq,[x,y],[p(2).x,p(2).y]);
-    eq3 = subs(eq,[x,y],[p(3).x,p(3).y]);
-    [lineEqn.a,lineEqn.b,lineEqn.c] = solve(eq1,eq2,eq3,a,b,c);
+    % let b = 1;
+    eq1 = subs(eq,[x,y,b],[p(1).x,p(1).y,1]);
+    eq2 = subs(eq,[x,y,b],[p(2).x,p(2).y,1]);
+    Eqn = solve(eq1,eq2,a,c);
+    if(isempty(Eqn))
+        % then let b = 0, a=1
+        eq3 = subs(eq,[x,y,b,a],[p(1).x,p(1).y,0,1]);
+        Eqn = solve(eq3,c);
+        lineEqn.c = Eqn;
+        lineEqn.a = 1;
+        lineEqn.b = 0;
+    else
+        lineEqn.a = Eqn.a;
+        lineEqn.b = 1;
+        lineEqn.c = Eqn.c;
+    end
 end
 
 function normalLine = getNormalToLine(lineEqn,midxy)
@@ -79,17 +92,18 @@ function normalLine = getNormalToLine(lineEqn,midxy)
     eq3 = subs(eq1,[a0,b0,b],[lineEqn.a,lineEqn.b,1]);
     eq4 = subs(eq2,[x,y,b],[midxy.x,midxy.y,1]); % subs b = 1.
     % then a = -gradient, c = -intercept
-    [a,c] = solve(eq3,eq4,a,c);
-    if(a==inf || a==(-inf))
+    nline = solve(eq3,eq4,a,c);
+    if(isempty(nline))
         eq4 = subs(eq2,[x,y,a,b],[midxy.x,midxy.y,1,0]); % subs a=1,b=0
         % then the eqn is in the form x = c
         normalLine.a = 1;
         normalLine.b = 0;
-        normalLine.c = solve(eq4,c);
+        nline = solve(eq4,c);
+        normalLine.c = nline;
     else
-        normalLine.a = a;
+        normalLine.a = nline.a;
         normalLine.b = 1;
-        normalLine.c = c;
+        normalLine.c = nline.c;
     end
 end
 
@@ -99,5 +113,12 @@ syms a b c x y eq1 eq2 eq
 eq = a*x + b*y + c;
 eq1 = subs(eq,[a,b,c],[line1.a,line1.b,line1.c]);
 eq2 = subs(eq,[a,b,c],[line2.a,line2.b,line2.c]);
-[x,y] = solve(eq1,eq2,x,y);
+pt = solve(eq1,eq2,x,y);
+if(~isempty(pt))
+    x = pt.x;
+    y = pt.y;
+else
+   x = [];
+   y = [];
+end
 end

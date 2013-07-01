@@ -3,6 +3,10 @@ function [A,b,numRows_Aeq,numRows_AInEq] = getConstraints(numEdges,jEdges,...
             onEdgeListIDs,minNumActEdgesPercentage,...
             twoCellEdges,edges2cells,setOfCellsMat,cellStatesAll)
 % returns equality and inequality constraints
+
+% Inputs:
+%   twoCellEdges - list of edgeIDs that separate exactly two cells
+
 % equality constraints:
 %   each edge should be either active or inactive
 %   each node should be either active or inactive

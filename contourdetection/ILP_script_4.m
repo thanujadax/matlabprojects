@@ -12,6 +12,8 @@ imagePath = '/home/thanuja/Dropbox/data/mitoData/emJ_00_170x.png';
 % hard coded back bone edge 1962
 
 orientations = 0:10:350;
+orientationsStepSize = 10;
+
 barLength = 13; % should be odd
 barWidth = 4; %
 marginSize = ceil(barLength/2);
@@ -96,7 +98,7 @@ edgepixels = edges2pixels(:,2:nce);
 wsBoundariesFromGraph(edgepixels(edgepixels>0)) = 1; % edge pixels
 figure;imagesc(wsBoundariesFromGraph);title('boundaries from graph') 
 disp('preparing coefficients for ILP solver...')
-%% Edge priors
+%% Edge unary values
 % edge priors - from orientation filters
 % edgePriors = getEdgePriors(orientedScoreSpace3D,edges2pixels);
 edgePriors = getEdgeUnaryAbs(edgepixels,output(:,:,3));
@@ -134,11 +136,22 @@ for i=1:numJtypes
                                 edgePriors_i,cPos,cNeg);
     end
 end
-%% Face adjacency graph (between pairs of cells)
+%% Faces of wsgraph -> cell types (between pairs of cells)
 boundaryEdges = getBoundaryEdges2(wsBoundariesFromGraph,barLength,edgepixels,...
     nodeEdges,edgeListInds);
-[faceAdj,edges2cells,setOfCells] = getFaceAdjFromJnAdjGraph(edgeListInds,nodeEdges,...
+[faceAdj,edges2cells,setOfCells,twoCellEdges] = getFaceAdjFromJnAdjGraph(edgeListInds,nodeEdges,...
     junctionTypeListInds,jAnglesAll_alpha,boundaryEdges,edges2nodes);
+
+cellcogs = getCellCentroidsAll(setOfCells,edges2pixels,edgeListInds,...
+    sizeR,sizeC,edges2nodes,nodeInds);
+
+[~,edgeOrientationsInds] = getEdgePriors(orientedScoreSpace3D,edges2pixels);
+edgeOrientations = (edgeOrientationInds-1).*orientationsStepSize;
+
+cellStatesAll = getAllCellStates(setOfCells,cellcogs,edgeListInds,edgeOrientations,...
+    sizeR,sizeC,edges2pixels);
+
+
 %% Removing misoriented edges
 % uses the compatibility of the orientation of the adjoining pixels of each
 % edge
@@ -187,7 +200,10 @@ f = getILPcoefficientVector2(scaledEdgePriors,nodeAngleCosts,...
 % equality constraints and closedness constrains in Aeq matrix
 % [Aeq,beq] = getEqConstraints2(numEdges,jEdges,edges2pixels);
 [Aeq,beq,numEq,numLt] = getConstraints(numEdges,jEdges,edges2pixels,nodeAngleCosts,...
-                    offEdgeListIDs,onEdgeListIDs,minNumActEdgesPercentage);
+            offEdgeListIDs,onEdgeListIDs,minNumActEdgesPercentage,...
+            twoCellEdges,edges2cells,setOfCells,cellStatesAll);
+                
+                
 senseArray(1:numEq) = '=';
 if(numLt>0)
     senseArray((numEq+1):(numEq+numLt)) = '<';

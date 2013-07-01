@@ -34,8 +34,21 @@ for i=1:numCombinations
     edge2_pixels(1) = []; % first element is the edgeID. get rid of it.
     edge2_pixels = edge2_pixels(edge2_pixels>0);
     
-    [points(i,1),points(i,2)] = getPerpendicularBisectorIntersection(edge1_pixels,edge2_pixels,...
-    edge1_ind,edge2_ind,sizeR,sizeC,edges2nodes,nodeInds)
+    [x,y] = getPerpendicularBisectorIntersection(edge1_pixels,edge2_pixels,...
+    edge1_ind,edge2_ind,sizeR,sizeC,edges2nodes,nodeInds,edgeIDs_all);
+
+    points(i,1) = -1;
+    points(i,2) = -1;
+    if(~isempty(x) && ~isempty(y))
+        if(isnumeric(x) && isnumeric(y))
+            points(i,1) = x;
+            points(i,2) = y;
+        end
+    end
+        
 end
+% remove any negative points from the points(i,j) matrix
+positiveRowInds = points(:,1)>0;
+points_pos = points(positiveRowInds,:);
 % get the centroid/median of these points -> (x,y)
-cellCentroid = floor(median(points));
+cellCentroid = floor(median(points_pos));
