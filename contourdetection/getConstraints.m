@@ -1,6 +1,7 @@
 function [A,b,numRows_Aeq,numRows_AInEq] = getConstraints(numEdges,jEdges,...
-                        edges2pixels,jDirectionalScores,offEdgeListIDs,...
-                        onEdgeListIDs,minNumActEdgesPercentage)
+            edges2pixels,jDirectionalScores,offEdgeListIDs,...
+            onEdgeListIDs,minNumActEdgesPercentage,...
+            twoCellEdges,edges2cells,setOfCellsMat,cellStatesAll)
 % returns equality and inequality constraints
 % equality constraints:
 %   each edge should be either active or inactive
@@ -18,6 +19,7 @@ withClosednessConstraint = 1; % 1 to enable closedness constraint (old)
 withEdgeNodeCoherenceConstraint = 1; % 1 to enable
 withOffEdgesConstraint = 1; % 1 to enable
 withOnEdgesConstraint = 1; % 1 to enable
+withCellConstraint = 1; % 1 to enable
 
 [~, numJtypes] = size(jEdges);
 % type 1 is J2 - junction with just 2 edges
@@ -104,8 +106,23 @@ if(minNumActEdgesPercentage>0)
 else
     minNumEdgeEqn = 0;
 end
+if(withCellConstraint)
+    disp('cell type constraint - on')
+    % num additional rows
+    numEdgesBetween2Cells = numel(twoCellEdges);
+    numCellConstrRows = numEdgesBetween2Cells;    
+    % num additional cols
+    numCells = size(setOfCellsMat,1);
+    numCellConstrCols = numCells;
+else
+    disp('cell type constraint - off')
+    % set the additional rows,cols to zero 
+    numCellConstrRows = 0;
+    numCellConstrCols = 0;
+end
+
 % num cols of Aeq = 2*numEdges + sum_j(numNodes_j*numCombinations+1)
-numCols_Aeq = 2*numEdges + sum(totJunctionVar); 
+numCols_Aeq = 2*numEdges + sum(totJunctionVar) + numCellConstrCols; 
 % num rows of Aeq = numEdges + 2*numJ
 
 % if(withClosednessConstraint)
@@ -123,7 +140,7 @@ numCols_Aeq = 2*numEdges + sum(totJunctionVar);
 % end
 
 numRows_Aeq = numEdgeActEqns + numJunctionActEquns + numClosednessEqns +...
-                numOffEdgesEqns + numOnEdgesEqns;
+                numOffEdgesEqns + numOnEdgesEqns + numCellConstrRows;
 numRows_AInEq = numCoherenceEqns + numDirectionalEqns + minNumEdgeEqn;
 totRows_A = numRows_Aeq + numRows_AInEq;
 A = zeros(totRows_A,numCols_Aeq);
@@ -146,6 +163,11 @@ if(withOnEdgesConstraint)
     rowStart = rowEnd + 1;
     rowEnd = rowStart - 1 + numOnEdgesEqns;
     b(rowStart:rowEnd) = 0; 
+end
+if(withCellConstraint)
+    rowStart = rowEnd + 1;
+    rowEnd = rowStart -1 + numCellConstrRows;
+    b(rowStart:rowEnd) = 0;
 end
 if(withEdgeNodeCoherenceConstraint)
     rowStart = rowEnd + 1;
@@ -252,6 +274,39 @@ if(withOnEdgesConstraint)
     onEdges_inActiveStateInd = onEdgeListIDs .* 2 - 1;
     rowStop = rowStop + 1;
     A(rowStop,onEdges_inActiveStateInd) = 1; % corresponding b should  be 0
+end
+%% Equality Constraint - cell type
+% get the edge (edgeIDs) corresponding to cell pairs
+% when an edge is active, determine which cell is active and which is
+% inactive
+% constraint: c_i - c_j - e_ij = 0;
+if(withCellConstraint)
+    colStartInd = numCols_Aeq - numCellConstrCols; % cell 1 col ind = colStartInd + 1; etc 
+    for i=1:numCellConstrRows
+        rowStop = rowStop + 1;
+        edgeListInd_i = find(edges2pixels(:,1)==twoCellEdges(i));
+        edgeActColInd = edgeListInd_i * 2;
+        cellsForEdge = edges2cells(i,:);
+        cellState_1 = cellStatesAll(cellsForEdge(1));
+        cellState_2 = cellStatesAll(cellsForEdge(2));
+        if(cellState_1>0)
+            % cell1 is of type:interior
+            cellActColInd_pos = colStartInd + cellsForEdge(1);
+            cellActColInd_neg = colStartInd + cellsForEdge(2);
+        elseif(cellState_2>0)
+            % cell2 is of type:interior
+            cellActColInd_pos = colStartInd + cellsForEdge(2);
+            cellActColInd_neg = colStartInd + cellsForEdge(1);
+        else
+            % both cells are of type:membrane
+            cellActColInd_pos = colStartInd + cellsForEdge(1);
+            cellActColInd_neg = colStartInd + cellsForEdge(2);
+        end
+        % set coefficients
+        A(rowStop,edgeActColInd) = -1;
+        A(rowStop,cellActColInd_pos) = 1;
+        A(rowStop,cellActColInd_neg) = -1;
+    end
 end
 %% inequality constraint - coherence between activeNodeStates and the corresponding active edges
 % this is required since only a particular pair of edges out of all the

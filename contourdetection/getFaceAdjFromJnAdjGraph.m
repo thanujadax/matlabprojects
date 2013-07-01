@@ -1,5 +1,6 @@
-function [faceAdj,edges2cells,setOfCellsMat] = getFaceAdjFromJnAdjGraph(edgeIDs,nodeEdges,...
-    junctionTypeListInds,jAnglesAll_alpha,boundaryEdgeIDs,edges2nodes)
+function [faceAdj,edges2cells,setOfCellsMat,listOfEdgeIDs] = getFaceAdjFromJnAdjGraph...
+    (edgeIDs,nodeEdges,junctionTypeListInds,jAnglesAll_alpha,...
+    boundaryEdgeIDs,edges2nodes)
 % Inputs: adjacency graph of junctions (planar graph)
 %   edgeIDs -
 %   nodeEdges -
@@ -11,9 +12,12 @@ function [faceAdj,edges2cells,setOfCellsMat] = getFaceAdjFromJnAdjGraph(edgeIDs,
 % Outputs: 
 %   faceAdj - adjacency graph of the faces of the input planar graph
 %   edges2cells - each row corresponds to an edge. the two columns give you
-%   the two cells that are connected by that edge.
+%   the two cells that are connected by that edge. The order of edges
+%   present is according to listOfEdgeIDs
 %   setOfCellsMat - each row corresponds to a cell and contains the set of
 %   edges bounding that cell as a row vector with zero padding
+%   listOfEdgeIDs - the edges considered in the faceAdjMatrix. Each of these edges
+%   connects a pair of cells
 
 MAX_EDGE_USAGE = 2;
 MAX_BOUNDARY_EDGE_USAGE = 1;
@@ -25,7 +29,7 @@ edgeUsage = zeros(numEdges,2);  % col1: edgeID, col2: usage
 edgeUsage(:,1) = edgeIDs;
 
 % separately identify edges on the boundary. these edges will only bound
-% one cell . p.s. there can be a few false negatives.
+% one cell. p.s. there can be a few false negatives.
 
 %setOfCells = []; % each row corresponds to a cell i.e. a set of edges enclosing a cell
 cellInd = 0;
@@ -136,4 +140,4 @@ cellList = 1:numCells; % row vector
 % add the cellList (index) as the first col of setOfCells. This is done so
 % that we can reuse getAdjacencyMat() to creage faceAdj.
 setOfCellsMat = [cellList' setOfCellsMat];
-[faceAdj,edges2cells,~] = getAdjacencyMat(setOfCellsMat);
+[faceAdj,edges2cells,~,listOfEdgeIDs] = getAdjacencyMat(setOfCellsMat);
