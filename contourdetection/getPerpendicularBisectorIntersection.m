@@ -114,9 +114,10 @@ eq = a*x + b*y + c;
 eq1 = subs(eq,[a,b,c],[line1.a,line1.b,line1.c]);
 eq2 = subs(eq,[a,b,c],[line2.a,line2.b,line2.c]);
 pt = solve(eq1,eq2,x,y);
+% TODO: convert sym to double
 if(~isempty(pt))
-    x = pt.x;
-    y = pt.y;
+    x = double(pt.x);
+    y = double(pt.y);
 else
    x = [];
    y = [];

@@ -9,7 +9,7 @@ function cogs = getCellCentroidsAll(cells2edges,edges2pixels,edgeIDs_all,...
 numCells = size(cells2edges,1);
 cogs = struct([]);
 for i=1:numCells
-    clear edgeIDset_cell
+    % clear edgeIDset_cell
     edgeIDset_cell = cells2edges(i,:);
     edgeIDset_cell = edgeIDset_cell(edgeIDset_cell>0);
     cog = getCellCentroid(edgeIDset_cell,edges2pixels,edgeIDs_all,...
