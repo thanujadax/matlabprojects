@@ -11,7 +11,7 @@ centerPixInd = edgePixels(centerpos);
 [centerPix.y,centerPix.x] = ind2sub([sizeR sizeC], centerPixInd);
 
 % determine the angle cog of cell makes with (wrt) the center pixel
-theta = tan2d((cog.y-centerpixel.y),(cog.x-centerpixel.x));
+theta = atan2d((cog.y-centerPix.y),(cog.x-centerPix.x));
 % convert theta into the same scale as edgeOrientation angles
 theta_scaled = convertThetaIntoOrientationScale(theta);
 

@@ -9,7 +9,7 @@ numEdges = max(max(nodeEdges(:,2:numEdgesPerNode)));
 edges2nodes = zeros(numEdges,2);
 
 sid = 0;
-
+k = 0;
 for i=1:numEdges
     % for each edge, find the two corresponding nodes at its ends
     [R,C] = find(nodeEdges(:,2:numEdgesPerNode)==i);
@@ -27,7 +27,8 @@ for i=1:numEdges
             edges2nodes(i,1) = j1;
             edges2nodes(i,2) = j2;
             % also, add the edgeID to the listOfEdgeIDs
-            listOfEdgeIDs(i) = i;
+            k = k + 1;
+            listOfEdgeIDs(k) = i;
         else
             sid = sid + 1;
             selfEdgeIDs(sid) = i;

@@ -146,7 +146,7 @@ cellcogs = getCellCentroidsAll(setOfCells,edges2pixels,edgeListInds,...
     sizeR,sizeC,edges2nodes,nodeInds);
 
 [~,edgeOrientationsInds] = getEdgePriors(orientedScoreSpace3D,edges2pixels);
-edgeOrientations = (edgeOrientationInds-1).*orientationsStepSize;
+edgeOrientations = (edgeOrientationsInds-1).*orientationsStepSize;
 
 cellStatesAll = getAllCellStates(setOfCells,cellcogs,edgeListInds,edgeOrientations,...
     sizeR,sizeC,edges2pixels);

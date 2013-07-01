@@ -24,7 +24,7 @@ for i=1:numCells
     clear getEdgeSet_cell 
     getEdgeSet_cell = cells2edges(i,:);
     getEdgeSet_cell = getEdgeSet_cell(getEdgeSet_cell>0);
-    numEdges_cell = numel(getEdgeSet);
+    numEdges_cell = numel(getEdgeSet_cell);
     clear cellStateVector_i
     cellStateVector_i = zeros(numEdges_cell,1);
     numEdges_toConsider = min(numEdges_cell,MAX_NUM_EDGES_TO_CONSIDER);
