@@ -1,10 +1,12 @@
-function edgePriors = getEdgePriors(orientedScoreSpace3D,edges2pixels)
+function [edgePriors,edgeOrientationIndex] = getEdgePriors(orientedScoreSpace3D,edges2pixels)
 % computes N-by-nOrientation matrix for each edge given in edges2pixels
 % returns the max response for each edge
 % for each edge, get the edge pixels. then get the orientation response to
 % all the pixels. For each orientation, calculate the mean response. choose
 % the orientation with the max avg response and the corresponding response
 % as the edgePrior.
+% Also return the edgeOrientationIndex as the 2nd output. To get the actual
+% edgeOrientation, multiply the orientationInd by the orientationStepSize.
 
 % Inputs:
 %   orientedScoreSpace3D - m-by-n-by-nOrientation matrix for the
@@ -14,12 +16,13 @@ function edgePriors = getEdgePriors(orientedScoreSpace3D,edges2pixels)
 
 % Output:
 %   edgePriors - N-by-1 array of max responses
-[nre,nce] = size(edges2pixels);  % first column is the edgeID
+[~,nce] = size(edges2pixels);  % first column is the edgeID
 edgepixels = edges2pixels(:,2:nce);
-[numR,numC,nOrientations] = size(orientedScoreSpace3D); 
+[~,~,nOrientations] = size(orientedScoreSpace3D); 
 numEdges = size(edgepixels,1);
 edgePriors_all = zeros(numEdges,nOrientations);
 edgePriors = zeros(numEdges,1);
+edgeOrientationIndex = zeros(numEdges,1);
 for i=1:numEdges
     % for each edge, get the pixel indices
     edgePixelInds = edgepixels(i,:);              % list indices
@@ -32,7 +35,7 @@ for i=1:numEdges
             meanEdgePixResp_j = mean(orientationResp_j(edgePixelInds));
             edgePriors_all(i,j) = meanEdgePixResp_j;
         end
-        edgePriors(i) = max(edgePriors_all(i,:)); 
+        [edgePriors(i),edgeOrientationIndex(i)] = max(edgePriors_all(i,:));  
     else
         edgePriors(i) = 0;  % self edge
     end
