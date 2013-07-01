@@ -103,7 +103,7 @@ edges2pixels = getEdges2Pixels(edgePixLabels);
 % for each node, get a list of edge IDs connected to it
 [nodeEdges,nodeInds] = getNodeEdges(ind4J,edgePixLabels,connectedJunctionIDs,sizeR,sizeC);
 
-[adjacencyMat,edges2nodes,selfEdgeIDs] = getAdjacencyMat(nodeEdges);
+[adjacencyMat,edges2nodes,selfEdgeIDs,~] = getAdjacencyMat(nodeEdges);
 
 if(selfEdgeIDs(1)~=0)
     % remove selfEdges from nodeEdges, edges2nodes and edges2pixels

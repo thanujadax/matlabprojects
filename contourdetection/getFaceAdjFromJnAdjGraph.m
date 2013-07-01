@@ -15,7 +15,7 @@ function [faceAdj,edges2cells,setOfCellsMat,listOfEdgeIDs] = getFaceAdjFromJnAdj
 %   the two cells that are connected by that edge. The order of edges
 %   present is according to listOfEdgeIDs
 %   setOfCellsMat - each row corresponds to a cell and contains the set of
-%   edges bounding that cell as a row vector with zero padding
+%   edges bounding that cell as a row vector with zero padding.
 %   listOfEdgeIDs - the edges considered in the faceAdjMatrix. Each of these edges
 %   connects a pair of cells
 
@@ -139,5 +139,5 @@ numCells = size(setOfCellsMat,1);
 cellList = 1:numCells; % row vector
 % add the cellList (index) as the first col of setOfCells. This is done so
 % that we can reuse getAdjacencyMat() to creage faceAdj.
-setOfCellsMat = [cellList' setOfCellsMat];
-[faceAdj,edges2cells,~,listOfEdgeIDs] = getAdjacencyMat(setOfCellsMat);
+setOfCellsMat_2 = [cellList' setOfCellsMat];
+[faceAdj,edges2cells,~,listOfEdgeIDs] = getAdjacencyMat(setOfCellsMat_2);

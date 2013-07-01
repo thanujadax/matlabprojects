@@ -303,9 +303,9 @@ if(withCellConstraint)
             cellActColInd_neg = colStartInd + cellsForEdge(2);
         end
         % set coefficients
-        A(rowStop,edgeActColInd) = -1;
-        A(rowStop,cellActColInd_pos) = 1;
-        A(rowStop,cellActColInd_neg) = -1;
+        A(rowStop,edgeActColInd) = -1;      % edge coefficient e_ij
+        A(rowStop,cellActColInd_pos) = 1;   % c_i coefficient
+        A(rowStop,cellActColInd_neg) = -1;  % c_j coefficient
     end
 end
 %% inequality constraint - coherence between activeNodeStates and the corresponding active edges
