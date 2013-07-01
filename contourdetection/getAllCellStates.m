@@ -15,6 +15,7 @@ function cellStates = getAllCellStates(cells2edges,cellcogs,edgeIDs,edgeOrientat
 %   returns a vector containing the cell state (cell interior = 1; membrane
 %   = 0) for each cell
 
+MAX_NUM_EDGES_TO_CONSIDER = 7;
 
 numCells = size(cells2edges,1);
 cellStates = zeros(numCells,1);
@@ -26,7 +27,8 @@ for i=1:numCells
     numEdges_cell = numel(getEdgeSet);
     clear cellStateVector_i
     cellStateVector_i = zeros(numEdges_cell,1);
-    for j=1:numEdges_cell
+    numEdges_toConsider = min(numEdges_cell,MAX_NUM_EDGES_TO_CONSIDER);
+    for j=1:numEdges_toConsider
         edgeListInd_j = find(edgeIDs==getEdgeSet_cell(j));
         clear edgePixels
         edgePixels = edges2pixels(edgeListInd_j,:);

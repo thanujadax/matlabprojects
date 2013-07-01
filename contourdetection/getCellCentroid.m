@@ -12,8 +12,12 @@ function cellCentroid = getCellCentroid(edgeIDset_cell,edges2pixels,edgeIDs_all,
 %   cellCentroid = [x; y] coordinates of the approximate centroid of the
 %   cell
 
+MAX_NUM_EDGES_TO_CONSIDER = 4;
+
 % generate random pairs of edges (from the set of edges for this cell)
 numEdgesInCell = numel(edgeIDset_cell);
+
+numEdgesInCell = min(numEdgesInCell,MAX_NUM_EDGES_TO_CONSIDER);
 edgeCombinationsVector = nchoosek(1:numEdgesInCell,2); % each row has 2 elements
 % which are 2 vector indices to get 2 edges
 
