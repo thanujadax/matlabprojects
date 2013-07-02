@@ -148,8 +148,11 @@ cellcogs = getCellCentroidsAll(setOfCells,edges2pixels,edgeListInds,...
 [~,edgeOrientationsInds] = getEdgePriors(orientedScoreSpace3D,edges2pixels);
 edgeOrientations = (edgeOrientationsInds-1).*orientationsStepSize;
 
-cellStatesAll = getAllCellStates(setOfCells,cellcogs,edgeListInds,edgeOrientations,...
-    sizeR,sizeC,edges2pixels);
+% cellStatesAll = getAllCellStates(setOfCells,cellcogs,edgeListInds,edgeOrientations,...
+%     sizeR,sizeC,edges2pixels);
+
+cellStatesAll = getAllCellStates(setOfCells,edgeListInds,edgeOrientations,...
+    sizeR,sizeC,edges2pixels,nodeInds,edges2nodes);
 
 
 %% Removing misoriented edges

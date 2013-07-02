@@ -5,6 +5,9 @@ function isInterior = checkIfCellIsInterior(internalPixels,edgePixels,...
 % returns a value between +1 and -1. If it's +1, it's most likely cell
 % interior
 
+% Inputs:
+%   internalPixels: matrix of x y coordinates. col1:x, col2:y
+
 % get center pixel of edge
 numEdgePixels = numel(edgePixels);
 centerpos = floor(numEdgePixels/2);
@@ -12,17 +15,16 @@ centerPixInd = edgePixels(centerpos);
 [centerPix.y,centerPix.x] = ind2sub([sizeR sizeC], centerPixInd);
 
 % determine the angle cog of cell makes with (wrt) the center pixel
-numInternalPixels = numel(internalPixels);
+numInternalPixels = size(internalPixels,1);
 isInterior = zeros(numInternalPixels,1);
-for i=1:numInternalPixels
-    theta = atan2d((internalPixels(i).y-centerPix.y),(internalPixels(i).x-centerPix.x));
-    % convert theta into the same scale as edgeOrientation angles
-    theta_scaled = convertThetaIntoOrientationScale(theta);
 
-    % based on the angle and the edge orientation determine if the cell is interior or not
-    isInterior(i) = sind(edgeOrientation - theta_scaled);
+theta = atan2d((internalPixels(:,2)-centerPix.y),(internalPixels(:,1)-centerPix.x));
+% convert theta into the same scale as edgeOrientation angles
+theta_scaled = convertThetaIntoOrientationScale(theta);
 
-end
+% based on the angle and the edge orientation determine if the cell is interior or not
+isInterior = sind(edgeOrientation - theta_scaled);
+
 
 meanInteriorScore = mean(isInterior);
 if(meanInteriorScore<0)
@@ -31,16 +33,16 @@ else
     isInterior = 1;
 end
     
-
 end
 
 function theta2 = convertThetaIntoOrientationScale(theta)
-if(theta>0 && theta <180)
-    theta2 = 360 - theta;
-elseif(theta<0 && theta>(-180))
-    theta2 = -1 * theta;
-else
-    theta2 = theta;
-end
-    
+numTheta = numel(theta);
+theta2 = theta; % initialization
+for i=1:numTheta
+    if(theta(i)>0 && theta(i) <180)
+        theta2(i) = 360 - theta(i);
+    elseif(theta(i)<0 && theta(i)>(-180))
+        theta2(i) = -1 * theta(i);
+    end
+end    
 end
