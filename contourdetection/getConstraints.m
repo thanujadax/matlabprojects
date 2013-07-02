@@ -284,13 +284,15 @@ end
 % when an edge is active, determine which cell is active and which is
 % inactive
 % constraint: c_i - c_j - e_ij = 0;
+% twoCellEdges contain the edgeListInds. not edgeIDs
 if(withCellConstraint)
+    edgeIDsAll = edges2pixels(:,1);
     colStartInd = numCols_Aeq - numCellConstrCols; % cell 1 col ind = colStartInd + 1; etc 
     for i=1:numCellConstrRows
         rowStop = rowStop + 1;
-        edgeListInd_i = find(edges2pixels(:,1)==twoCellEdges(i));
-        edgeActColInd = edgeListInd_i * 2;
-        cellsForEdge = edges2cells(i,:);
+        edgeListInd_i = twoCellEdges(i);
+        edgeActColInd = edgeListInd_i * 2;        
+        cellsForEdge = edges2cells(edgeListInd_i,:);
         cellState_1 = cellStatesAll(cellsForEdge(1));
         cellState_2 = cellStatesAll(cellsForEdge(2));
         if(cellState_1>0)
