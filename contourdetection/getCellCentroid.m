@@ -12,6 +12,7 @@ function cellCentroid = getCellCentroid(edgeIDset_cell,edges2pixels,edgeIDs_all,
 %   cellCentroid = [x; y] coordinates of the approximate centroid of the
 %   cell
 
+%% method 1
 % % get all the edges bounding the cell
 % numEdgesForCell = numel(edgeIDset_cell);
 % edgeListInds = zeros(numEdgesForCell,1);
