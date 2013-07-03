@@ -292,9 +292,12 @@ if(withCellConstraint)
         rowStop = rowStop + 1;
         edgeListInd_i = twoCellEdges(i);
         edgeActColInd = edgeListInd_i * 2;        
-        cellsForEdge = edges2cells(edgeListInd_i,:);
-        cellState_1 = cellStatesAll(cellsForEdge(1));
-        cellState_2 = cellStatesAll(cellsForEdge(2));
+        cellsForEdge = edges2cells(edgeListInd_i,:); 
+        cellState_1 = cellStatesAll(cellsForEdge(1)); % remove
+        cellState_2 = cellStatesAll(cellsForEdge(2)); % remove
+        
+        cellState_1 = getCellStateGivenEdge()
+        
         if(cellState_1>0)
             % cell1 is of type:interior
             cellActColInd_pos = colStartInd + cellsForEdge(1);
@@ -390,4 +393,19 @@ if(minNumActEdgesPercentage>0)
     rowStop = rowStop + 1;
     allActiveEdgeIDs = 2:2:(numEdges*2);
     A(rowStop,allActiveEdgeIDs) = -1;
+end
+
+end
+%% Supplementary functions:
+function cellState = getCellStateGivenEdge(edgeID,edgeSet_cell,edgePixels,...
+                    edgeOrientation,sizeR,sizeC,edges2pixels)
+                
+    % get cellInteriorPoints (10points)
+    boundaryPixels = getBoundaryPixelsForCell(edgeSet_cell,edges2pixels,...
+    nodeInds,edges2nodes,edgeIDs);
+    [internalx,internaly] = getInternelPixelsFromBoundary(boundaryPixels,sizeR,sizeC);
+    cellInteriorPoints = samplePointsFromArrays(internalx,internaly,NUM_INTERNAL_POINTS);
+   
+    cellState = checkIfCellIsInterior(internalPixels,edgePixels,...
+                    edgeOrientation,sizeR,sizeC)
 end
