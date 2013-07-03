@@ -21,8 +21,7 @@ for i=1:numCells
     
     pixelValues = imgIn(intPixInds);
     
-    cellPriors(i) = mean(pixelValues);
-    
+    cellPriors(i) = 1 - 2* mean(pixelValues);
 end
 
-cellPriors = 1 - cellPriors;
+

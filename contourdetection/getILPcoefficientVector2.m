@@ -74,6 +74,7 @@ for i=1:numJtypes
 end
 k=1;
 for i=(f_stop_ind+1):(f_stop_ind+numCells)
+   
     f(i) = cellPriors(k);
     k = k + 1;
 end
