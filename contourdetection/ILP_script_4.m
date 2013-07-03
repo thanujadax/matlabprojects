@@ -17,7 +17,7 @@ orientationsStepSize = 10;
 barLength = 13; % should be odd
 barWidth = 4; %
 marginSize = ceil(barLength/2);
-marginPixVal = 0.1;
+% marginPixVal = 0.1;
 addBorder = ceil(barLength/2);
 threshFrac = 0.2;
 medianFilterH = 0;
@@ -35,6 +35,7 @@ elseif(fromInputImage)
     disp(imagePath);
     imgIn0 = double(imread(imagePath));
     % add border
+    marginPixVal = min(min(imgIn0));
     imgIn = addThickBorder(imgIn0,marginSize,marginPixVal);
     [output,rgbimg,orientedScoreSpace3D] = getOFR(imgIn,...
                             barLength,barWidth,invertImg,threshFrac);
@@ -142,8 +143,8 @@ boundaryEdges = getBoundaryEdges2(wsBoundariesFromGraph,barLength,edgepixels,...
 [faceAdj,edges2cells,setOfCells,twoCellEdges] = getFaceAdjFromJnAdjGraph(edgeListInds,nodeEdges,...
     junctionTypeListInds,jAnglesAll_alpha,boundaryEdges,edges2nodes);
 
-cellcogs = getCellCentroidsAll(setOfCells,edges2pixels,edgeListInds,...
-    sizeR,sizeC,edges2nodes,nodeInds);
+% cellcogs = getCellCentroidsAll(setOfCells,edges2pixels,edgeListInds,...
+%     sizeR,sizeC,edges2nodes,nodeInds);
 
 [~,edgeOrientationsInds] = getEdgePriors(orientedScoreSpace3D,edges2pixels);
 edgeOrientations = (edgeOrientationsInds-1).*orientationsStepSize;
@@ -152,7 +153,10 @@ edgeOrientations = (edgeOrientationsInds-1).*orientationsStepSize;
 % cellStatesAll = getAllCellStates(setOfCells,edgeListInds,edgeOrientations,...
 %     sizeR,sizeC,edges2pixels,nodeInds,edges2nodes);
 
-
+% normalize input image
+normalizedInputImage = imgIn./(max(max(imgIn)));
+cellPriors = getCellPriors_intensity(normalizedInputImage,setOfCells,edges2pixels,...
+    nodeInds,edges2nodes);
 %% Removing misoriented edges
 % uses the compatibility of the orientation of the adjoining pixels of each
 % edge
@@ -204,7 +208,7 @@ scaledEdgePriors = edgePriors.*cEdge;
             twoCellEdges,edges2cells,setOfCells,edgeOrientations,sizeR,sizeC);
         
 f = getILPcoefficientVector2(scaledEdgePriors,nodeAngleCosts,...
-    bbNodeListInds,junctionTypeListInds,bbJunctionCost,numCells);
+    bbNodeListInds,junctionTypeListInds,bbJunctionCost,numCells,cellPriors);
                 
 senseArray(1:numEq) = '=';
 if(numLt>0)

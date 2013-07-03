@@ -1,5 +1,6 @@
 function f = getILPcoefficientVector2(edgePriors,nodeAngleCosts,...
-            bbJunctionsListInds,junctionTypeListInds,bbJunctionCost,numCells)
+            bbJunctionsListInds,junctionTypeListInds,bbJunctionCost,...
+            numCells,cellPriors)
 numEdges = size(edgePriors,1);
 
 [~, numJtypes] = size(nodeAngleCosts);
@@ -70,4 +71,9 @@ for i=1:numJtypes
         angleCostMat_i = nodeAngleCost_i';
         f(f_start_ind:f_stop_ind) = angleCostMat_i(1:numCoeff_i);
     end
+end
+k=1;
+for i=(f_stop_ind+1):(f_stop_ind+numCells)
+    f(i) = cellPriors(k);
+    k = k + 1;
 end
