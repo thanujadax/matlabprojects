@@ -11,6 +11,9 @@ function isInterior = checkIfCellIsInterior(internalPixels,edgePixels,...
 % get center pixel of edge
 numEdgePixels = numel(edgePixels);
 centerpos = floor(numEdgePixels/2);
+if(centerpos==0);
+    centerpos=1;
+end
 centerPixInd = edgePixels(centerpos);
 [centerPix.y,centerPix.x] = ind2sub([sizeR sizeC], centerPixInd);
 
@@ -26,11 +29,12 @@ theta_scaled = convertThetaIntoOrientationScale(theta);
 isInterior = sind(edgeOrientation - theta_scaled);
 
 
-meanInteriorScore = mean(isInterior);
-if(meanInteriorScore<0)
-    isInterior = -1;
-else
+maxInteriorScore = max(isInterior);
+
+if(maxInteriorScore>0)
     isInterior = 1;
+else
+    isInterior = - 1;
 end
     
 end

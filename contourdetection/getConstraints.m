@@ -1,11 +1,13 @@
-function [A,b,numRows_Aeq,numRows_AInEq] = getConstraints(numEdges,jEdges,...
+function [A,b,numRows_Aeq,numRows_AInEq,numCellConstrCols] = getConstraints(numEdges,jEdges,...
             edges2pixels,jDirectionalScores,offEdgeListIDs,...
-            onEdgeListIDs,minNumActEdgesPercentage,...
-            twoCellEdges,edges2cells,setOfCellsMat,cellStatesAll)
+            onEdgeListIDs,minNumActEdgesPercentage,nodeInds,edges2nodes,...
+            twoCellEdges,edges2cells,setOfCellsMat,edgeOrientations,sizeR,sizeC)
 % returns equality and inequality constraints
 
 % Inputs:
 %   twoCellEdges - list of edgeIDs that separate exactly two cells
+%   edges2cells - rowID = edgeID
+%   edgeOrientations - rowID = edgeListInd
 
 % equality constraints:
 %   each edge should be either active or inactive
@@ -286,30 +288,30 @@ end
 % constraint: c_i - c_j - e_ij = 0;
 % twoCellEdges contain the edgeListInds. not edgeIDs
 if(withCellConstraint)
-    edgeIDsAll = edges2pixels(:,1);
+    % edgeIDsAll = edges2pixels(:,1);
     colStartInd = numCols_Aeq - numCellConstrCols; % cell 1 col ind = colStartInd + 1; etc 
     for i=1:numCellConstrRows
         rowStop = rowStop + 1;
-        edgeListInd_i = twoCellEdges(i);
-        edgeActColInd = edgeListInd_i * 2;        
-        cellsForEdge = edges2cells(edgeListInd_i,:); 
-        cellState_1 = cellStatesAll(cellsForEdge(1)); % remove
-        cellState_2 = cellStatesAll(cellsForEdge(2)); % remove
-        
-        cellState_1 = getCellStateGivenEdge()
-        
+        edgeID_i = twoCellEdges(i);  % twoCellEdges contains edgeIDs
+        edgeListInd_i = find(edges2pixels(:,1)==edgeID_i);
+        edgeActColInd = edgeListInd_i * 2; % col ind for the edge activation  
+        % edges2cells: row ID is the edgeID. not edgeListID.      
+        cellsForEdge = edges2cells(edgeID_i,:); 
+        edgeSet_cell_1 = setOfCellsMat(cellsForEdge(1),:);
+        edgeSet_cell_1 = edgeSet_cell_1(edgeSet_cell_1>0);
+        cellState_1 = getCellStateGivenEdge(edgeID_i,edgeSet_cell_1,...
+                    edgeOrientations(edgeListInd_i),sizeR,sizeC,edges2pixels,...
+                    nodeInds,edges2nodes);
+                              
         if(cellState_1>0)
             % cell1 is of type:interior
-            cellActColInd_pos = colStartInd + cellsForEdge(1);
-            cellActColInd_neg = colStartInd + cellsForEdge(2);
-        elseif(cellState_2>0)
-            % cell2 is of type:interior
-            cellActColInd_pos = colStartInd + cellsForEdge(2);
-            cellActColInd_neg = colStartInd + cellsForEdge(1);
+            cellActColInd_pos = colStartInd + cellsForEdge(1);  % col to mark +1
+            cellActColInd_neg = colStartInd + cellsForEdge(2);  % col to mark -1
         else
-            % both cells are of type:membrane
-            cellActColInd_pos = colStartInd + cellsForEdge(1);
-            cellActColInd_neg = colStartInd + cellsForEdge(2);
+            % cell1 is of type: membrane
+            cellActColInd_pos = colStartInd + cellsForEdge(2);  % +1 interior
+            cellActColInd_neg = colStartInd + cellsForEdge(1);  % -1 membrane
+        	
         end
         % set coefficients
         A(rowStop,edgeActColInd) = -1;      % edge coefficient e_ij
@@ -397,15 +399,30 @@ end
 
 end
 %% Supplementary functions:
-function cellState = getCellStateGivenEdge(edgeID,edgeSet_cell,edgePixels,...
-                    edgeOrientation,sizeR,sizeC,edges2pixels)
-                
+function cellState = getCellStateGivenEdge(edgeID,edgeSet_cell,...
+                    edgeOrientation,sizeR,sizeC,edges2pixels,nodeInds,edges2nodes)
+    NUM_INTERNAL_POINTS = 5;
+    % gives the cell state (+1 for cell-interior, -1 for membrane) wrt to the edgeID given             
     % get cellInteriorPoints (10points)
     boundaryPixels = getBoundaryPixelsForCell(edgeSet_cell,edges2pixels,...
-    nodeInds,edges2nodes,edgeIDs);
+    nodeInds,edges2nodes,edges2pixels(:,1));
     [internalx,internaly] = getInternelPixelsFromBoundary(boundaryPixels,sizeR,sizeC);
-    cellInteriorPoints = samplePointsFromArrays(internalx,internaly,NUM_INTERNAL_POINTS);
-   
+    internalPixels = samplePointsFromArrays(internalx,internaly,NUM_INTERNAL_POINTS);
+    
+    edgePixels = edges2pixels(edges2pixels(:,1)==edgeID,:);
+    edgePixels(1) = []; % first element is the edgeID
+    edgePixels = edgePixels(edgePixels>0);
     cellState = checkIfCellIsInterior(internalPixels,edgePixels,...
-                    edgeOrientation,sizeR,sizeC)
+                    edgeOrientation,sizeR,sizeC);
+end
+
+function cellInteriorPoints = samplePointsFromArrays(internalx,internaly,maxn)
+    numInputPoints = numel(internalx);
+    % pick maxn number of random integers ranging from 1 to numInputPoints
+    pixListInds = randi(numInputPoints,maxn,1);
+    cellInteriorPoints = zeros(maxn,2);
+    for i=1:maxn
+        cellInteriorPoints(i,1) = internalx(pixListInds(i));
+        cellInteriorPoints(i,2) = internaly(pixListInds(i));
+    end
 end

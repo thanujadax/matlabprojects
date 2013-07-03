@@ -1,5 +1,5 @@
 function f = getILPcoefficientVector2(edgePriors,nodeAngleCosts,...
-            bbJunctionsListInds,junctionTypeListInds,bbJunctionCost)
+            bbJunctionsListInds,junctionTypeListInds,bbJunctionCost,numCells)
 numEdges = size(edgePriors,1);
 
 [~, numJtypes] = size(nodeAngleCosts);
@@ -27,7 +27,7 @@ for i=1:numJtypes
 end
 
 
-numElements = numEdges*2 + sum(totJunctionVar);
+numElements = numEdges*2 + sum(totJunctionVar) + numCells;
 f = zeros(numElements,1);
 % order of elements in f
 %[{edgeInactive},{edgeActive},{J2inactive},{J2Active},{J3inactive},{J4Active_3}...]
@@ -48,7 +48,7 @@ for i=1:numJtypes
     nodeAngleCost_i = nodeAngleCosts{i};
     if(~isnan(nodeAngleCost_i))
         maxJcost = max(nodeAngleCost_i,[],2);          % inactivation cost
-        minJcost = min(nodeAngleCost_i,[],2);           % TODO: should this be min???
+        minJcost = min(nodeAngleCost_i,[],2);          
         avgJcost = (minJcost + maxJcost)/2;
         
         % identify the bbJunctions and set a very high inactivation cost

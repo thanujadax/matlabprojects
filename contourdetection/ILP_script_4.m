@@ -148,11 +148,9 @@ cellcogs = getCellCentroidsAll(setOfCells,edges2pixels,edgeListInds,...
 [~,edgeOrientationsInds] = getEdgePriors(orientedScoreSpace3D,edges2pixels);
 edgeOrientations = (edgeOrientationsInds-1).*orientationsStepSize;
 
-% cellStatesAll = getAllCellStates(setOfCells,cellcogs,edgeListInds,edgeOrientations,...
-%     sizeR,sizeC,edges2pixels);
-
-cellStatesAll = getAllCellStates(setOfCells,edgeListInds,edgeOrientations,...
-    sizeR,sizeC,edges2pixels,nodeInds,edges2nodes);
+% 
+% cellStatesAll = getAllCellStates(setOfCells,edgeListInds,edgeOrientations,...
+%     sizeR,sizeC,edges2pixels,nodeInds,edges2nodes);
 
 
 %% Removing misoriented edges
@@ -197,15 +195,16 @@ numJunctions = numel(nodeInds);
 
 % f = getILPcoefficientVector(edgePriors,j3NodeAngleCost,j4NodeAngleCost);
 scaledEdgePriors = edgePriors.*cEdge;
-f = getILPcoefficientVector2(scaledEdgePriors,nodeAngleCosts,...
-    bbNodeListInds,junctionTypeListInds,bbJunctionCost);
+
 % constraints
 % equality constraints and closedness constrains in Aeq matrix
 % [Aeq,beq] = getEqConstraints2(numEdges,jEdges,edges2pixels);
-[Aeq,beq,numEq,numLt] = getConstraints(numEdges,jEdges,edges2pixels,nodeAngleCosts,...
-            offEdgeListIDs,onEdgeListIDs,minNumActEdgesPercentage,...
-            twoCellEdges,edges2cells,setOfCells,cellStatesAll);
-                
+[Aeq,beq,numEq,numLt,numCells] = getConstraints(numEdges,jEdges,edges2pixels,nodeAngleCosts,...
+            offEdgeListIDs,onEdgeListIDs,minNumActEdgesPercentage,nodeInds,edges2nodes,...
+            twoCellEdges,edges2cells,setOfCells,edgeOrientations,sizeR,sizeC);
+        
+f = getILPcoefficientVector2(scaledEdgePriors,nodeAngleCosts,...
+    bbNodeListInds,junctionTypeListInds,bbJunctionCost,numCells);
                 
 senseArray(1:numEq) = '=';
 if(numLt>0)

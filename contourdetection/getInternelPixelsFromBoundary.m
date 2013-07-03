@@ -43,7 +43,7 @@ for i=(lowestpt.y+1):(highestpt.y-1)
     x_left = min(x_for_y);          % left most x
     x_right = max(x_for_y);         % right most x
     numRowPixels = x_right - x_left - 1; % excluding the boundary pixels
-    j=(x_left+1):(x_right-1)        % all internal x coordinates for y=i
+    j=(x_left+1):(x_right-1);        % all internal x coordinates for y=i
     k = ones(numRowPixels,1) .* i;  % the y coordinate vector
     
     % append to the output column vectors
