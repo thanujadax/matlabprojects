@@ -9,7 +9,7 @@ function jAnglesAll_alpha = getNodeAngles_fromGraph_allJtypes(junctionTypeListIn
 %   jEdgesAll - cell array with jEdgesAll{i} corresponding the edgeSet of
 %   junction type i. each row in the edge set corresponds to a junction
 %   instance of that type
-
+MAX_NUM_PIXELS = 3;  % maximum number of pixels away from the node used to calculate alpha
 [nre,nce] = size(edges2pixels);  % first column is the edgeID
 edgepixels = edges2pixels(:,2:nce);
 
@@ -37,6 +37,10 @@ for dim=1:numJtypes
             edges_i = jEdges(i,:);
             nodeListInd = junctionTypeListInds(i,dim);% get the index of the node in concern
             nodeInd = nodeInds(nodeListInd); 
+            % debug code
+            if(nodeInd==20901)
+                a = 99;
+            end
             [rNode,cNode] = ind2sub([sizeR sizeC],nodeInd);
             for j=1:degree
                 % for each edge of this node
@@ -54,7 +58,8 @@ for dim=1:numJtypes
                     edgePixelInds = zeros(rmax,cmax);
                     edgePixelInds(r1,c1) = edgePixelInds0(r1,c1);
                     % get the edge pixels(3) which are closest to the node i
-                    nodePixels = getNodeEdgePixel(nodeInd,edgePixelInds,sizeR,sizeC);
+                    nodePixels = getNodeEdgePixel(nodeInd,edgePixelInds,sizeR,sizeC,...
+                                    MAX_NUM_PIXELS);
                     % get their orientation
                     [rP,cP] = ind2sub([sizeR sizeC],nodePixels');
                     numEdgePix = numel(nodePixels);
@@ -77,16 +82,6 @@ for dim=1:numJtypes
                         x = cNode2 - cNode;
                     else
                         % get alpha wrt the end edge pixels
-%                         for k=1:numEdgePix
-%                             y = rP(k) - rNode;
-%                             x = cP(k) - cNode;
-%                             alpha = atan2d(y,x);
-%                             if(alpha<0)
-%                                 alpha = alpha + 360;
-%                             end
-%                         orientations(k) = alpha;
-%                         end
-                        % get the first in the list
                         rp1 = rP(1);
                         rp2 = rP(end);
                         cp1 = cP(1);
@@ -98,13 +93,8 @@ for dim=1:numJtypes
                     if(alpha<0)
                         alpha = alpha + 360;
                     end
-%                         medianAlpha = median(orientations);
-%                     if(numel(alpha)>1)
-%                         % prob
-%                         alpha
-%                     else
+
                     jAngles(i,j) = alpha;
-%                     end
                 end
                     
             end
