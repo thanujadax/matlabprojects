@@ -397,7 +397,7 @@ if(minNumActEdgesPercentage>0)
     A(rowStop,allActiveEdgeIDs) = -1;
 end
 
-end
+end  % end of main function
 %% Supplementary functions:
 function cellState = getCellStateGivenEdge(edgeID,edgeSet_cell,...
                     edgeOrientation,sizeR,sizeC,edges2pixels,nodeInds,edges2nodes)
