@@ -23,18 +23,3 @@ sortedPixInds = edgePixelInds(sortedInd);
 
 nodePixels = sortedPixInds(1:maxNumPix); 
 
-
-
-% sortedDistance = sort(distance);
-% minDist3 = sortedDistance(maxNumPix);
-% % nodePixels = edgePixelInds(distance<=minDist3);
-% sortNodePixelsDists = zeros(maxNumPix,2);
-% tmp = edgePixelInds(distance<=minDist3)';
-% tmp1 = tmp(1:maxNumPix);
-% sortNodePixelsDists(:,1) = tmp1;
-% tmp = distance(distance<=minDist3)';
-% tmp2 = tmp(1:maxNumPix);
-% sortNodePixelsDists(:,2) = tmp2;
-% [Y,I]=sort(sortNodePixelsDists(:,2));
-% sortNodePixelsDists=sortNodePixelsDists(I,:);
-% nodePixels = sortNodePixelsDists(:,1);

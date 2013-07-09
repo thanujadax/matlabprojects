@@ -1,5 +1,11 @@
 function cellPriors = getCellPriors_intensity(imgIn,setOfCells,edges2pixels,...
-    nodeInds,edges2nodes)
+    nodeInds,edges2nodes,K)
+% Inputs:
+%   imgIn - normalized image. 1 -> bright
+%   K - positive scalar factor for the costs 
+
+% Output:
+%   cellPriors - value between K (membrane) and -K (cell interior). 
 
 [sizeR,sizeC] = size(imgIn);
 
@@ -21,7 +27,11 @@ for i=1:numCells
     
     pixelValues = imgIn(intPixInds);
     
-    cellPriors(i) = 1 - 2* mean(pixelValues);
+    % cellPriors(i) = 1 - 2* mean(pixelValues);
+    
+    meanPixVal = mean(pixelValues); % always between 0 and 1
+    theta = meanPixVal * pi;
+    cellPriors(i) = cos(theta) * K; 
 end
 
 

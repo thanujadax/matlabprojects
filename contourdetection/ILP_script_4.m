@@ -19,7 +19,7 @@ barWidth = 4; %
 marginSize = ceil(barLength/2);
 % marginPixVal = 0.1;
 addBorder = ceil(barLength/2);
-threshFrac = 0.2;
+threshFrac = 0.01;
 medianFilterH = 0;
 invertImg = 1;      % 1 for EM images when input image is taken from imagePath
 % max vote response image of the orientation filters
@@ -51,22 +51,22 @@ end
 angleStep = 10; % 10 degrees discretization step of orientations
 
 % param
-cEdge = 1;        % scaling factor for edge priors
-cNode = 100;          % scaling factor for the node cost coming from gaussian normal distr.
-sig = 50;          % standard deviation(degrees) for the node cost function's gaussian distr.
-midPoint = 180;     % angle difference of an edge pair (in degrees) for maximum cost 
+cEdge = 1;        % general scaling factor for edge priors
+% cNode = 100;        % scaling factor for the node cost coming from gaussian normal distr.
+cCell = 100;        % positive scaling factor for cell priors
+% sig = 50;         % standard deviation(degrees) for the node cost function's gaussian distr.
+% midPoint = 180;   % angle difference of an edge pair (in degrees) for maximum cost 
 lenThresh = 25;     % max length of edges to be checked for misorientations
 lenThreshBB = 4;    % min length of edges to be considered for being in the backbone (BB)
 priorThreshFracBB = 0.55; % threshold of edgePrior for an edge to be considered BB
-% param for exp cost function
-decayRate = 0.02;
+
 maxCost_direction = 1000;  % C for the directional cost function
-cPos = 1000000;
-cNeg = 10;
+cPos = 1000;        % scaling factor for positive nodeAngleCosts
+cNeg = 10;          % scaling factor for negative nodeAngleCosts
 minNumActEdgesPercentage = 0;  % percentage of the tot num edges to retain (min)
-bbEdgeReward = 1000;
-offEdgeCost = -2000;
-bbJunctionCost = 100000;
+bbEdgeReward = 1500;
+offEdgeReward = -1000;
+bbJunctionReward = 100000;        % inactivation cost for bbjunction
 
 % generate hsv outputs using the orientation information
 % output(:,:,1) contains the hue (orinetation) information
@@ -156,14 +156,14 @@ edgeOrientations = (edgeOrientationsInds-1).*orientationsStepSize;
 % normalize input image
 normalizedInputImage = imgIn./(max(max(imgIn)));
 cellPriors = getCellPriors_intensity(normalizedInputImage,setOfCells,edges2pixels,...
-    nodeInds,edges2nodes);
+    nodeInds,edges2nodes,cCell);
 %% Removing misoriented edges
 % uses the compatibility of the orientation of the adjoining pixels of each
 % edge
 offEdgeListIDs = getUnOrientedEdgeIDs(edgepixels,...
                 lenThresh,output(:,:,1),sizeR,sizeC);
 % setting edgePriors
-edgePriors(offEdgeListIDs) = offEdgeCost;
+edgePriors(offEdgeListIDs) = offEdgeReward;
 % visualize off edges
 imgOffEdges = visualizeOffEdges(offEdgeListIDs,edgepixels,nodeInds,sizeR,sizeC);
 figure;imshow(imgOffEdges); title('visualization of edges turned off')
@@ -209,7 +209,7 @@ scaledEdgePriors = edgePriors.*cEdge;
             nodeEdges,junctionTypeListInds,edges2nodes,sizeR,sizeC);
         
 f = getILPcoefficientVector2(scaledEdgePriors,nodeAngleCosts,...
-    bbNodeListInds,junctionTypeListInds,bbJunctionCost,numCells,cellPriors);
+    bbNodeListInds,junctionTypeListInds,bbJunctionReward,cellPriors);
                 
 senseArray(1:numEq) = '=';
 if(numLt>0)
@@ -312,5 +312,5 @@ hsvImage = cat(3,output(:,:,1),output(:,:,2),ilpSegmentation);
 % convert it to an RGB image
 RGBimg = hsv2rgb(hsvImage);
 % titleStr = sprintf('C = %d : lambda = %d',cNode,decayRate);
-titleStr = sprintf('C = %d',maxCost_direction);
-figure;imshow(RGBimg);title(titleStr)
+% titleStr = sprintf('C = %d',maxCost_direction);
+figure;imshow(RGBimg)

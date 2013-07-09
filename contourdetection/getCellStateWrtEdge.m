@@ -59,10 +59,6 @@ else
 end
 
 % which region is cell interior. look for the next edge
-nodeAlphas_0
-nextAlpha
-alpha_inputEdge
-nodeListInd_0
 nextEdgePos = find(nodeAlphas_0==nextAlpha);
 nextEdgeID = nodeEdgeIDs_0(nextEdgePos);
 edgeInCell = find(edgeSet_cell==nextEdgeID);

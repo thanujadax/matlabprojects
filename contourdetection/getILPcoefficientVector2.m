@@ -1,6 +1,6 @@
 function f = getILPcoefficientVector2(edgePriors,nodeAngleCosts,...
             bbJunctionsListInds,junctionTypeListInds,bbJunctionCost,...
-            numCells,cellPriors)
+            cellPriors)
 numEdges = size(edgePriors,1);
 
 [~, numJtypes] = size(nodeAngleCosts);
@@ -27,13 +27,13 @@ for i=1:numJtypes
     end
 end
 
-
+numCells = numel(cellPriors);
 numElements = numEdges*2 + sum(totJunctionVar) + numCells;
 f = zeros(numElements,1);
 % order of elements in f
 %[{edgeInactive},{edgeActive},{J2inactive},{J2Active},{J3inactive},{J4Active_3}...]
 
-% edge variables
+%% edge variables
 j=1;
 for i=1:2:2*numEdges
     f(i) = edgePriors(j);        % inactivation cost
@@ -42,7 +42,8 @@ for i=1:2:2*numEdges
 end
 
 f_stop_ind = numEdges*2;
-% junction variables
+
+%%  junction variables
 for i=1:numJtypes
     % for each junction type
     clear nodeAngleCost_i
@@ -72,9 +73,10 @@ for i=1:numJtypes
         f(f_start_ind:f_stop_ind) = angleCostMat_i(1:numCoeff_i);
     end
 end
+
+%% cells
 k=1;
 for i=(f_stop_ind+1):(f_stop_ind+numCells)
-   
     f(i) = cellPriors(k);
     k = k + 1;
 end

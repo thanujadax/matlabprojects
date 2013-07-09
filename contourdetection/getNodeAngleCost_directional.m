@@ -12,6 +12,9 @@ function nodeAngleCost = getNodeAngleCost_directional(theta,alpha,edgePriors_j,.
 % edgePriors_j contains the edge priors for all the nodes in the junction
 % type in concern, in the order considered in theta and alpha
 
+% Parameters
+K = 100;    % scalar factor for node cost 
+
 if(theta==0)
     nodeAngleCost = nan;
 elseif(~isempty(theta))
@@ -31,7 +34,7 @@ elseif(~isempty(theta))
            for j=1:numCombinations
                 edge1LInd = combinations(j,1);
                 edge2LInd = combinations(j,2);
-                edgePriorFactor = edgePriors_j(i,edge1LInd) * edgePriors_j(i,edge2LInd)*100;
+                edgePriorFactor = edgePriors_j(i,edge1LInd) * edgePriors_j(i,edge2LInd)*K;
                 nodeAngleCost(i,j) = outwardnessScores(i,edge1LInd) *...
                                     outwardnessScores(i,edge2LInd) * edgePriorFactor;
 
