@@ -19,7 +19,7 @@ barWidth = 4; %
 marginSize = ceil(barLength/2);
 % marginPixVal = 0.1;
 addBorder = ceil(barLength/2);
-threshFrac = 0.01;
+threshFrac = 0.2;
 medianFilterH = 0;
 invertImg = 1;      % 1 for EM images when input image is taken from imagePath
 % max vote response image of the orientation filters
@@ -307,8 +307,35 @@ end
 %             barLength,barWidth,threshFrac,medianFilterH);
 % get the active pixels
 %output(:,:,3) = ilpSegmentation;
+totX = numel(x);
+numCells = numel(cellPriors);
+% get active foreground cells
+cellStartPos = totX - numCells + 1;
+cellVector = x(cellStartPos:totX);
+activeCellInd = find(cellVector==1);
+% get internal pixels for foreground cells
+foregroundPixels = [];
+for i=1:numel(activeCellInd)
+    boundaryEdgeIDs_i = setOfCells(activeCellInd(i),:);
+    boundaryEdgeIDs_i = boundaryEdgeIDs_i(boundaryEdgeIDs_i>0);
+    boundaryPixelInds_i = getBoundaryPixelsForCell(boundaryEdgeIDs_i,edges2pixels,...
+    nodeInds,edges2nodes,edgeListInds);
+    [internalx_i,internaly_i] = getInternelPixelsFromBoundary(boundaryPixelInds_i,...
+                                    sizeR,sizeC);
+    foregroundPixels_i = sub2ind([sizeR sizeC],internaly_i,internalx_i);
+    foregroundPixels = [foregroundPixels; foregroundPixels_i];
+end
+% assign white to active (foreground) cells
+output_h = output(:,:,1);
+output_h(foregroundPixels) = 1; 
+output_s = output(:,:,2);
+output_s(foregroundPixels) = 0;
+output_v = ilpSegmentation;
+output_v(foregroundPixels) = 1;
+
 % create HSV image
-hsvImage = cat(3,output(:,:,1),output(:,:,2),ilpSegmentation);
+% hsvImage = cat(3,output(:,:,1),output(:,:,2),ilpSegmentation);
+hsvImage = cat(3,output_h,output_s,output_v);
 % convert it to an RGB image
 RGBimg = hsv2rgb(hsvImage);
 % titleStr = sprintf('C = %d : lambda = %d',cNode,decayRate);
