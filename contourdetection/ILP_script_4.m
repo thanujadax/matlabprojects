@@ -174,8 +174,8 @@ onEdgeListIDs = getBackboneEdgeIDs(edgepixels,edgePriors,...
                 lenThreshBB,priorThreshFracBB);
 edgePriors(onEdgeListIDs) = bbEdgeReward;
 % test - enforcing some edges to be picked
-% clear onEdgeListIDs
-% onEdgeListIDs = [];
+clear onEdgeListIDs
+onEdgeListIDs = [];
 
 % visualize BB edges
 imgBBEdges = visualizeOffEdges(onEdgeListIDs,edgepixels,nodeInds,sizeR,sizeC);

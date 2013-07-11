@@ -6,7 +6,8 @@ function [faceAdj,edges2cells,setOfCellsMat,listOfEdgeIDs] = getFaceAdjFromJnAdj
 %   nodeEdges -
 %   junctionTypeListInds -
 %   jAnglesAll_alpha -
-%   boundaryEdgeIDs - 
+%   boundaryEdgeIDs - edges at the border of the image. Each of them belong
+%   just to one cell
 %   edges2nodes - 
 
 % Outputs: 
@@ -34,6 +35,11 @@ edgeUsage(:,1) = edgeIDs;
 %setOfCells = []; % each row corresponds to a cell i.e. a set of edges enclosing a cell
 cellInd = 0;
 for i=1:numEdges
+    % debug code
+    if(i==263)  % edgeID = 267
+        a = 99;
+    end % debug code end
+    
     % check usage
     currentEdgeID = edgeIDs(i);
     currentEdgeUsage = edgeUsage(i,2); 
@@ -59,6 +65,14 @@ for i=1:numEdges
         ,junctionTypeListInds,jAnglesAll_alpha,edges2nodes,edgeIDs);
     [nextEdgeIDs_2(2),~] = getNextEdge(currentEdgeID,currentNodeListInds(2),nodeEdges...
         ,junctionTypeListInds,jAnglesAll_alpha,edges2nodes,edgeIDs);
+    % start debug code
+    if(nextEdgeIDs_2(1)==307)
+        a = 98;
+    elseif(nextEdgeIDs_2(2)==307)
+        a = 97;
+    end
+    % end debug code
+    
     nextEdgeUsage_2 = zeros(1,2);
     nextEdgeUsage_2(1) = edgeUsage((edgeUsage(:,1)==nextEdgeIDs_2(1)),2);
     nextEdgeUsage_2(2) = edgeUsage((edgeUsage(:,1)==nextEdgeIDs_2(2)),2);
@@ -73,8 +87,7 @@ for i=1:numEdges
         % nextEdge(1) is a boundary edge
         if(nextEdgeUsage_2(1)<MAX_BOUNDARY_EDGE_USAGE)
             edge1ok = 1;
-            % flag set. get loop
-            
+            % flag set. get loop            
         else
             edge1ok = 0;
         end
@@ -108,29 +121,42 @@ for i=1:numEdges
         end
     end   
     
-    % find loops
+    % find loops (closed contours)
     setOfEdges_loop = [];
     if(edge1ok)
         % look for loop containing edge1
-        [setOfEdges_loop,edgeUsage] = getEdgeLoop(currentNodeListInds(1),...
+        [setOfEdges_loop,edgeUsage_new] = getEdgeLoop(currentNodeListInds(1),...
             currentEdgeID,nodeEdges,junctionTypeListInds,jAnglesAll_alpha,edgeUsage,...
             boundaryEdgeIDs,MAX_EDGE_USAGE,MAX_BOUNDARY_EDGE_USAGE,...
             edges2nodes,edgeIDs);
 
     elseif(edge2ok)
         % look for loop containing edge2
-        [setOfEdges_loop,edgeUsage] = getEdgeLoop(currentNodeListInds(2),...
+        [setOfEdges_loop,edgeUsage_new] = getEdgeLoop(currentNodeListInds(2),...
             currentEdgeID,nodeEdges,junctionTypeListInds,jAnglesAll_alpha,edgeUsage,...
             boundaryEdgeIDs,MAX_EDGE_USAGE,MAX_BOUNDARY_EDGE_USAGE,...
             edges2nodes,edgeIDs);
     end
     
     if(~isempty(setOfEdges_loop) && setOfEdges_loop(1)~=0)
-        % TODO: append to cycle list
+        % start debug code
+        if(~isempty(find(setOfEdges_loop==307)))
+            a = 88;
+        end
+        % end debug code
+        
+        
         cellInd = cellInd + 1;
         % setOfCells = [setOfCells; setOfEdges_loop];
         setOfCells{cellInd} = setOfEdges_loop;
+        edgeUsage = edgeUsage_new;
     end
+    
+    % start debug code
+    if(edgeUsage(263,2))
+        a = 77;
+    end
+    % end debug code
 end
 % create adjacency matrix for the cells. The coefficients correspond to the
 % edgeID that connects the corresponding pair of cells
