@@ -36,7 +36,7 @@ edgeUsage(:,1) = edgeIDs;
 cellInd = 0;
 for i=1:numEdges
     % debug code
-    if(i==263)  % edgeID = 267
+    if(i==1)  % edgeID = 15
         a = 99;
     end % debug code end
     
@@ -44,6 +44,7 @@ for i=1:numEdges
     currentEdgeID = edgeIDs(i);
     currentEdgeUsage = edgeUsage(i,2); 
     % if boundaryEdge, max usage is 1
+    % check if the edge is a boundary edge.
     if(max(boundaryEdgeIDs==currentEdgeID))
         % is a boundary edge
 %         if(currentEdgeUsage>=MAX_BOUNDARY_EDGE_USAGE)
@@ -52,7 +53,7 @@ for i=1:numEdges
         % we don't want to initialize a loop with a boundary edge.
         continue
     else
-        % most likely, not a boundary edge
+        % not a boundary edge
         if(currentEdgeUsage>=MAX_EDGE_USAGE)
             continue
         end
@@ -153,7 +154,7 @@ for i=1:numEdges
     end
     
     % start debug code
-    if(edgeUsage(263,2))
+    if(edgeUsage(15,2))
         a = 77;
     end
     % end debug code

@@ -2,8 +2,8 @@ function [setOfEdges,edgeUsage] = getEdgeLoop(startNodeListInd,startEdgeID,nodeE
     junctionTypeListInds,jAnglesAll_alpha,edgeUsage,boundaryEdgeIDs,maxUsage,maxUsageB,...
     edges2nodes,edgeIDs)
 % returns the set of edges that completes a clockwise loop
-% returns empty if no other edges are found or returns zero if the found
-% edges have reached allowed usage limit
+% returns empty if no other edges are found or returns zero if the edges that have been 
+% found, have reached allowed usage limit
 % setOfEdges - row vector containing the edgeIDs corresponding to a cell
 
 setOfEdges = [];
