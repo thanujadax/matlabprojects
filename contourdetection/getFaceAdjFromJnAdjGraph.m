@@ -45,13 +45,15 @@ for i=1:numEdges
     currentEdgeUsage = edgeUsage(i,2); 
     % if boundaryEdge, max usage is 1
     % check if the edge is a boundary edge.
+    currentEdgeIsBoundary = 0;
     if(max(boundaryEdgeIDs==currentEdgeID))
         % is a boundary edge
-%         if(currentEdgeUsage>=MAX_BOUNDARY_EDGE_USAGE)
-%             continue
-%         end 
-        % we don't want to initialize a loop with a boundary edge.
-        continue
+        currentEdgeIsBoundary = 1;
+        if(currentEdgeUsage>=MAX_BOUNDARY_EDGE_USAGE)
+            continue
+        end 
+        % we don't want to initialize a loop with a boundary edge. - ????
+%         continue
     else
         % not a boundary edge
         if(currentEdgeUsage>=MAX_EDGE_USAGE)
@@ -86,11 +88,16 @@ for i=1:numEdges
     % else continue
     if(max(boundaryEdgeIDs==nextEdgeIDs_2(1)))
         % nextEdge(1) is a boundary edge
-        if(nextEdgeUsage_2(1)<MAX_BOUNDARY_EDGE_USAGE)
-            edge1ok = 1;
-            % flag set. get loop            
-        else
+        % if the current edge is also a boundary edge, pick edge2
+        if(currentEdgeIsBoundary)
             edge1ok = 0;
+        else
+            if(nextEdgeUsage_2(1)<MAX_BOUNDARY_EDGE_USAGE)
+                edge1ok = 1;
+                % flag set. get loop            
+            else
+                edge1ok = 0;
+            end
         end
     else
         % nextEdge(1) is not a boundary edge (most likely)
