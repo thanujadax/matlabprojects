@@ -315,16 +315,27 @@ cellVector = x(cellStartPos:totX);
 activeCellInd = find(cellVector==1);
 % get internal pixels for foreground cells
 foregroundPixels = [];
+
+wsIDs = getWsIDsForCellIDs(ws,setOfCells,edges2pixels,nodeInds,...
+            edges2nodes,edgeListInds);
+
 for i=1:numel(activeCellInd)
-    boundaryEdgeIDs_i = setOfCells(activeCellInd(i),:);
-    boundaryEdgeIDs_i = boundaryEdgeIDs_i(boundaryEdgeIDs_i>0);
-    boundaryPixelInds_i = getBoundaryPixelsForCell(boundaryEdgeIDs_i,edges2pixels,...
-    nodeInds,edges2nodes,edgeListInds);
-    [internalx_i,internaly_i] = getInternelPixelsFromBoundary(boundaryPixelInds_i,...
-                                    sizeR,sizeC);
-    foregroundPixels_i = sub2ind([sizeR sizeC],internaly_i,internalx_i);
-    foregroundPixels = [foregroundPixels; foregroundPixels_i];
+    wsID_i = wsIDs(activeCellInd(i));
+    cellPixInds_i = find(ws==wsID_i);
+    foregroundPixels = [foregroundPixels; cellPixInds_i];
 end
+
+% for i=1:numel(activeCellInd)
+%     boundaryEdgeIDs_i = setOfCells(activeCellInd(i),:);
+%     boundaryEdgeIDs_i = boundaryEdgeIDs_i(boundaryEdgeIDs_i>0);
+%     boundaryPixelInds_i = getBoundaryPixelsForCell(boundaryEdgeIDs_i,edges2pixels,...
+%     nodeInds,edges2nodes,edgeListInds);
+%     [internalx_i,internaly_i] = getInternelPixelsFromBoundary(boundaryPixelInds_i,...
+%                                     sizeR,sizeC);
+%     foregroundPixels_i = sub2ind([sizeR sizeC],internaly_i,internalx_i);
+%     foregroundPixels = [foregroundPixels; foregroundPixels_i];
+% end
+
 % assign white to active (foreground) cells
 output_h = output(:,:,1);
 output_h(foregroundPixels) = 1; 
