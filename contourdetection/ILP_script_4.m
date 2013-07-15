@@ -312,7 +312,7 @@ numCells = numel(cellPriors);
 % get active foreground cells
 cellStartPos = totX - numCells + 1;
 cellVector = x(cellStartPos:totX);
-activeCellInd = find(cellVector==1);
+activeCellInd = find(cellVector>0);
 % get internal pixels for foreground cells
 foregroundPixels = [];
 
