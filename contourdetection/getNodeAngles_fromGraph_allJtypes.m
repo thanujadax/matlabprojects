@@ -98,7 +98,74 @@ for dim=1:numJtypes
                     jAngles(i,j) = alpha;
                 end
                     
+            end % for this node - all edges
+            % check if there are duplicates. if yes, recalculate all the
+            % angles fo that node wrt the node instead of the closest edge
+            % pixel
+            alphas = unique(jAngles(i,:));
+            if(numel(alphas)<numel(jAngles(i,:)))
+                % recalculate alphas
+                for j=1:degree
+                    % for each edge of this node
+                    edgeID = edges_i(j);
+                    if(edgeID~=0)
+                        edgeListInd = find(edges2pixels(:,1)==edgeID);  
+                        if(isempty(edgeListInd))
+                            continue;
+                        end
+                        edgePixelInds0 = edgepixels(edgeListInd,:);
+                        %edgePixelInds = edgePixelInds(edgePixelInds>0);
+                        [r1,c1] = find(edgePixelInds0>0);
+                        rmax = max(r1);
+                        cmax = max(c1);
+                        edgePixelInds = zeros(rmax,cmax);
+                        edgePixelInds(r1,c1) = edgePixelInds0(r1,c1);
+                        % get the edge pixels(3) which are closest to the node i
+                        nodePixels = getNodeEdgePixel(nodeInd,edgePixelInds,sizeR,sizeC,...
+                                        MAX_NUM_PIXELS);
+                        % get their orientation
+                        [rP,cP] = ind2sub([sizeR sizeC],nodePixels');
+                        numEdgePix = numel(nodePixels);
+    %                     orientations = zeros(numEdgePix,1);
+                        if(numEdgePix==1)
+                            % just one edge pixel
+                            % get the 2 junction nodes
+                            edgeNodes = edges2nodes(edgeListInd,:);
+                            if(edgeNodes(1)==nodeListInd)
+                                node2ListInd = edgeNodes(2);
+                            elseif(edgeNodes(2)==nodeListInd)
+                                node2ListInd = edgeNodes(1);
+                            else
+                                disp('ERROR: getNodeAngles_fromGraph_allJtypes. node mismatch');
+                            end
+                            % calculate alpha based on these 2
+                            nodeInd2 = nodeInds(node2ListInd); 
+                            [rNode2,cNode2] = ind2sub([sizeR sizeC],nodeInd2);
+                            y = rNode2 - rNode;
+                            x = cNode2 - cNode;
+                        else
+                            % get alpha wrt the node pixel
+                            rp1 = rNode;
+                            rp2 = rP(end);
+                            cp1 = cNode;
+                            cp2 = cP(end);
+                            y = rp2 - rp1;
+                            x = cp2 - cp1;
+                        end
+                        alpha = atan2d(y,x);
+                        if(alpha<0)
+                            alpha = alpha + 360;
+                        end
+
+                        jAngles(i,j) = alpha;
+                    end
+
+                end
+                
+                
+                
             end
+            
         end
         % assign the jAngles for this Jtype into jAnglesAll(:,:,Jtype)
         jAnglesAll_alpha{dim} = jAngles;
