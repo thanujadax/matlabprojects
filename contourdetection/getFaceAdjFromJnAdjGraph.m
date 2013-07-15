@@ -36,7 +36,7 @@ edgeUsage(:,1) = edgeIDs;
 cellInd = 0;
 for i=1:numEdges
     % debug code
-    if(i==110)  % edgeID = 15
+    if(i==183)  % edgeID = 15
         a = 99;
     end % debug code end
     
