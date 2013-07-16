@@ -35,10 +35,6 @@ edgeUsage(:,1) = edgeIDs;
 %setOfCells = []; % each row corresponds to a cell i.e. a set of edges enclosing a cell
 cellInd = 0;
 for i=1:numEdges
-    % debug code
-    if(i==206)  % edgeID = 208
-        a = 99;
-    end % debug code end
     
     % check usage
     currentEdgeID = edgeIDs(i);
@@ -68,13 +64,6 @@ for i=1:numEdges
         ,junctionTypeListInds,jAnglesAll_alpha,edges2nodes,edgeIDs);
     [nextEdgeIDs_2(2),~] = getNextEdge(currentEdgeID,currentNodeListInds(2),nodeEdges...
         ,junctionTypeListInds,jAnglesAll_alpha,edges2nodes,edgeIDs);
-    % start debug code
-    if(nextEdgeIDs_2(1)==307)
-        a = 98;
-    elseif(nextEdgeIDs_2(2)==307)
-        a = 97;
-    end
-    % end debug code
     
     nextEdgeUsage_2 = zeros(1,2);
     nextEdgeUsage_2(1) = edgeUsage((edgeUsage(:,1)==nextEdgeIDs_2(1)),2);
@@ -147,24 +136,13 @@ for i=1:numEdges
     end
     
     if(~isempty(setOfEdges_loop) && setOfEdges_loop(1)~=0)
-        % start debug code
-        if(~isempty(find(setOfEdges_loop==307)))
-            a = 88;
-        end
-        % end debug code
-        
-        
+ 
         cellInd = cellInd + 1;
         % setOfCells = [setOfCells; setOfEdges_loop];
         setOfCells{cellInd} = setOfEdges_loop;
         edgeUsage = edgeUsage_new;
     end
     
-    % start debug code
-    if(edgeUsage(206,2))
-        a = 77;
-    end
-    % end debug code
 end
 % create adjacency matrix for the cells. The coefficients correspond to the
 % edgeID that connects the corresponding pair of cells

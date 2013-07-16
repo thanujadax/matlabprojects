@@ -37,11 +37,6 @@ for dim=1:numJtypes
             edges_i = jEdges(i,:);
             nodeListInd = junctionTypeListInds(i,dim);% get the index of the node in concern
             nodeInd = nodeInds(nodeListInd); 
-            % debug code
-            if(i==11)
-                a = 99;
-            end
-            % end of debug code
             [rNode,cNode] = ind2sub([sizeR sizeC],nodeInd);
             for j=1:degree
                 % for each edge of this node

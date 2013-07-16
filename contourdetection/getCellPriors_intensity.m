@@ -24,14 +24,17 @@ for i=1:numCells
     [internalx,internaly] = getInternelPixelsFromBoundary(boundaryPixels,sizeR,sizeC);
     
     intPixInds = sub2ind([sizeR sizeC],internaly,internalx);
-    
-    pixelValues = imgIn(intPixInds);
-    
-    % cellPriors(i) = 1 - 2* mean(pixelValues);
-    
-    meanPixVal = mean(pixelValues); % always between 0 and 1
-    theta = meanPixVal * pi;
-    cellPriors(i) = cos(theta) * K; 
+    if(~isempty(intPixInds))
+        pixelValues = imgIn(intPixInds);
+
+        % cellPriors(i) = 1 - 2* mean(pixelValues);
+
+        meanPixVal = mean(pixelValues); % always between 0 and 1
+        theta = meanPixVal * pi;
+        cellPriors(i) = cos(theta) * K; 
+    else
+        cellPriors(i) = 0;
+    end
 end
 
 

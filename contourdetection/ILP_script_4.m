@@ -19,7 +19,7 @@ barWidth = 4; %
 marginSize = ceil(barLength/2);
 % marginPixVal = 0.1;
 addBorder = ceil(barLength/2);
-threshFrac = 0.17;
+threshFrac = 0.15;
 medianFilterH = 0;
 invertImg = 1;      % 1 for EM images when input image is taken from imagePath
 % max vote response image of the orientation filters

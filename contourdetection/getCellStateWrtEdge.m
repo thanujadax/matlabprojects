@@ -26,14 +26,13 @@ if(numel(numOfUniqueAngles)<numel(nodeAlphas_0))
         edges2pixels,sizeR,sizeC);
 end
 
-% get dirction to search (clockwise or counter clockwise)
+% get direction to search (clockwise or counter clockwise)
 inputEdgePos = find(nodeEdgeIDs_0==edgeID);
 alpha_inputEdge = nodeAlphas_0(inputEdgePos);
 directionToSearch = cosd(edgeOrientation - alpha_inputEdge);
 
 % get the cell to the brighter side
 % hence the cellState
-numEdgesForNode = numel(nodeEdgeIDs_0);
 
 % get next edge ID
 if(directionToSearch>0)
