@@ -4,6 +4,8 @@ function boundaryPixelInds = getBoundaryPixelsForCell(edgeSet_cell,edges2pixels,
 % returns the pixelInds for the boundary pixels for the given cell
 boundaryPixelInds = [];
 
+edgeSet_cell = edgeSet_cell(edgeSet_cell>0);
+
 % get node pix inds
 numEdges = numel(edgeSet_cell);
 edgeListInds = zeros(numEdges,1);

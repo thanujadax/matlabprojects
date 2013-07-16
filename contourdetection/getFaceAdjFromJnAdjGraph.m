@@ -1,6 +1,6 @@
-function [faceAdj,edges2cells,setOfCellsMat,listOfEdgeIDs] = getFaceAdjFromJnAdjGraph...
+function [faceAdj,edges2cells,setOfCellsMat,listOfEdgeIDs,wsIDs] = getFaceAdjFromJnAdjGraph...
     (edgeIDs,nodeEdges,junctionTypeListInds,jAnglesAll_alpha,...
-    boundaryEdgeIDs,edges2nodes)
+    boundaryEdgeIDs,edges2nodes,ws,edges2pixels)
 % Inputs: adjacency graph of junctions (planar graph)
 %   edgeIDs -
 %   nodeEdges -
@@ -169,6 +169,48 @@ end
 % create adjacency matrix for the cells. The coefficients correspond to the
 % edgeID that connects the corresponding pair of cells
 setOfCellsMat = setOfCells2Mat(setOfCells);
+
+wsIDs = getWsIDsForCellIDs(ws,setOfCellsMat,edges2pixels,nodeEdges(:,1),...
+            edges2nodes,edgeIDs);
+        
+% look for duplicate wsIDs
+uniqueIDs = unique(wsIDs);
+n = histc(wsIDs,uniqueIDs);
+duplicateWsIDs = uniqueIDs(n>1);
+listOfCellsToRemove = [];
+[sizeR,sizeC] = size(ws);
+while(~isempty(duplicateWsIDs))
+    duplicateCellIDs_i = find(wsIDs==duplicateWsIDs(1));
+    % find which cell is the biggest
+    % get the internal pixels for each cell
+    numDupCells_i = numel(duplicateCellIDs_i);
+    numPixPerDupCell = zeros(numDupCells_i,1);
+    for i=1:numDupCells_i
+        boundaryPixels_ii = getBoundaryPixelsForCell(setOfCellsMat((duplicateCellIDs_i(i)),:)...
+            ,edges2pixels,nodeEdges(:,1),edges2nodes,edgeIDs);
+        [internalx,internaly] = getInternelPixelsFromBoundary(boundaryPixels_ii,sizeR,sizeC);
+        % get the most popular label for the internal pixels
+        internalPixels_ii = sub2ind([sizeR sizeC],internaly,internalx);
+        numPixPerDupCell(i) = numel(internalPixels_ii);       
+    end
+    [~,pos_i] = max(numPixPerDupCell);
+    cellToRem_i = duplicateCellIDs_i(pos_i);
+    listOfCellsToRemove = [listOfCellsToRemove; cellToRem_i];
+    duplicateWsIDs(1) = [];     % remove this wsID from the duplicates list
+end
+
+% removing detected duplicates
+% sort cell ids in descending order
+listOfCellsToRemove = sort(listOfCellsToRemove,'descend');
+numCellsToRemove = numel(listOfCellsToRemove);
+if(~isempty(listOfCellsToRemove))
+    for i=1:numCellsToRemove
+        setOfCellsMat(listOfCellsToRemove(i),:)=[];
+        wsIDs(i) = [];
+        
+    end
+end
+
 numCells = size(setOfCellsMat,1);
 cellList = 1:numCells; % row vector
 % add the cellList (index) as the first col of setOfCells. This is done so
