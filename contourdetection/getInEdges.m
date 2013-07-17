@@ -20,18 +20,8 @@ for i=1:numel(twoCellEdges)
     edgeListInd_i = find(edgeIDsAll==twoCellEdges(i));
     if(~edgeActivationVector(edgeListInd_i))
         % edge is inactive
-%         cellInd_1 = edges2cells(edgeListInd_i,1);
-%         cellInd_2 = edges2cells(edgeListInd_i,2);
         cellInd_1 = edges2cells(twoCellEdges(i),1);
         cellInd_2 = edges2cells(twoCellEdges(i),2);
-        % start debug code
-        if(cellInd_1==0)
-            a=99;
-        end
-        if(cellInd_2==0)
-            a=98;
-        end
-        % end debug code
         
         cellState_1 = cellActivationVector(cellInd_1);
         cellState_2 = cellActivationVector(cellInd_2);
