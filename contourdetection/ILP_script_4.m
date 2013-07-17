@@ -266,7 +266,9 @@ onEdgeInd = find(onEdgeStates>0);
 onEdgePixelInds = getPixSetFromEdgeIDset(onEdgeInd,edgepixels);
 ilpSegmentation(onEdgePixelInds) = 1;
 % active nodes
+% get 
 fIndStop = 2*numEdges;
+nodeInactiveStates_x = [];
 for i=1:numJtypes
     % for each junction type
     % get the list of junctions and check their states in vector 'x'
@@ -281,6 +283,7 @@ for i=1:numJtypes
         fIndStop = fIndStart -1 + numJnodes_i*numStatePJ_i;
         fIndsToLook = fIndStart:numStatePJ_i:fIndStop; % indices of inactive state
         inactiveness_nodes_i = x(fIndsToLook);
+        nodeInactiveStates_x = [nodeInactiveStates_x; inactiveness_nodes_i];
         activeStateNodeListInd = find(inactiveness_nodes_i==0);
         if(~isempty(activeStateNodeListInd))
             nodeListInd_i = junctionNodesListInds_i(activeStateNodeListInd);
@@ -325,7 +328,7 @@ for i=1:numel(activeCellInd)
     foregroundPixels = [foregroundPixels; cellPixInds_i];
 end
 
-% make the cell interior edges also white
+% make inactive edges inside foreground regions show as foreground
 [inEdgeListInds,inEdgeIDs] = getInEdges(twoCellEdges,cellActivationVector,...
                 onEdgeStates,edges2cells,edgeListInds);
             
@@ -338,6 +341,13 @@ if(~isempty(inEdgeListInds))
     end
     foregroundPixels = [foregroundPixels; inEdgePixels];
 end
+
+% make inactive nodes inside foreground regions show as foreground
+nodeActivationVector = ~nodeInactiveStates_x;
+
+inNodePixels = getInNodePixels(inEdgeIDs,nodeEdges,...
+        nodeActivationVector,connectedJunctionIDs);
+foregroundPixels = [foregroundPixels; inNodePixels];
 
 % assign white to active (foreground) cells
 output_h = output(:,:,1);
