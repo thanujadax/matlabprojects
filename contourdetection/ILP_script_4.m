@@ -311,8 +311,8 @@ totX = numel(x);
 numCells = numel(cellPriors);
 % get active foreground cells
 cellStartPos = totX - numCells + 1;
-cellVector = x(cellStartPos:totX);
-activeCellInd = find(cellVector>0);
+cellActivationVector = x(cellStartPos:totX);
+activeCellInd = find(cellActivationVector>0);
 % get internal pixels for foreground cells
 foregroundPixels = [];
 
@@ -325,16 +325,19 @@ for i=1:numel(activeCellInd)
     foregroundPixels = [foregroundPixels; cellPixInds_i];
 end
 
-% for i=1:numel(activeCellInd)
-%     boundaryEdgeIDs_i = setOfCells(activeCellInd(i),:);
-%     boundaryEdgeIDs_i = boundaryEdgeIDs_i(boundaryEdgeIDs_i>0);
-%     boundaryPixelInds_i = getBoundaryPixelsForCell(boundaryEdgeIDs_i,edges2pixels,...
-%     nodeInds,edges2nodes,edgeListInds);
-%     [internalx_i,internaly_i] = getInternelPixelsFromBoundary(boundaryPixelInds_i,...
-%                                     sizeR,sizeC);
-%     foregroundPixels_i = sub2ind([sizeR sizeC],internaly_i,internalx_i);
-%     foregroundPixels = [foregroundPixels; foregroundPixels_i];
-% end
+% make the cell interior edges also white
+inEdges = getInEdges(twoCellEdges,cellActivationVector,...
+                onEdgeStates,edges2cells,edgeListInds);
+            
+if(~isempty(inEdges))
+    inEdgePixels = [];
+    for i=1:numel(inEdges)
+        inEdgePixels_i = edgepixels(inEdges(i),:);
+        inEdgePixels_i = inEdgePixels_i(inEdgePixels_i>0);
+        inEdgePixels = [inEdgePixels; inEdgePixels_i'];
+    end
+    foregroundPixels = [foregroundPixels; inEdgePixels];
+end
 
 % assign white to active (foreground) cells
 output_h = output(:,:,1);
