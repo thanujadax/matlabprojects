@@ -175,7 +175,7 @@ onEdgeListIDs = getBackboneEdgeIDs(edgepixels,edgePriors,...
 edgePriors(onEdgeListIDs) = bbEdgeReward;
 % test - enforcing some edges to be picked
 clear onEdgeListIDs
-onEdgeListIDs = [];
+onEdgeListIDs = [224];
 
 % visualize BB edges
 imgBBEdges = visualizeOffEdges(onEdgeListIDs,edgepixels,nodeInds,sizeR,sizeC);
