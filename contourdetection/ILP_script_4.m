@@ -326,13 +326,13 @@ for i=1:numel(activeCellInd)
 end
 
 % make the cell interior edges also white
-inEdges = getInEdges(twoCellEdges,cellActivationVector,...
+[inEdgeListInds,inEdgeIDs] = getInEdges(twoCellEdges,cellActivationVector,...
                 onEdgeStates,edges2cells,edgeListInds);
             
-if(~isempty(inEdges))
+if(~isempty(inEdgeListInds))
     inEdgePixels = [];
-    for i=1:numel(inEdges)
-        inEdgePixels_i = edgepixels(inEdges(i),:);
+    for i=1:numel(inEdgeListInds)
+        inEdgePixels_i = edgepixels(inEdgeListInds(i),:);
         inEdgePixels_i = inEdgePixels_i(inEdgePixels_i>0);
         inEdgePixels = [inEdgePixels; inEdgePixels_i'];
     end

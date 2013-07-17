@@ -1,4 +1,4 @@
-function inEdges = getInEdges(twoCellEdges,cellActivationVector,...
+function [inEdgeListInds, inEdgeIDs] = getInEdges(twoCellEdges,cellActivationVector,...
                 edgeActivationVector,edges2cells,edgeIDsAll)
 
 % Output:
@@ -14,7 +14,8 @@ function inEdges = getInEdges(twoCellEdges,cellActivationVector,...
 %   edges2cells - 
 %   edgeIDsAll - list of all edgeIDs available in order
 
-inEdges = [];
+inEdgeListInds = [];
+inEdgeIDs = [];
 
 for i=1:numel(twoCellEdges)
     edgeListInd_i = find(edgeIDsAll==twoCellEdges(i));
@@ -27,7 +28,8 @@ for i=1:numel(twoCellEdges)
         cellState_2 = cellActivationVector(cellInd_2);
         if(cellState_1>0 && cellState_2>0)
             % append this edgeListInd to the set of inEdges
-            inEdges = [inEdges; edgeListInd_i];
+            inEdgeListInds = [inEdgeListInds; edgeListInd_i];
+            inEdgeIDs = [inEdgeIDs; twoCellEdges(i)];
         end
     end
 end
