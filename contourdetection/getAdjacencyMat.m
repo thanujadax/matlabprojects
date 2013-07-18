@@ -35,13 +35,13 @@ for i=1:numEdges
         end
     elseif(numel(R)==1)
         % if 1, it contains a self edge.
-        disp('warning:getAdjacencyMat - edge skipped')       
+        % disp('warning:getAdjacencyMat - edge skipped')       
         sid = sid + 1;
         selfEdgeIDs(sid) = i;
         
     else
-        disp('warning:getAdjacencyMat - edge skipped')
-        i
+        % disp('warning:getAdjacencyMat - edge skipped')
+        % i
         sid = sid + 1;
         selfEdgeIDs(sid) = i;
         

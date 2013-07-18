@@ -1,6 +1,8 @@
 function boundaryEdges = getBoundaryEdges2(wsgraph,marginSize,edgepixels,...
     nodeEdges,edgeIDs)
 
+% returns boundary edge IDs
+
 % from each boundary, along perpendicular lines get all the pixels nearest
 % to the edge i.e. along each line given by a set of pixels.
 % Remove the nodeInds from this list of pixels. Then we are left with the

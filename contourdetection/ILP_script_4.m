@@ -167,19 +167,36 @@ edgePriors(offEdgeListIDs) = offEdgeReward;
 % visualize off edges
 imgOffEdges = visualizeOffEdges(offEdgeListIDs,edgepixels,nodeInds,sizeR,sizeC);
 figure;imshow(imgOffEdges); title('visualization of edges turned off')
-%% Backbone junctions
-bbNodeListInds = getJunctionsForEdges(edges2nodes,offEdgeListIDs);
-%% Activate backbone
+%% Backbone
+numBoundaryEdges = numel(boundaryEdges);
+boundaryEdgeListInds = zeros(numBoundaryEdges,1);
+for i=1:numBoundaryEdges
+    boundaryEdgeListInds(i) = find(edgeListInds==boundaryEdges(i));
+end
+
 onEdgeListIDs = getBackboneEdgeIDs(edgepixels,edgePriors,...
                 lenThreshBB,priorThreshFracBB);
-edgePriors(onEdgeListIDs) = bbEdgeReward;
-% test - enforcing some edges to be picked
-clear onEdgeListIDs
-onEdgeListIDs = [224];
+% removing boundary edges from the onEdgeListID list
+onEdgeListIDs = setdiff(onEdgeListIDs,boundaryEdgeListInds);
+
+bbNodeListInds = getJunctionsForEdges(edges2nodes,onEdgeListIDs);
+bbNodePixInds = nodeInds(bbNodeListInds);
+bbnodesVis = wsBoundariesFromGraph;
+bbnodesVis(bbNodePixInds) = 0.2;
+figure;imagesc(bbnodesVis);
 
 % visualize BB edges
 imgBBEdges = visualizeOffEdges(onEdgeListIDs,edgepixels,nodeInds,sizeR,sizeC);
 figure;imshow(imgBBEdges); title('visualization of backbone 1')
+
+edgePriors(onEdgeListIDs) = bbEdgeReward;
+% test - enforcing some edges to be picked
+clear onEdgeListIDs
+onEdgeListIDs = [];
+
+% visualize BB edges
+imgBBEdges = visualizeOffEdges(onEdgeListIDs,edgepixels,nodeInds,sizeR,sizeC);
+figure;imshow(imgBBEdges); title('visualization of backbone 2')
 % onEdgeListIDs = 2024;
 % % visualize BB edges
 % imgBBEdges = visualizeOffEdges(onEdgeListIDs,edgepixels,nodeInds,sizeR,sizeC);
