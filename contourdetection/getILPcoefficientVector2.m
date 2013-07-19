@@ -51,7 +51,8 @@ for i=1:numJtypes
     if(~isnan(nodeAngleCost_i))
         maxJcost = max(nodeAngleCost_i,[],2);          % inactivation cost
         minJcost = min(nodeAngleCost_i,[],2);          
-        avgJcost = (minJcost + maxJcost)/2;
+%         offJcost = (minJcost + maxJcost)/2;
+        offJcost = -1 .* minJcost;
         
         % identify the bbJunctions and set a very high inactivation cost
         clear nodeListInds_i
@@ -60,11 +61,11 @@ for i=1:numJtypes
         if(numel(bbJunctionListInds_i)>0)
             % assign a very high inactivation cost for this nodes
             % (avgJcost)
-            avgJcost(bbListInds_i) = bbJunctionCost;
+            offJcost(bbListInds_i) = bbJunctionCost;
         end
         
     %     nodeAngleCost_i = [maxJcost nodeAngleCost_i];
-        nodeAngleCost_i = [avgJcost nodeAngleCost_i];
+        nodeAngleCost_i = [offJcost nodeAngleCost_i];
         numCoeff_i = totJunctionVar(i);
         f_start_ind = f_stop_ind + 1;
         f_stop_ind = f_start_ind + numCoeff_i - 1;
