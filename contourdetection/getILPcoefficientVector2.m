@@ -52,7 +52,8 @@ for i=1:numJtypes
         maxJcost = max(nodeAngleCost_i,[],2);          % inactivation cost
         minJcost = min(nodeAngleCost_i,[],2);          
 %         offJcost = (minJcost + maxJcost)/2;
-        offJcost = -1 .* minJcost;
+        % offJcost = -1 .* minJcost;
+        offJcost = minJcost .* 0;
         
         % identify the bbJunctions and set a very high inactivation cost
         clear nodeListInds_i

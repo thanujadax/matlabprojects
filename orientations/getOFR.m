@@ -10,7 +10,7 @@ medianFilterH = 0;  % H is median filtered to remove salt and pepper noise in a 
 % invertImg = 1;      % 1 for membrane images that have to be inverted for Hough transform calculation
 
 grayThresholding = 0;       % 1 if the inverted image should be thresholded
-grayThreshold = 0.5;
+grayThreshold = 0;
 
 gaussianFiltering = 0;      % 1 if gaussian filtering should be performed on the input image
 sigma = 1;

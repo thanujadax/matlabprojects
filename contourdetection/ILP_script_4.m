@@ -66,7 +66,7 @@ cNeg = 10;          % scaling factor for negative nodeAngleCosts
 minNumActEdgesPercentage = 0;  % percentage of the tot num edges to retain (min)
 bbEdgeReward = 1500;
 offEdgeReward = -1000;
-bbJunctionReward = 100000;        % inactivation cost for bbjunction
+bbJunctionReward = 1000;        % inactivation cost for bbjunction
 
 % generate hsv outputs using the orientation information
 % output(:,:,1) contains the hue (orinetation) information
@@ -162,6 +162,7 @@ cellPriors = getCellPriors_intensity(normalizedInputImage,setOfCells,edges2pixel
 % edge
 offEdgeListIDs = getUnOrientedEdgeIDs(edgepixels,...
                 lenThresh,output(:,:,1),sizeR,sizeC);
+% offEdgeListIDs = [];
 % setting edgePriors
 edgePriors(offEdgeListIDs) = offEdgeReward;
 % visualize off edges
