@@ -212,7 +212,7 @@ figure;imshow(imgBBEdges); title('visualization of backbone 1')
 edgePriors(onEdgeListIDs) = bbEdgeReward;
 % test - enforcing some edges to be picked
 clear onEdgeListIDs
-onEdgeListIDs = [];
+onEdgeListIDs = [363];
 
 % visualize BB edges
 imgBBEdges = visualizeOffEdges(onEdgeListIDs,edgepixels,nodeInds,sizeR,sizeC);
@@ -322,7 +322,7 @@ for i=1:numJtypes
         fIndsToLook = fIndStart:numStatePJ_i:fIndStop; % indices of inactive state
         inactiveness_nodes_i = x(fIndsToLook);
         nodeInactiveStates_x = [nodeInactiveStates_x; inactiveness_nodes_i];
-        activeStateNodeListInd = find(inactiveness_nodes_i<0);
+        activeStateNodeListInd = find(inactiveness_nodes_i<0.5);
         if(~isempty(activeStateNodeListInd))
             nodeListInd_i = junctionNodesListInds_i(activeStateNodeListInd);
             nodeActivationVector(nodeListInd_i) = 1;
