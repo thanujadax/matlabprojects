@@ -287,6 +287,7 @@ ilpSegmentation(onEdgePixelInds) = 1;
 % get 
 fIndStop = 2*numEdges;
 nodeInactiveStates_x = [];
+nodeActivationVector = zeros(numel(nodeInds),1);    % stores 1 for active node list inds
 for i=1:numJtypes
     % for each junction type
     % get the list of junctions and check their states in vector 'x'
@@ -305,6 +306,7 @@ for i=1:numJtypes
         activeStateNodeListInd = find(inactiveness_nodes_i==0);
         if(~isempty(activeStateNodeListInd))
             nodeListInd_i = junctionNodesListInds_i(activeStateNodeListInd);
+            nodeActivationVector(nodeListInd_i) = 1;
             nodeIndsActive_i = nodeInds(nodeListInd_i);
             % if any of the active nodes are in the connectionJunction set,
             % make the other nodes in the same set active as well.
@@ -361,7 +363,7 @@ if(~isempty(inEdgeListInds))
 end
 
 % make inactive nodes inside foreground regions show as foreground
-nodeActivationVector = ~nodeInactiveStates_x;
+% nodeActivationVector = ~nodeInactiveStates_x;
 
 inNodePixels = getInNodePixels(inEdgeIDs,nodeEdges,...
         nodeActivationVector,connectedJunctionIDs);

@@ -33,7 +33,7 @@ k = 0;
 for i = 1:numel(edgeListIndToExamine)
     clear edgePixels_i;
     edgeListID = edgeListIndToExamine(i); % row number for the edge in edges2pixels
-    if(edgeListID==2624)
+    if(edgeListID==541)
         abc = 1;
     end
     edgePixels_i = edgepixels(edgeListID,:); % set of pixels for 
