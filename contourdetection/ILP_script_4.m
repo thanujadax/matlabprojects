@@ -65,7 +65,7 @@ cPos = 1000;        % scaling factor for positive nodeAngleCosts
 cNeg = 10;          % scaling factor for negative nodeAngleCosts
 minNumActEdgesPercentage = 0;  % percentage of the tot num edges to retain (min)
 bbEdgeReward = 1500;
-offEdgeReward = -1000;
+offEdgeReward = -500;
 bbJunctionReward = 1000;        % inactivation cost for bbjunction
 
 % generate hsv outputs using the orientation information
@@ -160,8 +160,31 @@ cellPriors = getCellPriors_intensity(normalizedInputImage,setOfCells,edges2pixel
 %% Removing misoriented edges
 % uses the compatibility of the orientation of the adjoining pixels of each
 % edge
+
 offEdgeListIDs = getUnOrientedEdgeIDs(edgepixels,...
                 lenThresh,output(:,:,1),sizeR,sizeC);
+            
+% remove the edges connected to the boundaryNodes
+% boundary edges
+numBoundaryEdges = numel(boundaryEdges);
+boundaryEdgeListInds = zeros(numBoundaryEdges,1);
+for i=1:numBoundaryEdges
+    boundaryEdgeListInds(i) = find(edgeListInds==boundaryEdges(i));
+end
+% boundaryNodeEdges = all edges that has at least one end connected to the boundary
+boundaryNodeListInds = edges2nodes(boundaryEdgeListInds,:);
+boundaryNodeListInds = unique(boundaryNodeListInds);
+boundaryNodeEdges = nodeEdges(boundaryNodeListInds,:);
+boundaryNodeEdges(:,1)=[];
+boundaryNodeEdges = unique(boundaryNodeEdges);
+boundaryNodeEdges = boundaryNodeEdges(boundaryNodeEdges>0);
+boundaryNodeEdgeListIDs = numel(boundaryNodeEdges);
+for i=1:numel(boundaryNodeEdges)
+    boundaryNodeEdgeListIDs(i) = find(edgeListInds==boundaryNodeEdges(i));
+end
+% remove boundaryNodeEdgeListIDs from the offEdgeListIDs
+offEdgeListIDs = setdiff(offEdgeListIDs,boundaryNodeEdgeListIDs);
+          
 % offEdgeListIDs = [];
 % setting edgePriors
 edgePriors(offEdgeListIDs) = offEdgeReward;
@@ -169,11 +192,7 @@ edgePriors(offEdgeListIDs) = offEdgeReward;
 imgOffEdges = visualizeOffEdges(offEdgeListIDs,edgepixels,nodeInds,sizeR,sizeC);
 figure;imshow(imgOffEdges); title('visualization of edges turned off')
 %% Backbone
-numBoundaryEdges = numel(boundaryEdges);
-boundaryEdgeListInds = zeros(numBoundaryEdges,1);
-for i=1:numBoundaryEdges
-    boundaryEdgeListInds(i) = find(edgeListInds==boundaryEdges(i));
-end
+
 
 onEdgeListIDs = getBackboneEdgeIDs(edgepixels,edgePriors,...
                 lenThreshBB,priorThreshFracBB);
@@ -303,7 +322,7 @@ for i=1:numJtypes
         fIndsToLook = fIndStart:numStatePJ_i:fIndStop; % indices of inactive state
         inactiveness_nodes_i = x(fIndsToLook);
         nodeInactiveStates_x = [nodeInactiveStates_x; inactiveness_nodes_i];
-        activeStateNodeListInd = find(inactiveness_nodes_i==0);
+        activeStateNodeListInd = find(inactiveness_nodes_i<0);
         if(~isempty(activeStateNodeListInd))
             nodeListInd_i = junctionNodesListInds_i(activeStateNodeListInd);
             nodeActivationVector(nodeListInd_i) = 1;
