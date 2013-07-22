@@ -67,6 +67,8 @@ minNumActEdgesPercentage = 0;  % percentage of the tot num edges to retain (min)
 bbEdgeReward = 1500;
 offEdgeReward = -500;
 bbJunctionReward = 1000;        % inactivation cost for bbjunction
+boundaryEdgeReward = -60;   % prior value for boundary edges so that they won't have too much weight
+
 
 % generate hsv outputs using the orientation information
 % output(:,:,1) contains the hue (orinetation) information
@@ -157,20 +159,15 @@ edgeOrientations = (edgeOrientationsInds-1).*orientationsStepSize;
 normalizedInputImage = imgIn./(max(max(imgIn)));
 cellPriors = getCellPriors_intensity(normalizedInputImage,setOfCells,edges2pixels,...
     nodeInds,edges2nodes,cCell);
-%% Removing misoriented edges
-% uses the compatibility of the orientation of the adjoining pixels of each
-% edge
-
-offEdgeListIDs = getUnOrientedEdgeIDs(edgepixels,...
-                lenThresh,output(:,:,1),sizeR,sizeC);
-            
-% remove the edges connected to the boundaryNodes
+%% Boundary edges
 % boundary edges
 numBoundaryEdges = numel(boundaryEdges);
 boundaryEdgeListInds = zeros(numBoundaryEdges,1);
 for i=1:numBoundaryEdges
     boundaryEdgeListInds(i) = find(edgeListInds==boundaryEdges(i));
 end
+edgePriors(boundaryEdgeListInds) = boundaryEdgeReward;
+
 % boundaryNodeEdges = all edges that has at least one end connected to the boundary
 boundaryNodeListInds = edges2nodes(boundaryEdgeListInds,:);
 boundaryNodeListInds = unique(boundaryNodeListInds);
@@ -182,6 +179,16 @@ boundaryNodeEdgeListIDs = numel(boundaryNodeEdges);
 for i=1:numel(boundaryNodeEdges)
     boundaryNodeEdgeListIDs(i) = find(edgeListInds==boundaryNodeEdges(i));
 end
+
+%% Removing misoriented edges
+% uses the compatibility of the orientation of the adjoining pixels of each
+% edge
+
+offEdgeListIDs = getUnOrientedEdgeIDs(edgepixels,...
+                lenThresh,output(:,:,1),sizeR,sizeC);
+            
+% remove the edges connected to the boundaryNodes
+
 % remove boundaryNodeEdgeListIDs from the offEdgeListIDs
 offEdgeListIDs = setdiff(offEdgeListIDs,boundaryNodeEdgeListIDs);
           
@@ -212,7 +219,7 @@ figure;imshow(imgBBEdges); title('visualization of backbone 1')
 edgePriors(onEdgeListIDs) = bbEdgeReward;
 % test - enforcing some edges to be picked
 clear onEdgeListIDs
-onEdgeListIDs = [363];
+onEdgeListIDs = [];
 
 % visualize BB edges
 imgBBEdges = visualizeOffEdges(onEdgeListIDs,edgepixels,nodeInds,sizeR,sizeC);
