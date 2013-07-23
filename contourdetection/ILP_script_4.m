@@ -67,7 +67,7 @@ minNumActEdgesPercentage = 0;  % percentage of the tot num edges to retain (min)
 bbEdgeReward = 1500;
 offEdgeReward = -500;
 bbJunctionReward = 1000;        % inactivation cost for bbjunction
-boundaryEdgeReward = -60;   % prior value for boundary edges so that they won't have too much weight
+boundaryEdgeReward = -35;   % prior value for boundary edges so that they won't have too much weight
 
 
 % generate hsv outputs using the orientation information
@@ -100,11 +100,28 @@ wsBoundariesFromGraph(clusterNodeIDs) = 0.5;    % cluster nodes
 edgepixels = edges2pixels(:,2:nce);
 wsBoundariesFromGraph(edgepixels(edgepixels>0)) = 1; % edge pixels
 figure;imagesc(wsBoundariesFromGraph);title('boundaries from graph') 
+
+% boundary edges
+boundaryEdges = getBoundaryEdges2(wsBoundariesFromGraph,barLength,edgepixels,...
+    nodeEdges,edgeListInds);
+numBoundaryEdges = numel(boundaryEdges);
+boundaryEdgeListInds = zeros(numBoundaryEdges,1);
+for i=1:numBoundaryEdges
+    boundaryEdgeListInds(i) = find(edgeListInds==boundaryEdges(i));
+end
+
+
+
 disp('preparing coefficients for ILP solver...')
 %% Edge unary values
 % edge priors - from orientation filters
 % edgePriors = getEdgePriors(orientedScoreSpace3D,edges2pixels);
 edgePriors = getEdgeUnaryAbs(edgepixels,output(:,:,3));
+
+% assigning predetermined edgePriors for boundaryEdges before nodeAngleCost
+% calculation
+% edgePriors(boundaryEdgeListInds) = boundaryEdgeReward;
+
 % visualize edge unaries
 edgeUnaryMat = visualizeEdgeUnaries(edgepixels,edgePriors,sizeR,sizeC);
 figure;imagesc(edgeUnaryMat);title('abs-max-OFR')
@@ -140,8 +157,6 @@ for i=1:numJtypes
     end
 end
 %% Faces of wsgraph -> cell types (between pairs of cells)
-boundaryEdges = getBoundaryEdges2(wsBoundariesFromGraph,barLength,edgepixels,...
-    nodeEdges,edgeListInds);
 [faceAdj,edges2cells,setOfCells,twoCellEdges,wsIDs] = getFaceAdjFromJnAdjGraph(edgeListInds,nodeEdges,...
     junctionTypeListInds,jAnglesAll_alpha,boundaryEdges,edges2nodes,ws,edges2pixels);
 
@@ -160,12 +175,9 @@ normalizedInputImage = imgIn./(max(max(imgIn)));
 cellPriors = getCellPriors_intensity(normalizedInputImage,setOfCells,edges2pixels,...
     nodeInds,edges2nodes,cCell);
 %% Boundary edges
-% boundary edges
-numBoundaryEdges = numel(boundaryEdges);
-boundaryEdgeListInds = zeros(numBoundaryEdges,1);
-for i=1:numBoundaryEdges
-    boundaryEdgeListInds(i) = find(edgeListInds==boundaryEdges(i));
-end
+% assigning predetermined edge priors for boundary edges after
+% nodeAngleCost calculation
+
 edgePriors(boundaryEdgeListInds) = boundaryEdgeReward;
 
 % boundaryNodeEdges = all edges that has at least one end connected to the boundary
