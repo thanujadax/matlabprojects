@@ -1,0 +1,16 @@
+I wrote the code just using the following external packages.
+
+The most important dependency and the one you most probably won't be able to get rid of is the random forest wrapper and implementation:
+
+http://code.google.com/p/randomforest-matlab/
+
+When I started with this project, the normxcorr2 function of Matlab was quite slow and I was happy to find this library normxcorr2_mex wrapper around openCVs cross correlation. You can either change the code to use the matlab internal version or get the normxcorr2_mex package from here:
+
+http://www.cs.ubc.ca/~deaton/remarks_ncc.html
+
+Another very stupid dependency is the SIFT package. I just happen to like the included imsmooth function a lot. I know there is Gaussian blurr as a mtlab filter, so again, feel free to either change the code to get rid of the dependency or get the sift package from here:
+
+http://www.vlfeat.org/~vedaldi/code/sift.html
+
+
+
