@@ -11,6 +11,7 @@ imagePath = '/home/thanuja/Dropbox/data/mitoData/emJ_00_170x.png';
 % imagePath = '/home/thanuja/Dropbox/data/thanuja/emchallenge-class/competition-final0000.tif';
 % hard coded back bone edge 1962
 
+
 orientations = 0:10:350;
 orientationsStepSize = 10;
 
@@ -19,7 +20,7 @@ barWidth = 4; %
 marginSize = ceil(barLength/2);
 % marginPixVal = 0.1;
 addBorder = ceil(barLength/2);
-threshFrac = 0.15;
+threshFrac = 0;
 medianFilterH = 0;
 invertImg = 1;      % 1 for EM images when input image is taken from imagePath
 % max vote response image of the orientation filters
