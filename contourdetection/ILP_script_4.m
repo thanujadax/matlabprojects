@@ -40,6 +40,7 @@ elseif(fromInputImage)
     imgIn = addThickBorder(imgIn0,marginSize,marginPixVal);
     [output,rgbimg,orientedScoreSpace3D] = getOFR(imgIn,...
                             barLength,barWidth,invertImg,threshFrac);
+    % output is in HSV form
     imIn = output(:,:,3);
 else
 %     imFilePath = 'stem_256x_t02_V.png';
@@ -316,14 +317,17 @@ ilpSegmentation = zeros(sizeR,sizeC);
 % active edges
 % consider the edgeID given in the first col of edges2pixels?? no need for
 % this since we use edgepixels array which is already sans the skipped
+
 % edges
 onStateEdgeXind = 2:2:(numEdges*2);
 onEdgeStates = x(onStateEdgeXind);
-onEdgeInd = find(onEdgeStates>0);
+onEdgeInd = find(onEdgeStates>0.5);
+offEdgeInd = find(onEdgeStates<0.5);
 onEdgePixelInds = getPixSetFromEdgeIDset(onEdgeInd,edgepixels);
+offEdgePixelInds = getPixSetFromEdgeIDset(offEdgeInd,edgepixels);
 ilpSegmentation(onEdgePixelInds) = 1;
-% active nodes
-% get 
+
+% active nodes 
 fIndStop = 2*numEdges;
 nodeInactiveStates_x = [];
 nodeActivationVector = zeros(numel(nodeInds),1);    % stores 1 for active node list inds
@@ -363,6 +367,9 @@ for i=1:numJtypes
         end
     end
 end
+
+activeContourPixels = find(ilpSegmentation);
+
 % figure;imagesc(ilpSegmentation);title('ILP contours');
 % reconstruct the edges with the values from the orientation filters (HSV)
 % [output rgbimg] = reconstructHSVgauss_mv(orientedScoreSpace3D,orientations,...
@@ -383,9 +390,19 @@ wsIDs = getWsIDsForCellIDs(ws,setOfCells,edges2pixels,nodeInds,...
 
 for i=1:numel(activeCellInd)
     wsID_i = wsIDs(activeCellInd(i));
+    if(wsID_i==0)
+        disp('problem with wsid check')
+    end
     cellPixInds_i = find(ws==wsID_i);
+%     clear edgeps
+%     edgeps = intersect(cellPixInds_i,offEdgePixelInds);
+%     if(~isempty(edgeps))
+%         activeCellInd(i)
+%     end
     foregroundPixels = [foregroundPixels; cellPixInds_i];
 end
+
+% foregroundPixels = setdiff(foregroundPixels,offEdgePixelInds);
 
 % make inactive edges inside foreground regions show as foreground
 [inEdgeListInds,inEdgeIDs] = getInEdges(twoCellEdges,cellActivationVector,...
@@ -408,13 +425,14 @@ inNodePixels = getInNodePixels(inEdgeIDs,nodeEdges,...
         nodeActivationVector,connectedJunctionIDs);
 foregroundPixels = [foregroundPixels; inNodePixels];
 
-% assign white to active (foreground) cells
+
+foregroundPixels = setdiff(foregroundPixels,activeContourPixels);
+
+
+% first visualize the contours
 output_h = output(:,:,1);
-output_h(foregroundPixels) = 1; 
 output_s = output(:,:,2);
-output_s(foregroundPixels) = 0;
 output_v = ilpSegmentation;
-output_v(foregroundPixels) = 1;
 
 % create HSV image
 % hsvImage = cat(3,output(:,:,1),output(:,:,2),ilpSegmentation);
@@ -424,3 +442,19 @@ RGBimg = hsv2rgb(hsvImage);
 % titleStr = sprintf('C = %d : lambda = %d',cNode,decayRate);
 % titleStr = sprintf('C = %d',maxCost_direction);
 figure;imshow(RGBimg)
+
+
+% assign white to active (foreground) cells
+
+output_h(foregroundPixels) = 1; 
+output_s(foregroundPixels) = 0;
+output_v(foregroundPixels) = 1;
+
+% create HSV image
+% hsvImage = cat(3,output(:,:,1),output(:,:,2),ilpSegmentation);
+hsvImage_foreground = cat(3,output_h,output_s,output_v);
+% convert it to an RGB image
+RGBimg_foreground = hsv2rgb(hsvImage_foreground);
+% titleStr = sprintf('C = %d : lambda = %d',cNode,decayRate);
+% titleStr = sprintf('C = %d',maxCost_direction);
+figure;imshow(RGBimg_foreground)
