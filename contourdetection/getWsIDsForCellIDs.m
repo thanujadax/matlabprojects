@@ -18,6 +18,7 @@ for i=1:numCells
     % get the most popular label for the internal pixels
     internalPixels = sub2ind([sizeR sizeC],internaly,internalx);
     internalPixWsLabels = ws(internalPixels);
+    internalPixWsLabels = internalPixWsLabels(internalPixWsLabels>0);
     wsIDs(i) = mode(double(internalPixWsLabels));
-    
+   
 end

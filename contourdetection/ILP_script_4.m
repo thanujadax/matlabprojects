@@ -392,14 +392,15 @@ for i=1:numel(activeCellInd)
     wsID_i = wsIDs(activeCellInd(i));
     if(wsID_i==0)
         disp('problem with wsid check')
-    end
-    cellPixInds_i = find(ws==wsID_i);
+    else
+        cellPixInds_i = find(ws==wsID_i);
 %     clear edgeps
 %     edgeps = intersect(cellPixInds_i,offEdgePixelInds);
 %     if(~isempty(edgeps))
 %         activeCellInd(i)
 %     end
-    foregroundPixels = [foregroundPixels; cellPixInds_i];
+        foregroundPixels = [foregroundPixels; cellPixInds_i];
+    end
 end
 
 % foregroundPixels = setdiff(foregroundPixels,offEdgePixelInds);
