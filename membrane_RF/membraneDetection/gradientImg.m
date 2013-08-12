@@ -13,7 +13,8 @@ function [gx, gy, mag] = gradientImg(im, s)
 % $$$ gy = filter2(fgy,im);
 % $$$ gx = filter2(fgx,im);
 
-
 im = imsmooth(double(im),s);
+% imageOut = gaussianFilter(imageIn,sigma,maskSize)
+% im = gaussianFilter(double(im),s,5);
 [gx,gy] = gradient(im);
 mag = sqrt(gx.^2 + gy.^2);

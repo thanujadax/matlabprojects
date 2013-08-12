@@ -27,8 +27,8 @@ colormap(gray);
 % that it's the same size as the original image
 % this is not necessary, but is used for display
 
-% ncc = normxcorr2_mex(template, img, 'same');
-ncc = normxcorr2(template, img);
+ncc = normxcorr2_mex(template, img, 'same');
+% ncc = normxcorr2(template, img);
 
 % display the ncc
 H = figure(2); clf;

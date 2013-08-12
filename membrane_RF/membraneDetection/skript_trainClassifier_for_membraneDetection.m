@@ -47,7 +47,7 @@ for i=1:length(imgNames)
   posNeg = find(im(:,:,1)==255 & im(:,:,2)==0);
   
   if length(posPos)>0 | length(posNeg)>0
-    load(strcat(name(1:end-10),'_fm.mat'));
+    load(strcat(name(1:end-10),'_im_fm.mat'));
     fm = reshape(fm,size(fm,1)*size(fm,2),size(fm,3));
     fm(isnan(fm))=0;
     fmPos = [fmPos; fm(posPos,:)];
@@ -85,7 +85,7 @@ disp('preparation')
 tic;
   name = imgNames(i).name
   im = imread(name);
-  load(strcat(name(1:end-10),'_fm.mat'));
+  load(strcat(name(1:end-10),'_im_fm.mat'));
   fm = reshape(fm,size(fm,1)*size(fm,2),size(fm,3));
   fm(isnan(fm))=0;
   clear fmNeg
