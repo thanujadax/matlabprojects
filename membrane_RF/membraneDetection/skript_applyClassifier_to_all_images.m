@@ -7,7 +7,7 @@ imgNames = dir('*_image.tif');
 for i=1:length(imgNames)
   name = imgNames(i).name
   im = imread(name);
-  load(strcat(name(1:end-10),'_fm.mat'));
+  load(strcat(name(1:end-10),'_im_fm.mat'));
   fm = reshape(fm,size(fm,1)*size(fm,2),size(fm,3));
   fm(isnan(fm))=0;
   clear fmNeg
@@ -17,8 +17,8 @@ for i=1:length(imgNames)
   clear y
   clear im
 
-  %y_hat has the binary yes/no decision of the classifier
-  %votes is the votes of the trees (more like probability map)
+  % y_hat has the binary yes/no decision of the classifier
+  % votes is the votes of the trees (more like probability map)
   [y_hat,votes] = classRF_predict(double(fm), forest);
   votes = reshape(votes(:,2),imsize);
   votes = double(votes)/max(votes(:));
