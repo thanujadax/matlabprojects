@@ -44,7 +44,8 @@ for i=1:length(imgFiles_training)
         disp('Feature extraction of training images done!')
         disp('Feature matrices saved as *_fm.mat files');
     else
-        disp('Found precalculated feature matrix for training image %d',i)
+        txt1 = sprintf('Found precalculated feature matrix for training image %d',i);
+        disp(txt1);
     end
 end
 
@@ -84,7 +85,13 @@ y = [zeros(size(fmNeg,1),1);ones(size(fmPos,1),1)];
 x = double([fmNeg;fmPos]);
 
 extra_options.sampsize = [maxNumberOfSamplesPerClass, maxNumberOfSamplesPerClass];
-forest_pixelProb = classRF_train(x, y, NUM_TREES,MTRY,extra_options);
+if ~exist('forest_pixelProb.mat','file')
+    forest_pixelProb = classRF_train(x, y, NUM_TREES,MTRY,extra_options);
+    save forest_pixelProb.mat forest_pixelProb
+else
+    disp('forest_pixelProb.mat already exists!')
+    load forest_pixelProb.mat
+end
 
 %% Evaluation of the learned forest
 % Read test images
@@ -93,7 +100,7 @@ imgFiles_testing = dir(pathForImages_testing);
 for i=1:length(imgFiles_testing)
     name = imgFiles_testing(i).name;
     % extract features only if feature matrix is not already presaved
-    if ~exist(strcat(name(1:LEN_IMG_IND),'_fm.mat'),'file');
+    if ~exist(strcat(name(1:LEN_IMG_IND),'_fm.mat'),'file')
         disp('extracting features for the test images ...');
         im = norm01((imresize(imread(name),1)));
         % fm = getFeatures(im); % TODO
@@ -125,9 +132,11 @@ for i=1:length(testingLabelImgNames)
   
   votes = zeros(imsize(1)*imsize(2),1);
   
-  disp('prediction for test image %d',i)
-  [y_h,v] = classRF_predict(double(fm), forest);
-  disp('prediction for test image %d done!',i)
+  txt1 = sprintf('prediction for test image %d',i);
+  disp(txt1);
+  [y_h,v] = classRF_predict(double(fm), forest_pixelProb);
+  txt1 = sprintf('prediction for test image %d done!',i);
+  disp(txt1);
   votes = v(:,2);
   votes = reshape(votes,imsize);
   votes = double(votes)/max(votes(:));

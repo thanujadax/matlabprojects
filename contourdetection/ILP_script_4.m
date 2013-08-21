@@ -5,9 +5,9 @@
 isToyProb = 0;
 useGurobi = 1;
 fromInputImage = 1;
-% imagePath = '/home/thanuja/Dropbox/data/mitoData/emJ_00_170x.png';
+imagePath = '/home/thanuja/Dropbox/data/mitoData/emJ_00_170x.png';
 % imagePath = '/home/thanuja/Dropbox/data/testImg/testCurves1.png';
-imagePath = '/home/thanuja/Dropbox/data/mitoData/stem1_256by256.png';
+% imagePath = '/home/thanuja/Dropbox/data/mitoData/stem1_256by256.png';
 % imagePath = '/home/thanuja/Dropbox/data/thanuja/emchallenge-class/competition-final0000.tif';
 % hard coded back bone edge 1962
 
@@ -174,8 +174,17 @@ edgeOrientations = (edgeOrientationsInds-1).*orientationsStepSize;
 
 % normalize input image
 normalizedInputImage = imgIn./(max(max(imgIn)));
-cellPriors = getCellPriors_intensity(normalizedInputImage,setOfCells,edges2pixels,...
-    nodeInds,edges2nodes,cCell);
+
+% cellPriors_old = getCellPriors_intensity(normalizedInputImage,setOfCells,edges2pixels,...
+%     nodeInds,edges2nodes,cCell);
+% get cell priors from RFC probability map
+if ~exist('forest.mat','file')
+    forest = trainRandomForest_pixelProb();
+else
+    load forest.mat
+end
+cellPriors = regionScoreCalculator(forest,imIn,setOfCells,edges2pixels,...
+    nodeInds,edges2nodes,cCell,sizeR,sizeC);
 %% Boundary edges
 % assigning predetermined edge priors for boundary edges after
 % nodeAngleCost calculation
