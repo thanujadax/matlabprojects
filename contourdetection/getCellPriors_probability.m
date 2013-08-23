@@ -1,7 +1,7 @@
 function cellPriors = getCellPriors_probability(pixelProbabilities,setOfCells,edges2pixels,...
-    nodeInds,edges2nodes,K,sizeR,sizeC)
+    nodeInds,edges2nodes,K,sizeR,sizeC,wsIndsForCells,ws)
 % Inputs:
-%   imgIn - normalized image. 1 -> bright
+%   imgIn(pixelProbabilities) - normalized image. 1 -> bright
 %   K - positive scalar factor for the costs 
 
 % Output:
@@ -11,6 +11,7 @@ function cellPriors = getCellPriors_probability(pixelProbabilities,setOfCells,ed
 
 numCells = size(setOfCells,1);
 cellPriors = zeros(numCells,1);
+regionScoreSpace = zeros(sizeR,sizeC);
 
 for i=1:numCells
     
@@ -21,9 +22,13 @@ for i=1:numCells
         nodeInds,edges2nodes,edges2pixels(:,1));
 
     % get internal pixels of each cell
-    [internalx,internaly] = getInternelPixelsFromBoundary(boundaryPixels,sizeR,sizeC);
+%     [internalx,internaly] = getInternelPixelsFromBoundary(boundaryPixels,sizeR,sizeC);
+%     
+%     intPixInds = sub2ind([sizeR sizeC],internaly,internalx);
     
-    intPixInds = sub2ind([sizeR sizeC],internaly,internalx);
+    intPixInds = getInternalPixForCell(ws,wsIndsForCells(i));
+    
+    
     if(~isempty(intPixInds))
         pixelValues = pixelProbabilities(intPixInds);
 

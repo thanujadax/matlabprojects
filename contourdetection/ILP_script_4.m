@@ -41,7 +41,7 @@ elseif(fromInputImage)
     [output,rgbimg,orientedScoreSpace3D] = getOFR(imgIn,...
                             barLength,barWidth,invertImg,threshFrac);
     % output is in HSV form
-    imIn = output(:,:,3);
+    OFR_mag = output(:,:,3);
 else
 %     imFilePath = 'stem_256x_t02_V.png';
     imFilePath = '/home/thanuja/Dropbox/data/mitoData/emJ_00_350x_V.png';
@@ -77,12 +77,12 @@ boundaryEdgeReward = -35;   % prior value for boundary edges so that they won't 
 if(~fromInputImage)
     [output rgbimg] = reconstructHSVgauss_mv(orientedScoreSpace3D,orientations,...
             barLength,barWidth,threshFrac,medianFilterH);
-    imIn = imread(imFilePath);
+    OFR_mag = imread(imFilePath);
 end
 figure;imshow(rgbimg)
 OFR_abs = output(:,:,3);
 % watershed segmentation
-ws = watershed(imIn);
+ws = watershed(OFR_mag);
 % ws = watershed(output(:,:,3));
 [sizeR,sizeC] = size(ws);
 %% generate graph from the watershed edges
@@ -159,7 +159,7 @@ for i=1:numJtypes
     end
 end
 %% Faces of wsgraph -> cell types (between pairs of cells)
-[faceAdj,edges2cells,setOfCells,twoCellEdges,wsIDs] = getFaceAdjFromJnAdjGraph(edgeListInds,nodeEdges,...
+[faceAdj,edges2cells,setOfCells,twoCellEdges,wsIDsForCells] = getFaceAdjFromJnAdjGraph(edgeListInds,nodeEdges,...
     junctionTypeListInds,jAnglesAll_alpha,boundaryEdges,edges2nodes,ws,edges2pixels);
 
 % cellcogs = getCellCentroidsAll(setOfCells,edges2pixels,edgeListInds,...
@@ -183,8 +183,8 @@ if ~exist('forest.mat','file')
 else
     load forest.mat
 end
-cellPriors = regionScoreCalculator(forest,imIn,setOfCells,edges2pixels,...
-    nodeInds,edges2nodes,cCell,sizeR,sizeC);
+cellPriors = regionScoreCalculator(forest,normalizedInputImage,setOfCells,edges2pixels,...
+    nodeInds,edges2nodes,cCell,wsIDsForCells,ws);
 %% Boundary edges
 % assigning predetermined edge priors for boundary edges after
 % nodeAngleCost calculation
@@ -394,11 +394,11 @@ activeCellInd = find(cellActivationVector>0);
 % get internal pixels for foreground cells
 foregroundPixels = [];
 
-wsIDs = getWsIDsForCellIDs(ws,setOfCells,edges2pixels,nodeInds,...
-            edges2nodes,edgeListInds);
+% wsIDs = getWsIDsForCellIDs(ws,setOfCells,edges2pixels,nodeInds,...
+%             edges2nodes,edgeListInds);
 
 for i=1:numel(activeCellInd)
-    wsID_i = wsIDs(activeCellInd(i));
+    wsID_i = wsIDsForCells(activeCellInd(i));
     if(wsID_i==0)
         disp('problem with wsid check')
     else
