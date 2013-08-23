@@ -55,7 +55,7 @@ angleStep = 10; % 10 degrees discretization step of orientations
 % param
 cEdge = 1;        % general scaling factor for edge priors
 % cNode = 100;        % scaling factor for the node cost coming from gaussian normal distr.
-cCell = 100;        % positive scaling factor for cell priors
+cCell = 1000;        % positive scaling factor for cell priors
 % sig = 50;         % standard deviation(degrees) for the node cost function's gaussian distr.
 % midPoint = 180;   % angle difference of an edge pair (in degrees) for maximum cost 
 lenThresh = 25;     % max length of edges to be checked for misorientations

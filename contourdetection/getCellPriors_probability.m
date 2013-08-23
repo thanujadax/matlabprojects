@@ -18,8 +18,8 @@ for i=1:numCells
     edgeSet_cell = setOfCells(i,:);
     edgeSet_cell = edgeSet_cell(edgeSet_cell>0);
     % get boundary pixels of each cell
-    boundaryPixels = getBoundaryPixelsForCell(edgeSet_cell,edges2pixels,...
-        nodeInds,edges2nodes,edges2pixels(:,1));
+%     boundaryPixels = getBoundaryPixelsForCell(edgeSet_cell,edges2pixels,...
+%         nodeInds,edges2nodes,edges2pixels(:,1));
 
     % get internal pixels of each cell
 %     [internalx,internaly] = getInternelPixelsFromBoundary(boundaryPixels,sizeR,sizeC);
@@ -40,4 +40,9 @@ for i=1:numCells
     else
         cellPriors(i) = 0;
     end
+    regionScoreSpace(intPixInds) = cellPriors(i);
 end
+
+% visualize region scores
+regionScoreSpace = regionScoreSpace./(max(max(regionScoreSpace)));
+figure;imshow(regionScoreSpace)
