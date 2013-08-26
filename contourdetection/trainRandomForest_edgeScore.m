@@ -70,8 +70,13 @@ end
 trainingLabelImgNames = dir(pathForLabels_training);
 fmPos = [];
 fmNeg = [];
+cell_posEdgeIDs_all = cell(1,numTrainingImgs);
+cell_negEdgeIDs_all = cell(1,numTrainingImgs);
 
-for i=1:length(trainingLabelImgNames)
+totPosEdges = 0;
+totNegEdges = 0;
+
+for i=1:numTrainingImgs
   name = trainingLabelImgNames(i).name;
   im = imread(name);
   % get the edges that are inside the positive region
@@ -79,26 +84,34 @@ for i=1:length(trainingLabelImgNames)
   numEdges_i = size(edgepixels_i,1);
   posPos = find(im(:,:,2)==255 & im(:,:,1)==0);
   posNeg = find(im(:,:,1)==255 & im(:,:,2)==0);
+  posEdgeID_i = [];
+  negEdgeID_i = [];
   for j=1:numEdges_i
     edgePix_edge_i = edgepixels(j,:);
     clear negativePix_j
     negativePix_j = posNeg(edgePix_edge_i);
     if(isempty(negativePix_j))
-        % the edges is positive
-        
+        % the edge is positive
+        posEdgeID_i = [posEdgeID_i; j];
+    else
+        negEdgeID_i = [negEdgeID_i; j];
     end
   end
-
   
-  if ~isempty(posPos) || ~isempty(posNeg)
-      load(strcat(name(1:LEN_IMG_IND),'_fm.mat'));
-      fm = reshape(fm,size(fm,1)*size(fm,2),size(fm,3));
-      fm(isnan(fm))=0;
-      fmPos = [fmPos; fm(posPos,:)];
-      fmNeg = [fmNeg; fm(posNeg,:)];
-      clear fm;
-  end
+  totPosEdges = totPosEdges + numel(posEdgeID_i); 
+  totNegEdges = totNegEdges + numel(negEdgeID_i);
+  
+  cell_posEdgeIDs_all{i} = posEdgeID_i;
+  cell_negEdgeIDs_all{i} = negEdgeID_i;
+  
+  % TODO: build x and y within this loop
+
 end
+
+% create input training data matrix x
+totNumEdges = totPosEdges + totNegEdges;
+x = double
+
 
 %% Train RFC
 
