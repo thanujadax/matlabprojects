@@ -11,9 +11,8 @@ imagePath = '/home/thanuja/Dropbox/data/mitoData/emJ_00_170x.png';
 % imagePath = '/home/thanuja/Dropbox/data/thanuja/emchallenge-class/competition-final0000.tif';
 % hard coded back bone edge 1962
 
-
-orientations = 0:10:350;
 orientationsStepSize = 10;
+orientations = 0:orientationsStepSize:350;
 
 barLength = 13; % should be odd
 barWidth = 4; %

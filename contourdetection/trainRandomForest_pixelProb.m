@@ -26,7 +26,7 @@ MTRY = 5;
   csHist = cs;
 
 %% read training images
-imgFiles_training = dir(pathForImages_training); % images for both training and testing
+imgFiles_training = dir(pathForImages_training); % images for training
 
 %% extract features. save separate feature matrices for each training image
 % name of feature matrix: <imageName(1:ind)>_fm.mat
