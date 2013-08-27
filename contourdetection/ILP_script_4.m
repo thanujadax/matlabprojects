@@ -37,7 +37,7 @@ elseif(fromInputImage)
     % add border
     marginPixVal = min(min(imgIn0));
     imgIn = addThickBorder(imgIn0,marginSize,marginPixVal);
-    [output,rgbimg,orientedScoreSpace3D] = getOFR(imgIn,...
+    [output,rgbimg,orientedScoreSpace3D] = getOFR(imgIn,orientations,...
                             barLength,barWidth,invertImg,threshFrac);
     % output is in HSV form
     OFR_mag = output(:,:,3);

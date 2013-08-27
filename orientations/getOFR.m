@@ -1,5 +1,6 @@
 % orientation filter response
-function [output3,RGBimg3,orientedScoreSpace3D] = getOFR(imgIn,barLength,barWidth,invertImg,threshFrac)
+function [output3,RGBimg3,orientedScoreSpace3D] = getOFR(imgIn,orientations,barLength,...
+                        barWidth,invertImg,threshFrac)
 %% parameters
 displayIntermediateFigures=0;
 
@@ -30,7 +31,7 @@ slidingDist = 1;           % the number of pixels to jump
 % barLength = 11; % should be odd
 % barWidth = 3; % 
 negLines = barWidth; % number of negative lines per side
-orientations = 0:10:350;    
+% orientations = 0:10:350;    
 % orientations = 0:45:315;
 
 % % for symmetric bars

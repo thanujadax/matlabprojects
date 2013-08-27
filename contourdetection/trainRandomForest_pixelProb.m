@@ -33,7 +33,7 @@ imgFiles_training = dir(pathForImages_training); % images for training
 for i=1:length(imgFiles_training)
     name = imgFiles_training(i).name;
     % extract features only if feature matrix is not already presaved
-    if ~exist(strcat(name(1:LEN_IMG_IND),'_fm.mat'),'file');
+    if ~exist(strcat(name(1:LEN_IMG_IND),'_fm.mat'),'file')
         disp('extracting features for the training images ...');
         im = norm01((imresize(imread(name),1)));
         % fm = getFeatures(im); % TODO
@@ -114,8 +114,6 @@ for i=1:length(imgFiles_testing)
 end
 % Read labels for test images
 testingLabelImgNames = dir(pathForLabels_testing);
-fmPos = [];
-fmNeg = [];
 
 for i=1:length(testingLabelImgNames)
   name = testingLabelImgNames(i).name;
@@ -142,7 +140,7 @@ for i=1:length(testingLabelImgNames)
   votes = double(votes)/max(votes(:));
   
   disp('visualization')
-  tic;
+
   im = imread(name);			% 
   % this illustration uses the thickened skeleton of the segmentation
   % this is the skeletonized view

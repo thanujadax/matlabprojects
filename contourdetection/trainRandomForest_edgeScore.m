@@ -1,4 +1,4 @@
-function forest_edgeScore = trainRandomForest_edgeScore()
+function forest_edgeProb = trainRandomForest_edgeScore()
 
 % Script to train RFC for edge classification
 %   0 - edge to be turned off (not part of contour)
@@ -20,8 +20,8 @@ LEN_IMG_IND = 3;
 NUM_TREES = 500;
 MTRY = 5;
 
-orientations = 0:10:350;
 orientationsStepSize = 10;
+orientations = 0:orientationsStepSize:350;
 
 barLength = 13; % should be odd
 barWidth = 4; %
@@ -40,25 +40,39 @@ imgFiles_training = dir(pathForImages_training); % images for training
 fm = [];
 numTrainingImgs = length(imgFiles_training); 
 cells_edgepixels_allTrainingImgs = cell(1,numTrainingImgs);
+disp('Edge feature extraction ... ');
 for i=1:numTrainingImgs
-    imgIn0 = double(imread(imgFiles_training(i).name));
-    % add border
-    marginPixVal = min(min(imgIn0));
-    imgIn = addThickBorder(imgIn0,marginSize,marginPixVal);
-    [output,rgbimg,orientedScoreSpace3D] = getOFR(imgIn,...
-                            barLength,barWidth,invertImg,threshFrac);
-    OFR_mag = output(:,:,3);
-    ws = watershed(OFR_mag);
-    [sizeR,sizeC] = size(ws);
-    disp('creating graph from watershed boundaries...');
-    [adjacencyMat,nodeEdges,edges2nodes,edges2pixels,connectedJunctionIDs] = getGraphFromWS(ws,output);
-    edgepixels_i = edge2pixels;
-    edgepixels_i(:,1) = []; % delete the first column which has edgeIDs
-    cells_edgepixels_allTrainingImgs{i} =  edgepixels_i;
-    % extract features
-    edgePrior = getEdgeUnaryAbs(edgepixels,OFR_mag);
-    fm_i = edgeFeatures(edgepixels_i,orientedScoreSpace3D,edgePrior);
-    fm = [fm;fm_i];
+    name = imgFiles_training(i).name;
+    str1 = sprintf('image %d:',i);
+    disp(str1)
+    if ~exist(strcat(name(1:LEN_IMG_IND),'_efm.mat'),'file')
+        imgIn0 = double(imread(name));
+        % add border
+        marginPixVal = min(min(imgIn0));
+        imgIn = addThickBorder(imgIn0,marginSize,marginPixVal);
+        [output,rgbimg,orientedScoreSpace3D] = getOFR(imgIn,orientations,...
+                                barLength,barWidth,invertImg,threshFrac);
+        OFR_mag = output(:,:,3);
+        ws = watershed(OFR_mag);
+        [sizeR,sizeC] = size(ws);
+        disp('creating graph from watershed boundaries...');
+        [adjacencyMat,nodeEdges,edges2nodes,edges2pixels,connectedJunctionIDs] = getGraphFromWS(ws,output);
+        edgepixels_i = edges2pixels;
+        edgepixels_i(:,1) = []; % delete the first column which has edgeIDs
+        cells_edgepixels_allTrainingImgs{i} = edgepixels_i;
+        
+        % extract features
+        edgePrior = getEdgeUnaryAbs(edgepixels_i,OFR_mag);
+        str2 = sprintf('calculating edge features for image %d',i);
+        disp(str2)
+        fm = edgeFeatures(edgepixels_i,orientedScoreSpace3D,edgePrior);
+        % save feature matrix
+        save(strcat(name(1:LEN_IMG_IND),'_efm.mat'),'fm');
+    else
+        txt1 = sprintf('Found precalculated feature matrix for training image %d',i);
+        disp(txt1);
+    end
+        
 end
 
 %% Read training labels
@@ -70,15 +84,15 @@ end
 trainingLabelImgNames = dir(pathForLabels_training);
 fmPos = [];
 fmNeg = [];
-cell_posEdgeIDs_all = cell(1,numTrainingImgs);
-cell_negEdgeIDs_all = cell(1,numTrainingImgs);
-
-totPosEdges = 0;
-totNegEdges = 0;
 
 for i=1:numTrainingImgs
+    
   name = trainingLabelImgNames(i).name;
   im = imread(name);
+  % add border - TODO: what value to assign to the label border?
+  marginPixVal = 0;
+  im = addThickBorder(im,marginSize,marginPixVal);
+  
   % get the edges that are inside the positive region
   edgepixels_i = cells_edgepixels_allTrainingImgs{i};
   numEdges_i = size(edgepixels_i,1);
@@ -97,22 +111,132 @@ for i=1:numTrainingImgs
         negEdgeID_i = [negEdgeID_i; j];
     end
   end
-  
-  totPosEdges = totPosEdges + numel(posEdgeID_i); 
-  totNegEdges = totNegEdges + numel(negEdgeID_i);
-  
-  cell_posEdgeIDs_all{i} = posEdgeID_i;
-  cell_negEdgeIDs_all{i} = negEdgeID_i;
-  
-  % TODO: build x and y within this loop
 
+  if ~isempty(posPos) || ~isempty(posNeg)
+      load(strcat(name(1:LEN_IMG_IND),'_efm.mat'));
+      fm = reshape(fm,size(fm,1)*size(fm,2),size(fm,3));
+      fm(isnan(fm))=0;
+      fmPos = [fmPos; fm(posEdgeID_i,:)];
+      fmNeg = [fmNeg; fm(negEdgeID_i,:)];
+      clear fm;
+  end
+% visualize training data - on edges    
+edgeMap = zeros(size(im));
+positiveEdges = edgepixels_i(posEdgeID_i,:);
+positiveEdgePixels = positiveEdges(positiveEdges>0);
+edgeMap(positiveEdgePixels) = 1;
+figure;imshow(edgeMap);title('training img - positive edges')
 end
 
-% create input training data matrix x
-totNumEdges = totPosEdges + totNegEdges;
-x = double
-
+clear posPos
+clear posNeg
 
 %% Train RFC
+disp('Training ...')
+disp('Number of training samples per class: ');
+disp('on edges: ');
+disp(size(fmPos,1));
+disp('off edges: ');
+disp(size(fmNeg,1));
 
+y = [zeros(size(fmNeg,1),1);ones(size(fmPos,1),1)];
+x = double([fmNeg;fmPos]);
+
+extra_options.sampsize = [maxNumberOfSamplesPerClass, maxNumberOfSamplesPerClass];
+if ~exist('forest_edgeProb.mat','file')
+    forest_edgeProb = classRF_train(x, y, NUM_TREES,MTRY,extra_options);
+    disp('RFC learned for edge classification!')
+    save forest_edgeProb.mat forest_edgeProb
+    disp('saved forest forest_edgeProb.mat')
+else
+    disp('forest_edgeProb.mat already exists!')
+    load forest_edgeProb.mat
+end
 %% Visualization and evaluation of the trained RFC
+% Read test images
+disp('Testing the learned RFC for edge classification ...')
+imgFiles_testing = dir(pathForImages_testing);
+% calculate feature matrices for test images
+disp('Edge feature extraction for test images ...')
+for i=1:length(imgFiles_testing)
+    name = imgFiles_testing(i).name;
+    % extract features only if feature matrix is not already presaved
+    if ~exist(strcat(name(1:LEN_IMG_IND),'_efm.mat'),'file')
+        imgIn0 = double(imread(name));
+        % add border
+        marginPixVal = min(min(imgIn0));
+        imgIn = addThickBorder(imgIn0,marginSize,marginPixVal);
+        [output,rgbimg,orientedScoreSpace3D] = getOFR(imgIn,orientations,...
+                                barLength,barWidth,invertImg,threshFrac);
+        OFR_mag = output(:,:,3);
+        ws = watershed(OFR_mag);
+        
+        disp('creating graph from watershed boundaries...');
+        [adjacencyMat,nodeEdges,edges2nodes,edges2pixels,connectedJunctionIDs] = getGraphFromWS(ws,output);
+        edgepixels_i = edges2pixels;
+        edgepixels_i(:,1) = []; % delete the first column which has edgeIDs
+
+        % extract features
+        edgePrior = getEdgeUnaryAbs(edgepixels_i,OFR_mag);
+        str2 = sprintf('Calculating edge features for test image %d ...',i);
+        disp(str2)
+        fm = edgeFeatures(edgepixels_i,orientedScoreSpace3D,edgePrior);
+        disp('done!')
+        % save feature matrix
+        save(strcat(name(1:LEN_IMG_IND),'_efm.mat'),'fm');
+        % save edgepixels
+        save(strcat(name(1:LEN_IMG_IND),'_edgepixels.mat'),'edgepixels_i');
+    else
+        txt1 = sprintf('Found precalculated feature matrix for test image %d',i);
+        disp(txt1);
+    end
+    
+end
+% Read labels for test images
+testingLabelImgNames = dir(pathForLabels_testing);
+
+for i=1:length(testingLabelImgNames)
+  name = testingLabelImgNames(i).name;
+  im = imread(name);
+  % add border
+  marginPixVal = min(min(im));
+  im = addThickBorder(im,marginSize,marginPixVal);
+  [sizeR,sizeC] = size(im);
+  load(strcat(name(1:LEN_IMG_IND),'_efm.mat'));
+  load(strcat(name(1:LEN_IMG_IND),'_edgepixels.mat'));
+  fm = reshape(fm,size(fm,1)*size(fm,2),size(fm,3));
+  fm(isnan(fm))=0;
+  clear fmNeg
+  clear fmPos
+  im=uint8Img(im(:,:,1));
+  imsize = size(im);
+  clear y
+  clear im
+  
+  votes = zeros(imsize(1)*imsize(2),1);
+  
+  txt1 = sprintf('Classifying edges for test image %d ...',i);
+  disp(txt1);
+  [y_h,v] = classRF_predict(double(fm), forest_pixelProb);
+  txt1 = sprintf('classifying edges for test image %d done!',i);
+  disp(txt1);
+  votes = v(:,2);
+  votes = double(votes)/max(votes(:)); % on probability for each edge
+  numEdges = size(votes,1);
+  
+  disp('visualization')
+  edgeMap = zeros(sizeR,sizeC);
+  for i=1:numEdges
+      edgeMap(edgepixels_i(i)) = votes(i);
+  end
+  im = imread(name);			% 
+  % this illustration uses the thickened skeleton of the segmentation
+  % this is the skeletonized view
+  figure; imshow(makeColorOverlay(edgeMap,im));
+  imwrite(makeColorOverlay(edgeMap,im),strcat(name(1:LEN_IMG_IND),'_overlay.tif'),'tif');
+  % TODO: calculate edge prediction error
+  
+end
+
+
+
