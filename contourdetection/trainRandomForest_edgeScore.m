@@ -101,7 +101,7 @@ for i=1:numTrainingImgs
   posEdgeID_i = [];
   negEdgeID_i = [];
   for j=1:numEdges_i
-    edgePix_edge_i = edgepixels(j,:);
+    edgePix_edge_i = edgepixels_i(j,:);
     clear negativePix_j
     negativePix_j = posNeg(edgePix_edge_i);
     if(isempty(negativePix_j))
