@@ -9,10 +9,10 @@ function forest_edgeProb = trainRandomForest_edgeScore()
 
 %% Parameters
 % use wild cards to allow for indices
-pathForImages_training = '/home/thanuja/Dropbox/data/RF_training_mem/*_trainingImage.tif'; 
-pathForImages_testing = '/home/thanuja/Dropbox/data/RF_training_mem/*_testingImg.tif';
-pathForLabels_training = '/home/thanuja/Dropbox/data/RF_training_mem/*_trainingLabels.tif';
-pathForLabels_testing = '/home/thanuja/Dropbox/data/RF_training_mem/*_testingLabels.tif';
+pathForImages_training = '/home/thanuja/Dropbox/data/RF_training_edge/*_trainingImage.tif'; 
+pathForImages_testing = '/home/thanuja/Dropbox/data/RF_training_edge/*_testingImg.tif';
+pathForLabels_training = '/home/thanuja/Dropbox/data/RF_training_edge/*_trainingLabels.tif';
+pathForLabels_testing = '/home/thanuja/Dropbox/data/RF_training_edge/*_testingLabels.tif';
 
 maxNumberOfSamplesPerClass = 5000;
 LEN_IMG_IND = 3;

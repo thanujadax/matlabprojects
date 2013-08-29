@@ -71,11 +71,14 @@ boundaryEdges_listInds = zeros(numBoundaryEdgePixels,1);
 for i=1:numBoundaryEdgePixels
     clear edgeListInd
     [edgeListInd,~] = find(edgepixels==boundaryEdgePixels(i));
-    boundaryEdges_listInds(i) = edgeListInd;
-    boundaryEdges(i) = edgeIDs(edgeListInd,1);
+    if(~isempty(edgeListInd))
+        boundaryEdges_listInds(i) = edgeListInd;
+        boundaryEdges(i) = edgeIDs(edgeListInd,1);
+    end
 end
 
 boundaryEdges = unique(boundaryEdges);
+boundaryEdges = boundaryEdges(boundaryEdges>0);
 boundaryEdges_listInds = unique(boundaryEdges_listInds);
 %% visualization
 numBoundaryEdges = numel(boundaryEdges);
@@ -87,9 +90,11 @@ if(visualize)
     imgTmp(edgepix_all) = 1;
     % color boundary edges with 0.5
     for i=1:numBoundaryEdges
-        edgepix_i = edgepixels(boundaryEdges_listInds(i),:);
-        edgepix_i = edgepix_i(edgepix_i>0);
-        imgTmp(edgepix_i) = 0.5;
+        if(boundaryEdges_listInds(i)~=0)
+            edgepix_i = edgepixels(boundaryEdges_listInds(i),:);
+            edgepix_i = edgepix_i(edgepix_i>0);
+            imgTmp(edgepix_i) = 0.5;
+        end
     end
     figure;imagesc(imgTmp);title('boundary edges');
 end

@@ -6,6 +6,8 @@ function [adjacencyMat,nodeEdges,edges2nodes,edges2pixels,connectedJunctionIDs] 
 % ws = watershed(imIn);
 % %figure;imagesc(ws)
 
+saveMatrices = 1;  % to save some of the generated matrices
+
 % % test input ws
 % ws = imread('toyWS.png');
 [sizeR,sizeC] = size(ws);
@@ -60,6 +62,9 @@ edgepix = zeros(sizeR,sizeC);
 edgepix(wsBoundaries>0) = hsvOutput_V(wsBoundaries>0);
 edgepix(wsJ>0) = 1;
 hsvOutput(:,:,3) = edgepix;
+if(saveMatrices)
+    save('edgepix.mat','edgepix');
+end
 hsvImg = cat(3,hsvOutput(:,:,1),hsvOutput(:,:,2),hsvOutput(:,:,3));
 RGBimg = hsv2rgb(hsvImg);
 figure;imshow(RGBimg);
@@ -140,6 +145,9 @@ if(selfEdgeIDs(1)~=0)
     % as 2 edge junctions.
 end
 
+if(saveMatrices)
+    save('edges2pixels.mat','edges2pixels')
+end
 %% visualize graph
 [r,c] = ind2sub([sizeR sizeC],nodeInds);
 xy = [c r];

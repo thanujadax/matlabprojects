@@ -5,11 +5,11 @@
 isToyProb = 0;
 useGurobi = 1;
 fromInputImage = 1;
-imagePath = '/home/thanuja/Dropbox/data/mitoData/emJ_00_170x.png';
+% imagePath = '/home/thanuja/Dropbox/data/mitoData/emJ_00_170x.png';
 % imagePath = '/home/thanuja/Dropbox/data/testImg/testCurves1.png';
 % imagePath = '/home/thanuja/Dropbox/data/mitoData/stem1_256by256.png';
 % imagePath = '/home/thanuja/Dropbox/data/thanuja/emchallenge-class/competition-final0000.tif';
-% hard coded back bone edge 1962
+imagePath = '/home/thanuja/Dropbox/data/RF_training_edge/I00_trainingImage.tif';
 
 orientationsStepSize = 10;
 orientations = 0:orientationsStepSize:350;
@@ -178,9 +178,11 @@ normalizedInputImage = imgIn./(max(max(imgIn)));
 %     nodeInds,edges2nodes,cCell);
 % get cell priors from RFC probability map
 if ~exist('forest.mat','file')
+    disp('RF for membrane classification not found. Training new classifier...')
     forest = trainRandomForest_pixelProb();
 else
     load forest.mat
+    disp('loaded pre-trained RF for membrane vs cell-interior classification')
 end
 cellPriors = regionScoreCalculator(forest,normalizedInputImage,setOfCells,edges2pixels,...
     nodeInds,edges2nodes,cCell,wsIDsForCells,ws);
