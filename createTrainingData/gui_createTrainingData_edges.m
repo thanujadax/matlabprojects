@@ -103,7 +103,7 @@ function pushbutton_toggleEdgeState_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 % get the current position (data point)
-
+pos = get(0,'userdata')
 % which edge (edgeListInd) is this pixel part of?
 
 % toggle the state of this edge
@@ -119,7 +119,18 @@ function push_loadEdgeMap_Callback(hObject, eventdata, handles)
 str=get(handles.edit_edgemap_path, 'string');
 load(str); % loads edgeMap (edgeMap as matrix)
 handles.edgeMap = edgeMap;
-imshow(handles.edgeMap,[]);
+fh = imshow(handles.edgeMap,[]);
+
+dcm_obj = datacursormode(handles.edgeMap);
+datacursormode on;
+set(dcm_obj,'UpdateFcn', @myupdatefcn )
+
+
+function txt = myupdatefcn(~, event_obj)
+  pos = event_obj.Position;
+  disp(['You clicked X:',num2str(pos(1)),', Y:',num2str(pos(2))]);
+  txt = {'Point to Compute'};
+  set(0,'userdata',pos);
 
 
 
