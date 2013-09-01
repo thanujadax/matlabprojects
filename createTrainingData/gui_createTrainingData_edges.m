@@ -108,7 +108,7 @@ function push_loadEdgeMap_Callback(hObject, eventdata, handles)
 % hObject    handle to push_loadEdgeMap (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-str=get(edit_edgemap_path, 'string');
+str=get(handles.edit_edgemap_path, 'string');
 handles.edgeMap = load(str);
 
 
