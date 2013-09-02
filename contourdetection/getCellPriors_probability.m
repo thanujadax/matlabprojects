@@ -45,4 +45,4 @@ end
 
 % visualize region scores
 regionScoreSpace = regionScoreSpace./(max(max(regionScoreSpace)));
-figure;imshow(regionScoreSpace)
+figure;imshow(regionScoreSpace);title('region scores')
