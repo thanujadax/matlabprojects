@@ -9,13 +9,9 @@ fromInputImage = 1;
 % imagePath = '/home/thanuja/Dropbox/data/testImg/testCurves1.png';
 % imagePath = '/home/thanuja/Dropbox/data/mitoData/stem1_256by256.png';
 % imagePath = '/home/thanuja/Dropbox/data/thanuja/emchallenge-class/competition-final0000.tif';
-<<<<<<< HEAD
 % hard coded back bone edge 1962
-imagePath = '/home/thanuja/Dropbox/data/RF_training_edge/I15_testingImage.tif';
-=======
+% imagePath = '/home/thanuja/Dropbox/data/RF_training_edge/I15_testingImage.tif';
 imagePath = '/home/thanuja/Dropbox/data/RF_training_edge/I00_trainingImage.tif';
->>>>>>> 92460a4089b9421056401bdfb75029262f82a7bd
-
 orientationsStepSize = 10;
 orientations = 0:orientationsStepSize:350;
 

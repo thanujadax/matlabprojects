@@ -117,9 +117,7 @@ function push_loadEdgeMap_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 str=get(handles.edit_edgemap_path, 'string');
-<<<<<<< HEAD
 handles.edgeMap = load(str);
-=======
 load(str); % loads edgeMap (edgeMap as matrix)
 handles.edgeMap = edgeMap;
 fh = imshow(handles.edgeMap,[]);
@@ -135,9 +133,6 @@ function txt = myupdatefcn(~, event_obj)
   txt = {'Point to Compute'};
   set(0,'userdata',pos);
 
-
-
-
 function edit_edges2pixels_path_Callback(hObject, eventdata, handles)
 % hObject    handle to edit_edges2pixels_path (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -146,7 +141,6 @@ function edit_edges2pixels_path_Callback(hObject, eventdata, handles)
 % Hints: get(hObject,'String') returns contents of edit_edges2pixels_path as text
 %        str2double(get(hObject,'String')) returns contents of edit_edges2pixels_path as a double
 
->>>>>>> 92460a4089b9421056401bdfb75029262f82a7bd
 
 % --- Executes during object creation, after setting all properties.
 function edit_edges2pixels_path_CreateFcn(hObject, eventdata, handles)
