@@ -38,8 +38,8 @@ fm(isnan(fm))=0;
 pixelProbabilities = v(:,2);
 pixelProbabilities = reshape(pixelProbabilities,[sizeR sizeC]);
 pixelProbabilities = double(pixelProbabilities)/max(pixelProbabilities(:));
-figure; imshow(makeColorOverlay(pixelProbabilities,imIn));
-title('predicted pixel probabilities overlay')
+% figure; imshow(makeColorOverlay(pixelProbabilities,imIn));
+% title('predicted pixel probabilities overlay')
 %% calculate region scores (mean, median, number of cells)
 % if region score is close to 1 it's probably cell interior
 % if close to zero, it's probably membrane/(mitochondria?)

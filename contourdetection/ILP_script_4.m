@@ -5,13 +5,13 @@
 isToyProb = 0;
 useGurobi = 1;
 fromInputImage = 1;
-% imagePath = '/home/thanuja/Dropbox/data/mitoData/emJ_00_170x.png';
+imagePath = '/home/thanuja/Dropbox/data/mitoData/emJ_00_170x.png';
 % imagePath = '/home/thanuja/Dropbox/data/testImg/testCurves1.png';
 % imagePath = '/home/thanuja/Dropbox/data/mitoData/stem1_256by256.png';
 % imagePath = '/home/thanuja/Dropbox/data/thanuja/emchallenge-class/competition-final0000.tif';
 % hard coded back bone edge 1962
 % imagePath = '/home/thanuja/Dropbox/data/RF_training_edge/I15_testingImage.tif';
-imagePath = '/home/thanuja/Dropbox/data/RF_training_edge/I00_trainingImage.tif';
+% imagePath = '/home/thanuja/Dropbox/data/RF_training_edge/I00_trainingImage.tif';
 orientationsStepSize = 10;
 orientations = 0:orientationsStepSize:350;
 
@@ -112,8 +112,6 @@ for i=1:numBoundaryEdges
     boundaryEdgeListInds(i) = find(edgeListInds==boundaryEdges(i));
 end
 
-
-
 disp('preparing coefficients for ILP solver...')
 %% Edge unary values
 % edge priors - from orientation filters
@@ -159,7 +157,7 @@ for i=1:numJtypes
     end
 end
 %% Faces of wsgraph -> cell types (between pairs of cells)
-[faceAdj,edges2cells,setOfCells,twoCellEdges,wsIDsForCells] = getFaceAdjFromJnAdjGraph(edgeListInds,nodeEdges,...
+[faceAdj,edges2regions,setOfRegions,twoRegionEdges,wsIDsForRegions] = getFaceAdjFromJnAdjGraph(edgeListInds,nodeEdges,...
     junctionTypeListInds,jAnglesAll_alpha,boundaryEdges,edges2nodes,ws,edges2pixels);
 
 % cellcogs = getCellCentroidsAll(setOfCells,edges2pixels,edgeListInds,...
@@ -185,8 +183,8 @@ else
     load forest.mat
     disp('loaded pre-trained RF for membrane vs cell-interior classification')
 end
-cellPriors = regionScoreCalculator(forest,normalizedInputImage,setOfCells,edges2pixels,...
-    nodeInds,edges2nodes,cCell,wsIDsForCells,ws);
+regionPriors = regionScoreCalculator(forest,normalizedInputImage,setOfRegions,edges2pixels,...
+    nodeInds,edges2nodes,cCell,wsIDsForRegions,ws);
 %% Boundary edges
 % assigning predetermined edge priors for boundary edges after
 % nodeAngleCost calculation
@@ -274,11 +272,11 @@ scaledEdgePriors = edgePriors.*cEdge;
 % [Aeq,beq] = getEqConstraints2(numEdges,jEdges,edges2pixels);
 [Aeq,beq,numEq,numLt,numCells] = getConstraints(numEdges,jEdges,edges2pixels,nodeAngleCosts,...
             offEdgeListIDs,onEdgeListIDs,minNumActEdgesPercentage,...
-            twoCellEdges,edges2cells,setOfCells,edgeOrientations,jAnglesAll_alpha,...
+            twoRegionEdges,edges2regions,setOfRegions,edgeOrientations,jAnglesAll_alpha,...
             nodeEdges,junctionTypeListInds,edges2nodes,sizeR,sizeC);
         
 f = getILPcoefficientVector2(scaledEdgePriors,nodeAngleCosts,...
-    bbNodeListInds,junctionTypeListInds,bbJunctionReward,cellPriors);
+    bbNodeListInds,junctionTypeListInds,bbJunctionReward,regionPriors);
                 
 senseArray(1:numEq) = '=';
 if(numLt>0)
@@ -388,7 +386,7 @@ activeContourPixels = find(ilpSegmentation);
 % get the active pixels
 %output(:,:,3) = ilpSegmentation;
 totX = numel(x);
-numCells = numel(cellPriors);
+numCells = numel(regionPriors);
 % get active foreground cells
 cellStartPos = totX - numCells + 1;
 cellActivationVector = x(cellStartPos:totX);
@@ -400,16 +398,12 @@ foregroundPixels = [];
 %             edges2nodes,edgeListInds);
 
 for i=1:numel(activeCellInd)
-    wsID_i = wsIDsForCells(activeCellInd(i));
+    wsID_i = wsIDsForRegions(activeCellInd(i));
     if(wsID_i==0)
         disp('problem with wsid check')
     else
-        cellPixInds_i = find(ws==wsID_i);
-%     clear edgeps
-%     edgeps = intersect(cellPixInds_i,offEdgePixelInds);
-%     if(~isempty(edgeps))
-%         activeCellInd(i)
-%     end
+%         cellPixInds_i = find(ws==wsID_i);
+        cellPixInds_i = getInternalPixForCell(ws,wsID_i);
         foregroundPixels = [foregroundPixels; cellPixInds_i];
     end
 end
@@ -417,8 +411,8 @@ end
 % foregroundPixels = setdiff(foregroundPixels,offEdgePixelInds);
 
 % make inactive edges inside foreground regions show as foreground
-[inEdgeListInds,inEdgeIDs] = getInEdges(twoCellEdges,cellActivationVector,...
-                onEdgeStates,edges2cells,edgeListInds);
+[inEdgeListInds,inEdgeIDs] = getInEdges(twoRegionEdges,cellActivationVector,...
+                onEdgeStates,edges2regions,edgeListInds);
             
 if(~isempty(inEdgeListInds))
     inEdgePixels = [];

@@ -1,5 +1,5 @@
-function cellPriors = getCellPriors_probability(pixelProbabilities,setOfCells,edges2pixels,...
-    nodeInds,edges2nodes,K,sizeR,sizeC,wsIndsForCells,ws)
+function regionPriors = getCellPriors_probability(pixelProbabilities,setOfCells,edges2pixels,...
+    nodeInds,edges2nodes,K,sizeR,sizeC,wsIndsForRegion,ws)
 % Inputs:
 %   imgIn(pixelProbabilities) - normalized image. 1 -> bright
 %   K - positive scalar factor for the costs 
@@ -10,7 +10,7 @@ function cellPriors = getCellPriors_probability(pixelProbabilities,setOfCells,ed
 % numpixels = numel(pixelProbabilities);
 
 numCells = size(setOfCells,1);
-cellPriors = zeros(numCells,1);
+regionPriors = zeros(numCells,1);
 regionScoreSpace = zeros(sizeR,sizeC);
 
 for i=1:numCells
@@ -26,7 +26,7 @@ for i=1:numCells
 %     
 %     intPixInds = sub2ind([sizeR sizeC],internaly,internalx);
     
-    intPixInds = getInternalPixForCell(ws,wsIndsForCells(i));
+    intPixInds = getInternalPixForCell(ws,wsIndsForRegion(i));
     
     
     if(~isempty(intPixInds))
@@ -36,11 +36,11 @@ for i=1:numCells
 
         meanPixVal = mean(pixelValues); % always between 0 and 1
         theta = meanPixVal * pi;
-        cellPriors(i) = cos(theta) * K; 
+        regionPriors(i) = cos(theta) * K; 
     else
-        cellPriors(i) = 0;
+        regionPriors(i) = 0;
     end
-    regionScoreSpace(intPixInds) = cellPriors(i);
+    regionScoreSpace(intPixInds) = regionPriors(i);
 end
 
 % visualize region scores
