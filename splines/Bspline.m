@@ -1,4 +1,5 @@
 function q = Bspline(t, v, dt)
+
 % Evaluate the piecewise cubic B-spline curve at intervals of dt
 % and return the resulting vector of points
 %  has knots t(i) and control points v(i).
@@ -7,6 +8,8 @@ function q = Bspline(t, v, dt)
 %   (2) This function evaluates the B-spline curve over [t_4, t_{m-3}],
 %       where m is the number of knots. (Note the spline is not 
 %       well-defined outside this interval.)
+%   (3) for circular B-splines, append a copy of the top 4 data points to the bottom
+%   of the list of data points.
 
 
 m = size(t, 2);  % number of knots
