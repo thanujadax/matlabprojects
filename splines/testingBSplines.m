@@ -49,3 +49,9 @@ qy = Bspline(t, y, dt);
 % ylabel('y');
 % legend('control polygon', 'B-spline curve');
 figure;plot(qx,qy)
+%% spline curve by uniform subdivision
+order = 3;
+values = spcrv(data',order); 
+figure;
+plot(data(:,1),data(:,2),'*')
+hold on, plot(values(1,:),values(2,:)), hold off
