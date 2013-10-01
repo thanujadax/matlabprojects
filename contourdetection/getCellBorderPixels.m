@@ -1,5 +1,5 @@
 function cellBorderPixels = getCellBorderPixels(c_cellBorderEdgeIDs,...
-            c_cellBorderNodeIDs,edgepixels,nodeInds)
+            c_cellBorderNodeIDs,edgepixels,nodeInds,connectedJunctionIDs)
 
 numCells = numel(c_cellBorderEdgeIDs);
 cellBorderPixels = [];
@@ -10,11 +10,28 @@ for i=1:numCells
     cellBorderEdgePixels_i = edgepixels(cellEdgeInds,:);
     cellBorderEdgePixels_i = cellBorderEdgePixels_i(cellBorderEdgePixels_i>0);
     % cellBorderEdgePixels{i} = cellBorderEdgePixels_i;
-    cellBorderPixels = [cellBorderPixels; cellBorderEdgePixels_i'];
+    cellBorderPixels = [cellBorderPixels; cellBorderEdgePixels_i];
     
     % get node pixels
     cellNodeInds = c_cellBorderNodeIDs{i};
     cellBorderNodePixels_i = nodeInds(cellNodeInds);
-    cellBorderPixels = [cellBorderPixels; cellBorderNodePixels_i'];
+    
+    cellBorderPixels = [cellBorderPixels; cellBorderNodePixels_i];
+    
+    % if this is a cluster nodes, add the entire cluster to the list
+    clusID_indList = ismember(connectedJunctionIDs(:,1),cellBorderNodePixels_i);
+    clusIDs = connectedJunctionIDs(clusID_indList,2);
+    clusIDs = unique(clusIDs);
+    
+    if(isempty(clusIDs))
+        % not a cluster node
+        
+    else
+        % cluster node
+        clusPixListInds = ismember(connectedJunctionIDs(:,2),clusIDs);
+        clusPix_i = connectedJunctionIDs(clusPixListInds,1);
+        cellBorderPixels = [cellBorderPixels; clusPix_i];
+    end
+    
 end
 

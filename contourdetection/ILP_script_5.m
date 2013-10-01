@@ -470,3 +470,9 @@ figure;imshow(RGBimg_foreground)
 [c_cellBorderEdgeIDs,c_cellBorderNodeIDs] = getCellBorderPixels(onEdgeInd,...
         edges2nodes,nodeEdges,edgeListInds);
 
+cellBorderPixels = getCellBorderPixels(c_cellBorderEdgeIDs,...
+            c_cellBorderNodeIDs,edgepixels,nodeInds,connectedJunctionIDs);
+        
+visualizeCells = zeros(sizeR,sizeC);
+visualizeCells(cellBorderPixels) = 1;
+figure;imshow(visualizeCells)
