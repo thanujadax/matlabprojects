@@ -476,3 +476,4 @@ cellBorderPixels = getCellBorderPixels(c_cellBorderEdgeIDs,...
 visualizeCells = zeros(sizeR,sizeC);
 visualizeCells(cellBorderPixels) = 1;
 figure;imshow(visualizeCells)
+
