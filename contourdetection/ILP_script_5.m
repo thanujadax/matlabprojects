@@ -468,5 +468,5 @@ RGBimg_foreground = hsv2rgb(hsvImage_foreground);
 figure;imshow(RGBimg_foreground)
 %% store extracted geometry in datastructures
 [c_cellBorderEdgeIDs,c_cellBorderNodeIDs] = getCellBorderPixels(onEdgeInd,...
-        edges2nodes,nodeEdges);
+        edges2nodes,nodeEdges,edgeListInds);
 

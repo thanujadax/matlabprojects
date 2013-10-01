@@ -1,5 +1,5 @@
 function [c_cellBorderEdgeIDs,c_cellBorderNodeIDs] = getCellBorderPixels(onEdgeInd,...
-        edges2nodes,nodeEdges)
+        edges2nodes,nodeEdges,edgeListInds)
     
 usedEdgeInds = [];
 
@@ -13,20 +13,18 @@ for i=1:numEdges
         k = k+1
         %usedEdgeInds(end+1) = edgeInd_i; % edge_i marked as used
         [c_cellBorderEdgeIDs{k},c_cellBorderNodeIDs{k}] = getBorderForCell(edgeInd_i,...
-            onEdgeInd,edges2nodes,nodeEdges);
+            onEdgeInd,edges2nodes,nodeEdges,edgeListInds);
         usedEdgeInds = [usedEdgeInds; c_cellBorderEdgeIDs{k}];
     end
 end
 
 
 function [visitedEdges, visitedNodes] = getBorderForCell(edgeInd_i,onEdgeInd,...
-            edges2nodes,nodeEdges)
+            edges2nodes,nodeEdges,edgeListInds)
 
 % c_cellBorderPixels = [];
 visitedNodes = [];  % records all the nodes visited already for this cell
 visitedEdges = [];  % records all the edges visited already for this cell
-
-nodeInds = nodeEdges(:,1);
 
 nodesForEdge_i = edges2nodes(edgeInd_i,:);
 node_i = nodesForEdge_i(1); % pick the first node to start traversing the cell
@@ -39,15 +37,17 @@ while(sum(visitedEdges==edgeInd_i)==0 && numel(node_i)==1)
     visitedNodes(end+1) = node_i;
     
     % pick the next edge
-    edges_for_node_i = nodeEdges(node_i,:);
-    edges_for_node_i(1) = []; % first element is the nodePixInd
-    active_edges_node_i = intersect(edges_for_node_i,onEdgeInd);
+    edgeIDs_for_node_i = nodeEdges(node_i,:);
+    edgeIDs_for_node_i(1) = []; % first element is the nodePixInd
+
+    [~,edgeInds_for_node_i] = ismember(edgeIDs_for_node_i,edgeListInds);
+    active_edges_node_i = intersect(edgeInds_for_node_i,onEdgeInd);
     nextEdges = (active_edges_node_i==edgeInd_i);
     nextEdges = ~nextEdges;
     edgeInd_i = active_edges_node_i(nextEdges);
-    if(edgeInd_i==158)
-        a = 00;
-    end
+%     if(edgeInd_i==158)
+%         a = 00;
+%     end
     % pick the next node
     nextNodes = edges2nodes(edgeInd_i,:);
     nextNode_listInd = (nextNodes==node_i);
