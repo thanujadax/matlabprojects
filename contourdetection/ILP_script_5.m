@@ -477,3 +477,5 @@ visualizeCells = zeros(sizeR,sizeC);
 visualizeCells(cellBorderPixels) = 1;
 figure;imshow(visualizeCells)
 
+cells2pixels = getCellPixels(cellBorderPixels,ws);
+
