@@ -486,6 +486,7 @@ visualizeCells = zeros(sizeR,sizeC,3);
 numCs = numel(c_cells2regions);
 for i=1:numCs
     % pick random color (RGB vals)
+    R = rand(1); G = rand(1); B = rand(1);
     
     % get regions for this cell and the internal pixels. set RGB
     
