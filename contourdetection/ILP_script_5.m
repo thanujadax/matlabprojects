@@ -484,14 +484,25 @@ offEdgeIDList = edgeListInds(ismember(edgeListInds,offEdgeInd));
 % visualize each cell in different colors
 visualizeCells = zeros(sizeR,sizeC,3);
 numCs = numel(c_cells2regions);
+rMat = zeros(sizeR,sizeC);
+gMat = zeros(sizeR,sizeC);
+bMat = zeros(sizeR,sizeC);
 for i=1:numCs
     % pick random color (RGB vals)
     R = rand(1); G = rand(1); B = rand(1);
     
     % get regions for this cell and the internal pixels. set RGB
+    cellRegionList_i = c_cells2regions{i};
+    regionPixels = getRegionPixels(cellRegionList_i,wsIDsForRegions,ws);
+    rMat(regionPixels) = R;
+    gMat(regionPixels) = G;
+    bMat(regionPixels) = B;
     
+    visualizeCells(:,:,1) = rMat;
+    visualizeCells(:,:,2) = gMat;
+    visualizeCells(:,:,3) = bMat;
     % get internal edges for this cell. set RGB.
 end
 
-
+figure;imshow(visualizeCells);
 
