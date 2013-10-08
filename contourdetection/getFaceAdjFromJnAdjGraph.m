@@ -11,7 +11,8 @@ function [faceAdj,edges2cells,setOfCellsMat,listOfEdgeIDs,wsIDs] = getFaceAdjFro
 %   edges2nodes - 
 
 % Outputs: 
-%   faceAdj - adjacency graph of the faces of the input planar graph
+%   faceAdj - adjacency graph of the faces of the input planar graph.
+%   values are edgeIDs
 %   edges2cells - each row corresponds to an edge. the two columns give you
 %   the two cells that are connected by that edge. The order of edges
 %   present is according to listOfEdgeIDs
