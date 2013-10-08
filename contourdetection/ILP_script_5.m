@@ -473,9 +473,14 @@ figure;imshow(RGBimg_foreground)
 cellBorderPixels = getCellBorderPixels(c_cellBorderEdgeIDs,...
             c_cellBorderNodeIDs,edgepixels,nodeInds,connectedJunctionIDs);
         
-visualizeCells = zeros(sizeR,sizeC);
-visualizeCells(cellBorderPixels) = 1;
-figure;imshow(visualizeCells)
+visualizeCellBorders = zeros(sizeR,sizeC);
+visualizeCellBorders(cellBorderPixels) = 1;
+figure;imshow(visualizeCellBorders)
 
-cells2pixels = getCellPixels(cellBorderPixels,ws);
+% regions aggregating to cells
+offEdgeIDList = edgeListInds(ismember(edgeListInds,offEdgeInd)); 
+c_cells2regions = getRegionsForCells(faceAdj,offEdgeIDList);
+
+
+
 
