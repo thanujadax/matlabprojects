@@ -479,8 +479,18 @@ figure;imshow(visualizeCellBorders)
 
 % regions aggregating to cells
 offEdgeIDList = edgeListInds(ismember(edgeListInds,offEdgeInd)); 
-c_cells2regions = getRegionsForCells(faceAdj,offEdgeIDList);
-
+[c_cells2regions,c_cellInternalEdgeIDs] = getRegionsForCells(...
+                    faceAdj,offEdgeIDList);
+% visualize each cell in different colors
+visualizeCells = zeros(sizeR,sizeC,3);
+numCs = numel(c_cells2regions);
+for i=1:numCs
+    % pick random color (RGB vals)
+    
+    % get regions for this cell and the internal pixels. set RGB
+    
+    % get internal edges for this cell. set RGB.
+end
 
 
 

@@ -1,4 +1,4 @@
-function c_cells2regions = getRegionsForCells(faceAdj,offEdgeIDList)
+function [c_cells2regions,c_cellInternalEdgeIDs] = getRegionsForCells(faceAdj,offEdgeIDList)
 
 % Input:
 %   faceAdj: face-adjacency graph for all the regions. The values are
@@ -17,10 +17,10 @@ for i=1:numRegions
         internalEdgeList_i = [];
         [regionList_i,internalEdgeList_i] = getRegionList(...
             i,faceAdj,offEdgeIDList,regionList_i,internalEdgeList_i);
-        usedRegionList = [usedRegionList regionList_i];
+        usedRegionsList = [usedRegionsList regionList_i];
         k = k + 1;
         c_cells2regions{k} = regionList_i;
-        c_cellInternalEdgeIDs = internalEdgeList_i;
+        c_cellInternalEdgeIDs{k} = internalEdgeList_i;
     end
 end
 
