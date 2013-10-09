@@ -45,7 +45,7 @@ if(~isempty(immediateNeighborList))
         thisRegionNeighborList = [thisRegionNeighborList newNeighbors];
         newConnectedEdges = setdiff(offEdgeIDsForThisRegion,connectedEdgeIDs);
         if(~isempty(newConnectedEdges))
-            connectedEdgeIDs = [connectedEdgeIDs; newConnectedEdges];
+            connectedEdgeIDs = [connectedEdgeIDs; newConnectedEdges'];
         end
         % get the connected regions for the regions in the list as well
         % iterate until no new regions are added to the list of regions
