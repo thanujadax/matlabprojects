@@ -477,10 +477,11 @@ visualizeCellBorders = zeros(sizeR,sizeC);
 visualizeCellBorders(cellBorderPixels) = 1;
 figure;imshow(visualizeCellBorders)
 
-% regions aggregating to cells
+% regions aggregating to form cells
 offEdgeIDList = edgeListInds(ismember(edgeListInds,offEdgeInd)); 
 [c_cells2regions,c_cellInternalEdgeIDs] = getRegionsForCells(...
                     faceAdj,offEdgeIDList);
+                
 % visualize each cell in different colors
 visualizeCells = zeros(sizeR,sizeC,3);
 numCs = numel(c_cells2regions);

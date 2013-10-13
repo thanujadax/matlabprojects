@@ -7,7 +7,11 @@ function [c_cells2regions,c_cellInternalEdgeIDs] = getRegionsForCells(faceAdj,of
 
 usedRegionsList = [];
 numRegions = size(faceAdj,1);
-k = 0;
+k = 0; 
+
+% TODO: only consider on regions
+
+
 for i=1:numRegions
     % check if region is already used
     if(sum(ismember(usedRegionsList,i))==0)
@@ -30,7 +34,9 @@ function [thisRegionNeighborList,connectedEdgeIDs] = getRegionList(...
         thisRegionID,faceAdj,offEdgeIDList,thisRegionNeighborList,...
         connectedEdgeIDs)
 numRegions = size(faceAdj,1);
-
+if(~(sum(ismember(thisRegionNeighborList,thisRegionID))))
+thisRegionNeighborList = [thisRegionNeighborList thisRegionID];
+end
 % get all edges connected to this region
 edgeIDsForThisRegion = faceAdj(thisRegionID,:); 
 edgeIDsForThisRegion_nz = edgeIDsForThisRegion(edgeIDsForThisRegion>0);
@@ -45,7 +51,7 @@ if(~isempty(immediateNeighborList))
         thisRegionNeighborList = [thisRegionNeighborList newNeighbors];
         newConnectedEdges = setdiff(offEdgeIDsForThisRegion,connectedEdgeIDs);
         if(~isempty(newConnectedEdges))
-            connectedEdgeIDs = [connectedEdgeIDs; newConnectedEdges'];
+            connectedEdgeIDs = [connectedEdgeIDs; newConnectedEdges];
         end
         % get the connected regions for the regions in the list as well
         % iterate until no new regions are added to the list of regions
