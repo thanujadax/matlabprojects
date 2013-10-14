@@ -14,7 +14,7 @@ numRegions = numel(regionList);
 
 for i=1:numRegions
     % get internal pixel of region i
-    wsID = wsIDsForRegions(i);
+    wsID = wsIDsForRegions(regionList(i));
     internalPix_i = find(ws==wsID);
     % append to list of internal pixels
     regionPixels = [regionPixels; internalPix_i];
