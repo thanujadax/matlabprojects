@@ -504,7 +504,12 @@ for i=1:numCs
     visualizeCells(:,:,1) = rMat;
     visualizeCells(:,:,2) = gMat;
     visualizeCells(:,:,3) = bMat;
+    
     % get internal edges for this cell. set RGB.
+    
+    
+    % get internal nodes for this cell. set RGB
+    
 end
 
 figure;imshow(visualizeCells);
