@@ -270,7 +270,7 @@ scaledEdgePriors = edgePriors.*cEdge;
 % constraints
 % equality constraints and closedness constrains in Aeq matrix
 % [Aeq,beq] = getEqConstraints2(numEdges,jEdges,edges2pixels);
-[Aeq,beq,numEq,numLt,numCells] = getConstraints(numEdges,jEdges,edges2pixels,nodeAngleCosts,...
+[Aeq,beq,numEq,numLt,numRegions] = getConstraints(numEdges,jEdges,edges2pixels,nodeAngleCosts,...
             offEdgeListIDs,onEdgeListIDs,minNumActEdgesPercentage,...
             twoRegionEdges,edges2regions,setOfRegions,edgeOrientations,jAnglesAll_alpha,...
             nodeEdges,junctionTypeListInds,edges2nodes,sizeR,sizeC);
@@ -388,19 +388,19 @@ activeContourPixels = find(ilpSegmentation);
 % get the active pixels
 %output(:,:,3) = ilpSegmentation;
 totX = numel(x);
-numCells = numel(regionPriors);
+numRegions = numel(regionPriors);
 % get active foreground cells
-cellStartPos = totX - numCells + 1;
-cellActivationVector = x(cellStartPos:totX);
-activeCellInd = find(cellActivationVector>0);
+regionStartPos = totX - numRegions + 1;
+regionActivationVector = x(regionStartPos:totX);
+activeRegionInd = find(regionActivationVector>0);
 % get internal pixels for foreground cells
 foregroundPixels = [];
 
 % wsIDs = getWsIDsForCellIDs(ws,setOfCells,edges2pixels,nodeInds,...
 %             edges2nodes,edgeListInds);
 
-for i=1:numel(activeCellInd)
-    wsID_i = wsIDsForRegions(activeCellInd(i));
+for i=1:numel(activeRegionInd)
+    wsID_i = wsIDsForRegions(activeRegionInd(i));
     if(wsID_i==0)
         disp('problem with wsid check')
     else
@@ -413,7 +413,7 @@ end
 % foregroundPixels = setdiff(foregroundPixels,offEdgePixelInds);
 
 % make inactive edges inside foreground regions show as foreground
-[inEdgeListInds,inEdgeIDs] = getInEdges(twoRegionEdges,cellActivationVector,...
+[inEdgeListInds,inEdgeIDs] = getInEdges(twoRegionEdges,regionActivationVector,...
                 onEdgeStates,edges2regions,edgeListInds);
             
 if(~isempty(inEdgeListInds))
@@ -479,8 +479,8 @@ figure;imshow(visualizeCellBorders)
 
 % regions aggregating to form cells
 offEdgeIDList = edgeListInds(ismember(edgeListInds,offEdgeInd)); 
-[c_cells2regions,c_cellInternalEdgeIDs] = getRegionsForCells(...
-                    faceAdj,offEdgeIDList);
+[c_cells2regions,c_cellInternalEdgeIDs] = getRegionsForOnCells(...
+                    faceAdj,activeRegionInd,offEdgeIDList,setOfRegions,wsIDsForRegions,ws);
                 
 % visualize each cell in different colors
 visualizeCells = zeros(sizeR,sizeC,3);
