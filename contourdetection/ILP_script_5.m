@@ -331,9 +331,9 @@ ilpSegmentation = zeros(sizeR,sizeC);
 onStateEdgeXind = 2:2:(numEdges*2);
 onEdgeStates = x(onStateEdgeXind);
 onEdgeInd = find(onEdgeStates>0.5);
-offEdgeInd = find(onEdgeStates<0.5);
+offEdgeListInd = find(onEdgeStates<0.5);
 onEdgePixelInds = getPixSetFromEdgeIDset(onEdgeInd,edgepixels);
-offEdgePixelInds = getPixSetFromEdgeIDset(offEdgeInd,edgepixels);
+offEdgePixelInds = getPixSetFromEdgeIDset(offEdgeListInd,edgepixels);
 ilpSegmentation(onEdgePixelInds) = 1;
 
 % active nodes 
@@ -478,7 +478,9 @@ visualizeCellBorders(cellBorderPixels) = 1;
 figure;imshow(visualizeCellBorders)
 
 % regions aggregating to form cells
-offEdgeIDList = edgeListInds(ismember(edgeListInds,offEdgeInd)); 
+% offEdgeIDList = edgeListInds(ismember(edgeListInds,offEdgeListInd)); 
+offEdgeIDList = edgeListInds(offEdgeListInd);
+
 [c_cells2regions,c_cellInternalEdgeIDs] = getRegionsForOnCells(...
                     faceAdj,activeRegionInd,offEdgeIDList,setOfRegions,wsIDsForRegions,ws);
                 
