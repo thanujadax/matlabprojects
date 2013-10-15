@@ -527,6 +527,10 @@ for i=1:numCs
     visualizeCells(:,:,3) = bMat;
     
     % get internal nodes for this cell. set RGB
+    regionIntNodeListInds = c_cellIntNodeListInds{i};
+    regionIntNodePixInds = getNodePixelsFromNodeInd...
+                (regionIntNodeListInds,nodeInds,connectedJunctionIDs);
+            
     
 end
 
