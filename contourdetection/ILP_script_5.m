@@ -24,6 +24,8 @@ threshFrac = 0.1;
 medianFilterH = 0;
 invertImg = 1;      % 1 for EM images when input image is taken from imagePath
 % max vote response image of the orientation filters
+b_imWithBorder = 1; % add thick dark border around the image
+
 if(isToyProb)
 %     imFilePath = 'testMem4_V.png';
     imFilePath = 'circle1_V.png';
@@ -37,7 +39,9 @@ elseif(fromInputImage)
     imgIn0 = double(imread(imagePath));
     % add border
     marginPixVal = min(min(imgIn0));
-    imgIn = addThickBorder(imgIn0,marginSize,marginPixVal);
+    if(b_imWithBorder)
+        imgIn = addThickBorder(imgIn0,marginSize,marginPixVal);
+    end
     [output,rgbimg,orientedScoreSpace3D] = getOFR(imgIn,orientations,...
                             barLength,barWidth,invertImg,threshFrac);
     % output is in HSV form
@@ -157,9 +161,11 @@ for i=1:numJtypes
     end
 end
 %% Faces of wsgraph -> cell types (between pairs of cells)
-[faceAdj,edges2regions,setOfRegions,twoRegionEdges,wsIDsForRegions] = getFaceAdjFromJnAdjGraph(edgeListInds,nodeEdges,...
-    junctionTypeListInds,jAnglesAll_alpha,boundaryEdges,edges2nodes,ws,edges2pixels);
+% [faceAdj,edges2regions,setOfRegions,twoRegionEdges,wsIDsForRegions] = getFaceAdjFromJnAdjGraph(edgeListInds,nodeEdges,...
+%     junctionTypeListInds,jAnglesAll_alpha,boundaryEdges,edges2nodes,ws,edges2pixels);
 
+[faceAdj,edges2regions,setOfRegions,twoRegionEdges,wsIDsForRegions] ...
+    = getFaceAdjFromWS(ws,edges2pixels,b_imWithBorder);
 % cellcogs = getCellCentroidsAll(setOfCells,edges2pixels,edgeListInds,...
 %     sizeR,sizeC,edges2nodes,nodeInds);
 

@@ -21,8 +21,6 @@ function [faceAdj,edges2regions,setOfRegionsMat,twoRegionEdgeIDs,wsIDsForRegions
 
 numWsFaces = max(max(ws));
 % initialize
-wsIDsForRegions = 1:numWsFaces;
-setOfRegionsMat = [];
 
 if(b_imWithBorder)
     start = 2; % the first ws region is the border. ignore it.
@@ -30,18 +28,36 @@ else
     start = 1;
 end
 
+wsIDsForRegions = start:numWsFaces;
+maxNumEdgesPerRegion = 0;
+
 for i=start:numWsFaces
     clear intPix_i edgePix_i edgeSet_i
     % get internal pixels
     intPix_i = (ws==i);
     % get edge pixels
-    edgePix_i = getEdgePixForWsFace(intPix_i);
+    edgePix_i = getEdgePixForWsFace(intPix_i,ws);
     % get edges (edgeIDs)
     edgeSet_i = getEdgeSetFromEdgePixSet(edgePix_i,edges2pixels);
-    setOfRegionsMat = [setOfRegionsMat; edgeSet_i]; 
-    % get regionID
+    c_setOfRegions{i} = edgeSet_i'; 
+    numEdgesInSet = numel(edgeSet_i);
+    if(numEdgesInSet>maxNumEdgesPerRegion)
+        maxNumEdgesPerRegion = numEdgesInSet; 
+    end
 end
 
+setOfRegionsMat = zeros(numel(wsIDsForRegions),maxNumEdgesPerRegion);
+for i=1:numel(wsIDsForRegions)
+    setOfEdgesForRegion_i = c_setOfRegions{i};
+    numEdgesInSet = numel(setOfEdgesForRegion_i);
+    numZerosForPadding = maxNumEdgesPerRegion - numEdgesInSet;
+    if(numZerosForPadding>0)
+        % pad to the right
+        zeroArray = zeros(1,numZerosForPadding);
+        setOfEdgesForRegion_i = [setOfEdgesForRegion_i zeroArray];
+    end
+    setOfRegionsMat(i,:) = setOfEdgesForRegion_i;
+end
 
 % add the cellList (index) as the first col of setOfCells. This is done so
 % that we can reuse getAdjacencyMat() to creage faceAdj.
@@ -49,7 +65,9 @@ setOfRegionsMat_2 = [wsIDsForRegions' setOfRegionsMat];
 [faceAdj,edges2regions,~,twoRegionEdgeIDs] = getAdjacencyMat(setOfRegionsMat_2);
 
 
-function edgePix = getEdgePixForWsFace(intPix)
+function edgePix = getEdgePixForWsFace(intPix,ws)
+
+edgePix = [];
 
 [sizeR, sizeC] = size(ws);
 [r,c] = find(intPix);
@@ -63,45 +81,49 @@ for j=topRow:botRow
     row_j = find(intPix(j,:));
     lc_j = min(row_j);
     rc_j = max(row_j);
-    el = lc_j -1;
-    if(el>0)
+    eLeft = lc_j -1;
+    if(eLeft>0 && ws(j,eLeft)==0)
         % it's an edge
-        edgePix = [edgePix; row_j el];
+        newPix = [j eLeft];
+        edgePix = [edgePix; newPix];
     end
-    er = rc_j +1;
-    if(er<=sizeC)
+    eRight = rc_j +1;
+    if(eRight<=sizeC && ws(j,eRight)==0)
         % it's an edge
-        edgePix = [edgePix; row_j er];
+        newPix = [j eRight];
+        edgePix = [edgePix; newPix];
     end
 end
 
 % each col
 for j=leftCol:rightCol
-    col_j = find(indPix(:,j));
+    col_j = find(intPix(:,j));
     tr_j = min(col_j);
     br_j = max(col_j);
-    et = tr_j -1;
-    if(et>0)
+    eTop = tr_j -1;
+    if(eTop>0 && ws(eTop,j)==0)
         % it's an edge
-        edgePix = [edgePix; et col_j];
+        newPix = [eTop j];
+        edgePix = [edgePix; newPix];
     end
-    eb = br_j +1;
-    if(eb<=sizeR)
+    ebottom = br_j +1;
+    if(ebottom<=sizeR && ws(ebottom,j)==0)
         % it's an edge
-        edgePix = [edgePix; eb col_j];
+        newPix = [ebottom j];
+        edgePix = [edgePix; newPix];
     end
 end
 
 edgePix = sub2ind([sizeR sizeC],edgePix(:,1),edgePix(:,2));
 edgePix = unique(edgePix);
 
-function edgeSet = getEdgeSetFromEdgePixSet(edgePix,edges2pixels)
+function edgeIDset = getEdgeSetFromEdgePixSet(edgePix,edges2pixels)
 numEdgePix = numel(edgePix);
 edgepixels = edges2pixels;
 edgepixels(:,1) = [];
 [x1,x2] = ismember(edgepixels,edgePix);
-[~,x1sum] = sum(x1,2); % sum each row
-edgeSet = edges2pixels((x1sum>0),1);
+x1sum = sum(x1,2); % sum each row
+edgeIDset = edges2pixels((x1sum>0),1);
 
 
 
