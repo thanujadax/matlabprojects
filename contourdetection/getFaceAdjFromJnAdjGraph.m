@@ -1,4 +1,4 @@
-function [faceAdj,edges2cells,setOfCellsMat,listOfEdgeIDs,wsIDs] = getFaceAdjFromJnAdjGraph...
+function [faceAdj,edges2cells,setOfCellsMat,listOfTwoRegionEdgeIDs,wsIDs] = getFaceAdjFromJnAdjGraph...
     (edgeIDs,nodeEdges,junctionTypeListInds,jAnglesAll_alpha,...
     boundaryEdgeIDs,edges2nodes,ws,edges2pixels)
 % Inputs: adjacency graph of junctions (planar graph)
@@ -39,6 +39,12 @@ for i=1:numEdges
     
     % check usage
     currentEdgeID = edgeIDs(i);
+    % start of debug code
+    if(currentEdgeID==1051)
+        aa = 00;
+    end
+    % end of debug code
+        
     currentEdgeUsage = edgeUsage(i,2); 
     % if boundaryEdge, max usage is 1
     % check if the edge is a boundary edge.
@@ -195,4 +201,4 @@ cellList = 1:numCells; % row vector
 % add the cellList (index) as the first col of setOfCells. This is done so
 % that we can reuse getAdjacencyMat() to creage faceAdj.
 setOfCellsMat_2 = [cellList' setOfCellsMat];
-[faceAdj,edges2cells,~,listOfEdgeIDs] = getAdjacencyMat(setOfCellsMat_2);
+[faceAdj,edges2cells,~,listOfTwoRegionEdgeIDs] = getAdjacencyMat(setOfCellsMat_2);
