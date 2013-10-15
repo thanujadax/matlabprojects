@@ -1,10 +1,13 @@
-function [c_cells2regions,c_cellInternalEdgeIDs] = getRegionsForOnCells(faceAdj,...
-            onRegionIndList,offEdgeIDList,setOfRegions,wsIDsForRegions,ws)
+function [c_cells2regions,c_cellInternalEdgeIDs,c_cellIntNodeListInds] = getRegionsForOnCells(...
+    faceAdj,onRegionIndList,offEdgeIDList,setOfRegions,wsIDsForRegions,ws,...
+    offNodeIndList,edges2nodes,edgeListInds)
 
 % Input:
 %   faceAdj: face-adjacency graph for all the regions. The values are
 %   edgeIDs: 
 %   offEdgeIDList: 
+
+% Outputs:
 
 usedRegionsList = [];
 numActiveRegions = numel(onRegionIndList);
@@ -22,8 +25,24 @@ for i=1:numActiveRegions
             onRegionIndList,wsIDsForRegions,ws);
         usedRegionsList = [usedRegionsList regionList_i];
         k = k + 1;
-        c_cells2regions{k} = regionList_i;
+        
+        % regions
+        c_cells2regions{k} = regionList_i;      
+        % internal edges
+        
+        allEdgeIDsForRegions = setOfRegions(regionList_i,:);
+        allEdgeIDsForRegions = allEdgeIDsForRegions(allEdgeIDsForRegions>0);
+        internalEdgeList_i = intersect(offEdgeIDList,allEdgeIDsForRegions);
+        
         c_cellInternalEdgeIDs{k} = internalEdgeList_i;
+        
+        % internal nodes
+        edgeListInds_i = find(ismember(edgeListInds,internalEdgeList_i));
+        nodeListIndsOfIntEdges_all = edges2nodes(edgeListInds_i,:);
+        nodeListIndsOfIntEdges_all = nodeListIndsOfIntEdges_all(nodeListIndsOfIntEdges_all>0);
+        nodeListInds_internal_i = intersect(offNodeIndList,nodeListIndsOfIntEdges_all);
+        c_cellIntNodeListInds{k} = nodeListInds_internal_i; 
+        
     end
 end
 

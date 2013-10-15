@@ -385,6 +385,9 @@ for i=1:numJtypes
     end
 end
 
+inactiveNodePixInds = setdiff(nodeInds,nodeIndsActive);
+offNodeIndList = find(ismember(nodeInds,inactiveNodePixInds));
+
 activeContourPixels = find(ilpSegmentation);
 
 % figure;imagesc(ilpSegmentation);title('ILP contours');
@@ -487,8 +490,9 @@ figure;imshow(visualizeCellBorders)
 % offEdgeIDList = edgeListInds(ismember(edgeListInds,offEdgeListInd)); 
 offEdgeIDList = edgeListInds(offEdgeListInd);
 
-[c_cells2regions,c_cellInternalEdgeIDs] = getRegionsForOnCells(...
-                    faceAdj,activeRegionInd,offEdgeIDList,setOfRegions,wsIDsForRegions,ws);
+[c_cells2regions,c_cellInternalEdgeIDs,c_cellIntNodeListInds] = getRegionsForOnCells(...
+            faceAdj,activeRegionInd,offEdgeIDList,setOfRegions,wsIDsForRegions,ws,...
+            offNodeIndList,edges2nodes,edgeListInds);
                 
 % visualize each cell in different colors
 visualizeCells = zeros(sizeR,sizeC,3);
@@ -507,12 +511,20 @@ for i=1:numCs
     gMat(regionPixels) = G;
     bMat(regionPixels) = B;
     
+    
+    % get internal edges for this cell. set RGB.
+    regionIntEdgeIDs = c_cellInternalEdgeIDs{i};
+    regionIntEdgeListInds_logicalInd = ismember(edgeListInds,regionIntEdgeIDs);
+    regionIntEdgePixels = edgepixels(regionIntEdgeListInds_logicalInd,:);
+    regionIntEdgePixels = regionIntEdgePixels(regionIntEdgePixels>0);
+    
+    rMat(regionIntEdgePixels) = R;
+    gMat(regionIntEdgePixels) = G;
+    bMat(regionIntEdgePixels) = B;
+    
     visualizeCells(:,:,1) = rMat;
     visualizeCells(:,:,2) = gMat;
     visualizeCells(:,:,3) = bMat;
-    
-    % get internal edges for this cell. set RGB.
-    
     
     % get internal nodes for this cell. set RGB
     
