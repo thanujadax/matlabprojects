@@ -30,7 +30,7 @@ end
 
 wsIDsForRegions = start:numWsFaces;
 maxNumEdgesPerRegion = 0;
-
+k = 0; % index for cells to store sets of edges of each region
 for i=start:numWsFaces
     clear intPix_i edgePix_i edgeSet_i
     % get internal pixels
@@ -39,7 +39,8 @@ for i=start:numWsFaces
     edgePix_i = getEdgePixForWsFace(intPix_i,ws);
     % get edges (edgeIDs)
     edgeSet_i = getEdgeSetFromEdgePixSet(edgePix_i,edges2pixels);
-    c_setOfRegions{i} = edgeSet_i'; 
+    k = k + 1;
+    c_setOfRegions{k} = edgeSet_i'; 
     numEdgesInSet = numel(edgeSet_i);
     if(numEdgesInSet>maxNumEdgesPerRegion)
         maxNumEdgesPerRegion = numEdgesInSet; 
