@@ -153,39 +153,51 @@ totRows_A = numRows_Aeq + numRows_AInEq;
 A = zeros(totRows_A,numCols_Aeq);
 %% b
 b = zeros(totRows_A,1);
+% node and edge activation
 rowStart = 1;
 rowEnd = numEdges + sum(nodeTypeStats(:,1));
-b(rowStart:rowEnd) = 1; % node and edge activation
+b(rowStart:rowEnd) = 1; 
+% % region activation
+% rowStart = rowEnd + 1;
+% rowEnd = rowEnd + numCells;
+% b(rowStart:rowEnd) = 1;
+% closedness constraint
 if(withClosednessConstraint)
     rowStart = rowEnd + 1;
     rowEnd = rowStart - 1 + numClosednessEqns;
     b(rowStart:rowEnd) = 0;
 end
+% off edges constr
 if(withOffEdgesConstraint)
     rowStart = rowEnd + 1;
     rowEnd = rowStart - 1 + numOffEdgesEqns;
     b(rowStart:rowEnd) = 0; 
 end
+%
 if(withOnEdgesConstraint)
     rowStart = rowEnd + 1;
     rowEnd = rowStart - 1 + numOnEdgesEqns;
     b(rowStart:rowEnd) = 0; 
 end
+%
 if(withCellConstraint)
     rowStart = rowEnd + 1;
     rowEnd = rowStart -1 + numCellConstrRows;
     b(rowStart:rowEnd) = 0;
 end
+%
 if(withEdgeNodeCoherenceConstraint)
     rowStart = rowEnd + 1;
     rowEnd = rowStart - 1 + numCoherenceEqns;
     b(rowStart:rowEnd) = 1.1; % less than
 end
+%
 if(withDirectionalConstraint)
     rowStart = rowEnd + 1;
     rowEnd = rowStart - 1 + numDirectionalEqns;
     b(rowStart:rowEnd) = 0; % less than    
 end
+%
 if(minNumActEdgesPercentage>0)
     rowStart = rowEnd + 1;
     rowEnd = rowStart - 1 + minNumEdgeEqn;
@@ -214,6 +226,11 @@ for jType = 1:numJtypes
         A(row,colStart:colStop) = 1;
     end    
 end
+% %% activation/inactivation constraints for each region
+% rowStart = rowStop + 1;
+% rowStop = rowStop + numCells;
+% colStart = colStop + 1;
+% colStop = 
 
 
 %% closedness constraints
@@ -284,7 +301,7 @@ if(withOnEdgesConstraint)
 end
 %% Equality Constraint - cell type
 % get the edge (edgeIDs) corresponding to cell pairs
-% when an edge is active, determine which cell is active and which is
+% when an edge is active, determine which cell can be active and which is
 % inactive
 % constraint: c_i - c_j - e_ij = 0;
 % twoCellEdges contain the edgeListInds. not edgeIDs

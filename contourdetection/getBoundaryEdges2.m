@@ -10,6 +10,8 @@ function boundaryEdges = getBoundaryEdges2(wsgraph,marginSize,edgepixels,...
 
 visualize = 1;
 
+marginSize = marginSize*2;
+
 [sizeR, sizeC] = size(wsgraph); % size of the image
 % top edge pixels
 topEdgePixels = zeros(sizeC,1);
@@ -80,6 +82,7 @@ end
 boundaryEdges = unique(boundaryEdges);
 boundaryEdges = boundaryEdges(boundaryEdges>0);
 boundaryEdges_listInds = unique(boundaryEdges_listInds);
+boundaryEdges_listInds = boundaryEdges_listInds(boundaryEdges_listInds>0);
 %% visualization
 numBoundaryEdges = numel(boundaryEdges);
 if(visualize)

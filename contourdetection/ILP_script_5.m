@@ -10,8 +10,8 @@ imagePath = '/home/thanuja/Dropbox/data/mitoData/emJ_00_170x.png';
 % imagePath = '/home/thanuja/Dropbox/data/mitoData/stem1_256by256.png';
 % imagePath = '/home/thanuja/Dropbox/data/thanuja/emchallenge-class/competition-final0000.tif';
 % hard coded back bone edge 1962
-% imagePath = '/home/thanuja/Dropbox/data/RF_training_edge/I15_testingImage.tif';
-% imagePath = '/home/thanuja/Dropbox/data/RF_training_edge/I00_trainingImage.tif';
+imagePath = '/home/thanuja/Dropbox/data/RF_training_edge/I15_testingImage.tif';
+% imagePath = '/home/thanuja/Dropbox/data/RF_training_edge/I05_trainingImage.tif';
 orientationsStepSize = 10;
 orientations = 0:orientationsStepSize:350;
 
@@ -99,16 +99,16 @@ junctionTypeListInds = getJunctionTypeListInds(nodeEdges);
 % nodeInds list of pixel indices of the detected junctions
 clusterNodeIDs = connectedJunctionIDs(:,1); % indices of the clustered junction nodes
 disp('graph created!')
-wsBoundariesFromGraph = zeros(sizeR,sizeC);
-wsBoundariesFromGraph(nodeInds) = 0.7;          % junction nodes
-wsBoundariesFromGraph(clusterNodeIDs) = 0.5;    % cluster nodes
+wsRegionBoundariesFromGraph = zeros(sizeR,sizeC);
+wsRegionBoundariesFromGraph(nodeInds) = 0.7;          % junction nodes
+wsRegionBoundariesFromGraph(clusterNodeIDs) = 0.5;    % cluster nodes
 [nre,nce] = size(edges2pixels);  % first column is the edgeID
 edgepixels = edges2pixels(:,2:nce);
-wsBoundariesFromGraph(edgepixels(edgepixels>0)) = 1; % edge pixels
-figure;imagesc(wsBoundariesFromGraph);title('boundaries from graph') 
+wsRegionBoundariesFromGraph(edgepixels(edgepixels>0)) = 1; % edge pixels
+figure;imagesc(wsRegionBoundariesFromGraph);title('boundaries from graph') 
 
 % boundary edges
-boundaryEdges = getBoundaryEdges2(wsBoundariesFromGraph,barLength,edgepixels,...
+boundaryEdges = getBoundaryEdges2(wsRegionBoundariesFromGraph,barLength,edgepixels,...
     nodeEdges,edgeListInds);
 numBoundaryEdges = numel(boundaryEdges);
 boundaryEdgeListInds = zeros(numBoundaryEdges,1);
@@ -229,7 +229,6 @@ imgOffEdges = visualizeOffEdges(offEdgeListIDs,edgepixels,nodeInds,sizeR,sizeC);
 figure;imshow(imgOffEdges); title('visualization of edges turned off')
 %% Backbone
 
-
 onEdgeListIDs = getBackboneEdgeIDs(edgepixels,edgePriors,...
                 lenThreshBB,priorThreshFracBB);
 % removing boundary edges from the onEdgeListID list
@@ -237,7 +236,7 @@ onEdgeListIDs = setdiff(onEdgeListIDs,boundaryEdgeListInds);
 
 bbNodeListInds = getJunctionsForEdges(edges2nodes,onEdgeListIDs);
 bbNodePixInds = nodeInds(bbNodeListInds);
-bbnodesVis = wsBoundariesFromGraph;
+bbnodesVis = wsRegionBoundariesFromGraph;
 bbnodesVis(bbNodePixInds) = 0.2;
 figure;imagesc(bbnodesVis);
 
