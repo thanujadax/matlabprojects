@@ -521,15 +521,19 @@ for i=1:numCs
     rMat(regionIntEdgePixels) = R;
     gMat(regionIntEdgePixels) = G;
     bMat(regionIntEdgePixels) = B;
-    
-    visualizeCells(:,:,1) = rMat;
-    visualizeCells(:,:,2) = gMat;
-    visualizeCells(:,:,3) = bMat;
-    
+      
     % get internal nodes for this cell. set RGB
     regionIntNodeListInds = c_cellIntNodeListInds{i};
     regionIntNodePixInds = getNodePixelsFromNodeInd...
                 (regionIntNodeListInds,nodeInds,connectedJunctionIDs);
+    
+    rMat(regionIntNodePixInds) = R;
+    gMat(regionIntNodePixInds) = G;
+    bMat(regionIntNodePixInds) = B;
+    
+    visualizeCells(:,:,1) = rMat;
+    visualizeCells(:,:,2) = gMat;
+    visualizeCells(:,:,3) = bMat;
             
     
 end
