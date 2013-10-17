@@ -154,14 +154,22 @@ for i=1:numUEdges
     edgePix = edgepixels(edgeListInd_logical,:);
     edgePix = edgePix(edgePix>0);
     pixIndsAroundEdge = getPixIndsAroundEdge(ws,edgePix);
-    numPixAround = numel(pixIndsAroundEdge);
-    if(numPixAround>2)
-        disp('ERROR! getFaceAdjFromWS. too many region pixels detected')
+    regionIDsAroundEdge = ws(pixIndsAroundEdge) + 1;
+    regionIDsAroundEdge = unique(regionIDsAroundEdge); 
+    regionIDsAroundEdge = regionIDsAroundEdge(regionIDsAroundEdge>0);
+    numRegionsAround = numel(regionIDsAroundEdge);
+    if(numRegionsAround>2)
+        disp('PROBLEM! getFaceAdjFromWS. too many regions detected around edge')
+    else
+        for j=1:numRegionsAround
+            % get the relevent entry in c_setOfRegions
+        end
+        
     end
-    regionIDs = ws(pixIndsAroundEdge) + 1;
 end
 
 function pixIndsAroundEdge = getPixIndsAroundEdge(ws,edgePix)
+% returns pixInds that belong to ws regions around a certain edgePixel
 [sizeR,sizeC] = size(ws);
 numEdgePix = numel(edgePix);
 
@@ -189,5 +197,6 @@ p(8) = sub2ind([sizeR sizeC],r2,c2);
 
 ws_p = ws(p);
 regionPixels_logical = (ws_p>1);
+
 
 pixIndsAroundEdge = find(regionPixels_logical);
