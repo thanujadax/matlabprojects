@@ -10,7 +10,7 @@ for i=1:numEdges
     edgeInd_i = onEdgeInd(i);
     if(sum(usedEdgeInds==edgeInd_i)==0)
         % edge_i is not yet used
-        k = k+1
+        k = k+1;
         %usedEdgeInds(end+1) = edgeInd_i; % edge_i marked as used
         [c_cellBorderEdgeIDs{k},c_cellBorderNodeIDs{k}] = getBorderForCell(edgeInd_i,...
             onEdgeInd,edges2nodes,nodeEdges,edgeListInds);

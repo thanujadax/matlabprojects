@@ -1,6 +1,6 @@
 function f = getILPcoefficientVector2(edgePriors,nodeAngleCosts,...
             bbJunctionsListInds,junctionTypeListInds,bbJunctionCost,...
-            cellPriors)
+            regionPriors)
 numEdges = size(edgePriors,1);
 
 [~, numJtypes] = size(nodeAngleCosts);
@@ -27,8 +27,8 @@ for i=1:numJtypes
     end
 end
 
-numCells = numel(cellPriors);
-numElements = numEdges*2 + sum(totJunctionVar) + numCells;
+numRegions = numel(regionPriors);
+numElements = numEdges*2 + sum(totJunctionVar) + numRegions*2;
 f = zeros(numElements,1);
 % order of elements in f
 %[{edgeInactive},{edgeActive},{J2inactive},{J2Active},{J3inactive},{J4Active_3}...]
@@ -78,7 +78,8 @@ end
 
 %% cells
 k=1;
-for i=(f_stop_ind+1):(f_stop_ind+numCells)
-    f(i) = cellPriors(k);
+for i=(f_stop_ind+1):2:(f_stop_ind+numRegions*2)
+    f(i) = - regionPriors(k); % inactivation
+    f(i+1) = regionPriors(k); % activation
     k = k + 1;
 end

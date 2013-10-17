@@ -1,5 +1,5 @@
 function [faceAdj,edges2regions,setOfRegionsMat,twoRegionEdgeIDs,wsIDsForRegions]...
-    = getFaceAdjFromWS(ws,edges2pixels,b_imWithBorder)
+    = getFaceAdjFromWS(ws,edges2pixels,b_imWithBorder,boundaryEdgeIDs)
 % For all the faces in WS, get the corresponding regionID.
 % RegionID is the sequence number of each region in setOfRegions
 
@@ -19,6 +19,9 @@ function [faceAdj,edges2regions,setOfRegionsMat,twoRegionEdgeIDs,wsIDsForRegions
 %   listOfEdgeIDs - the edges considered in the faceAdjMatrix. Each of these edges
 %   connects a pair of cells
 
+edgeIdList = edges2pixels(:,1);
+numEdges = numel(edgeIdList);
+edgeUsage = zeros(numEdges,1);
 numWsFaces = max(max(ws));
 % initialize
 
@@ -38,14 +41,29 @@ for i=start:numWsFaces
     % get edge pixels
     edgePix_i = getEdgePixForWsFace(intPix_i,ws);
     % get edges (edgeIDs)
-    edgeSet_i = getEdgeSetFromEdgePixSet(edgePix_i,edges2pixels);
+    edgeIdSet_i = getEdgeSetFromEdgePixSet(edgePix_i,edges2pixels);
     k = k + 1;
-    c_setOfRegions{k} = edgeSet_i'; 
-    numEdgesInSet = numel(edgeSet_i);
+    c_setOfRegions{k} = edgeIdSet_i'; 
+    numEdgesInSet = numel(edgeIdSet_i);
     if(numEdgesInSet>maxNumEdgesPerRegion)
         maxNumEdgesPerRegion = numEdgesInSet; 
     end
+    % keep track of edge usage
+    edgeListInds_logical = ismember(edgeIdList,edgeIdSet_i);
+    edgeCurrentUsage_i = edgeUsage(edgeListInds_logical);
+    edgeUsageUpdated_i = edgeCurrentUsage_i + 1; % increment usage
+    edgeUsage(edgeListInds_logical) = edgeUsageUpdated_i;
 end
+
+nonBoundaryEdgeListInds_logical = (edgeIdList ~= boundaryEdgeIDs);
+nonBoundaryEdgeUsage = edgeUsage(nonBoundaryEdgeListInds_logical);
+underUtilizedEdgeListInd_logical = (nonBoundaryEdgeUsage==1);
+underUtilizedEdgeIDs = edgeIdList(underUtilizedEdgeListInd_logical);
+% for each under utilized edge (appears only in one region), get the
+% regions on either side by searching around and update c_setOfRegions{}
+c_setOfRegions = updateRegionsWithInsideEdges(ws,c_setOfRegions,...
+            underUtilizedEdgeIDs,edges2pixels);
+
 
 setOfRegionsMat = zeros(numel(wsIDsForRegions),maxNumEdgesPerRegion);
 for i=1:numel(wsIDsForRegions)
@@ -126,5 +144,50 @@ edgepixels(:,1) = [];
 x1sum = sum(x1,2); % sum each row
 edgeIDset = edges2pixels((x1sum>0),1);
 
+function c_setOfRegions = updateRegionsWithInsideEdges(ws,c_setOfRegions,...
+            underUtilizedEdgeIDs,edges2pixels)
+numUEdges = numel(underUtilizedEdgeIDs);
+edgepixels = edges2pixels;
+edgepixels(:,1) = [];
+for i=1:numUEdges
+    edgeListInd_logical = (edges2pixels(:,1)==underUtilizedEdgeIDs(i));
+    edgePix = edgepixels(edgeListInd_logical,:);
+    edgePix = edgePix(edgePix>0);
+    pixIndsAroundEdge = getPixIndsAroundEdge(ws,edgePix);
+    numPixAround = numel(pixIndsAroundEdge);
+    if(numPixAround>2)
+        disp('ERROR! getFaceAdjFromWS. too many region pixels detected')
+    end
+    regionIDs = ws(pixIndsAroundEdge) + 1;
+end
 
+function pixIndsAroundEdge = getPixIndsAroundEdge(ws,edgePix)
+[sizeR,sizeC] = size(ws);
+numEdgePix = numel(edgePix);
 
+if(numEdgePix>2)
+    [r,c] = ind2sub([sizeR sizeC],edgePix(2));
+else
+    [r,c] = ind2sub([sizeR sizeC],edgePix(1));
+end
+
+r1 = r+1;
+c1 = c+1;
+r2 = r-1;
+c2 = c-1;
+
+p = zeros(8,1);
+% all pix inds around one edge pixel selected above
+p(1) = sub2ind([sizeR sizeC],r,c1);
+p(2) = sub2ind([sizeR sizeC],r,c2);
+p(3) = sub2ind([sizeR sizeC],r1,c);
+p(4) = sub2ind([sizeR sizeC],r1,c1);
+p(5) = sub2ind([sizeR sizeC],r1,c2);
+p(6) = sub2ind([sizeR sizeC],r2,c);
+p(7) = sub2ind([sizeR sizeC],r2,c1);
+p(8) = sub2ind([sizeR sizeC],r2,c2);
+
+ws_p = ws(p);
+regionPixels_logical = (ws_p>1);
+
+pixIndsAroundEdge = find(regionPixels_logical);

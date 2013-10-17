@@ -36,6 +36,7 @@ nodeTypeStats = zeros(numJtypes,2);
 % column 2: n.o. edge pair combinations to be activated
 totJunctionVar = zeros(numJtypes,1); % stores the number of coefficients for each type of J
 totActiveJunctionConfs = zeros(numJtypes,1);
+
 for i=1:numJtypes
     jEdges_i = jEdges{i};
     if(jEdges_i==0)
@@ -57,7 +58,10 @@ end
 
 % number of equations for each catagory
 numEdgeActEqns = numEdges;
-numJunctionActEquns = sum(nodeTypeStats(:,1));  % number of junctions
+numJunctionActEqns = sum(nodeTypeStats(:,1));  % number of junctions
+numRegions = size(setOfCellsMat,1);
+numRegionActEqns = numRegions;
+
 if(withClosednessConstraint)
     numClosednessEqns = sum(nodeTypeStats(:,1));    % num of junctions
     disp('Closedness constraint - on')
@@ -119,8 +123,8 @@ if(withCellConstraint)
     numEdgesBetween2Cells = numel(twoCellEdges);
     numCellConstrRows = numEdgesBetween2Cells;    
     % num additional cols
-    numCells = size(setOfCellsMat,1);
-    numCellConstrCols = numCells;
+    
+    numCellConstrCols = numRegions*2;
 else
     disp('cell type constraint - off')
     % set the additional rows,cols to zero 
@@ -129,7 +133,7 @@ else
 end
 
 % num cols of Aeq = 2*numEdges + sum_j(numNodes_j*numCombinations+1)
-numCols_Aeq = 2*numEdges + sum(totJunctionVar) + numCellConstrCols; 
+numCols_Aeq = 2*numEdges + sum(totJunctionVar) + numRegions*2; 
 % num rows of Aeq = numEdges + 2*numJ
 
 % if(withClosednessConstraint)
@@ -146,63 +150,60 @@ numCols_Aeq = 2*numEdges + sum(totJunctionVar) + numCellConstrCols;
 %     totRows_A = numRows_Aeq + numRows_AInEq;
 % end
 
-numRows_Aeq = numEdgeActEqns + numJunctionActEquns + numClosednessEqns +...
+numRows_Aeq = numEdgeActEqns + numJunctionActEqns + numRegionActEqns + numClosednessEqns +...
                 numOffEdgesEqns + numOnEdgesEqns + numCellConstrRows;
 numRows_AInEq = numCoherenceEqns + numDirectionalEqns + minNumEdgeEqn;
 totRows_A = numRows_Aeq + numRows_AInEq;
 A = zeros(totRows_A,numCols_Aeq);
 %% b
 b = zeros(totRows_A,1);
-% node and edge activation
+% edge, node and region activation
 rowStart = 1;
-rowEnd = numEdges + sum(nodeTypeStats(:,1));
-b(rowStart:rowEnd) = 1; 
-% % region activation
-% rowStart = rowEnd + 1;
-% rowEnd = rowEnd + numCells;
-% b(rowStart:rowEnd) = 1;
-% closedness constraint
+rowEnd = numEdgeActEqns + numJunctionActEqns + numRegionActEqns;
+b(rowStart:rowEnd) = 1;
+
 if(withClosednessConstraint)
     rowStart = rowEnd + 1;
     rowEnd = rowStart - 1 + numClosednessEqns;
     b(rowStart:rowEnd) = 0;
 end
-% off edges constr
+
 if(withOffEdgesConstraint)
     rowStart = rowEnd + 1;
     rowEnd = rowStart - 1 + numOffEdgesEqns;
     b(rowStart:rowEnd) = 0; 
 end
-%
+
 if(withOnEdgesConstraint)
     rowStart = rowEnd + 1;
     rowEnd = rowStart - 1 + numOnEdgesEqns;
     b(rowStart:rowEnd) = 0; 
 end
-%
+
 if(withCellConstraint)
     rowStart = rowEnd + 1;
     rowEnd = rowStart -1 + numCellConstrRows;
     b(rowStart:rowEnd) = 0;
 end
-%
+
 if(withEdgeNodeCoherenceConstraint)
     rowStart = rowEnd + 1;
     rowEnd = rowStart - 1 + numCoherenceEqns;
     b(rowStart:rowEnd) = 1.1; % less than
 end
-%
+
 if(withDirectionalConstraint)
     rowStart = rowEnd + 1;
     rowEnd = rowStart - 1 + numDirectionalEqns;
     b(rowStart:rowEnd) = 0; % less than    
 end
-%
+
 if(minNumActEdgesPercentage>0)
     rowStart = rowEnd + 1;
     rowEnd = rowStart - 1 + minNumEdgeEqn;
     b(rowStart:rowEnd) = minNumActEdges * (-1); % less than    
 end
+
 %% activation/inactivation constraints for each edge
 j = 1;
 for i=1:numEdges
@@ -226,13 +227,15 @@ for jType = 1:numJtypes
         A(row,colStart:colStop) = 1;
     end    
 end
-% %% activation/inactivation constraints for each region
-% rowStart = rowStop + 1;
-% rowStop = rowStop + numCells;
-% colStart = colStop + 1;
-% colStop = 
-
-
+%% activation/inactivation constraints for each region
+rowStop = rowStop + 1;
+j = colStop + 1;
+for row=rowStop:(rowStop+numRegionActEqns-1)
+    A(row,j:(j+1)) = 1;
+    j = j + 2;
+end
+rowStop = row;
+colStop = j;
 %% closedness constraints
 if(withClosednessConstraint)
     % for each node, either exactly two edges should be active (active node) or
@@ -301,10 +304,12 @@ if(withOnEdgesConstraint)
 end
 %% Equality Constraint - cell type
 % get the edge (edgeIDs) corresponding to cell pairs
-% when an edge is active, determine which cell can be active and which is
+% when an edge is active, determine which cell is active and which is
 % inactive
 % constraint: c_i - c_j - e_ij = 0;
 % twoCellEdges contain the edgeListInds. not edgeIDs
+% each cell has two corresponding x variables. one to denote inactivation
+% (-1 or membrane) the other to denote activation (+1 or membrane).
 if(withCellConstraint)
     % edgeIDsAll = edges2pixels(:,1);
     colStartInd = numCols_Aeq - numCellConstrCols; % cell 1 col ind = colStartInd + 1; etc 
@@ -324,12 +329,12 @@ if(withCellConstraint)
                               
         if(cellState_1>0)
             % cell1 is of type:interior
-            cellActColInd_pos = colStartInd + cellsForEdge(1);  % col to mark +1
-            cellActColInd_neg = colStartInd + cellsForEdge(2);  % col to mark -1
+            cellActColInd_pos = colStartInd + cellsForEdge(1)*2;  % col to mark +1
+            cellActColInd_neg = colStartInd + cellsForEdge(2)*2;  % col to mark -1
         else
             % cell1 is of type: membrane
-            cellActColInd_pos = colStartInd + cellsForEdge(2);  % +1 interior
-            cellActColInd_neg = colStartInd + cellsForEdge(1);  % -1 membrane
+            cellActColInd_pos = colStartInd + cellsForEdge(2)*2;  % +1 interior
+            cellActColInd_neg = colStartInd + cellsForEdge(1)*2;  % -1 membrane
         	
         end
         % set coefficients

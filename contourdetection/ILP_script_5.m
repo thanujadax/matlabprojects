@@ -5,7 +5,7 @@
 isToyProb = 0;
 useGurobi = 1;
 fromInputImage = 1;
-imagePath = '/home/thanuja/Dropbox/data/mitoData/emJ_00_170x.png';
+% imagePath = '/home/thanuja/Dropbox/data/mitoData/emJ_00_170x.png';
 % imagePath = '/home/thanuja/Dropbox/data/testImg/testCurves1.png';
 % imagePath = '/home/thanuja/Dropbox/data/mitoData/stem1_256by256.png';
 % imagePath = '/home/thanuja/Dropbox/data/thanuja/emchallenge-class/competition-final0000.tif';
@@ -275,7 +275,7 @@ scaledEdgePriors = edgePriors.*cEdge;
 % constraints
 % equality constraints and closedness constrains in Aeq matrix
 % [Aeq,beq] = getEqConstraints2(numEdges,jEdges,edges2pixels);
-[Aeq,beq,numEq,numLt,numRegions] = getConstraints(numEdges,jEdges,edges2pixels,nodeAngleCosts,...
+[Aeq,beq,numEq,numLt,numRegionVars] = getConstraints(numEdges,jEdges,edges2pixels,nodeAngleCosts,...
             offEdgeListIDs,onEdgeListIDs,minNumActEdgesPercentage,...
             twoRegionEdges,edges2regions,setOfRegions,edgeOrientations,jAnglesAll_alpha,...
             nodeEdges,junctionTypeListInds,edges2nodes,sizeR,sizeC);
@@ -398,8 +398,8 @@ activeContourPixels = find(ilpSegmentation);
 totX = numel(x);
 numRegions = numel(regionPriors);
 % get active foreground cells
-regionStartPos = totX - numRegions + 1;
-regionActivationVector = x(regionStartPos:totX);
+regionStartPos = totX - numRegionVars + 2;
+regionActivationVector = x(regionStartPos:2:totX);
 activeRegionInd = find(regionActivationVector>0);
 % get internal pixels for foreground cells
 foregroundPixels = [];
