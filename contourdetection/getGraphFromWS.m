@@ -1,4 +1,5 @@
-function [adjacencyMat,nodeEdges,edges2nodes,edges2pixels,connectedJunctionIDs] = getGraphFromWS(ws,hsvOutput)
+function [adjacencyMat,nodeEdges,edges2nodes,edges2pixels,connectedJunctionIDs,...
+    selfEdgePixelSet] = getGraphFromWS(ws,hsvOutput)
 % % extracting edges and junctions from WS
 % % imIn = imread('stem_256x_t02_V.png');
 % imIn = imread('testMem4_V.png');
@@ -110,6 +111,9 @@ edges2pixels = getEdges2Pixels(edgePixLabels);
 
 [adjacencyMat,edges2nodes,selfEdgeIDs,~] = getAdjacencyMat(nodeEdges);
 
+% initialize output
+selfEdgePixelSet = zeros(numel(selfEdgeIDs),1);
+
 if(selfEdgeIDs(1)~=0)
     % remove selfEdges from nodeEdges, edges2nodes and edges2pixels
     % edges2nodes
@@ -123,6 +127,7 @@ if(selfEdgeIDs(1)~=0)
         cx = cx + 1;
         nodeEdges(rx,cx)=0;    
         % edges2pixels
+        selfEdgePixelSet(i) = edges2pixels(selfEdgeIDs(i),2); 
         edges2pixels(selfEdgeIDs(i),2) = 0;  % set the self edge 'pixel' to zero
     end
     % from edges2pixels, remove the rows who's second column has a zero

@@ -2,9 +2,9 @@ function nodePix = getNodePixelsFromNodeInd(nodeListInds,nodeIndsAll,connectedJu
 
 nodePixInds = nodeIndsAll(nodeListInds);
 
-clustedNodeInds_logical = ismember(connectedJunctionIDsAll(:,1),nodePixInds);
+clusteredNodeInds_logical = ismember(connectedJunctionIDsAll(:,1),nodePixInds);
 
-clusIDs = connectedJunctionIDsAll(clustedNodeInds_logical,2);
+clusIDs = connectedJunctionIDsAll(clusteredNodeInds_logical,2);
 
 clusNodeInds_logical = ismember(connectedJunctionIDsAll(:,2),clusIDs);
 
