@@ -165,7 +165,7 @@ end
 %     junctionTypeListInds,jAnglesAll_alpha,boundaryEdges,edges2nodes,ws,edges2pixels);
 disp('calculating adjacency graph of regions ...')
 [faceAdj,edges2regions,setOfRegions,twoRegionEdges,wsIDsForRegions] ...
-    = getFaceAdjFromWS(ws,edges2pixels,b_imWithBorder);
+    = getFaceAdjFromWS(ws,edges2pixels,b_imWithBorder,boundaryEdges);
 % cellcogs = getCellCentroidsAll(setOfCells,edges2pixels,edgeListInds,...
 %     sizeR,sizeC,edges2nodes,nodeInds);
 

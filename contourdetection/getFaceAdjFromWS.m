@@ -55,10 +55,12 @@ for i=start:numWsFaces
     edgeUsage(edgeListInds_logical) = edgeUsageUpdated_i;
 end
 
-nonBoundaryEdgeListInds_logical = (edgeIdList ~= boundaryEdgeIDs);
+nonBoundaryEdgeListInds_logical = ~ismember(edgeIdList,boundaryEdgeIDs);
+nonBoundaryEdgeIDs = edgeIdList(nonBoundaryEdgeListInds_logical);
 nonBoundaryEdgeUsage = edgeUsage(nonBoundaryEdgeListInds_logical);
-underUtilizedEdgeListInd_logical = (nonBoundaryEdgeUsage==1);
-underUtilizedEdgeIDs = edgeIdList(underUtilizedEdgeListInd_logical);
+underUtilizedEdgeListInd_wrt_NBE_logical = (nonBoundaryEdgeUsage==1);
+
+underUtilizedEdgeIDs = nonBoundaryEdgeIDs(underUtilizedEdgeListInd_wrt_NBE_logical);
 % for each under utilized edge (appears only in one region), get the
 % regions on either side by searching around and update c_setOfRegions{}
 c_setOfRegions = updateRegionsWithInsideEdges(ws,c_setOfRegions,...
@@ -153,16 +155,24 @@ for i=1:numUEdges
     edgeListInd_logical = (edges2pixels(:,1)==underUtilizedEdgeIDs(i));
     edgePix = edgepixels(edgeListInd_logical,:);
     edgePix = edgePix(edgePix>0);
-    pixIndsAroundEdge = getPixIndsAroundEdge(ws,edgePix);
-    regionIDsAroundEdge = ws(pixIndsAroundEdge) + 1;
+    regionPixIndsAroundEdge = getPixIndsAroundEdge(ws,edgePix);
+    regionIDsAroundEdge = ws(regionPixIndsAroundEdge) + 1;
     regionIDsAroundEdge = unique(regionIDsAroundEdge); 
-    regionIDsAroundEdge = regionIDsAroundEdge(regionIDsAroundEdge>0);
     numRegionsAround = numel(regionIDsAroundEdge);
     if(numRegionsAround>2)
+        disp('*********************************************************');
         disp('PROBLEM! getFaceAdjFromWS. too many regions detected around edge')
+        disp('*********************************************************');
     else
+        disp('Region updated with new edge');
         for j=1:numRegionsAround
             % get the relevent entry in c_setOfRegions
+            edgesForRegion_i = c_setOfRegions{regionIDsAroundEdge(j)};
+            if(~sum(ismember(edgesForRegion_i,underUtilizedEdgeIDs(i))))
+                % append under utilized edge ID to this region
+                edgesForRegion_i = [edgesForRegion_i underUtilizedEdgeIDs(i)];
+                c_setOfRegions{regionIDsAroundEdge(j)} = edgesForRegion_i;
+            end
         end
         
     end
@@ -196,7 +206,7 @@ p(7) = sub2ind([sizeR sizeC],r2,c1);
 p(8) = sub2ind([sizeR sizeC],r2,c2);
 
 ws_p = ws(p);
-regionPixels_logical = (ws_p>1);
+regionPixels_logical = (ws_p>1); % ignore pixels falling on edges/nodes and the border
 
 
 pixIndsAroundEdge = find(regionPixels_logical);
