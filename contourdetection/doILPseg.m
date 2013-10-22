@@ -1,4 +1,4 @@
-function visualizeCells = doILPseg(imagePath)
+function segmentationOut = doILPseg(imagePath)
 
 % ILP script 5
 % with the new cost calculation at the junctions, incorporating the
@@ -557,5 +557,6 @@ for i=1:numCs
     
 end
 
-figure;imshow(visualizeCells);
+% figure;imshow(visualizeCells);
+segmentationOut = removeThickBorder(visualizeCells,marginSize);
 

@@ -539,3 +539,5 @@ end
 
 figure;imshow(visualizeCells);
 
+segmentationOut = removeThickBorder(visualizeCells,marginSize);
+
