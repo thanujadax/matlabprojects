@@ -17,5 +17,6 @@ for i=1:length(imgFiles_training)
     % save
     saveFileName = strcat(name(1:LEN_IMG_IND),'_neuronseg05.png');
     saveFileName = strcat(outputDir,saveFileName);
-    save(saveFileName,'seg');    
+    % save(saveFileName,'seg');    
+    imwrite(seg,saveFileName,'png');
 end
