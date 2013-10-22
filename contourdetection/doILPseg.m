@@ -4,7 +4,7 @@ function segmentationOut = doILPseg(imagePath)
 % with the new cost calculation at the junctions, incorporating the
 % directionality of the 
 
-showIntermediate = 0;
+showIntermediate = 1;
 
 isToyProb = 0;
 useGurobi = 1;
@@ -16,6 +16,7 @@ fromInputImage = 1;
 % hard coded back bone edge 1962
 % imagePath = '/home/thanuja/Dropbox/data/RF_training_edge/I15_testingImage.tif';
 % imagePath = '/home/thanuja/Dropbox/data/RF_training_edge/I05_trainingImage.tif';
+imagePath = '/home/thanuja/Dropbox/data/evaldata/input/I11_raw05.tif';
 orientationsStepSize = 10;
 orientations = 0:orientationsStepSize:350;
 
@@ -61,7 +62,7 @@ end
 angleStep = 10; % 10 degrees discretization step of orientations
 
 % param
-cEdge = 1;        % general scaling factor for edge priors
+cEdge = 10;        % general scaling factor for edge priors
 % cNode = 100;        % scaling factor for the node cost coming from gaussian normal distr.
 cCell = 1000;        % positive scaling factor for cell priors
 % sig = 50;         % standard deviation(degrees) for the node cost function's gaussian distr.
@@ -559,4 +560,14 @@ end
 
 % figure;imshow(visualizeCells);
 segmentationOut = removeThickBorder(visualizeCells,marginSize);
+figure; imshow(normalizedInputImage);
+hold on
+fh = imshow(segmentationOut);
+hold off
+imAlphaData = ones(sizeR,sizeC) .* 0.5;
+set(fh,'AlphaData',imAlphaData);
+pp = 00;
+
+
+
 

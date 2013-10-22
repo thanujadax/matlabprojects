@@ -1,6 +1,6 @@
 % evaluation script
 
-function [ri,gce,vi] = evaluateSegmentation()
+function [VI,RI,ARI] = evaluateSegmentation()
 
 
 trueLabelDir = '/home/thanuja/Dropbox/data/evaldata/labels/';
@@ -17,9 +17,12 @@ imgFiles_seg = dir(inputSegFileNames);
 
 numImages = length(imgFiles_labels);
 
-ri = zeros(numImages,1);
-gce = zeros(numImages,1);
-vi = zeros(numImages,1);
+% ri = zeros(numImages,1);
+% gce = zeros(numImages,1);
+VI = zeros(numImages,1);
+RI = zeros(numImages,1);
+AR = zeros(numImages,1);
+
 
 % evaluation metrics
 for i=1:length(imgFiles_labels)
@@ -37,12 +40,31 @@ for i=1:length(imgFiles_labels)
     imLabel_int = im2uint16(rgb2gray(imLabel));
     imSeg_int = im2uint16(rgb2gray(imSeg));
     
-    [ri(i),gce(i),vi(i)]=compare_segmentations(imLabel_int,imSeg_int);
-    rimat = strcat(segDir,'ri.mat');
-    gcemat = strcat(segDir,'gce.mat');
-    vimat = strcat(segDir,'vi.mat');
+    [L1m,L1n] = size(imLabel_int);
+    [L2m,L2n] = size(imSeg_int);
+
+    numL1 = L1m*L1n;
+    numL2 = L2m*L2n;
+
+    label_vec = reshape(imLabel_int,numL1,1);
+    seg_vec = reshape(imSeg_int,numL2,1);
     
-    save(rimat,'ri');
-    save(gcemat,'gce');
-    save(vimat,'vi');
+    % [ri(i),gce(i),vi(i)]=compare_segmentations(imLabel_int,imSeg_int);
+    % vi(i) = varinfo(imLabel_int,imSeg_int);
+    [variationOfInf,~] = vi(label_vec,seg_vec);
+    VI(i) = variationOfInf;
+    
+    [AR(i),RI(i),~,~]=RandIndex(label_vec,seg_vec);
+    
 end
+
+rimat = strcat(segDir,'ri.mat');
+arimat = strcat(segDir,'ari.mat');
+% gcemat = strcat(segDir,'gce.mat');
+vimat = strcat(segDir,'vi.mat');
+
+% save(rimat,'ri');
+% save(gcemat,'gce');
+save(vimat,'VI');
+save(rimat,'RI');
+save(arimat,'AR');
