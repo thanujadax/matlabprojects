@@ -1,5 +1,5 @@
 function [adjacencyMat,nodeEdges,edges2nodes,edges2pixels,connectedJunctionIDs,...
-    selfEdgePixelSet] = getGraphFromWS(ws,hsvOutput)
+    selfEdgePixelSet] = getGraphFromWS(ws,hsvOutput,displayImg)
 % % extracting edges and junctions from WS
 % % imIn = imread('stem_256x_t02_V.png');
 % imIn = imread('testMem4_V.png');
@@ -68,8 +68,9 @@ if(saveMatrices)
 end
 hsvImg = cat(3,hsvOutput(:,:,1),hsvOutput(:,:,2),hsvOutput(:,:,3));
 RGBimg = hsv2rgb(hsvImg);
-figure;imshow(RGBimg);
-
+if(displayImg)
+    figure;imshow(RGBimg);
+end
 %% extracting edges connecting junctions
 % assign unique labels for edges
 % all the pixels in each edge should have the same label
@@ -154,13 +155,14 @@ if(saveMatrices)
     save('edges2pixels.mat','edges2pixels')
 end
 %% visualize graph
-[r,c] = ind2sub([sizeR sizeC],nodeInds);
-xy = [c r];
-% figure;gplot(adjacencyMat,xy,'-*');
-figure;gplotwl(adjacencyMat,xy);
-set(gca,'YDir','reverse');
-axis square
-
+if(displayImg)
+    [r,c] = ind2sub([sizeR sizeC],nodeInds);
+    xy = [c r];
+    % figure;gplot(adjacencyMat,xy,'-*');
+    figure;gplotwl(adjacencyMat,xy);
+    set(gca,'YDir','reverse');
+    axis square
+end
 % n = size(adjacencyMat,1);
 % k = 1:n;
 % figure;gplot(adjacencyMat(k,k),xy(k,:),'-*')

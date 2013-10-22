@@ -1,4 +1,4 @@
-% ILP script 4
+% ILP script 5
 % with the new cost calculation at the junctions, incorporating the
 % directionality of the 
 
@@ -9,7 +9,6 @@ fromInputImage = 1;
 % imagePath = '/home/thanuja/Dropbox/data/testImg/testCurves1.png';
 % imagePath = '/home/thanuja/Dropbox/data/mitoData/stem1_256by256.png';
 % imagePath = '/home/thanuja/Dropbox/data/thanuja/emchallenge-class/competition-final0000.tif';
-% hard coded back bone edge 1962
 imagePath = '/home/thanuja/Dropbox/data/RF_training_edge/I15_testingImage.tif';
 % imagePath = '/home/thanuja/Dropbox/data/RF_training_edge/I05_trainingImage.tif';
 orientationsStepSize = 10;
@@ -91,7 +90,8 @@ ws = watershed(OFR_mag);
 [sizeR,sizeC] = size(ws);
 %% generate graph from the watershed edges
 disp('creating graph from watershed boundaries...');
-[adjacencyMat,nodeEdges,edges2nodes,edges2pixels,connectedJunctionIDs] = getGraphFromWS(ws,output);
+[adjacencyMat,nodeEdges,edges2nodes,edges2pixels,connectedJunctionIDs,selfEdgePixelSet] ...
+    = getGraphFromWS(ws,output);
 nodeInds = nodeEdges(:,1);                  % indices of the junction nodes
 edgeListInds = edges2pixels(:,1);
 junctionTypeListInds = getJunctionTypeListInds(nodeEdges);

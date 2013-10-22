@@ -67,8 +67,10 @@ if(displayIntermediateFigures)
     colormap('gray');
     title('original')
 end
-figure;imshow(img);title('input image')
-% invert
+if(displayIntermediateFigures)
+    figure;imshow(img);title('input image')
+end
+    % invert
 if(invertImg)
     imgInv = invertImage(img);
 else
@@ -126,8 +128,10 @@ disp(str);
 [output3,RGBimg3] = reconstructHSVgauss_mv(orientedScoreSpace3D,orientations,...
             barLength,barWidth,threshFrac,medianFilterH);
 % titlestr = sprintf('threshold percentage = %f',threshFrac);
-figure;imshow(RGBimg3);title('RGB impression of max_OFR')
-% title(titlestr)
+if(displayIntermediateFigures)
+    figure;imshow(RGBimg3);title('RGB impression of max_OFR')
+end
+    % title(titlestr)
 % % batch processing
 % savefilepath = '/home/thanuja/Dropbox/RESULTS/orientations/thresholding4/';
 % for i=20:5:75

@@ -1,5 +1,5 @@
 function regionPriors = getCellPriors_probability(pixelProbabilities,setOfCells,edges2pixels,...
-    nodeInds,edges2nodes,K,sizeR,sizeC,wsIndsForRegion,ws)
+    nodeInds,edges2nodes,K,sizeR,sizeC,wsIndsForRegion,ws,displayImg)
 % Inputs:
 %   imgIn(pixelProbabilities) - normalized image. 1 -> bright
 %   K - positive scalar factor for the costs 
@@ -45,4 +45,6 @@ end
 
 % visualize region scores
 regionScoreSpace = regionScoreSpace./(max(max(regionScoreSpace)));
-figure;imshow(regionScoreSpace);title('region scores')
+if(displayImg)
+    figure;imshow(regionScoreSpace);title('region scores')
+end

@@ -1,5 +1,5 @@
 function regionScores = regionScoreCalculator(forest,imIn,setOfCells,edges2pixels,...
-    nodeInds,edges2nodes,K,wsIndsForCells,ws)
+    nodeInds,edges2nodes,K,wsIndsForCells,ws,showImg)
 
 % Inputs:
 %   imgIn - normalized image. 1 -> bright
@@ -51,8 +51,10 @@ pixelProbabilities = double(pixelProbabilities)/max(pixelProbabilities(:));
 % have to invert the probabilities. here, 1 correspond to dark pixels.
 % change it around
 pixelProbabilities = (pixelProbabilities-1).*(-1);
-figure;imshow(pixelProbabilities);
-title('pixel probability map')
+if(showImg)
+    figure;imshow(pixelProbabilities);
+    title('pixel probability map')
+end
 regionScores = getCellPriors_probability(pixelProbabilities,setOfCells,edges2pixels,...
-    nodeInds,edges2nodes,K,sizeR,sizeC,wsIndsForCells,ws);
+    nodeInds,edges2nodes,K,sizeR,sizeC,wsIndsForCells,ws,showImg);
 
