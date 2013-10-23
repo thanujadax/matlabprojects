@@ -1,9 +1,9 @@
 % evaluation script
 
-function [VI,RI,ARI] = evaluateSegmentation()
+function [VI, ME, SE, totNumNeur] = evaluateSegmentation()
 
 
-trueLabelDir = '/home/thanuja/Dropbox/data/evaldata/labels/';
+trueLabelDir = '/home/thanuja/Dropbox/data/evaldata/labels2/';
 segDir = '/home/thanuja/Dropbox/data/evaldata/output/';
 
 LEN_IMG_IND = 3;
@@ -22,11 +22,14 @@ numImages = length(imgFiles_labels);
 VI = zeros(numImages,1);
 RI = zeros(numImages,1);
 AR = zeros(numImages,1);
-mergeErr = zeros(numImages,1);
+wrongMerges = zeros(numImages,1);
+wrongSplits = zeros(numImages,1);
+numNeurons = zeros(numImages,1);
 
 % evaluation metrics
 for i=1:length(imgFiles_labels)
     i
+
     nameLabel = imgFiles_labels(i).name;
     nameSeg = imgFiles_seg(i).name;
     
@@ -51,22 +54,39 @@ for i=1:length(imgFiles_labels)
     
     % [ri(i),gce(i),vi(i)]=compare_segmentations(imLabel_int,imSeg_int);
     % vi(i) = varinfo(imLabel_int,imSeg_int);
-    [variationOfInf,~] = vi(label_vec,seg_vec);
-    VI(i) = variationOfInf;
+      [variationOfInf,~] = vi(label_vec,seg_vec);
+      VI(i) = variationOfInf;
     
-    [AR(i),RI(i),~,~]=RandIndex(label_vec,seg_vec);
+    %   [AR(i),RI(i),~,~]=RandIndex(label_vec,seg_vec);
     
-    mergeErr(i) = getMergeError(label_vec,seg_vec);
+    [wrongMerges(i),numNeurons(i)]= getMergeError(label_vec,seg_vec);
+    [wrongSplits(i),~]= getMergeError(seg_vec,label_vec); % split error
     
 end
 
-rimat = strcat(segDir,'ri.mat');
-arimat = strcat(segDir,'ari.mat');
+% rimat = strcat(segDir,'ri.mat');
+% arimat = strcat(segDir,'ari.mat');
 % gcemat = strcat(segDir,'gce.mat');
-vimat = strcat(segDir,'vi.mat');
+% vimat = strcat(segDir,'vi.mat');
 
 % save(rimat,'ri');
 % save(gcemat,'gce');
-save(vimat,'VI');
-save(rimat,'RI');
-save(arimat,'AR');
+
+% save(vimat,'VI');
+% save(rimat,'RI');
+% save(arimat,'AR');
+
+memat = strcat(segDir,'ME.mat');
+semat = strcat(segDir,'SE.mat');
+NNmat = strcat(segDir,'NN.mat');
+
+save(memat,'wrongMerges');
+save(semat,'wrongSplits');
+save(NNmat,'numNeurons');
+
+totNumNeur = sum(numNeurons);
+totME = sum(wrongMerges);
+totSE = sum(wrongSplits);
+
+ME = totME/totNumNeur;
+SE = totSE/totNumNeur;
