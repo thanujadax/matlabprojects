@@ -1,14 +1,14 @@
-% inputfilename = '/home/thanuja/Dropbox/data/em_2013january/neurons/06.tiff';
-% writeFilePath = '/home/thanuja/Dropbox/data/evaldata2/labels/';
+inputfilename = '/home/thanuja/Dropbox/data/em_2013january/neurons/05.tiff';
+writeFilePath = '/home/thanuja/Dropbox/data/evaldata/labels2/';
 
-inputfilename = '/home/thanuja/Dropbox/data/em_2013january/raw/06.tif';
-writeFilePath = '/home/thanuja/Dropbox/data/evaldata2/input/';
+% inputfilename = '/home/thanuja/Dropbox/data/em_2013january/raw/06.tif';
+% writeFilePath = '/home/thanuja/Dropbox/data/evaldata2/input/';
 
 fmt = 'tif';
 A = imread(inputfilename, fmt);
 
-dimx = 512;
-dimy = 512;
+dimx = 256;
+dimy = 256;
 
 [sizeR,sizeC] = size(A);
 
@@ -27,9 +27,9 @@ for i=1:numBlocks
         % convert RGB into integer labels
         % intLabelsB = im2uint16(B);
         
-        % writeName = sprintf('I%02d_neuronLabels06.tif',k);
+        writeName = sprintf('I%02d_neuronLabels05.tif',k);
         
-        writeName = sprintf('I%02d_raw06.tif',k);
+        % writeName = sprintf('I%02d_raw06.tif',k);
         
         writeFileName = strcat(writeFilePath,writeName);
         disp(writeFileName)

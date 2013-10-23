@@ -22,7 +22,7 @@ numImages = length(imgFiles_labels);
 VI = zeros(numImages,1);
 RI = zeros(numImages,1);
 AR = zeros(numImages,1);
-
+mergeErr = zeros(numImages,1);
 
 % evaluation metrics
 for i=1:length(imgFiles_labels)
@@ -55,6 +55,8 @@ for i=1:length(imgFiles_labels)
     VI(i) = variationOfInf;
     
     [AR(i),RI(i),~,~]=RandIndex(label_vec,seg_vec);
+    
+    mergeErr(i) = getMergeError(label_vec,seg_vec);
     
 end
 
