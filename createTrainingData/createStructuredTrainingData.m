@@ -43,14 +43,66 @@ ws = watershed(OFR_mag);
 
 [adjacencyMat,nodeEdges,edges2nodes,edges2pixels,connectedJunctionIDs,selfEdgePixelSet] ...
     = getGraphFromWS(ws,HSVmat,showIntermediate);
+
+nodeInds = nodeEdges(:,1);                  % indices of the junction nodes
+edgeListInds = edges2pixels(:,1);
+
+clusterNodeIDs = connectedJunctionIDs(:,1); % indices of the clustered junction nodes
+
+wsRegionBoundariesFromGraph = zeros(sizeR,sizeC);
+wsRegionBoundariesFromGraph(nodeInds) = 0.7;          % junction nodes
+wsRegionBoundariesFromGraph(clusterNodeIDs) = 0.5;    % cluster nodes
+[nre,nce] = size(edges2pixels);  % first column is the edgeID
+edgepixels = edges2pixels(:,2:nce);
+wsRegionBoundariesFromGraph(edgepixels(edgepixels>0)) = 1; % edge pixels
+
+boundaryEdges = getBoundaryEdges2(wsRegionBoundariesFromGraph,barLength,edgepixels,...
+    nodeEdges,edgeListInds,showIntermediate);
+
 [faceAdj,edges2regions,setOfRegions,twoRegionEdges,wsIDsForRegions] ...
     = getFaceAdjFromWS(ws,edges2pixels,b_imWithBorder,boundaryEdges);
 
 %% get regions that matches individual neurons (connected components)
 
 [labelImg_indexed,numLabels] = getLabelIndexImg(labelImage);
-cells2regions = get
+[c_cells2WSregions,c_internalEdgeIDs,c_extEdgeIDs] = getCells2WSregions...
+                    (labelImg_indexed,ws,numLabels,setOfRegions);
+% visualize internal and external edges
+edgeVisualization = zeros(sizeR,sizeC,3);
+edgeMat2D_R = zeros(sizeR,sizeC);
+edgeMat2D_G = zeros(sizeR,sizeC);
+edgeMat2D_B = zeros(sizeR,sizeC);
+for i=1:numLabels
+    R_i = rand(1);
+    G_i = rand(1);
+    B_i = rand(1);
+    
+    R_e = rand(1);
+    G_e = rand(1);
+    B_e = rand(1);
+    
+    internalEdgeIDs_i = c_internalEdgeIDs{i};
+    internalEdgeListInds_logical = ismember(edgeListInds,internalEdgeIDs_i);
+    internalEdgePixels = edgepixels(internalEdgeListInds_logical,:);
+    internalEdgePixels = internalEdgePixels(internalEdgePixels>0);
+    
+    edgeMat2D_R(internalEdgePixels) = R_i;
+    edgeMat2D_G(internalEdgePixels) = G_i;
+    edgeMat2D_B(internalEdgePixels) = B_i;
+    
+    extEdgeIDs_i = c_extEdgeIDs{i};
+    extEdgeListInds_logical = ismember(edgeListInds,extEdgeIDs_i);
+    extEdgePixels = edgepixels(extEdgeListInds_logical,:);
+    extEdgePixels = extEdgePixels(extEdgePixels>0);
+    
+    edgeMat2D_R(extEdgePixels) = R_e;
+    edgeMat2D_G(extEdgePixels) = G_e;
+    edgeMat2D_B(extEdgePixels) = B_e;
+        
+end
+edgeVisualization(:,:,1) = edgeMat2D_R;
+edgeVisualization(:,:,2) = edgeMat2D_G;
+edgeVisualization(:,:,3) = edgeMat2D_B;
 
-% get internal edges that bound two active regions
-% get external edges that bound just one active region
+figure;imshow(edgeVisualization)
 
