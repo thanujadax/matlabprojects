@@ -13,6 +13,7 @@ orientations = 0:orientationsStepSize:350;
 
 barLength = 13;     % should be odd
 barWidth = 4;       %
+b_imWithBorder = 1; % 1 to add thick border
 marginSize = ceil(barLength/2);
 marginPixVal = 0;
 addBorder = ceil(barLength/2);
@@ -28,10 +29,11 @@ rawImage = imread(rawImagePath);
 labelImage = imread(labelImagePath);
 
 % add thick border
-rawImage = addThickBorder(rawImage,marginSize,marginPixVal);
-labelImage = addThickBorder(labelImage,marginSize,marginPixVal);
-
-% Extract WS graph for raw image
+if(b_imWithBorder)
+    rawImage = addThickBorder(rawImage,marginSize,marginPixVal);
+    labelImage = addThickBorder(labelImage,marginSize,marginPixVal);
+end
+%% Extract WS graph for raw image
 [HSVmat,rgbimg,orientedScoreSpace3D] = getOFR(rawImage,orientations,...
                             barLength,barWidth,invertImg,threshFrac);
 OFR_mag = HSVmat(:,:,3);    % OFR value matrix
@@ -41,10 +43,14 @@ ws = watershed(OFR_mag);
 
 [adjacencyMat,nodeEdges,edges2nodes,edges2pixels,connectedJunctionIDs,selfEdgePixelSet] ...
     = getGraphFromWS(ws,HSVmat,showIntermediate);
+[faceAdj,edges2regions,setOfRegions,twoRegionEdges,wsIDsForRegions] ...
+    = getFaceAdjFromWS(ws,edges2pixels,b_imWithBorder,boundaryEdges);
 
+%% get regions that matches individual neurons (connected components)
 
+[labelImg_indexed,numLabels] = getLabelIndexImg(labelImage);
+cells2regions = get
 
-% get regions that matches individual neurons (connected components)
 % get internal edges that bound two active regions
 % get external edges that bound just one active region
 

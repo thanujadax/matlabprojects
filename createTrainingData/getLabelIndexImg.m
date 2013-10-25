@@ -1,4 +1,4 @@
-function labelIndImg = getLabelIndexImg(labelImage)
+function [labelIndImg,numLabels] = getLabelIndexImg(labelImage)
 
 grayImg = rgb2gray(labelImage);
 labelIndImg0 = im2uint16(grayImg);
