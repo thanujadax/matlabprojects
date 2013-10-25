@@ -1,6 +1,8 @@
 % orientation filter response
 function [output3,RGBimg3,orientedScoreSpace3D] = getOFR(imgIn,orientations,barLength,...
                         barWidth,invertImg,threshFrac)
+                    
+% output3 = HSV 3D matrix
 %% parameters
 displayIntermediateFigures=0;
 

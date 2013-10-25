@@ -4,11 +4,11 @@ close all;
 
 % == INPUTS: DATA TO ANALYZE ==
 % The directory with the groundtruth
-sInputDir = 'inputs/';
-sGroundTruth = 'groundtruth/';
+sInputDir = '/home/thanuja/Dropbox/data/evaldata/';
+sGroundTruth = 'labels2/';
 % The directory with the experiments
-sAlgoOutput = 'algooutput/';
-sExperiment = 'marginalsNew/';
+sAlgoOutput = 'output/';
+sExperiment = 'exp1/';
 
 % == LOAD THE DATA == 
 lDirGroundTruth = dir(fullfile(sInputDir,sGroundTruth));
