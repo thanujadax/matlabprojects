@@ -1,8 +1,12 @@
-function [c_wsIDsInCell,c_internalEdgeIDsInCell,c_extEdgeIDsInCell]...
-            = getCells2WSregions(labelImg_indexed,ws,numLabels,setOfRegions)
+function [c_wsIDsInCell,c_internalEdgeIDsInCell,c_extEdgeIDsInCell,...
+          c_internalNodeListInds,c_extNodeListInds]...
+            = getCells2WSregions(labelImg_indexed,ws,numLabels,setOfRegions,...
+            nodeEdges,connectedJunctionIDs,edges2nodes)
         
 % Inputs:
 %   setOfRegions: contains edgeIDs for each wsRegion
+%   nodeEdges: edgeIDs for each nodePixelInd
+%   connectedJunctionIDs: 
 
 
 % Params:
@@ -11,6 +15,8 @@ threshFrac = 0.2; % fraction of WSregion pixels allowed to be OUTSIDE of the cel
 c_wsIDsInCell = cell(numLabels,1);
 c_internalEdgeIDsInCell = cell(numLabels,1);
 c_extEdgeIDsInCell = cell(numLabels,1);
+c_internalNodeListInds = cell(numLabels,1);
+c_extNodeListInds = cell(numLabels,1);
 
 % regionID = wsID - 1;
 
@@ -45,6 +51,12 @@ parfor i=1:numLabels
     % the other edges are external
     extEdgeIDs_i = setdiff(edgeIDs_unique_i,internalEdgeIDs_i);
     c_extEdgeIDsInCell{i} = extEdgeIDs_i;
+    
+    % all nodes where 2 internal edges meet are internal nodes
+    
+    
+    % nodes where at least 1 external edge meets with other nodes, are
+    % external nodes
 end
 
 
@@ -62,3 +74,10 @@ for i=1:numWsRegions
         wsIDs_filtered = [wsIDs_filtered; wsID_i];
     end
 end
+
+function [internalNodeListInds,extNodeListInds] = getlNodes...
+                (internalEdgeIDs,extEdgeIDs,edges2nodes,nodeEdges)
+
+            
+intEdgeListInd = ismember();            
+nodesListIndsToAllIntEdges = edges2nodes()

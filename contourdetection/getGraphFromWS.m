@@ -1,11 +1,8 @@
 function [adjacencyMat,nodeEdges,edges2nodes,edges2pixels,connectedJunctionIDs,...
     selfEdgePixelSet] = getGraphFromWS(ws,hsvOutput,displayImg)
-% % extracting edges and junctions from WS
-% % imIn = imread('stem_256x_t02_V.png');
-% imIn = imread('testMem4_V.png');
-% [sizeR,sizeC] = size(imIn);
-% ws = watershed(imIn);
-% %figure;imagesc(ws)
+
+% Outputs:
+% nodeEdges: contains the set of edgeIDs for each nodePixInd
 
 saveMatrices = 1;  % to save some of the generated matrices
 

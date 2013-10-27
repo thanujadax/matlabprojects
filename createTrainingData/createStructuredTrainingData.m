@@ -65,8 +65,9 @@ boundaryEdges = getBoundaryEdges2(wsRegionBoundariesFromGraph,barLength,edgepixe
 %% get regions that matches individual neurons (connected components)
 
 [labelImg_indexed,numLabels] = getLabelIndexImg(labelImage);
-[c_cells2WSregions,c_internalEdgeIDs,c_extEdgeIDs] = getCells2WSregions...
-                    (labelImg_indexed,ws,numLabels,setOfRegions);
+[c_cells2WSregions,c_internalEdgeIDs,c_extEdgeIDs,c_internalNodeInds,c_extNodeInds]...
+            = getCells2WSregions(labelImg_indexed,ws,numLabels,setOfRegions,...
+            nodeEdges,connectedJunctionIDs);
 % visualize internal and external edges
 edgeVisualization = zeros(sizeR,sizeC,3);
 edgeMat2D_R = zeros(sizeR,sizeC);
