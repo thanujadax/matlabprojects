@@ -1,4 +1,4 @@
-% function trainingData = createStructuredTrainingData()
+% function [] = createStructuredTrainingData(rawImagePath,labelImagePath)
 % create structured training labels: edges, nodes and regions
 
 % Inputs
@@ -21,8 +21,8 @@ threshFrac = 0.1;
 medianFilterH = 0;
 invertImg = 1;      % 1 for EM images when input image is taken from imagePath
 
-rawImagePath = '/home/thanuja/Dropbox/data/evaldata/input/I03_raw05.tif';
-labelImagePath = '/home/thanuja/Dropbox/data/evaldata/labels2/I03_neuronLabels05.tif';
+% rawImagePath = '/home/thanuja/Dropbox/data/evaldata/input/I03_raw05.tif';
+% labelImagePath = '/home/thanuja/Dropbox/data/evaldata/labels2/I03_neuronLabels05.tif';
 
 %% Read inputs. Perform initial processing
 rawImage = imread(rawImagePath);
@@ -67,7 +67,7 @@ boundaryEdges = getBoundaryEdges2(wsRegionBoundariesFromGraph,barLength,edgepixe
 [labelImg_indexed,numLabels] = getLabelIndexImg(labelImage);
 [c_cells2WSregions,c_internalEdgeIDs,c_extEdgeIDs,c_internalNodeInds,c_extNodeInds]...
             = getCells2WSregions(labelImg_indexed,ws,numLabels,setOfRegions,...
-            nodeEdges,connectedJunctionIDs);
+            edgeListInds,edges2nodes);
 % visualize internal and external edges
 edgeVisualization = zeros(sizeR,sizeC,3);
 edgeMat2D_R = zeros(sizeR,sizeC);
@@ -81,6 +81,14 @@ for i=1:numLabels
     R_e = rand(1);
     G_e = rand(1);
     B_e = rand(1);
+    
+    R_in = rand(1);
+    G_in = rand(1);
+    B_in = rand(1);
+    
+    R_en = rand(1);
+    G_en = rand(1);
+    B_en = rand(1);
     
     internalEdgeIDs_i = c_internalEdgeIDs{i};
     internalEdgeListInds_logical = ismember(edgeListInds,internalEdgeIDs_i);
@@ -99,6 +107,23 @@ for i=1:numLabels
     edgeMat2D_R(extEdgePixels) = R_e;
     edgeMat2D_G(extEdgePixels) = G_e;
     edgeMat2D_B(extEdgePixels) = B_e;
+    
+    internalNodeListInds = c_internalNodeInds{i};
+    intNodePixInds = getNodePixelsFromNodeInd...
+                (internalNodeListInds,nodeInds,connectedJunctionIDs);
+            
+    edgeMat2D_R(intNodePixInds) = R_in;
+    edgeMat2D_G(intNodePixInds) = G_in;
+    edgeMat2D_B(intNodePixInds) = B_in;
+            
+    extNodeListInds = c_extNodeInds{i};
+    extNodePixInds = getNodePixelsFromNodeInd...
+                (extNodeListInds,nodeInds,connectedJunctionIDs);
+    
+    edgeMat2D_R(extNodePixInds) = R_en;
+    edgeMat2D_G(extNodePixInds) = G_en;
+    edgeMat2D_B(extNodePixInds) = B_en;
+    
         
 end
 edgeVisualization(:,:,1) = edgeMat2D_R;

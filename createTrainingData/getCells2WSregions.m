@@ -1,7 +1,7 @@
 function [c_wsIDsInCell,c_internalEdgeIDsInCell,c_extEdgeIDsInCell,...
           c_internalNodeListInds,c_extNodeListInds]...
             = getCells2WSregions(labelImg_indexed,ws,numLabels,setOfRegions,...
-            nodeEdges,connectedJunctionIDs,edges2nodes)
+            edgeListInds,edges2nodes)
         
 % Inputs:
 %   setOfRegions: contains edgeIDs for each wsRegion
@@ -52,11 +52,14 @@ parfor i=1:numLabels
     extEdgeIDs_i = setdiff(edgeIDs_unique_i,internalEdgeIDs_i);
     c_extEdgeIDsInCell{i} = extEdgeIDs_i;
     
-    % all nodes where 2 internal edges meet are internal nodes
-    
-    
+    % all nodes where 2 internal edges meet are internal nodes    
     % nodes where at least 1 external edge meets with other nodes, are
     % external nodes
+    [internalNodeListInds,extNodeListInds] = getNodes...
+                (internalEdgeIDs_i,extEdgeIDs_i,edges2nodes,edgeListInds);
+    c_internalNodeListInds{i} = internalNodeListInds;
+    c_extNodeListInds{i} = extNodeListInds;
+            
 end
 
 
@@ -75,9 +78,16 @@ for i=1:numWsRegions
     end
 end
 
-function [internalNodeListInds,extNodeListInds] = getlNodes...
-                (internalEdgeIDs,extEdgeIDs,edges2nodes,nodeEdges)
+function [internalNodeListInds,extNodeListInds] = getNodes...
+                (internalEdgeIDs,extEdgeIDs,edges2nodes,edgeListInds)
 
-            
-intEdgeListInd = ismember();            
-nodesListIndsToAllIntEdges = edges2nodes()
+intEdgeListInd_logical = ismember(edgeListInds,internalEdgeIDs);            
+internalNodeListInds_all = edges2nodes(intEdgeListInd_logical,:);
+internalNodeListInds_all = unique(internalNodeListInds_all);
+
+extEdgeListInd_logical = ismember(edgeListInds,extEdgeIDs);            
+extNodeListInds = edges2nodes(extEdgeListInd_logical,:);
+extNodeListInds = unique(extNodeListInds);
+
+internalNodeListInds = setdiff(internalNodeListInds_all,extNodeListInds);
+
