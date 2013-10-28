@@ -1,4 +1,5 @@
-% function [] = createStructuredTrainingData(rawImagePath,labelImagePath)
+function [internalEdgePixels, extEdgePixels, inactivePixels, edgepixels, OFR, edgePriors,OFR_mag] = ...
+    createStructuredTrainingData(rawImagePath,labelImagePath)
 % create structured training labels: edges, nodes and regions
 
 % Inputs
@@ -34,7 +35,7 @@ if(b_imWithBorder)
     labelImage = addThickBorder(labelImage,marginSize,marginPixVal);
 end
 %% Extract WS graph for raw image
-[HSVmat,rgbimg,orientedScoreSpace3D] = getOFR(rawImage,orientations,...
+[HSVmat,rgbimg,OFR] = getOFR(rawImage,orientations,...
                             barLength,barWidth,invertImg,threshFrac);
 OFR_mag = HSVmat(:,:,3);    % OFR value matrix
 
@@ -62,6 +63,8 @@ boundaryEdges = getBoundaryEdges2(wsRegionBoundariesFromGraph,barLength,edgepixe
 [faceAdj,edges2regions,setOfRegions,twoRegionEdges,wsIDsForRegions] ...
     = getFaceAdjFromWS(ws,edges2pixels,b_imWithBorder,boundaryEdges);
 
+
+edgePriors = getEdgeUnaryAbs(edgepixels,output(:,:,3));
 %% get regions that matches individual neurons (connected components)
 
 [labelImg_indexed,numLabels] = getLabelIndexImg(labelImage);
