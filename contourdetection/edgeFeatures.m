@@ -1,4 +1,4 @@
-function fm = edgeFeatures(edgepixels,OFR,edgePrior)
+function fm = edgeFeatures(rawImage,edgepixels,OFR,edgePrior)
 
 % Inputs:
 %   edgepixels - each row corresponds to an edge. gives the pixelInds as a

@@ -56,7 +56,8 @@ for i=1:numTrainingImgs
         ws = watershed(OFR_mag);
         [sizeR,sizeC] = size(ws);
         disp('creating graph from watershed boundaries...');
-        [adjacencyMat,nodeEdges,edges2nodes,edges2pixels,connectedJunctionIDs] = getGraphFromWS(ws,output);
+        [adjacencyMat,nodeEdges,edges2nodes,edges2pixels,connectedJunctionIDs]...
+            = getGraphFromWS(ws,output,0);
         edgepixels_i = edges2pixels;
         edgepixels_i(:,1) = []; % delete the first column which has edgeIDs
         cells_edgepixels_allTrainingImgs{i} = edgepixels_i;
@@ -65,7 +66,7 @@ for i=1:numTrainingImgs
         edgePrior = getEdgeUnaryAbs(edgepixels_i,OFR_mag);
         str2 = sprintf('calculating edge features for image %d',i);
         disp(str2)
-        fm = edgeFeatures(edgepixels_i,orientedScoreSpace3D,edgePrior);
+        fm = edgeFeatures(imgIn,edgepixels_i,orientedScoreSpace3D,edgePrior);
         % save feature matrix
         save(strcat(name(1:LEN_IMG_IND),'_efm.mat'),'fm');
     else
