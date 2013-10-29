@@ -1,4 +1,4 @@
-function fm = getEdgeFeatureMat(rawImage,edgepixels,OFR,edgePrior)
+function fm = getEdgeFeatureMat(rawImage,edgepixels,OFR,edgePriors)
 
 % Inputs:
 %   rawImage
@@ -41,7 +41,7 @@ for i=1:numEdges
     numEdgePixels = numel(edgepixels_i);
     % 1. precalculated edge prior
     k = 1;
-    fm(i,k) = edgePrior(i);      
+    fm(i,k) = edgePriors(i);      
     % |OFR|max - |OFR|min (1)
     OFR_i = zeros(numEdgePixels,numOFRdim);
     OFRabs_i = zeros(numEdgePixels,numOFRdim);

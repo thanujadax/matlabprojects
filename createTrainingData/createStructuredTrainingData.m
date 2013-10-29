@@ -28,8 +28,8 @@ threshFrac = 0.1;
 medianFilterH = 0;
 invertImg = 1;      % 1 for EM images when input image is taken from imagePath
 
-rawImagePath = '/home/thanuja/Dropbox/data/evaldata/input/I03_raw05.tif';
-labelImagePath = '/home/thanuja/Dropbox/data/evaldata/labels2/I03_neuronLabels05.tif';
+% rawImagePath = '/home/thanuja/Dropbox/data/evaldata/input/I03_raw05.tif';
+% labelImagePath = '/home/thanuja/Dropbox/data/evaldata/labels2/I03_neuronLabels05.tif';
 
 %% Read inputs. Perform initial processing
 rawImage = imread(rawImagePath);
