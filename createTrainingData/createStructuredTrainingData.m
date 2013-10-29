@@ -1,13 +1,19 @@
-function [internalEdgePixels, extEdgePixels, inactivePixels, edgepixels, OFR, edgePriors,OFR_mag] = ...
+function [c_cells2WSregions,c_internalEdgeIDs,c_extEdgeIDs,c_internalNodeInds,...
+    c_extNodeInds,inactiveEdgeIDs,edgeListInds,edgepixels,OFR,edgePriors,OFR_mag] = ...
     createStructuredTrainingData(rawImagePath,labelImagePath)
 % create structured training labels: edges, nodes and regions
 
-% Inputs
+% Inputs:
 %   raw EM image
 %   labels for the raw image: neurons, mitochondria? (later)
 
+% Outputs:
+% ...
+% inactiveEdgeIDs - inactive edges that are outside of cells
+% ...
+
 %% Parameters
-showIntermediate = 1;
+showIntermediate = 0;
 
 orientationsStepSize = 10;
 orientations = 0:orientationsStepSize:350;
@@ -22,8 +28,8 @@ threshFrac = 0.1;
 medianFilterH = 0;
 invertImg = 1;      % 1 for EM images when input image is taken from imagePath
 
-% rawImagePath = '/home/thanuja/Dropbox/data/evaldata/input/I03_raw05.tif';
-% labelImagePath = '/home/thanuja/Dropbox/data/evaldata/labels2/I03_neuronLabels05.tif';
+rawImagePath = '/home/thanuja/Dropbox/data/evaldata/input/I03_raw05.tif';
+labelImagePath = '/home/thanuja/Dropbox/data/evaldata/labels2/I03_neuronLabels05.tif';
 
 %% Read inputs. Perform initial processing
 rawImage = imread(rawImagePath);
@@ -64,18 +70,21 @@ boundaryEdges = getBoundaryEdges2(wsRegionBoundariesFromGraph,barLength,edgepixe
     = getFaceAdjFromWS(ws,edges2pixels,b_imWithBorder,boundaryEdges);
 
 
-edgePriors = getEdgeUnaryAbs(edgepixels,output(:,:,3));
+edgePriors = getEdgeUnaryAbs(edgepixels,OFR_mag);
 %% get regions that matches individual neurons (connected components)
 
 [labelImg_indexed,numLabels] = getLabelIndexImg(labelImage);
 [c_cells2WSregions,c_internalEdgeIDs,c_extEdgeIDs,c_internalNodeInds,c_extNodeInds]...
             = getCells2WSregions(labelImg_indexed,ws,numLabels,setOfRegions,...
             edgeListInds,edges2nodes);
+inactiveEdgeIDs = edgeListInds;     % initializing the list of inactive edgeIDs outside cells
+
 % visualize internal and external edges
 edgeVisualization = zeros(sizeR,sizeC,3);
 edgeMat2D_R = zeros(sizeR,sizeC);
 edgeMat2D_G = zeros(sizeR,sizeC);
 edgeMat2D_B = zeros(sizeR,sizeC);
+
 for i=1:numLabels
     R_i = rand(1);
     G_i = rand(1);
@@ -94,6 +103,10 @@ for i=1:numLabels
     B_en = rand(1);
     
     internalEdgeIDs_i = c_internalEdgeIDs{i};
+    
+    % update inactive edgeID list
+    inactiveEdgeIDs = setdiff(inactiveEdgeIDs,internalEdgeIDs_i);
+    
     internalEdgeListInds_logical = ismember(edgeListInds,internalEdgeIDs_i);
     internalEdgePixels = edgepixels(internalEdgeListInds_logical,:);
     internalEdgePixels = internalEdgePixels(internalEdgePixels>0);
@@ -103,6 +116,10 @@ for i=1:numLabels
     edgeMat2D_B(internalEdgePixels) = B_i;
     
     extEdgeIDs_i = c_extEdgeIDs{i};
+    
+    % update inactive edgeID list
+    inactiveEdgeIDs = setdiff(inactiveEdgeIDs,extEdgeIDs_i);
+    
     extEdgeListInds_logical = ismember(edgeListInds,extEdgeIDs_i);
     extEdgePixels = edgepixels(extEdgeListInds_logical,:);
     extEdgePixels = extEdgePixels(extEdgePixels>0);
@@ -129,6 +146,20 @@ for i=1:numLabels
     
         
 end
+
+% visualize inactive edges outside cells
+inactiveEdgeListInds_logical = ismember(edgeListInds,inactiveEdgeIDs);
+inactiveEdgePixels = edgepixels(inactiveEdgeListInds_logical,:);
+inactiveEdgePixels = inactiveEdgePixels(inactiveEdgePixels>0);
+R_ina = rand(1);
+G_ina = rand(1);
+B_ina = rand(1);
+edgeMat2D_R(inactiveEdgePixels) = R_ina;
+edgeMat2D_G(inactiveEdgePixels) = G_ina;
+edgeMat2D_B(inactiveEdgePixels) = B_ina;
+
+
+% Visualize the entire thing
 edgeVisualization(:,:,1) = edgeMat2D_R;
 edgeVisualization(:,:,2) = edgeMat2D_G;
 edgeVisualization(:,:,3) = edgeMat2D_B;

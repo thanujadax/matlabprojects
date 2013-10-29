@@ -8,6 +8,13 @@ function [c_wsIDsInCell,c_internalEdgeIDsInCell,c_extEdgeIDsInCell,...
 %   nodeEdges: edgeIDs for each nodePixelInd
 %   connectedJunctionIDs: 
 
+% Outputs:
+%     c_wsIDsInCell
+%     c_internalEdgeIDsInCell
+%     c_extEdgeIDsInCell
+%     c_internalNodeListInds
+%     c_extNodeListInds
+
 
 % Params:
 threshFrac = 0.2; % fraction of WSregion pixels allowed to be OUTSIDE of the cell
@@ -40,6 +47,7 @@ parfor i=1:numLabels
     % get all edges for the cell
     edgesForCell_i = setOfRegions_i(regionIDs,:);
     edgesForCell_i = edgesForCell_i(edgesForCell_i>0);
+    
     
     % pick the internal ones, having 2 regions bounded by it, which are
     % part of this cell
