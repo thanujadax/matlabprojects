@@ -1,5 +1,7 @@
 function forest_edgeProb = trainRandomForest_edgeScore()
 
+% OLDER version
+
 % Script to train RFC for edge classification
 %   0 - edge to be turned off (not part of contour)
 %   1 - edge to be turned on (part of contour)

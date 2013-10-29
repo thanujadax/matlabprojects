@@ -30,7 +30,7 @@ addBorder = ceil(barLength/2);
 threshFrac = 0.1;
 medianFilterH = 0;
 invertImg = 1;      % 1 for EM images when input image is taken from imagePath
-
+marginPixVal = 0;
 %% read training data - x
 rawImageFiles_training = dir(strcat(pathForImages_training,fileNameString)); % raw images for training
 labelImageFiles_training = dir(strcat(pathForLabels_training,fileNameString)); % training labels
@@ -51,21 +51,36 @@ for i=1:numTrainingImgs
     [c_cells2WSregions,c_internalEdgeIDs,c_extEdgeIDs,c_internalNodeInds,...
     c_extNodeInds,inactiveEdgeIDs,edgeListInds,edgepixels,OFR,edgePriors,OFR_mag]...
         = createStructuredTrainingData(rawImagePath_i,labelImagePath_i);
+    numEdgesTot = numel(edgeListInds);
+    edgeListIndSequence = 1:numEdgesTot;
     % edges part of object boundaries - active
     activeEdgeIDs = getElementsFromCell(c_extEdgeIDs);
     % edges inside cells - inactive
     inactiveInternalEdgeIDs = getElementsFromCell(c_internalEdgeIDs);
     % append to the list of inactive edges outside the cells
+    
+    [numR,numC] = size(inactiveEdgeIDs);
+    if(numC>1)
+        inactiveEdgeIDs = inactiveEdgeIDs';
+    end
+    [numR,numC] = size(inactiveInternalEdgeIDs);
+    if(numC>1)
+        inactiveInternalEdgeIDs = inactiveInternalEdgeIDs';
+    end
+    
     inactiveEdgeIDs = [inactiveEdgeIDs; inactiveInternalEdgeIDs]; 
     
     % get their features
-    activeEdgeListInds = edgeListInds(ismember(edgeListInds,activeEdgeIDs));
-    inactiveEdgeListInds = edgeListInds(ismember(edgeListInds,inactiveEdgeIDs));
-    edgeListInds_reordered = [activeEdgeListInds; inactiveEdgeListInds];
-    edgepixels_reordered = edgepixels(edgeListInds_reordered,:);
-    edgePriors_reordered = edgePriors(edgeListInds_reordered);
-    clear fm
-    fm = getEdgeFeatureMat(rawImage,edgepixels_reordered,OFR,edgePriors_reordered);
+    activeEdgeListInds_tr = edgeListIndSequence(ismember(edgeListInds,activeEdgeIDs));
+    inactiveEdgeListInds_tr = edgeListIndSequence(ismember(edgeListInds,inactiveEdgeIDs));
+    edgeListInds_reordered_tr = [activeEdgeListInds_tr'; inactiveEdgeListInds_tr'];
+    edgepixels_reordered_tr = edgepixels(edgeListInds_reordered_tr,:);
+    edgePriors_reordered_tr = edgePriors(edgeListInds_reordered_tr);
+    rawImage = double(imread(rawImagePath_i));
+    rawImage = rawImage./(max(max(rawImage)));
+    rawImage = addThickBorder(rawImage,marginSize,marginPixVal);
+    % clear fm
+    fm = getEdgeFeatureMat(rawImage,edgepixels_reordered_tr,OFR,edgePriors_reordered_tr);
     % append to the feature matrix x and the label matrix y
     x = [x; fm];
     numActiveEdges = numel(activeEdgeIDs);
@@ -138,6 +153,11 @@ for i=1:numTestingImgs
     edgeListInds_reordered = [activeEdgeListInds; inactiveEdgeListInds];
     edgepixels_reordered = edgepixels(edgeListInds_reordered,:);
     edgePriors_reordered = edgePriors(edgeListInds_reordered);
+    
+    rawImage = double(imread(rawImagePath_i));
+    rawImage = rawImage./(max(max(rawImage)));
+    rawImage = addThickBorder(rawImage,marginSize,marginPixVal);
+    
     clear fm
     fm = getEdgeFeatureMat(rawImage,edgepixels_reordered,OFR,edgePriors_reordered);
     % append to the feature matrix x and the label matrix y

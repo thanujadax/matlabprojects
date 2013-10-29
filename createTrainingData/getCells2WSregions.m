@@ -17,7 +17,7 @@ function [c_wsIDsInCell,c_internalEdgeIDsInCell,c_extEdgeIDsInCell,...
 
 
 % Params:
-threshFrac = 0.2; % fraction of WSregion pixels allowed to be OUTSIDE of the cell
+threshFrac = 0.33; % fraction of WSregion pixels allowed to be OUTSIDE of the cell
 
 c_wsIDsInCell = cell(numLabels,1);
 c_internalEdgeIDsInCell = cell(numLabels,1);

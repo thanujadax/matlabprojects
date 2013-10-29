@@ -9,7 +9,7 @@ showIntermediate = 1;
 isToyProb = 0;
 useGurobi = 1;
 fromInputImage = 1;
-imagePath = '/home/thanuja/Dropbox/data/mitoData/emJ_00_170x.png';
+% imagePath = '/home/thanuja/Dropbox/data/mitoData/emJ_00_170x.png';
 % imagePath = '/home/thanuja/Dropbox/data/testImg/testCurves1.png';
 % imagePath = '/home/thanuja/Dropbox/data/mitoData/stem1_256by256.png';
 % imagePath = '/home/thanuja/Dropbox/data/thanuja/emchallenge-class/competition-final0000.tif';
@@ -17,6 +17,8 @@ imagePath = '/home/thanuja/Dropbox/data/mitoData/emJ_00_170x.png';
 % imagePath = '/home/thanuja/Dropbox/data/RF_training_edge/I15_testingImage.tif';
 % imagePath = '/home/thanuja/Dropbox/data/RF_training_edge/I05_trainingImage.tif';
 % imagePath = '/home/thanuja/Dropbox/data/evaldata/input/I11_raw05.tif';
+imagePath = '/home/thanuja/Dropbox/data/edgeTraining2/trainingRaw/I00_raw05.tif';
+
 orientationsStepSize = 10;
 orientations = 0:orientationsStepSize:350;
 
@@ -560,13 +562,13 @@ end
 
 % figure;imshow(visualizeCells);
 segmentationOut = removeThickBorder(visualizeCells,marginSize);
-figure; imshow(normalizedInputImage);
-hold on
+% figure; imshow(normalizedInputImage);
+% hold on
 fh = imshow(segmentationOut);
-hold off
-imAlphaData = ones(sizeR,sizeC) .* 0.5;
-set(fh,'AlphaData',imAlphaData);
-pp = 00;
+% hold off
+% imAlphaData = ones(sizeR,sizeC) .* 0.5;
+% set(fh,'AlphaData',imAlphaData);
+% pp = 00;
 
 
 

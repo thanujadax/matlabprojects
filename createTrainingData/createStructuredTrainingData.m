@@ -32,7 +32,8 @@ invertImg = 1;      % 1 for EM images when input image is taken from imagePath
 % labelImagePath = '/home/thanuja/Dropbox/data/evaldata/labels2/I03_neuronLabels05.tif';
 
 %% Read inputs. Perform initial processing
-rawImage = imread(rawImagePath);
+rawImage = double(imread(rawImagePath));
+rawImage = rawImage./(max(max(rawImage)));
 labelImage = imread(labelImagePath);
 
 % add thick border
