@@ -20,3 +20,5 @@ for i=1:numCells
         end
     end
 end
+
+allElementsInList = unique(allElementsInList);

@@ -7,9 +7,9 @@
 %% Parameters
 % use wild cards to allow for indices
 pathForImages_training = '/home/thanuja/Dropbox/data/edgeTraining2/trainingRaw/'; 
-pathForImages_testing = '/home/thanuja/Dropbox/data/edgeTraining2/testingRaw/';
+pathForImages_testing = '/home/thanuja/Dropbox/data/edgeTraining2/testRaw/';
 pathForLabels_training = '/home/thanuja/Dropbox/data/edgeTraining2/trainingLabels/';
-pathForLabels_testing = '/home/thanuja/Dropbox/data/edgeTraining2/testingLabels/';
+pathForLabels_testing = '/home/thanuja/Dropbox/data/edgeTraining2/testLabels/';
 
 fileNameString = '*.tif';
 
@@ -71,9 +71,9 @@ for i=1:numTrainingImgs
     inactiveEdgeIDs = [inactiveEdgeIDs; inactiveInternalEdgeIDs]; 
     
     % get their features
-    activeEdgeListInds_tr = edgeListIndSequence(ismember(edgeListInds,activeEdgeIDs));
-    inactiveEdgeListInds_tr = edgeListIndSequence(ismember(edgeListInds,inactiveEdgeIDs));
-    edgeListInds_reordered_tr = [activeEdgeListInds_tr'; inactiveEdgeListInds_tr'];
+    [~,activeEdgeListInds_tr] = intersect(edgeListInds,activeEdgeIDs);
+    [~,inactiveEdgeListInds_tr] = intersect(edgeListInds,inactiveEdgeIDs);
+    edgeListInds_reordered_tr = [activeEdgeListInds_tr; inactiveEdgeListInds_tr];
     edgepixels_reordered_tr = edgepixels(edgeListInds_reordered_tr,:);
     edgePriors_reordered_tr = edgePriors(edgeListInds_reordered_tr);
     rawImage = double(imread(rawImagePath_i));
@@ -88,6 +88,35 @@ for i=1:numTrainingImgs
     activeLabelVect = ones(numActiveEdges,1);
     inactiveLabelVect = zeros(numInactiveEdges,1);
     y = [y; activeLabelVect; inactiveLabelVect];
+    
+    % debug code
+    checksum1 = size(fm,1) - numel(activeLabelVect) - numel(inactiveLabelVect);
+    if(checksum1~=0)
+        qq=1;
+    end
+    
+    
+    % visualize active edges (red) and inactive edges (green)
+    [sizeR,sizeC] = size(OFR_mag);
+    visualizeR = zeros(sizeR,sizeC);
+    visualizeG = zeros(sizeR,sizeC);
+    visualizeB = zeros(sizeR,sizeC);
+
+    activeEdgePixels_groundTruth = edgepixels(activeEdgeListInds_tr,:); 
+    activeEdgePixels_groundTruth = activeEdgePixels_groundTruth(activeEdgePixels_groundTruth>0);
+    visualizeR(activeEdgePixels_groundTruth) = 1;
+    
+    inactiveEdgePixels_groundTruth = edgepixels(inactiveEdgeListInds_tr,:); 
+    inactiveEdgePixels_groundTruth = inactiveEdgePixels_groundTruth(inactiveEdgePixels_groundTruth>0);
+    visualizeB(inactiveEdgePixels_groundTruth) = 1;
+   
+    visualization = zeros(sizeR,sizeC,3);
+    visualization(:,:,1) = visualizeR;
+    visualization(:,:,2) = visualizeG;
+    visualization(:,:,3) = visualizeB;
+
+    figure; imshow(visualization); title('training labels')
+    
     
 end
 disp('feature extraction done! Saving feature matrix x and label vector y...')
@@ -129,13 +158,16 @@ x0 = []; % feature matrix for test data
 y0 = []; % treu label vector for test data
 
 disp('extracting features for test images...')
+activeEdgeListInds = [];
+edgeListInds_reordered = [];
+
 for i=1:numTestingImgs
     
     str1 = sprintf('test image %d:',i);
     disp(str1)
     
-    rawImagePath_i = fullfile(pathForImages_training,rawImageFiles_training(i).name);
-    labelImagePath_i = fullfile(pathForLabels_training,labelImageFiles_training(i).name);
+    rawImagePath_i = fullfile(pathForImages_testing,rawImageFiles_testing(i).name);
+    labelImagePath_i = fullfile(pathForLabels_testing,labelImageFiles_testing(i).name);
     
     [c_cells2WSregions,c_internalEdgeIDs,c_extEdgeIDs,c_internalNodeInds,...
     c_extNodeInds,inactiveEdgeIDs,edgeListInds,edgepixels,OFR,edgePriors,OFR_mag]...
@@ -146,10 +178,11 @@ for i=1:numTestingImgs
     inactiveInternalEdgeIDs = getElementsFromCell(c_internalEdgeIDs);
     % append to the list of inactive edges outside the cells
     inactiveEdgeIDs = [inactiveEdgeIDs; inactiveInternalEdgeIDs]; 
+    inactiveEdgeIDs = unique(inactiveEdgeIDs);
     
     % get their features
-    activeEdgeListInds = edgeListInds(ismember(edgeListInds,activeEdgeIDs));
-    inactiveEdgeListInds = edgeListInds(ismember(edgeListInds,inactiveEdgeIDs));
+    [~,activeEdgeListInds] = intersect(edgeListInds,activeEdgeIDs);
+    [~,inactiveEdgeListInds] = intersect(edgeListInds,inactiveEdgeIDs);
     edgeListInds_reordered = [activeEdgeListInds; inactiveEdgeListInds];
     edgepixels_reordered = edgepixels(edgeListInds_reordered,:);
     edgePriors_reordered = edgePriors(edgeListInds_reordered);
@@ -175,7 +208,8 @@ save('x0.mat','x0');
 save('y0.mat','y0');
 % predicting labels for test data
 [y_h,v] = classRF_predict(double(x0), forestEdgeProb);
-
+predictedEdgeProbabilities = v(:,2);
+predictedEdgeProbabilities = predictedEdgeProbabilities./(max(predictedEdgeProbabilities));
 % visualize
 % active edges - ground truth - green
 % active edges - prediction - red
@@ -184,12 +218,12 @@ visualizeR = zeros(sizeR,sizeC);
 visualizeG = zeros(sizeR,sizeC);
 visualizeB = zeros(sizeR,sizeC);
 
-activeEdgePixels_groundTruth = edgepixels(activeEdgeListInds); 
+activeEdgePixels_groundTruth = edgepixels(activeEdgeListInds,:); 
 activeEdgePixels_groundTruth = activeEdgePixels_groundTruth(activeEdgePixels_groundTruth>0);
 visualizeG(activeEdgePixels_groundTruth) = 1;
 
-activeEdgeListInds_predicted = edgeListInds_reordered(y_h);
-activeEdgePixels_predicted = edgepixels(activeEdgeListInds_predicted);
+activeEdgeListInds_predicted = edgeListInds_reordered(logical(y_h));
+activeEdgePixels_predicted = edgepixels(activeEdgeListInds_predicted,:);
 activeEdgePixels_predicted = activeEdgePixels_predicted(activeEdgePixels_predicted>0);
 visualizeR(activeEdgePixels_predicted) = 1;
 
@@ -202,5 +236,17 @@ figure; imshow(visualization)
 
 % prediction error
 numTestEdges = numel(y_h);
-predictionError = (sum(abs(y - y_h)))/numTestEdges
+predictionError = (sum(abs(y0 - y_h)))/numTestEdges
 
+% visualize edge probabilities
+visualizeEdgeProbPred = zeros(sizeR,sizeC);
+visualizeEdgePriorProb = zeros(sizeR,sizeC);
+numEdges = numel(edgeListInds_reordered);
+for i=1:numEdges
+    edgePixels_i = edgepixels(edgeListInds_reordered(i),:);
+    edgePixels_i = edgePixels_i(edgePixels_i>0);
+    visualizeEdgeProbPred(edgePixels_i) = predictedEdgeProbabilities(i);
+    visualizeEdgePriorProb(edgePixels_i) = edgePriors_reordered(i);
+end
+figure;imagesc(visualizeEdgeProbPred);title('predicted probabilities')
+figure;imagesc(visualizeEdgePriorProb);title('prior probabilities')
