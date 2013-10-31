@@ -13,6 +13,8 @@ pathForLabels_testing = '/home/thanuja/Dropbox/data/edgeTraining2/testLabels/';
 
 fileNameString = '*.tif';
 
+showIntermediate = 0;
+
 maxNumberOfSamplesPerClass = 25000;
 LEN_IMG_IND = 3;
 % RF training param
@@ -49,7 +51,8 @@ for i=1:numTrainingImgs
     labelImagePath_i = fullfile(pathForLabels_training,labelImageFiles_training(i).name);
     
     [c_cells2WSregions,c_internalEdgeIDs,c_extEdgeIDs,c_internalNodeInds,...
-    c_extNodeInds,inactiveEdgeIDs,edgeListInds,edgepixels,OFR,edgePriors,OFR_mag]...
+    c_extNodeInds,inactiveEdgeIDs,edgeListInds,edgepixels,OFR,edgePriors,OFR_mag,...
+    boundaryEdgeIDs]...
         = createStructuredTrainingData(rawImagePath_i,labelImagePath_i);
     numEdgesTot = numel(edgeListInds);
     edgeListIndSequence = 1:numEdgesTot;
@@ -79,8 +82,10 @@ for i=1:numTrainingImgs
     rawImage = double(imread(rawImagePath_i));
     rawImage = rawImage./(max(max(rawImage)));
     rawImage = addThickBorder(rawImage,marginSize,marginPixVal);
+    
     % clear fm
-    fm = getEdgeFeatureMat(rawImage,edgepixels_reordered_tr,OFR,edgePriors_reordered_tr);
+    fm = getEdgeFeatureMat(rawImage,edgepixels_reordered_tr,OFR,...
+        edgePriors_reordered_tr,boundaryEdgeIDs,edgeListInds_reordered_tr);
     % append to the feature matrix x and the label matrix y
     x = [x; fm];
     numActiveEdges = numel(activeEdgeIDs);
@@ -170,7 +175,8 @@ for i=1:numTestingImgs
     labelImagePath_i = fullfile(pathForLabels_testing,labelImageFiles_testing(i).name);
     
     [c_cells2WSregions,c_internalEdgeIDs,c_extEdgeIDs,c_internalNodeInds,...
-    c_extNodeInds,inactiveEdgeIDs,edgeListInds,edgepixels,OFR,edgePriors,OFR_mag]...
+    c_extNodeInds,inactiveEdgeIDs,edgeListInds,edgepixels,OFR,edgePriors,OFR_mag,...
+    boundaryEdgeIDs]...
         = createStructuredTrainingData(rawImagePath_i,labelImagePath_i);
     % edges part of object boundaries - active
     activeEdgeIDs = getElementsFromCell(c_extEdgeIDs);
@@ -192,7 +198,8 @@ for i=1:numTestingImgs
     rawImage = addThickBorder(rawImage,marginSize,marginPixVal);
     
     clear fm
-    fm = getEdgeFeatureMat(rawImage,edgepixels_reordered,OFR,edgePriors_reordered);
+    fm = getEdgeFeatureMat(rawImage,edgepixels_reordered,OFR,...
+        edgePriors_reordered,boundaryEdgeIDs,edgeListInds_reordered);
     % append to the feature matrix x and the label matrix y
     x0 = [x0; fm];
     numActiveEdges = numel(activeEdgeIDs);

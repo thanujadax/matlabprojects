@@ -100,13 +100,12 @@ if(showIntermediate)
     figure;imagesc(wsRegionBoundariesFromGraph);title('boundaries from graph') 
 end
 % boundary edges
-boundaryEdges = getBoundaryEdges2(wsRegionBoundariesFromGraph,barLength,edgepixels,...
+boundaryEdgeIDs = getBoundaryEdges2(wsRegionBoundariesFromGraph,barLength,edgepixels,...
     nodeEdges,edgeListInds,showIntermediate);
-numBoundaryEdges = numel(boundaryEdges);
-boundaryEdgeListInds = zeros(numBoundaryEdges,1);
-for i=1:numBoundaryEdges
-    boundaryEdgeListInds(i) = find(edgeListInds==boundaryEdges(i));
-end
+numBoundaryEdges = numel(boundaryEdgeIDs);
+
+[~,boundaryEdgeListInds] = intersect(edgeListInds,boundaryEdgeIDs); 
+
 
 disp('preparing coefficients for ILP solver...')
 %% Edge unary values
@@ -155,7 +154,7 @@ end
 %% Faces of wsgraph -> cell types (between pairs of cells)
 disp('calculating adjacency graph of regions ...')
 [faceAdj,edges2regions,setOfRegions,twoRegionEdges,wsIDsForRegions] ...
-    = getFaceAdjFromWS(ws,edges2pixels,b_imWithBorder,boundaryEdges);
+    = getFaceAdjFromWS(ws,edges2pixels,b_imWithBorder,boundaryEdgeIDs);
 
 [~,edgeOrientationsInds] = getEdgePriors(orientedScoreSpace3D,edges2pixels);
 edgeOrientations = (edgeOrientationsInds-1).*orientationStepSize;

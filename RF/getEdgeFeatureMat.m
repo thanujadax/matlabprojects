@@ -1,4 +1,5 @@
-function fm = getEdgeFeatureMat(rawImage,edgepixels,OFR,edgePriors)
+function fm = getEdgeFeatureMat(rawImage,edgepixels,OFR,edgePriors,...
+                boundaryEdgeIDs,edgeListInds)
 
 % Inputs:
 %   rawImage
@@ -25,10 +26,11 @@ function fm = getEdgeFeatureMat(rawImage,edgepixels,OFR,edgePriors)
 %   raw pixel value based features:
 %   46-50: mean,max,min,stdMean,stdMax,stdMin,medianMean,medianMax,medianMin (5)
 %   51-58: unsorted normalized histogram (8)
+%   59: 1 if the edge is a boundary edge. else 0.
 
-% Tot number of features = 58
+% Tot number of features = 59
 
-numFeatures = 58;
+numFeatures = 59;
 numEdges = size(edgepixels,1);
 [sizeR,sizeC,numOFRdim] = size(OFR);
 % dimVector = 1:numOFRdim;
@@ -115,6 +117,20 @@ parfor i=1:numEdges
     k=K(end) + 1;
     K = k:(k+7);
     fm_i(K) = intensityHist./numEdgePixels;
+    % 59: isBoundaryEdge
+    k = K(end) + 1;
+    K = k;
+    fm_i(K) = isBoundaryEdge(i,boundaryEdgeIDs,edgeListInds)
     
     fm(i,:) = fm_i;
+end
+
+
+function b_isOnBoundary = isBoundaryEdge(edgeListInd_i,boundaryEdgeIDs,edgeListInds)
+
+edgeID_i = edgeListInds(edgeListInd_i);
+if(sum(ismember(boundaryEdgeIDs,edgeID_i))>0)
+    b_isOnBoundary = 1;
+else
+    b_isOnBoundary = 0;
 end
