@@ -1,12 +1,10 @@
-function segmentationOut = doILPseg(imagePath)
+% function segmentationOut = doILPseg(imagePath)
 
 % ILP script 5
 % with the new cost calculation at the junctions, incorporating the
 % directionality of the 
 
 showIntermediate = 1;
-
-isToyProb = 0;
 useGurobi = 1;
 fromInputImage = 1;
 % imagePath = '/home/thanuja/Dropbox/data/mitoData/emJ_00_170x.png';
@@ -19,49 +17,17 @@ fromInputImage = 1;
 % imagePath = '/home/thanuja/Dropbox/data/evaldata/input/I11_raw05.tif';
 imagePath = '/home/thanuja/Dropbox/data/edgeTraining2/trainingRaw/I00_raw05.tif';
 
-orientationsStepSize = 10;
-orientations = 0:orientationsStepSize:350;
+orientationStepSize = 10;
+orientations = 0:orientationStepSize:350;
 
 barLength = 13; % should be odd
 barWidth = 4; %
 marginSize = ceil(barLength/2);
-% marginPixVal = 0.1;
-addBorder = ceil(barLength/2);
+marginPixVal = 0;
 threshFrac = 0.1;
 medianFilterH = 0;
 invertImg = 1;      % 1 for EM images when input image is taken from imagePath
-% max vote response image of the orientation filters
 b_imWithBorder = 1; % add thick dark border around the image
-
-if(isToyProb)
-%     imFilePath = 'testMem4_V.png';
-    imFilePath = 'circle1_V.png';
-    % votes for each orientation for each edge
-%     load('orientedScoreSpace3D.mat') % loads the orientation filter scores
-    load('orientedScoreSpace3D_circle1.mat') % loads the orientation filter scores
-elseif(fromInputImage)
-    % read inputimage and get orientedScoreSpace and max_abs value of OFR
-    disp('using image file:')
-    disp(imagePath);
-    imgIn0 = double(imread(imagePath));
-    % add border
-    marginPixVal = min(min(imgIn0));
-    if(b_imWithBorder)
-        imgIn = addThickBorder(imgIn0,marginSize,marginPixVal);
-    end
-    [output,rgbimg,orientedScoreSpace3D] = getOFR(imgIn,orientations,...
-                            barLength,barWidth,invertImg,threshFrac);
-    % output is in HSV form
-    OFR_mag = output(:,:,3);
-else
-%     imFilePath = 'stem_256x_t02_V.png';
-    imFilePath = '/home/thanuja/Dropbox/data/mitoData/emJ_00_350x_V.png';
-    % votes for each orientation for each edge
-%     load('orientedScoreSpace3D_stem256x.mat') % loads the orientation filter scores
-    load('orientedScoreSpace3D_emJ350x.mat')
-end
-
-angleStep = 10; % 10 degrees discretization step of orientations
 
 % param
 cEdge = 10;        % general scaling factor for edge priors
@@ -73,7 +39,6 @@ lenThresh = 25;     % max length of edges to be checked for misorientations
 lenThreshBB = 4;    % min length of edges to be considered for being in the backbone (BB)
 priorThreshFracBB = 0.55; % threshold of edgePrior for an edge to be considered BB
 
-maxCost_direction = 1000;  % C for the directional cost function
 cPos = 1000;        % scaling factor for positive nodeAngleCosts
 cNeg = 10;          % scaling factor for negative nodeAngleCosts
 minNumActEdgesPercentage = 0;  % percentage of the tot num edges to retain (min)
@@ -82,6 +47,23 @@ offEdgeReward = -500;
 bbJunctionReward = 1000;        % inactivation cost for bbjunction
 boundaryEdgeReward = -35;   % prior value for boundary edges so that they won't have too much weight
 
+
+%% read inputimage and get orientedScoreSpace and max_abs value of OFR
+disp('using image file:')
+disp(imagePath);
+imgIn0 = double(imread(imagePath));
+
+% add border
+if(b_imWithBorder)
+    imgIn = addThickBorder(imgIn0,marginSize,marginPixVal);
+end
+
+
+%% Oriented Edge Filtering
+[output,rgbimg,orientedScoreSpace3D] = getOFR(imgIn,orientations,...
+                        barLength,barWidth,invertImg,threshFrac);
+% output is in HSV form
+OFR_mag = output(:,:,3);
 
 % generate hsv outputs using the orientation information
 % output(:,:,1) contains the hue (orinetation) information
@@ -93,10 +75,9 @@ end
 if(showIntermediate)
     figure;imshow(rgbimg)
 end
-OFR_abs = output(:,:,3);
-% watershed segmentation
+
+%% watershed segmentation
 ws = watershed(OFR_mag);
-% ws = watershed(output(:,:,3));
 [sizeR,sizeC] = size(ws);
 %% generate graph from the watershed edges
 disp('creating graph from watershed boundaries...');
@@ -130,7 +111,6 @@ end
 disp('preparing coefficients for ILP solver...')
 %% Edge unary values
 % edge priors - from orientation filters
-% edgePriors = getEdgePriors(orientedScoreSpace3D,edges2pixels);
 edgePriors = getEdgeUnaryAbs(edgepixels,output(:,:,3));
 
 % assigning predetermined edgePriors for boundaryEdges before nodeAngleCost
@@ -150,7 +130,7 @@ jEdges = getEdgesForAllNodeTypes(nodeEdges,junctionTypeListInds);
 % junction of type i (type1 = J2). A row of a cell corresponds to a node of
 % that type of junction.
 jAnglesAll = getNodeAnglesForAllJtypes(junctionTypeListInds,...
-    nodeInds,jEdges,edges2pixels,orientedScoreSpace3D,sizeR,sizeC,angleStep);
+    nodeInds,jEdges,edges2pixels,orientedScoreSpace3D,sizeR,sizeC,orientationStepSize);
 % jAnglesAll{i} - cell array. each row of a cell corresponds to the set of angles for each
 % edge at each junction of type 1 (= J2)
 
@@ -166,7 +146,6 @@ for i=1:numJtypes
     if(theta_i<0)
         % no such angles for this type of junction
     else
-        %nodeAngleCosts{i} = getNodeAngleCost(dTheta_i,midPoint,sig,cNode);
         edgePriors_i = getOrderedEdgePriorsForJ(i,junctionTypeListInds,...
                     nodeEdges,edgePriors,edgeListInds);
         nodeAngleCosts{i} = getNodeAngleCost_directional(theta_i,alpha_i,...
@@ -174,26 +153,16 @@ for i=1:numJtypes
     end
 end
 %% Faces of wsgraph -> cell types (between pairs of cells)
-% [faceAdj,edges2regions,setOfRegions,twoRegionEdges,wsIDsForRegions] = getFaceAdjFromJnAdjGraph(edgeListInds,nodeEdges,...
-%     junctionTypeListInds,jAnglesAll_alpha,boundaryEdges,edges2nodes,ws,edges2pixels);
 disp('calculating adjacency graph of regions ...')
 [faceAdj,edges2regions,setOfRegions,twoRegionEdges,wsIDsForRegions] ...
     = getFaceAdjFromWS(ws,edges2pixels,b_imWithBorder,boundaryEdges);
-% cellcogs = getCellCentroidsAll(setOfCells,edges2pixels,edgeListInds,...
-%     sizeR,sizeC,edges2nodes,nodeInds);
 
 [~,edgeOrientationsInds] = getEdgePriors(orientedScoreSpace3D,edges2pixels);
-edgeOrientations = (edgeOrientationsInds-1).*orientationsStepSize;
-
-% 
-% cellStatesAll = getAllCellStates(setOfCells,edgeListInds,edgeOrientations,...
-%     sizeR,sizeC,edges2pixels,nodeInds,edges2nodes);
+edgeOrientations = (edgeOrientationsInds-1).*orientationStepSize;
 
 % normalize input image
 normalizedInputImage = imgIn./(max(max(imgIn)));
 
-% cellPriors_old = getCellPriors_intensity(normalizedInputImage,setOfCells,edges2pixels,...
-%     nodeInds,edges2nodes,cCell);
 % get cell priors from RFC probability map
 if ~exist('forest.mat','file')
     disp('RF for membrane classification not found. Training new classifier...')
@@ -229,12 +198,9 @@ end
 offEdgeListIDs = getUnOrientedEdgeIDs(edgepixels,...
                 lenThresh,output(:,:,1),sizeR,sizeC);
             
-% remove the edges connected to the boundaryNodes
-
 % remove boundaryNodeEdgeListIDs from the offEdgeListIDs
 offEdgeListIDs = setdiff(offEdgeListIDs,boundaryNodeEdgeListIDs);
           
-% offEdgeListIDs = [];
 % setting edgePriors
 edgePriors(offEdgeListIDs) = offEdgeReward;
 % visualize off edges
@@ -293,7 +259,6 @@ scaledEdgePriors = edgePriors.*cEdge;
 
 % constraints
 % equality constraints and closedness constrains in Aeq matrix
-% [Aeq,beq] = getEqConstraints2(numEdges,jEdges,edges2pixels);
 [Aeq,beq,numEq,numLt,numRegionVars] = getConstraints(numEdges,jEdges,edges2pixels,nodeAngleCosts,...
             offEdgeListIDs,onEdgeListIDs,minNumActEdgesPercentage,...
             twoRegionEdges,edges2regions,setOfRegions,edgeOrientations,jAnglesAll_alpha,...
