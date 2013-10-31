@@ -251,4 +251,4 @@ end
 figure;imagesc(visualizeEdgeProbPred);title('predicted probabilities')
 figure;imagesc(visualizeEdgePriorProb);title('prior probabilities')
 
-save(visualizeEdgeProbPred,'/home/thanuja/Dropbox/data/prediction20131030.tif','tif');
+imwrite(visualizeEdgeProbPred,'/home/thanuja/Dropbox/data/prediction20131030.tif','tif');
