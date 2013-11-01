@@ -29,24 +29,23 @@ medianFilterH = 0;
 invertImg = 1;      % 1 for EM images when input image is taken from imagePath
 b_imWithBorder = 1; % add thick dark border around the image
 
-% param
-cEdge = 10;        % general scaling factor for edge priors
-% cNode = 100;        % scaling factor for the node cost coming from gaussian normal distr.
-cCell = 1000;        % positive scaling factor for cell priors
-% sig = 50;         % standard deviation(degrees) for the node cost function's gaussian distr.
-% midPoint = 180;   % angle difference of an edge pair (in degrees) for maximum cost 
 lenThresh = 25;     % max length of edges to be checked for misorientations
 lenThreshBB = 4;    % min length of edges to be considered for being in the backbone (BB)
 priorThreshFracBB = 0.55; % threshold of edgePrior for an edge to be considered BB
+minNumActEdgesPercentage = 0;  % percentage of the tot num edges to retain (min)
 
+% param
+numParam = 7;       % number of params to learn. refer QP section
+
+cEdge = 10;        % general scaling factor for edge priors
+cCell = 1000;        % positive scaling factor for cell priors
 cPos = 1000;        % scaling factor for positive nodeAngleCosts
 cNeg = 10;          % scaling factor for negative nodeAngleCosts
-minNumActEdgesPercentage = 0;  % percentage of the tot num edges to retain (min)
 bbEdgeReward = 1500;
 offEdgeReward = -500;
 bbJunctionReward = 1000;        % inactivation cost for bbjunction
-boundaryEdgeReward = -35;   % prior value for boundary edges so that they won't have too much weight
-
+boundaryEdgeReward = -35;   % prior value for boundary edges so that
+                            % they won't have too much weight
 
 %% read inputimage and get orientedScoreSpace and max_abs value of OFR
 disp('using image file:')
@@ -253,7 +252,7 @@ end
 % % visualize BB edges
 % imgBBEdges = visualizeOffEdges(onEdgeListIDs,edgepixels,nodeInds,sizeR,sizeC);
 % figure;imshow(imgBBEdges); title('visualization of backbone - constr - 2 ')
-%% ILP
+%% QP
 % cost function to minimize
 % state vector x: {edges*2}{J3*4}{J4*7}
 numEdges = size(edges2nodes,1);
@@ -275,6 +274,18 @@ scaledEdgePriors = edgePriors.*cEdge;
             offEdgeListIDs,onEdgeListIDs,minNumActEdgesPercentage,...
             twoRegionEdges,edges2regions,setOfRegions,edgeOrientations,jAnglesAll_alpha,...
             nodeEdges,junctionTypeListInds,edges2nodes,sizeR,sizeC);
+
+% last 7 variables are continuous RVs corresponding to the parameters to be
+% learned.
+%   1. w_off_e
+%   2. w_on_e
+%   3. w_off_r
+%   4. w_on_r
+%   5. w_off_n
+%   6. w_on_n_neg
+%   7. w_on_n_pos
+
+qmat = getQuadraticObjective_PE(edgePriors,regionPriors,nodeAngleCosts,numParam);
         
 f = getILPcoefficientVector2(scaledEdgePriors,nodeAngleCosts,...
     bbNodeListInds,junctionTypeListInds,bbJunctionReward,regionPriors);
@@ -288,6 +299,7 @@ if(useGurobi)
     disp('using Gurobi ILP solver...');
     model.A = sparse(Aeq);
     model.rhs = beq;
+    model.Q = sparse(qmat);
     model.obj = f';
 %     model.sense = '=';  % for the constraints given in A
     model.sense = senseArray;

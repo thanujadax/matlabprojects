@@ -1,6 +1,7 @@
-function f = getILPcoefficientVector2(edgePriors,nodeAngleCosts,...
+function f = getQuadraticObjective_PE(edgePriors,nodeAngleCosts,...
             bbJunctionsListInds,junctionTypeListInds,bbJunctionCost,...
             regionPriors)
+        
 numEdges = size(edgePriors,1);
 
 [~, numJtypes] = size(nodeAngleCosts);
@@ -83,3 +84,9 @@ for i=(f_stop_ind+1):2:(f_stop_ind+numRegions*2)
     f(i+1) = regionPriors(k); % activation
     k = k + 1;
 end
+
+%% Q - quadratic objective (sparse) matrix
+% n = numEdgeVariables + numRegionVariables + numNodeVariables + numParameters
+% q1 matrix is the sub-matrix in qmat's top right. Every element outside
+% q1, inside qmat is zero.
+

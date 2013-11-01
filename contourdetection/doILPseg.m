@@ -278,7 +278,8 @@ if(useGurobi)
     model.obj = f';
 %     model.sense = '=';  % for the constraints given in A
     model.sense = senseArray;
-    model.vtype = 'B';  % binary variables
+    model.vtype = 'B';  % binary variables. otherwise we can specify variable 
+    % types for each column of A. e.g. continuous, integer etc
     model.modelname = 'contourDetectionILP1';
     
     params.LogFile = 'gurobi.log';

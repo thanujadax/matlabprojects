@@ -25,7 +25,7 @@ withDirectionalConstraint = 1; % 1 to enable directionality constraint
 withClosednessConstraint = 1; % 1 to enable closedness constraint (old)
 withEdgeNodeCoherenceConstraint = 1; % 1 to enable
 withOffEdgesConstraint = 0; % 1 to enable
-withOnEdgesConstraint = 1; % 1 to enable
+withOnEdgesConstraint = 0; % 1 to enable
 withCellConstraint = 1; % 1 to enable
 
 [~, numJtypes] = size(jEdges);
