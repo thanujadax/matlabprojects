@@ -1,6 +1,5 @@
-function f = getQuadraticObjective_PE(edgePriors,nodeAngleCosts,...
-            bbJunctionsListInds,junctionTypeListInds,bbJunctionCost,...
-            regionPriors)
+function qsparse = getQuadraticObjective_PE(edgePriors,nodeAngleCosts,...
+            regionPriors,numParam)
         
 numEdges = size(edgePriors,1);
 
@@ -28,65 +27,75 @@ for i=1:numJtypes
     end
 end
 
+% numParam = 7;
 numRegions = numel(regionPriors);
-numElements = numEdges*2 + sum(totJunctionVar) + numRegions*2;
-f = zeros(numElements,1);
-% order of elements in f
-%[{edgeInactive},{edgeActive},{J2inactive},{J2Active},{J3inactive},{J4Active_3}...]
+numIntVariables = numEdges*2 + sum(totJunctionVar) + numRegions*2;
+totNumVariables = numIntVariables + numParam;
+qmat = zeros(numIntVariables,numParam);
+% order of elements in Q
+%[{edgeInactive},{edgeActive},{J2inactive},{J2Active},{J3inactive},{J4Active_3}...,{RegionInact},{RegionActive}]
+
+colOffset = 0;
 
 %% edge variables
 j=1;
 for i=1:2:2*numEdges
-    f(i) = edgePriors(j);        % inactivation cost *w_off
-    f(i+1) = -edgePriors(j);     % activation cost for the same edge *w_on
+    % col1: inactivation weight
+    colID = colOffset + 1;
+    qmat(i,colID) = edgePriors(j);        % inactivation cost *w_off
+    % col2: activation weight
+    colID = colOffset + 2;
+    qmat(i+1,colID) = -edgePriors(j);     % activation cost for the same edge *w_on
     j = j+1;
 end
 
-f_stop_ind = numEdges*2;
+q_stop_ind = numEdges*2;
 
 %%  junction variables
+
 for i=1:numJtypes
     % for each junction type
     clear nodeAngleCost_i
     nodeAngleCost_i = nodeAngleCosts{i};
     if(~isnan(nodeAngleCost_i))
-        maxJcost = max(nodeAngleCost_i,[],2);          % inactivation cost
-        minJcost = min(nodeAngleCost_i,[],2);          
-%         offJcost = (minJcost + maxJcost)/2;
-        % offJcost = -1 .* minJcost;
-        offJcost = minJcost .* 0;
+        % col 3: inactivation
+        offJcost = 1; % correspond to a constant weight parameter to be inferred by QP
+        q_stop_ind = q_stop_ind + 1;
+        colID = colOffset + 3;
+        qmat(q_stop_ind,colID) = offJcost;
         
-        % identify the bbJunctions and set a very high inactivation cost
-        clear nodeListInds_i
-        nodeListInds_i = junctionTypeListInds(:,i); % list inds of nodes of type i
-        [bbJunctionListInds_i,bbListInds_i,~] = intersect(nodeListInds_i,bbJunctionsListInds);
-        if(numel(bbJunctionListInds_i)>0)
-            % assign a very high inactivation cost for this nodes
-            % (avgJcost)
-            offJcost(bbListInds_i) = bbJunctionCost;
+        numJunctVar = numel(nodeAngleCost_i);
+        for m=1:numJunctVar
+            q_stop_ind = q_stop_ind + 1;
+            junctCost = nodeAngleCost_i(m);
+            if(junctCost>0)
+                % positive jn cost: col 4
+                colID = colOffset + 4;
+                qmat(q_stop_ind,colID) = junctCost;
+            else
+                % negative or zero jn cost: col 5
+                colID = colOffset + 5;
+                qmat(q_stop_ind,colID) = junctCost;
+            end
         end
-        
-    %     nodeAngleCost_i = [maxJcost nodeAngleCost_i];
-        nodeAngleCost_i = [offJcost nodeAngleCost_i];
-        numCoeff_i = totJunctionVar(i);
-        f_start_ind = f_stop_ind + 1;
-        f_stop_ind = f_start_ind + numCoeff_i - 1;
-        % assign coefficients to vector f
-        angleCostMat_i = nodeAngleCost_i';
-        f(f_start_ind:f_stop_ind) = angleCostMat_i(1:numCoeff_i);
     end
 end
 
 %% cells
 k=1;
-for i=(f_stop_ind+1):2:(f_stop_ind+numRegions*2)
-    f(i) = - regionPriors(k); % inactivation
-    f(i+1) = regionPriors(k); % activation
+for i=(q_stop_ind+1):2:(q_stop_ind+numRegions*2)
+    % col 6: region inactivation
+    colID = colOffset + 6;
+    qmat(i,colID) = - regionPriors(k); % inactivation
+    % col 7: region activation
+    colID = colOffset + 7;
+    qmat(i+1,colID) = regionPriors(k); % activation
     k = k + 1;
 end
 
-%% Q - quadratic objective (sparse) matrix
-% n = numEdgeVariables + numRegionVariables + numNodeVariables + numParameters
-% q1 matrix is the sub-matrix in qmat's top right. Every element outside
-% q1, inside qmat is zero.
+%% Creating sparse output matrix
+[r,c] = find(qmat);
+c = c + numIntVariables;
+s = qmat(qmat>0);
 
+qsparse = sparse(r,c,s,totNumVariables,totNumVariables);

@@ -36,6 +36,7 @@ minNumActEdgesPercentage = 0;  % percentage of the tot num edges to retain (min)
 
 % param
 numParam = 7;       % number of params to learn. refer QP section
+% edgeOff,edgeOff,nodeoff,nodePos,nodeNeg,regionOff,regionOn
 
 cEdge = 10;        % general scaling factor for edge priors
 cCell = 1000;        % positive scaling factor for cell priors
@@ -279,17 +280,18 @@ scaledEdgePriors = edgePriors.*cEdge;
 % learned.
 %   1. w_off_e
 %   2. w_on_e
-%   3. w_off_r
-%   4. w_on_r
-%   5. w_off_n
-%   6. w_on_n_neg
-%   7. w_on_n_pos
+%   3. w_off_n
+%   4. w_on_n_neg
+%   5. w_on_n_pos
+%   6. w_off_r
+%   7. w_on_r
 
-qmat = getQuadraticObjective_PE(edgePriors,regionPriors,nodeAngleCosts,numParam);
+qsparse = getQuadraticObjective_PE(edgePriors,regionPriors,nodeAngleCosts,numParam);
         
-f = getILPcoefficientVector2(scaledEdgePriors,nodeAngleCosts,...
-    bbNodeListInds,junctionTypeListInds,bbJunctionReward,regionPriors);
-                
+% f = getILPcoefficientVector2(scaledEdgePriors,nodeAngleCosts,...
+%     bbNodeListInds,junctionTypeListInds,bbJunctionReward,regionPriors);
+f = 0;
+
 senseArray(1:numEq) = '=';
 if(numLt>0)
     senseArray((numEq+1):(numEq+numLt)) = '<';
@@ -299,7 +301,8 @@ if(useGurobi)
     disp('using Gurobi ILP solver...');
     model.A = sparse(Aeq);
     model.rhs = beq;
-    model.Q = sparse(qmat);
+    % model.Q = qsparse;
+    model.Q = getQuadraticObjective_PE(edgePriors,regionPriors,nodeAngleCosts,numParam);
     model.obj = f';
 %     model.sense = '=';  % for the constraints given in A
     model.sense = senseArray;
