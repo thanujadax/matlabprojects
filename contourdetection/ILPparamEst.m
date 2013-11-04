@@ -15,7 +15,9 @@ fromInputImage = 1;
 % imagePath = '/home/thanuja/Dropbox/data/RF_training_edge/I15_testingImage.tif';
 % imagePath = '/home/thanuja/Dropbox/data/RF_training_edge/I05_trainingImage.tif';
 % imagePath = '/home/thanuja/Dropbox/data/evaldata/input/I11_raw05.tif';
-imagePath = '/home/thanuja/Dropbox/data/edgeTraining2/trainingRaw/I00_raw05.tif';
+
+imagePath = '/home/thanuja/Dropbox/data/edgeTraining2/trainingRaw/I03_raw05.tif';
+labelImagePath = '/home/thanuja/Dropbox/data/edgeTraining2/trainingLabels/I03_neuronLabels05.tif';
 
 orientationStepSize = 10;
 orientations = 0:orientationStepSize:350;
@@ -52,10 +54,12 @@ boundaryEdgeReward = -35;   % prior value for boundary edges so that
 disp('using image file:')
 disp(imagePath);
 imgIn0 = double(imread(imagePath));
+labelImage = double(imread(labelImagePath));
 
-% add border
+% add thick border
 if(b_imWithBorder)
-    imgIn = addThickBorder(imgIn0,marginSize,marginPixVal);
+    imgIn = addThickBorder(rawImage,marginSize,marginPixVal);
+    labelImage = addThickBorder(labelImage,marginSize,marginPixVal);
 end
 
 
@@ -115,13 +119,13 @@ edgePriors = getEdgeUnaryAbs(edgepixels,output(:,:,3));
 % get edge activation probabilities from RFC
 if ~exist('forestEdgeProb.mat','file')
     disp('RF for edge classification. Training new classifier...')
-    forest = trainRF_edgeProb();
+    forestEdgeProb = trainRF_edgeProb();
 else
     load forestEdgeProb.mat
     disp('loaded pre-trained RF for edge activation probability inference.')
 end
 
-edgeProbabilities = getEdgeProbabilitiesFromRFC...
+edgeUnary = getEdgeProbabilitiesFromRFC...
             (forestEdgeProb,imgIn,OFR,edgepixels,edgePriors);
 
 
@@ -130,7 +134,7 @@ edgeProbabilities = getEdgeProbabilitiesFromRFC...
 % edgePriors(boundaryEdgeListInds) = boundaryEdgeReward;
 
 % visualize edge unaries
-edgeUnaryMat = visualizeEdgeUnaries(edgepixels,edgePriors,sizeR,sizeC);
+edgeUnaryMat = visualizeEdgeUnaries(edgepixels,edgeUnary,sizeR,sizeC);
 if(showIntermediate)
     figure;imagesc(edgeUnaryMat);title('abs-max-OFR')
 end
@@ -159,7 +163,7 @@ for i=1:numJtypes
         % no such angles for this type of junction
     else
         edgePriors_i = getOrderedEdgePriorsForJ(i,junctionTypeListInds,...
-                    nodeEdges,edgeProbabilities,edgeListInds);
+                    nodeEdges,edgeUnary,edgeListInds);
         nodeAngleCosts{i} = getNodeAngleCost_directional(theta_i,alpha_i,...
                                 edgePriors_i,cPos,cNeg);
     end
@@ -253,6 +257,18 @@ end
 % % visualize BB edges
 % imgBBEdges = visualizeOffEdges(onEdgeListIDs,edgepixels,nodeInds,sizeR,sizeC);
 % figure;imshow(imgBBEdges); title('visualization of backbone - constr - 2 ')
+%% Get training labels for the image
+
+[labelImg_indexed,numLabels] = getLabelIndexImg(labelImage);
+[c_cells2WSregions,c_internalEdgeIDs,c_extEdgeIDs,c_internalNodeInds,c_extNodeInds]...
+            = getCells2WSregions(labelImg_indexed,ws,numLabels,setOfRegions,...
+            edgeListInds,edges2nodes);
+
+activeEdgeIDs = getElementsFromCell(c_extEdgeIDs);
+[~,activeEdgeListInds] = intersect(edgeListInds,activeEdgeIDs);
+
+
+
 %% QP
 % cost function to minimize
 % state vector x: {edges*2}{J3*4}{J4*7}
@@ -266,15 +282,15 @@ numJunctions = numel(nodeInds);
 % coeff for turning off J4s: max(j3NodeAngleCost)
 % coeff for turning on J4-config(1 to 6): j4NodeAngleCost
 
-% f = getILPcoefficientVector(edgePriors,j3NodeAngleCost,j4NodeAngleCost);
-scaledEdgePriors = edgePriors.*cEdge;
 
 % constraints
 % equality constraints and closedness constrains in Aeq matrix
-[Aeq,beq,numEq,numLt,numRegionVars] = getConstraints(numEdges,jEdges,edges2pixels,nodeAngleCosts,...
+[Aeq,beq,numEq,numLt,numRegionVars,numBinaryVar]...
+            = getConstraintsQP_PE(numEdges,jEdges,edges2pixels,nodeAngleCosts,...
             offEdgeListIDs,onEdgeListIDs,minNumActEdgesPercentage,...
             twoRegionEdges,edges2regions,setOfRegions,edgeOrientations,jAnglesAll_alpha,...
-            nodeEdges,junctionTypeListInds,edges2nodes,sizeR,sizeC);
+            nodeEdges,junctionTypeListInds,edges2nodes,sizeR,sizeC,...
+            activeEdgeListInds,numParam);
 
 % last 7 variables are continuous RVs corresponding to the parameters to be
 % learned.
@@ -286,7 +302,7 @@ scaledEdgePriors = edgePriors.*cEdge;
 %   6. w_off_r
 %   7. w_on_r
 
-qsparse = getQuadraticObjective_PE(edgePriors,regionPriors,nodeAngleCosts,numParam);
+% qsparse = getQuadraticObjective_PE(edgePriors,regionPriors,nodeAngleCosts,numParam);
         
 % f = getILPcoefficientVector2(scaledEdgePriors,nodeAngleCosts,...
 %     bbNodeListInds,junctionTypeListInds,bbJunctionReward,regionPriors);
@@ -296,18 +312,28 @@ senseArray(1:numEq) = '=';
 if(numLt>0)
     senseArray((numEq+1):(numEq+numLt)) = '<';
 end
+% variable types
+vtypeArray(1:numBinaryVar) = 'B'; % binary
+vtypeArray((numBinaryVar+1):(numBinaryVar+numParam)) = 'S'; % semi-continuous
+% lower bounds
+lbArray(1:(numBinaryVar+numParam)) = 0;
+% upper bounds
+ubArray(1:(numBinaryVar+numParam)) = 1;
 %% solver
 if(useGurobi)
     disp('using Gurobi ILP solver...');
     model.A = sparse(Aeq);
     model.rhs = beq;
     % model.Q = qsparse;
-    model.Q = getQuadraticObjective_PE(edgePriors,regionPriors,nodeAngleCosts,numParam);
+    model.Q = getQuadraticObjective_PE(edgeUnary,regionPriors,nodeAngleCosts,numParam);
     model.obj = f';
 %     model.sense = '=';  % for the constraints given in A
     model.sense = senseArray;
-    model.vtype = 'B';  % binary variables
+    model.vtype = vtypeArray;
+    model.lb = lbArray;
+    model.ub = ubArray;
     model.modelname = 'contourDetectionILP1';
+    
     
     params.LogFile = 'gurobi.log';
     params.Presolve = 0;
