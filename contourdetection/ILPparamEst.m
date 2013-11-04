@@ -40,14 +40,14 @@ minNumActEdgesPercentage = 0;  % percentage of the tot num edges to retain (min)
 numParam = 7;       % number of params to learn. refer QP section
 % edgeOff,edgeOff,nodeoff,nodePos,nodeNeg,regionOff,regionOn
 
-cEdge = 10;        % general scaling factor for edge priors
-cCell = 1000;        % positive scaling factor for cell priors
-cPos = 1000;        % scaling factor for positive nodeAngleCosts
-cNeg = 10;          % scaling factor for negative nodeAngleCosts
-bbEdgeReward = 1500;
-offEdgeReward = -500;
-bbJunctionReward = 1000;        % inactivation cost for bbjunction
-boundaryEdgeReward = -35;   % prior value for boundary edges so that
+cEdge = 1;        % general scaling factor for edge priors
+cCell = 1;        % positive scaling factor for cell priors
+cPos = 1;        % scaling factor for positive nodeAngleCosts
+cNeg = 1;          % scaling factor for negative nodeAngleCosts
+bbEdgeReward = 1;
+offEdgeReward = 1;
+bbJunctionReward = 1;        % inactivation cost for bbjunction
+boundaryEdgeReward = 1;   % prior value for boundary edges so that
                             % they won't have too much weight
 
 %% read inputimage and get orientedScoreSpace and max_abs value of OFR
@@ -307,7 +307,8 @@ numJunctions = numel(nodeInds);
         
 % f = getILPcoefficientVector2(scaledEdgePriors,nodeAngleCosts,...
 %     bbNodeListInds,junctionTypeListInds,bbJunctionReward,regionPriors);
-f = 0;
+numAcols = size(Aeq,2);
+f = zeros(1,numAcols);
 
 senseArray(1:numEq) = '=';
 if(numLt>0)
