@@ -86,16 +86,16 @@ k=1;
 for i=(q_stop_ind+1):2:(q_stop_ind+numRegions*2)
     % col 6: region inactivation
     colID = colOffset + 6;
-    qmat(i,colID) = - regionPriors(k); % inactivation
+    qmat(i,colID) = regionPriors(k); % inactivation
     % col 7: region activation
     colID = colOffset + 7;
-    qmat(i+1,colID) = regionPriors(k); % activation
+    qmat(i+1,colID) = - regionPriors(k); % activation
     k = k + 1;
 end
 
 %% Creating sparse output matrix
 [r,c] = find(qmat);
 c = c + numIntVariables;
-s = qmat(qmat>0);
+s = qmat(qmat~=0);
 
 qsparse = sparse(r,c,s,totNumVariables,totNumVariables);

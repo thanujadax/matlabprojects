@@ -58,7 +58,7 @@ labelImage = double(imread(labelImagePath));
 
 % add thick border
 if(b_imWithBorder)
-    imgIn = addThickBorder(rawImage,marginSize,marginPixVal);
+    imgIn = addThickBorder(imgIn0,marginSize,marginPixVal);
     labelImage = addThickBorder(labelImage,marginSize,marginPixVal);
 end
 
@@ -126,7 +126,8 @@ else
 end
 
 edgeUnary = getEdgeProbabilitiesFromRFC...
-            (forestEdgeProb,imgIn,OFR,edgepixels,edgePriors);
+            (forestEdgeProb,imgIn,OFR,edgepixels,edgePriors,...
+            boundaryEdgeIDs,edgeListInds);
 
 
 % assigning predetermined edgePriors for boundaryEdges before nodeAngleCost
@@ -302,7 +303,7 @@ numJunctions = numel(nodeInds);
 %   6. w_off_r
 %   7. w_on_r
 
-% qsparse = getQuadraticObjective_PE(edgePriors,regionPriors,nodeAngleCosts,numParam);
+% qsparse = getQuadraticObjective_PE(edgePriors,nodeAngleCosts,regionPriors,numParam);
         
 % f = getILPcoefficientVector2(scaledEdgePriors,nodeAngleCosts,...
 %     bbNodeListInds,junctionTypeListInds,bbJunctionReward,regionPriors);
@@ -325,7 +326,7 @@ if(useGurobi)
     model.A = sparse(Aeq);
     model.rhs = beq;
     % model.Q = qsparse;
-    model.Q = getQuadraticObjective_PE(edgeUnary,regionPriors,nodeAngleCosts,numParam);
+    model.Q = getQuadraticObjective_PE(edgeUnary,nodeAngleCosts,regionPriors,numParam);
     model.obj = f';
 %     model.sense = '=';  % for the constraints given in A
     model.sense = senseArray;

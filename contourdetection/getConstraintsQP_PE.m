@@ -136,7 +136,7 @@ else
     numCellConstrRows = 0;
     numCellConstrCols = 0;
 end
-if(withParamWeightEqns)
+if(withParamWeighting)
     numParamWeightEqns = 1;
 else
     numParamWeightEqns = 0;
