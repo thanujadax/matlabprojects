@@ -82,7 +82,7 @@ edgePriors = getEdgeUnaryAbs(edgepixels,OFR_mag);
 inactiveEdgeIDs = edgeListInds;     % initializing the list of inactive edgeIDs outside cells
 
 % visualize internal and external edges
-edgeVisualization = zeros(sizeR,sizeC,3);
+strDataVisualization = zeros(sizeR,sizeC,3);
 edgeMat2D_R = zeros(sizeR,sizeC);
 edgeMat2D_G = zeros(sizeR,sizeC);
 edgeMat2D_B = zeros(sizeR,sizeC);
@@ -162,9 +162,9 @@ edgeMat2D_B(inactiveEdgePixels) = B_ina;
 
 
 % Visualize the entire thing
-edgeVisualization(:,:,1) = edgeMat2D_R;
-edgeVisualization(:,:,2) = edgeMat2D_G;
-edgeVisualization(:,:,3) = edgeMat2D_B;
+strDataVisualization(:,:,1) = edgeMat2D_R;
+strDataVisualization(:,:,2) = edgeMat2D_G;
+strDataVisualization(:,:,3) = edgeMat2D_B;
 
-figure;imshow(edgeVisualization)
+figure;imshow(strDataVisualization)
 

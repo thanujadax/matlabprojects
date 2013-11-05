@@ -1,10 +1,10 @@
-function [A,b,numRows_Aeq,numRows_AInEq,numCellConstrCols,numBinaryVar]...
+function [A,b,numRows_Aeq,numRows_AInEq,numCellConstrCols,numBinaryVar,gt_rowID]...
             = getConstraintsQP_PE(numEdges,jEdges,...
             edges2pixels,jDirectionalScores,offEdgeListIDs,...
             onEdgeListIDs,minNumActEdgesPercentage,...
             twoCellEdges,edges2cells,setOfCellsMat,edgeOrientations,jAnglesAll_alpha,...
             nodeEdges,junctionTypeListInds,edges2nodes,sizeR,sizeC,...
-            activeEdgeListInds,numParam)
+            activeEdgeListInds,activeRegionListInds,activeNodeListInds,numParam)
 % returns linear equality and inequality constraints for parameter
 % estimation
 
@@ -24,13 +24,16 @@ function [A,b,numRows_Aeq,numRows_AInEq,numCellConstrCols,numBinaryVar]...
 %   multiplication of the outwardness score should be negative i.e. one
 %   edge should be inwards and the other should be outwards
 
-withDirectionalConstraint = 1; % 1 to enable directionality constraint
-withClosednessConstraint = 1; % 1 to enable closedness constraint (old)
-withEdgeNodeCoherenceConstraint = 1; % 1 to enable
+withDirectionalConstraint = 0; % 1 to enable directionality constraint
+withClosednessConstraint = 0; % 1 to enable closedness constraint (old)
+withEdgeNodeCoherenceConstraint = 0; % 1 to enable
 withOffEdgesConstraint = 0; % 1 to enable
 withOnEdgesConstraint = 0; % 1 to enable
-withCellConstraint = 1; % 1 to enable
+withCellConstraint = 0; % 1 to enable
 withParamWeighting = 1; % sum of all the params should be 1
+withTrainingSimilarity_edges = 0; % maximize the similarity 
+
+gt_rowID = [];  % stores row IDs for lower bounds (gt)
 
 [~, numJtypes] = size(jEdges);
 % type 1 is J2 - junction with just 2 edges
@@ -66,6 +69,9 @@ numJunctionActEqns = sum(nodeTypeStats(:,1));  % number of junctions
 numRegions = size(setOfCellsMat,1);
 numRegionActEqns = numRegions;
 numParamWeightEqns = 1;
+numTrainingSimilarityEqns = 2;
+
+numAllowedTrainingDiff = 50;  % number of edge mismatches allowed
 
 if(withClosednessConstraint)
     numClosednessEqns = sum(nodeTypeStats(:,1));    % num of junctions
@@ -137,9 +143,18 @@ else
     numCellConstrCols = 0;
 end
 if(withParamWeighting)
+    disp('parameter weighting (normalization) - on')
     numParamWeightEqns = 1;
 else
+    disp('parameter weighting (normalization) - off')
     numParamWeightEqns = 0;
+end
+if(withTrainingSimilarity_edges)
+    disp('maximize similarity to training labels - on')
+    numTrainingSimilarityEqns = 2;
+else
+    disp('maximize similarity to training labels - off')
+    numTrainingSimilarityEqns = 0;
 end
 
 % num cols of Aeq = 2*numEdges + sum_j(numNodes_j*numCombinations+1)
@@ -149,7 +164,7 @@ numBinaryVar = 2*numEdges + sum(totJunctionVar) + numRegions*2;
 
 numRows_Aeq = numEdgeActEqns + numJunctionActEqns + numRegionActEqns + numClosednessEqns +...
                 numOffEdgesEqns + numOnEdgesEqns + numCellConstrRows + numParamWeightEqns;
-numRows_AInEq = numCoherenceEqns + numDirectionalEqns + minNumEdgeEqn;
+numRows_AInEq = numCoherenceEqns + numDirectionalEqns + minNumEdgeEqn + numTrainingSimilarityEqns;
 totRows_A = numRows_Aeq + numRows_AInEq;
 A = zeros(totRows_A,numCols_Aeq);
 %% b
@@ -207,8 +222,19 @@ if(minNumActEdgesPercentage>0)
     b(rowStart:rowEnd) = minNumActEdges * (-1); % less than    
 end
 
+if(withTrainingSimilarity_edges)
+    numActEdges_training = numel(activeEdgeListInds);
+    rowEnd = rowEnd + 1;
+    b(rowEnd) = numActEdges_training - numAllowedTrainingDiff; % lower bound 
+    gt_rowID = [gt_rowID;rowEnd];
+    rowEnd = rowEnd + 1;
+    b(rowEnd) = numAllowedTrainingDiff; % upper bound
+end    
+
 %% activation/inactivation constraints for each edge
 
+% activate all the edges that are labeled active in training data.
+% deactivate all others.
 for i=1:numEdges
     if(sum(ismember(activeEdgeListInds,i))>0)
         % active edge
@@ -220,31 +246,78 @@ for i=1:numEdges
     A(i,j) = 1;
 end
 
-
+% % ordinary constraint: an edge has to be either active 1 or inactive 0.
+% j = 1;
+% for i=1:numEdges
+%     A(i,j:(j+1)) = 1;
+%     j = j+2;
+% end
 
 %% activation/inactivation constraints for each junction node
 colStop = numEdges*2;
 rowStop = numEdges;
+% % ordinary activation constraint
+% for jType = 1:numJtypes
+%     % for each junction type
+%     numNodes_j = nodeTypeStats(jType,1);
+%     numEdgePJ = jType + 1;      % number of edges per junction
+%     numCoef = nchoosek(numEdgePJ,2) + 1; % num edge pair combinations + inactivation  
+%     rowStart = rowStop + 1; 
+%     rowStop = rowStart - 1 + numNodes_j;
+%     for row=rowStart:rowStop
+%         colStart = colStop + 1;
+%         colStop = colStart - 1 + numCoef;
+%         A(row,colStart:colStop) = 1;
+%     end    
+% end
+
+% activation constraint - fit training labels
 for jType = 1:numJtypes
     % for each junction type
     numNodes_j = nodeTypeStats(jType,1);
     numEdgePJ = jType + 1;      % number of edges per junction
     numCoef = nchoosek(numEdgePJ,2) + 1; % num edge pair combinations + inactivation  
-    rowStart = rowStop + 1; 
-    rowStop = rowStart - 1 + numNodes_j;
-    for row=rowStart:rowStop
-        colStart = colStop + 1;
-        colStop = colStart - 1 + numCoef;
-        A(row,colStart:colStop) = 1;
-    end    
+    
+    junctionNodesListListInds_i = find(junctionTypeListInds(:,jType));
+    if(~isempty(junctionNodesListListInds_i))
+        for i=1:numel(junctionNodesListListInds_i)
+            rowStop = rowStop + 1;
+            colStart = colStop + 1;
+            colStop = colStart - 1 + numCoef;            
+            
+            if(sum(ismember(activeNodeListInds,junctionNodesListListInds_i(i)))>0)
+                % node is active
+                A(rowStop,(colStart+1):colStop) = 1;
+            else
+                % node is inactive
+                A(rowStop,colStart) = 1;
+            end
+        end
+    end
 end
 %% activation/inactivation constraints for each region
 rowStop = rowStop + 1;
 j = colStop + 1;
+% % ordinary activation constraint
+% for row=rowStop:(rowStop+numRegionActEqns-1)
+%     A(row,j:(j+1)) = 1;
+%     j = j + 2;
+% end
+
+% activation constraint to fit training labels
+rID = 0;
 for row=rowStop:(rowStop+numRegionActEqns-1)
-    A(row,j:(j+1)) = 1;
+    rID = rID + 1;
+    if(sum(ismember(activeRegionListInds,rID))>0)
+        % is active region
+        A(row,(j+1)) = 1;
+    else
+        % is inactive
+        A(row,j) = 1;
+    end
     j = j + 2;
 end
+
 rowStop = row;
 colStop = j;
 %% closedness constraints
@@ -356,12 +429,13 @@ if(withCellConstraint)
 end
 
 %% Equality constraint - sum of edge weights = 1
-rowStart = rowStop + 1;
-rowStop = rowStart;
-colStart = 2*numEdges + sum(totJunctionVar) + numRegions*2 + 1;
-colStop = colStart - 1 + numParam;
-A(rowStop,colStart:colStop) = 1; % continuous variables
-
+if(withParamWeighting)
+    rowStart = rowStop + 1;
+    rowStop = rowStart;
+    colStart = 2*numEdges + sum(totJunctionVar) + numRegions*2 + 1;
+    colStop = colStart - 1 + numParam;
+    A(rowStop,colStart:colStop) = 1; % continuous variables
+end
 %% inequality constraint - coherence between activeNodeStates and the corresponding active edges
 % this is required since only a particular pair of edges out of all the
 % possible edges connected to a node should be activated, if the node is active 
@@ -438,6 +512,20 @@ if(minNumActEdgesPercentage>0)
     rowStop = rowStop + 1;
     allActiveEdgeIDs = 2:2:(numEdges*2);
     A(rowStop,allActiveEdgeIDs) = -1;
+end
+
+%% Inequality constraint - max num diff compared to training data (edge activation)
+if(withTrainingSimilarity_edges)
+    actColIndsForEdges = activeEdgeListInds * 2;
+    rowStop = rowStop + 1;
+    A(rowStop,actColIndsForEdges) = 1;  % num on - min (lower bound) 
+    
+    rowStop = rowStop + 1;
+    allEdgeListInds = 1:numEdges;
+    inactiveEdgeListInds = setdiff(allEdgeListInds,activeEdgeListInds);
+    actColIndforInactiveEdges = inactiveEdgeListInds * 2;
+    A(rowStop,actColIndforInactiveEdges) = 1;  % num wrongly on - upper bound
+    
 end
 
 

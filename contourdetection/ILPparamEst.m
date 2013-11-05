@@ -16,8 +16,8 @@ fromInputImage = 1;
 % imagePath = '/home/thanuja/Dropbox/data/RF_training_edge/I05_trainingImage.tif';
 % imagePath = '/home/thanuja/Dropbox/data/evaldata/input/I11_raw05.tif';
 
-imagePath = '/home/thanuja/Dropbox/data/edgeTraining2/trainingRaw/I03_raw05.tif';
-labelImagePath = '/home/thanuja/Dropbox/data/edgeTraining2/trainingLabels/I03_neuronLabels05.tif';
+imagePath = '/home/thanuja/Dropbox/data/evaldata/input/I03_raw05.tif';
+labelImagePath = '/home/thanuja/Dropbox/data/evaldata/labels/I03_neuronLabels05.tif';
 
 orientationStepSize = 10;
 orientations = 0:orientationStepSize:350;
@@ -268,6 +268,17 @@ end
 activeEdgeIDs = getElementsFromCell(c_extEdgeIDs);
 [~,activeEdgeListInds] = intersect(edgeListInds,activeEdgeIDs);
 
+activeRegionListInds = getElementsFromCell(c_cells2WSregions);
+
+activeNodeListInds = getElementsFromCell(c_extNodeInds);
+
+
+%% visualize training data
+
+strDataVisualization = visualizeStrData...
+        (c_internalEdgeIDs,c_extEdgeIDs,edgeListInds,edgepixels,...
+        c_internalNodeInds,c_extNodeInds,nodeInds,connectedJunctionIDs,...
+        numLabels,sizeR,sizeC);
 
 
 %% QP
@@ -286,12 +297,12 @@ numJunctions = numel(nodeInds);
 
 % constraints
 % equality constraints and closedness constrains in Aeq matrix
-[Aeq,beq,numEq,numLt,numRegionVars,numBinaryVar]...
+[Aeq,beq,numEq,numLt,numRegionVars,numBinaryVar,gt_rowID]...
             = getConstraintsQP_PE(numEdges,jEdges,edges2pixels,nodeAngleCosts,...
             offEdgeListIDs,onEdgeListIDs,minNumActEdgesPercentage,...
             twoRegionEdges,edges2regions,setOfRegions,edgeOrientations,jAnglesAll_alpha,...
             nodeEdges,junctionTypeListInds,edges2nodes,sizeR,sizeC,...
-            activeEdgeListInds,numParam);
+            activeEdgeListInds,activeRegionListInds,activeNodeListInds,numParam);
 
 % last 7 variables are continuous RVs corresponding to the parameters to be
 % learned.
@@ -313,6 +324,9 @@ f = zeros(1,numAcols);
 senseArray(1:numEq) = '=';
 if(numLt>0)
     senseArray((numEq+1):(numEq+numLt)) = '<';
+end
+if(numel(gt_rowID)>0)
+   senseArray(gt_rowID) = '>'; 
 end
 % variable types
 vtypeArray(1:numBinaryVar) = 'B'; % binary
@@ -584,8 +598,3 @@ end
 segmentationOut = removeThickBorder(visualizeCells,marginSize);
 
 fh = imshow(segmentationOut);
-
-
-
-
-
