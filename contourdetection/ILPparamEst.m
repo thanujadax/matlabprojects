@@ -22,6 +22,11 @@ labelImagePath = '/home/thanuja/Dropbox/data/evaldata/labels/I03_neuronLabels05.
 orientationStepSize = 10;
 orientations = 0:orientationStepSize:350;
 
+% rewards for linear objective for parameter estimation
+edgeReward = 10;
+regionReward = 100;
+nodeReward = 0; % not implemented yet
+
 barLength = 13; % should be odd
 barWidth = 4; %
 marginSize = ceil(barLength/2);
@@ -54,7 +59,7 @@ boundaryEdgeReward = 1;   % prior value for boundary edges so that
 disp('using image file:')
 disp(imagePath);
 imgIn0 = double(imread(imagePath));
-labelImage = double(imread(labelImagePath));
+labelImage = imread(labelImagePath);
 
 % add thick border
 if(b_imWithBorder)
@@ -268,7 +273,9 @@ end
 activeEdgeIDs = getElementsFromCell(c_extEdgeIDs);
 [~,activeEdgeListInds] = intersect(edgeListInds,activeEdgeIDs);
 
-activeRegionListInds = getElementsFromCell(c_cells2WSregions);
+activeWSregionListInds = getElementsFromCell(c_cells2WSregions);
+
+activeRegionListInds = activeWSregionListInds - 1;
 
 activeNodeListInds = getElementsFromCell(c_extNodeInds);
 
@@ -278,7 +285,7 @@ activeNodeListInds = getElementsFromCell(c_extNodeInds);
 strDataVisualization = visualizeStrData...
         (c_internalEdgeIDs,c_extEdgeIDs,edgeListInds,edgepixels,...
         c_internalNodeInds,c_extNodeInds,nodeInds,connectedJunctionIDs,...
-        numLabels,sizeR,sizeC);
+        c_cells2WSregions,ws,numLabels,sizeR,sizeC);
 
 
 %% QP
@@ -319,7 +326,12 @@ numJunctions = numel(nodeInds);
 % f = getILPcoefficientVector2(scaledEdgePriors,nodeAngleCosts,...
 %     bbNodeListInds,junctionTypeListInds,bbJunctionReward,regionPriors);
 numAcols = size(Aeq,2);
-f = zeros(1,numAcols);
+% f = zeros(1,numAcols);
+bbJunctionCost = bbJunctionReward;
+f = getLinearObjective_PE(edgePriors,nodeAngleCosts,...
+            bbNodeListInds,junctionTypeListInds,bbJunctionCost,...
+            regionPriors,activeEdgeListInds,activeRegionListInds,...
+            activeNodeListInds,edgeReward,regionReward,nodeReward,numParam);
 
 senseArray(1:numEq) = '=';
 if(numLt>0)
@@ -330,7 +342,7 @@ if(numel(gt_rowID)>0)
 end
 % variable types
 vtypeArray(1:numBinaryVar) = 'B'; % binary
-vtypeArray((numBinaryVar+1):(numBinaryVar+numParam)) = 'S'; % semi-continuous
+vtypeArray((numBinaryVar+1):(numBinaryVar+numParam)) = 'C'; % semi-continuous
 % lower bounds
 lbArray(1:(numBinaryVar+numParam)) = 0;
 % upper bounds
@@ -346,6 +358,7 @@ if(useGurobi)
 %     model.sense = '=';  % for the constraints given in A
     model.sense = senseArray;
     model.vtype = vtypeArray;
+    % model.vtype = 'C';
     model.lb = lbArray;
     model.ub = ubArray;
     model.modelname = 'contourDetectionILP1';

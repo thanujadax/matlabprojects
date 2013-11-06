@@ -24,12 +24,12 @@ function [A,b,numRows_Aeq,numRows_AInEq,numCellConstrCols,numBinaryVar,gt_rowID]
 %   multiplication of the outwardness score should be negative i.e. one
 %   edge should be inwards and the other should be outwards
 
-withDirectionalConstraint = 0; % 1 to enable directionality constraint
-withClosednessConstraint = 0; % 1 to enable closedness constraint (old)
-withEdgeNodeCoherenceConstraint = 0; % 1 to enable
+withDirectionalConstraint = 1; % 1 to enable directionality constraint
+withClosednessConstraint = 1; % 1 to enable closedness constraint (old)
+withEdgeNodeCoherenceConstraint = 1; % 1 to enable
 withOffEdgesConstraint = 0; % 1 to enable
 withOnEdgesConstraint = 0; % 1 to enable
-withCellConstraint = 0; % 1 to enable
+withCellConstraint = 1; % 1 to enable
 withParamWeighting = 1; % sum of all the params should be 1
 withTrainingSimilarity_edges = 0; % maximize the similarity 
 
@@ -68,6 +68,7 @@ numEdgeActEqns = numEdges;
 numJunctionActEqns = sum(nodeTypeStats(:,1));  % number of junctions
 numRegions = size(setOfCellsMat,1);
 numRegionActEqns = numRegions;
+numCellConstrCols = numRegions*2;
 numParamWeightEqns = 1;
 numTrainingSimilarityEqns = 2;
 
@@ -135,12 +136,12 @@ if(withCellConstraint)
     numCellConstrRows = numEdgesBetween2Cells;    
     % num additional cols
     
-    numCellConstrCols = numRegions*2;
+    
 else
     disp('cell type constraint - off')
     % set the additional rows,cols to zero 
     numCellConstrRows = 0;
-    numCellConstrCols = 0;
+    % numCellConstrCols = 0;
 end
 if(withParamWeighting)
     disp('parameter weighting (normalization) - on')
@@ -233,90 +234,90 @@ end
 
 %% activation/inactivation constraints for each edge
 
-% activate all the edges that are labeled active in training data.
-% deactivate all others.
-for i=1:numEdges
-    if(sum(ismember(activeEdgeListInds,i))>0)
-        % active edge
-        j = 2*i;
-    else
-        % inactive edge
-        j = 2*i - 1;
-    end
-    A(i,j) = 1;
-end
-
-% % ordinary constraint: an edge has to be either active 1 or inactive 0.
-% j = 1;
+% % activate all the edges that are labeled active in training data.
+% % deactivate all others.
 % for i=1:numEdges
-%     A(i,j:(j+1)) = 1;
-%     j = j+2;
+%     if(sum(ismember(activeEdgeListInds,i))>0)
+%         % active edge
+%         j = 2*i;
+%     else
+%         % inactive edge
+%         j = 2*i - 1;
+%     end
+%     A(i,j) = 1;
 % end
+
+% ordinary constraint: an edge has to be either active 1 or inactive 0.
+j = 1;
+for i=1:numEdges
+    A(i,j:(j+1)) = 1;
+    j = j+2;
+end
 
 %% activation/inactivation constraints for each junction node
 colStop = numEdges*2;
 rowStop = numEdges;
-% % ordinary activation constraint
-% for jType = 1:numJtypes
-%     % for each junction type
-%     numNodes_j = nodeTypeStats(jType,1);
-%     numEdgePJ = jType + 1;      % number of edges per junction
-%     numCoef = nchoosek(numEdgePJ,2) + 1; % num edge pair combinations + inactivation  
-%     rowStart = rowStop + 1; 
-%     rowStop = rowStart - 1 + numNodes_j;
-%     for row=rowStart:rowStop
-%         colStart = colStop + 1;
-%         colStop = colStart - 1 + numCoef;
-%         A(row,colStart:colStop) = 1;
-%     end    
-% end
-
-% activation constraint - fit training labels
+% ordinary activation constraint
 for jType = 1:numJtypes
     % for each junction type
     numNodes_j = nodeTypeStats(jType,1);
     numEdgePJ = jType + 1;      % number of edges per junction
     numCoef = nchoosek(numEdgePJ,2) + 1; % num edge pair combinations + inactivation  
-    
-    junctionNodesListListInds_i = find(junctionTypeListInds(:,jType));
-    if(~isempty(junctionNodesListListInds_i))
-        for i=1:numel(junctionNodesListListInds_i)
-            rowStop = rowStop + 1;
-            colStart = colStop + 1;
-            colStop = colStart - 1 + numCoef;            
-            
-            if(sum(ismember(activeNodeListInds,junctionNodesListListInds_i(i)))>0)
-                % node is active
-                A(rowStop,(colStart+1):colStop) = 1;
-            else
-                % node is inactive
-                A(rowStop,colStart) = 1;
-            end
-        end
-    end
+    rowStart = rowStop + 1; 
+    rowStop = rowStart - 1 + numNodes_j;
+    for row=rowStart:rowStop
+        colStart = colStop + 1;
+        colStop = colStart - 1 + numCoef;
+        A(row,colStart:colStop) = 1;
+    end    
 end
+
+% % activation constraint - fit training labels
+% for jType = 1:numJtypes
+%     % for each junction type
+%     numNodes_j = nodeTypeStats(jType,1);
+%     numEdgePJ = jType + 1;      % number of edges per junction
+%     numCoef = nchoosek(numEdgePJ,2) + 1; % num edge pair combinations + inactivation  
+%     
+%     junctionNodesListListInds_i = find(junctionTypeListInds(:,jType));
+%     if(~isempty(junctionNodesListListInds_i))
+%         for i=1:numel(junctionNodesListListInds_i)
+%             rowStop = rowStop + 1;
+%             colStart = colStop + 1;
+%             colStop = colStart - 1 + numCoef;            
+%             
+%             if(sum(ismember(activeNodeListInds,junctionNodesListListInds_i(i)))>0)
+%                 % node is active
+%                 A(rowStop,(colStart+1):colStop) = 1;
+%             else
+%                 % node is inactive
+%                 A(rowStop,colStart) = 1;
+%             end
+%         end
+%     end
+% end
 %% activation/inactivation constraints for each region
 rowStop = rowStop + 1;
 j = colStop + 1;
-% % ordinary activation constraint
-% for row=rowStop:(rowStop+numRegionActEqns-1)
-%     A(row,j:(j+1)) = 1;
-%     j = j + 2;
-% end
-
-% activation constraint to fit training labels
-rID = 0;
+% ordinary activation constraint
 for row=rowStop:(rowStop+numRegionActEqns-1)
-    rID = rID + 1;
-    if(sum(ismember(activeRegionListInds,rID))>0)
-        % is active region
-        A(row,(j+1)) = 1;
-    else
-        % is inactive
-        A(row,j) = 1;
-    end
+    A(row,j:(j+1)) = 1;
     j = j + 2;
 end
+
+% % activation constraint to fit training labels
+% rID = 0;
+% for row=rowStop:(rowStop+numRegionActEqns-1)
+%     rID = rID + 1;
+%     if(sum(ismember(activeRegionListInds,rID))>0)
+%         % is active region
+%         A(row,(j+1)) = 1;
+%     else
+%         % is inactive
+%         A(row,j) = 1;
+%     end
+%     j = j + 2;
+% end
 
 rowStop = row;
 colStop = j;
