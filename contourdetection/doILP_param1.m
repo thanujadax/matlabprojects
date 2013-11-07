@@ -36,6 +36,8 @@ medianFilterH = 0;
 invertImg = 1;      % 1 for EM images when input image is taken from imagePath
 b_imWithBorder = 1; % add thick dark border around the image
 
+numTrees = 500;
+
 lenThresh = 25;     % max length of edges to be checked for misorientations
 lenThreshBB = 4;    % min length of edges to be considered for being in the backbone (BB)
 priorThreshFracBB = 0.55; % threshold of edgePrior for an edge to be considered BB
@@ -68,8 +70,7 @@ boundaryEdgeReward = 1;     % prior value for boundary edges so that
 w_off_e = 1;
 w_on_e = 1;
 w_off_n = 1;
-w_on_n_neg = 1;
-w_on_n_pos = 1;
+w_on_n = 1;
 w_off_r = 1;
 w_on_r = 1;
 
@@ -158,7 +159,7 @@ end
 
 edgeUnary = getEdgeProbabilitiesFromRFC...
             (forestEdgeProb,imgIn,OFR,edgepixels,edgePriors,...
-            boundaryEdgeIDs,edgeListInds);
+            boundaryEdgeIDs,edgeListInds,numTrees);
 
 
 % assigning predetermined edgePriors for boundaryEdges before nodeAngleCost
@@ -221,6 +222,7 @@ else
 end
 regionUnary = regionScoreCalculator(forest,normalizedInputImage,setOfRegions,edges2pixels,...
     nodeInds,edges2nodes,cCell,wsIDsForRegions,ws,showIntermediate);
+numRegions = numel(regionUnary);
 %% Boundary edges
 % assigning predetermined edge priors for boundary edges after
 % nodeAngleCost calculation
@@ -313,6 +315,14 @@ strDataVisualization = visualizeStrData...
         c_internalNodeInds,c_extNodeInds,nodeInds,connectedJunctionIDs,...
         c_cells2WSregions,ws,numLabels,sizeR,sizeC);
 
+labelVector = getLabelVector...
+    (activeEdgeListInds,activeNodeListInds,activeRegionListInds,...
+    numEdges,numRegions,jEdges,junctionTypeListInds);    
+
+labelVectorVisual = visualizeX(labelVector,sizeR,sizeC,numEdges,numRegions,edgepixels,...
+            junctionTypeListInds,nodeInds,connectedJunctionIDs,edges2nodes,...
+            nodeEdges,edgeListInds,faceAdj,setOfRegions,wsIDsForRegions,ws,...
+            marginSize);
 
 %% QP
 % cost function to minimize
@@ -353,7 +363,7 @@ numAcols = size(Aeq,2);
 % f = zeros(1,numAcols);
 bbJunctionCost = bbJunctionReward;
 f = getILPObjectiveVectorParametric(edgeUnary,nodeAngleCosts,...
-            regionUnary,w_off_e,w_on_e,w_off_n,w_off_r,w_on_r);
+            regionUnary,w_off_e,w_on_e,w_off_n,w_on_n,w_off_r,w_on_r);
 
 senseArray(1:numEq) = '=';
 if(numLt>0)

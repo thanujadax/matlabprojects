@@ -36,7 +36,8 @@ for i=1:numCells
 
         meanPixVal = mean(pixelValues); % always between 0 and 1
         theta = meanPixVal * pi;
-        regionPriors(i) = cos(theta) * K; 
+        % regionPriors(i) = cos(theta) * K;
+        regionPriors(i) = meanPixVal;
     else
         regionPriors(i) = 0;
     end

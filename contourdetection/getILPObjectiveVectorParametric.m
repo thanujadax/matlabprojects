@@ -1,5 +1,5 @@
 function f = getILPObjectiveVectorParametric(edgeUnary,nodeAngleCosts,...
-            regionUnary,w_off_e,w_on_e,w_off_n,w_off_r,w_on_r)
+            regionUnary,w_off_e,w_on_e,w_off_n,w_on_n,w_off_r,w_on_r)
 numEdges = size(edgeUnary,1);
 
 [~, numJtypes] = size(nodeAngleCosts);
@@ -47,9 +47,11 @@ for i=1:numJtypes
     % for each junction type
     clear nodeAngleCost_i
     nodeAngleCost_i = nodeAngleCosts{i};
+    nodeAngleCost_i = nodeAngleCost_i .* w_on_n;
+    [numJ,~] = size(nodeAngleCost_i);
     if(~isnan(nodeAngleCost_i))
         % inactivation cost - comes from learned param
-        offJcost = w_off_n;
+        offJcost = ones(numJ,1).*w_off_n;
         
     % REMOVED: bbJunction cost assignment.
         

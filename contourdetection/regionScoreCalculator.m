@@ -36,6 +36,7 @@ fm(isnan(fm))=0;
 
 % visualize prediction
 pixelProbabilities = v(:,2);
+
 pixelProbabilities = reshape(pixelProbabilities,[sizeR sizeC]);
 pixelProbabilities = double(pixelProbabilities)/max(pixelProbabilities(:));
 % figure; imshow(makeColorOverlay(pixelProbabilities,imIn));
@@ -57,4 +58,5 @@ if(showImg)
 end
 regionScores = getCellPriors_probability(pixelProbabilities,setOfCells,edges2pixels,...
     nodeInds,edges2nodes,K,sizeR,sizeC,wsIndsForCells,ws,showImg);
+
 
