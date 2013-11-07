@@ -13,6 +13,8 @@ function constraints = writeConstraintsFile(Aeq,b,senseArray)
 % 
 % 1*0 1*1 == 1 # y_0 + y_1 == 1
 
+filename = 'constraints.txt';
+fileID = fopen(filename,'w');
 [numConstraints,numVar] = size(Aeq);
 
 % var_num starts from zero
@@ -51,7 +53,8 @@ for i=1:numConstraints
     
     str = horzcat(str,rel);
     str = horzcat(str,bstr);
-    str
+    str = horzcat(str,'\n');
+    fprintf(fileID,str);
     
     
 end
