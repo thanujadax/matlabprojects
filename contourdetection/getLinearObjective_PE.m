@@ -61,13 +61,14 @@ f_stop_ind = numEdges*2;
 for i=1:numJtypes
     % for each junction type
     clear nodeAngleCost_i
-    nodeAngleCost_i = nodeAngleCosts{i};
+    nodeAngleCost_i = nodeAngleCosts{i};untitled10.m
     if(~isnan(nodeAngleCost_i))
         maxJcost = max(nodeAngleCost_i,[],2);          % inactivation cost
         minJcost = min(nodeAngleCost_i,[],2);          
 %         offJcost = (minJcost + maxJcost)/2;
         % offJcost = -1 .* minJcost;
-        offJcost = minJcost .* 0;
+%         offJcost = 0;
+        offJcost = 1;  % will have to be weighted by a parameter that has to be learned.
         
         % identify the bbJunctions and set a very high inactivation cost
         clear nodeListInds_i

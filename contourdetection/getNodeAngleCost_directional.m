@@ -13,7 +13,7 @@ function nodeAngleCost = getNodeAngleCost_directional(theta,alpha,edgePriors_j,.
 % type in concern, in the order considered in theta and alpha
 
 % Parameters
-K = 100;    % scalar factor for node cost 
+K = 1;    % scalar factor for node cost 
 
 if(theta==0)
     nodeAngleCost = nan;
