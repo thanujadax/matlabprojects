@@ -320,10 +320,17 @@ labelVector = getLabelVector...
     (activeEdgeListInds,activeNodeListInds,activeRegionListInds,...
     numEdges,numRegions,jEdges,junctionTypeListInds,edgeListInds);    
 
-labelVectorVisual = visualizeX(labelVector,sizeR,sizeC,numEdges,numRegions,edgepixels,...
-            junctionTypeListInds,nodeInds,connectedJunctionIDs,edges2nodes,...
-            nodeEdges,edgeListInds,faceAdj,setOfRegions,wsIDsForRegions,ws,...
-            marginSize);
+visLV = visualizeXall(x,sizeR,sizeC,numEdges,numRegions,edgepixels,...
+            junctionTypeListInds,nodeInds,connectedJunctionIDs,...
+            nodeEdges,edgeListInds,wsIDsForRegions,ws,twoRegionEdges,edges2regions,...
+            output,showIntermediate);
+        
+
+% TODO:
+% labelVectorVisual = visualizeX(labelVector,sizeR,sizeC,numEdges,numRegions,edgepixels,...
+%             junctionTypeListInds,nodeInds,connectedJunctionIDs,edges2nodes,...
+%             nodeEdges,edgeListInds,faceAdj,setOfRegions,wsIDsForRegions,ws,...
+%             marginSize);
 
 %% QP
 % cost function to minimize
@@ -380,6 +387,14 @@ vtypeArray((numBinaryVar+1):(numBinaryVar+numParam)) = 'C'; % continuous
 lbArray(1:(numBinaryVar+numParam)) = 0;
 % upper bounds
 ubArray(1:(numBinaryVar+numParam)) = 1;
+
+%% Write files for structured learninig bmrm
+featureMat = writeFeaturesFile(f,jEdges,numEdges,numRegions);
+
+constraints = writeConstraintsFile(Aeq,beq,senseArray);
+
+features = writeLabelsFile(labelVector);
+
 %% solver
 % if(useGurobi)
 %     disp('using Gurobi ILP solver...');
