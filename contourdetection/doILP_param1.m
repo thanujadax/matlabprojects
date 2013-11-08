@@ -62,10 +62,9 @@ boundaryEdgeReward = 1;     % prior value for boundary edges so that
 %   1. w_off_e
 %   2. w_on_e
 %   3. w_off_n
-%   4. w_on_n_neg
-%   5. w_on_n_pos
-%   6. w_off_r
-%   7. w_on_r
+%   4. w_on_n
+%   5. w_off_r
+%   6. w_on_r
 
 w_off_e = 1;
 w_on_e = 1;
@@ -119,6 +118,8 @@ ws = watershed(OFR_mag);
 disp('creating graph from watershed boundaries...');
 [adjacencyMat,nodeEdges,edges2nodes,edges2pixels,connectedJunctionIDs,selfEdgePixelSet] ...
     = getGraphFromWS(ws,output,showIntermediate);
+% nodeEdges - contain edgeIDs for each node
+
 nodeInds = nodeEdges(:,1);                  % indices of the junction nodes
 edgeListInds = edges2pixels(:,1);
 junctionTypeListInds = getJunctionTypeListInds(nodeEdges);
@@ -175,7 +176,7 @@ end
 [maxNodesPerJtype, numJtypes] = size(junctionTypeListInds);
 
 jEdges = getEdgesForAllNodeTypes(nodeEdges,junctionTypeListInds);
-% jEdges{i} - cell array. each cell corresponds to the set of edges for the
+% jEdges{i} - cell array. each cell corresponds to the set of edgeIDs for the
 % junction of type i (type1 = J2). A row of a cell corresponds to a node of
 % that type of junction.
 jAnglesAll = getNodeAnglesForAllJtypes(junctionTypeListInds,...
@@ -198,7 +199,7 @@ for i=1:numJtypes
         edgePriors_i = getOrderedEdgePriorsForJ(i,junctionTypeListInds,...
                     nodeEdges,edgeUnary,edgeListInds);
         nodeAngleCosts{i} = getNodeAngleCost_directional(theta_i,alpha_i,...
-                                edgePriors_i,w_on_n_pos,w_on_n_neg);
+                                edgePriors_i,w_on_n);
     end
 end
 %% Faces of wsgraph -> cell types (between pairs of cells)
@@ -317,7 +318,7 @@ strDataVisualization = visualizeStrData...
 
 labelVector = getLabelVector...
     (activeEdgeListInds,activeNodeListInds,activeRegionListInds,...
-    numEdges,numRegions,jEdges,junctionTypeListInds);    
+    numEdges,numRegions,jEdges,junctionTypeListInds,edgeListInds);    
 
 labelVectorVisual = visualizeX(labelVector,sizeR,sizeC,numEdges,numRegions,edgepixels,...
             junctionTypeListInds,nodeInds,connectedJunctionIDs,edges2nodes,...
@@ -380,48 +381,48 @@ lbArray(1:(numBinaryVar+numParam)) = 0;
 % upper bounds
 ubArray(1:(numBinaryVar+numParam)) = 1;
 %% solver
-if(useGurobi)
-    disp('using Gurobi ILP solver...');
-    model.A = sparse(Aeq);
-    model.rhs = beq;
-    model.obj = f';
-    model.sense = senseArray;
-    model.vtype = vtypeArray;
-    % model.vtype = 'C';
-    model.lb = lbArray;
-    model.ub = ubArray;
-    model.modelname = 'contourDetectionILP1';
-    
-    
-    params.LogFile = 'gurobi.log';
-    params.Presolve = 0;
-    params.ResultFile = 'modelfile.mps';
-    params.InfUnbdInfo = 1;
-
-    resultGurobi = gurobi(model,params);
-    x = resultGurobi.x;
-    
-    
-else
-    % Matlab ILP solver
-    disp('using MATLAB ILP solver...');
-    Initial values for the state variables
-    x0 = getInitValues(numEdges,numJ3,numJ4);  % TODO: infeasible. fix it!!
-    numStates = size(f,1);
-    maxIterationsILP = numStates * 1000000;
-    options = optimset('MaxIter',maxIterationsILP,...
-                    'MaxTime',5000000);
-    options = struct('MaxTime', 5000000);
-    disp('running ILP...');
-    t1 = cputime;
-    [x,fval,exitflag,optOutput] = bintprog(f,[],[],Aeq,beq,[],options);
-    t2 = cputime;
-    timetaken = t2-t1
-end
-
-
-%% visualize
-segmentationOut = visualizeX(x,sizeR,sizeC,numEdges,numRegions,edgepixels,...
-            junctionTypeListInds,nodeInds,connectedJunctionIDs,edges2nodes,...
-            nodeEdges,edgeListInds,faceAdj,setOfRegions,wsIDsForRegions,ws,...
-            marginSize);
+% if(useGurobi)
+%     disp('using Gurobi ILP solver...');
+%     model.A = sparse(Aeq);
+%     model.rhs = beq;
+%     model.obj = f';
+%     model.sense = senseArray;
+%     model.vtype = vtypeArray;
+%     % model.vtype = 'C';
+%     model.lb = lbArray;
+%     model.ub = ubArray;
+%     model.modelname = 'contourDetectionILP1';
+%     
+%     
+%     params.LogFile = 'gurobi.log';
+%     params.Presolve = 0;
+%     params.ResultFile = 'modelfile.mps';
+%     params.InfUnbdInfo = 1;
+% 
+%     resultGurobi = gurobi(model,params);
+%     x = resultGurobi.x;
+%     
+%     
+% else
+%     % Matlab ILP solver
+%     disp('using MATLAB ILP solver...');
+%     Initial values for the state variables
+%     x0 = getInitValues(numEdges,numJ3,numJ4);  % TODO: infeasible. fix it!!
+%     numStates = size(f,1);
+%     maxIterationsILP = numStates * 1000000;
+%     options = optimset('MaxIter',maxIterationsILP,...
+%                     'MaxTime',5000000);
+%     options = struct('MaxTime', 5000000);
+%     disp('running ILP...');
+%     t1 = cputime;
+%     [x,fval,exitflag,optOutput] = bintprog(f,[],[],Aeq,beq,[],options);
+%     t2 = cputime;
+%     timetaken = t2-t1
+% end
+% 
+% 
+% %% visualize
+% segmentationOut = visualizeX(x,sizeR,sizeC,numEdges,numRegions,edgepixels,...
+%             junctionTypeListInds,nodeInds,connectedJunctionIDs,edges2nodes,...
+%             nodeEdges,edgeListInds,faceAdj,setOfRegions,wsIDsForRegions,ws,...
+%             marginSize);

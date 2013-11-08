@@ -6,9 +6,9 @@ function [A,b,numRows_Aeq,numRows_AInEq,numCellConstrCols] = getConstraints(numE
 % returns equality and inequality constraints
 
 % Inputs:
-%   twoCellEdges - list of edgeIDs that separate exactly two cells
-%   edges2cells - rowID = edgeID
-%   edgeOrientations - rowID = edgeListInd
+%   twoCellEdges: list of edgeIDs that separate exactly two cells
+%   edges2cells: rowID = edgeID
+%   edgeOrientations: rowID = edgeListInd
 
 % equality constraints:
 %   each edge should be either active or inactive
