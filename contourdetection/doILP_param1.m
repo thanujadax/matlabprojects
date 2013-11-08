@@ -4,7 +4,7 @@
 % with the new cost calculation at the junctions, incorporating the
 % directionality of the 
 
-showIntermediate = 1;
+showIntermediate = 0;
 useGurobi = 1;
 fromInputImage = 1;
 % imagePath = '/home/thanuja/Dropbox/data/mitoData/emJ_00_170x.png';
@@ -16,8 +16,11 @@ fromInputImage = 1;
 % imagePath = '/home/thanuja/Dropbox/data/RF_training_edge/I05_trainingImage.tif';
 % imagePath = '/home/thanuja/Dropbox/data/evaldata/input/I11_raw05.tif';
 
-imagePath = '/home/thanuja/Dropbox/data/evaldata/input/I03_raw05.tif';
-labelImagePath = '/home/thanuja/Dropbox/data/evaldata/labels/I03_neuronLabels05.tif';
+% imagePath = '/home/thanuja/Dropbox/data/evaldata/input/I03_raw05.tif';
+% labelImagePath = '/home/thanuja/Dropbox/data/evaldata/labels/I03_neuronLabels05.tif';
+
+imagePath = '/home/thanuja/Dropbox/data/evaldata2/input/I03_raw06.tif';
+labelImagePath = '/home/thanuja/Dropbox/data/evaldata2/labels/I03_neuronLabels06.tif';
 
 orientationStepSize = 10;
 orientations = 0:orientationStepSize:350;
@@ -320,7 +323,7 @@ labelVector = getLabelVector...
     (activeEdgeListInds,activeNodeListInds,activeRegionListInds,...
     numEdges,numRegions,jEdges,junctionTypeListInds,edgeListInds);    
 
-visLV = visualizeXall(x,sizeR,sizeC,numEdges,numRegions,edgepixels,...
+visLV = visualizeXall(labelVector,sizeR,sizeC,numEdges,numRegions,edgepixels,...
             junctionTypeListInds,nodeInds,connectedJunctionIDs,...
             nodeEdges,edgeListInds,wsIDsForRegions,ws,twoRegionEdges,edges2regions,...
             output,showIntermediate);
