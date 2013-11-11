@@ -28,11 +28,6 @@ imagePath = '/home/thanuja/Dropbox/data/evaldata/input/I08_raw05.tif';
 orientationStepSize = 10;
 orientations = 0:orientationStepSize:350;
 
-% rewards for linear objective for parameter estimation
-edgeReward = 10;
-regionReward = 100;
-nodeReward = 0; % not implemented yet
-
 barLength = 13; % should be odd
 barWidth = 4; %
 marginSize = ceil(barLength/2);
@@ -79,12 +74,21 @@ boundaryEdgeReward = 1;     % prior value for boundary edges so that
 % w_off_r = 1;
 % w_on_r = 1;
 
-w_off_e = -11.8404;
-w_on_e = 11.8404;
-w_off_n = 6.33708;
-w_on_n = 10.6658;
-w_off_r = -2.55561;
-w_on_r = 2.55561;
+% w_off_e = -11.8404;
+% w_on_e = 11.8404;
+% w_off_n = 6.33708;
+% w_on_n = 10.6658;
+% w_off_r = -2.55561;
+% w_on_r = 2.55561;
+
+w_off_e = 16.8913;
+w_on_e = -16.8913;
+w_off_n = -10.6301;
+w_on_n = 9.27912;
+w_off_r = 1.07527;
+w_on_r = -1.07527;
+
+
 
 % tot num of int variables = 2*numEdges + 4*numJ3 + 7*numJ4
 % coeff (unary prior) for turning off each edge = +edgePriors (col vector)
@@ -423,6 +427,8 @@ if(useGurobi)
     % model.lb = lbArray;
     % model.ub = ubArray;
     model.modelname = 'contourDetectionILP1';
+    % initial guess
+    % model.start = labelVector;
     
     
     params.LogFile = 'gurobi.log';

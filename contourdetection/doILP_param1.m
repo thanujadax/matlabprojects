@@ -300,6 +300,7 @@ end
 %% Get training labels for the image
 
 [labelImg_indexed,numLabels] = getLabelIndexImg(labelImage);
+
 [c_cells2WSregions,c_internalEdgeIDs,c_extEdgeIDs,c_internalNodeInds,c_extNodeInds]...
             = getCells2WSregions(labelImg_indexed,ws,numLabels,setOfRegions,...
             edgeListInds,edges2nodes);
