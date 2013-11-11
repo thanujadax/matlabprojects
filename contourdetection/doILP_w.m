@@ -1,6 +1,6 @@
 % function segmentationOut = doILPseg(imagePath,labelPath)
 
-% to generate data to learn parameters w
+% using learned param, get segmentation
 
 % ILP script 5
 % with the new cost calculation at the junctions, incorporating the
@@ -18,8 +18,9 @@ fromInputImage = 1;
 % imagePath = '/home/thanuja/Dropbox/data/RF_training_edge/I05_trainingImage.tif';
 % imagePath = '/home/thanuja/Dropbox/data/evaldata/input/I11_raw05.tif';
 
-imagePath = '/home/thanuja/Dropbox/data/evaldata/input/I05_raw05.tif';
-labelImagePath = '/home/thanuja/Dropbox/data/evaldata/labels/I05_neuronLabels05.tif';
+imagePath = '/home/thanuja/Dropbox/data/evaldata/input/I08_raw05.tif';
+
+% labelImagePath = '/home/thanuja/Dropbox/data/evaldata/labels/I05_neuronLabels05.tif';
 
 % imagePath = '/home/thanuja/Dropbox/data/evaldata2/input/I03_raw06.tif';
 % labelImagePath = '/home/thanuja/Dropbox/data/evaldata2/labels/I03_neuronLabels06.tif';
@@ -71,12 +72,19 @@ boundaryEdgeReward = 1;     % prior value for boundary edges so that
 %   5. w_off_r
 %   6. w_on_r
 
-w_off_e = 1;
-w_on_e = 1;
-w_off_n = 1;
-w_on_n = 1;
-w_off_r = 1;
-w_on_r = 1;
+% w_off_e = 1;
+% w_on_e = 1;
+% w_off_n = 1;
+% w_on_n = 1;
+% w_off_r = 1;
+% w_on_r = 1;
+
+w_off_e = -11.8404;
+w_on_e = 11.8404;
+w_off_n = 6.33708;
+w_on_n = 10.6658;
+w_off_r = -2.55561;
+w_on_r = 2.55561;
 
 % tot num of int variables = 2*numEdges + 4*numJ3 + 7*numJ4
 % coeff (unary prior) for turning off each edge = +edgePriors (col vector)
@@ -90,12 +98,12 @@ w_on_r = 1;
 disp('using image file:')
 disp(imagePath);
 imgIn0 = double(imread(imagePath));
-labelImage = imread(labelImagePath);
+% labelImage = imread(labelImagePath);
 
 % add thick border
 if(b_imWithBorder)
     imgIn = addThickBorder(imgIn0,marginSize,marginPixVal);
-    labelImage = addThickBorder(labelImage,marginSize,marginPixVal);
+  %   labelImage = addThickBorder(labelImage,marginSize,marginPixVal);
 end
 
 
@@ -141,13 +149,15 @@ wsRegionBoundariesFromGraph(edgepixels(edgepixels>0)) = 1; % edge pixels
 if(showIntermediate)
     figure;imagesc(wsRegionBoundariesFromGraph);title('boundaries from graph') 
 end
+
+numEdges = size(edges2nodes,1);
+
 % boundary edges
 boundaryEdgeIDs = getBoundaryEdges2(wsRegionBoundariesFromGraph,barLength,edgepixels,...
     nodeEdges,edgeListInds,showIntermediate);
 numBoundaryEdges = numel(boundaryEdgeIDs);
 
 [~,boundaryEdgeListInds] = intersect(edgeListInds,boundaryEdgeIDs); 
-
 
 disp('preparing coefficients for ILP solver...')
 %% Edge unary values
@@ -298,39 +308,39 @@ end
 % imgBBEdges = visualizeOffEdges(onEdgeListIDs,edgepixels,nodeInds,sizeR,sizeC);
 % figure;imshow(imgBBEdges); title('visualization of backbone - constr - 2 ')
 %% Get training labels for the image
-
-[labelImg_indexed,numLabels] = getLabelIndexImg(labelImage);
-[c_cells2WSregions,c_internalEdgeIDs,c_extEdgeIDs,c_internalNodeInds,c_extNodeInds]...
-            = getCells2WSregions(labelImg_indexed,ws,numLabels,setOfRegions,...
-            edgeListInds,edges2nodes);
-
-activeEdgeIDs = getElementsFromCell(c_extEdgeIDs);
-[~,activeEdgeListInds] = intersect(edgeListInds,activeEdgeIDs);
-
-activeWSregionListInds = getElementsFromCell(c_cells2WSregions);
-
-activeRegionListInds = activeWSregionListInds - 1;
-
-activeNodeListInds = getElementsFromCell(c_extNodeInds);
-
-numEdges = size(edges2nodes,1);
+% 
+% [labelImg_indexed,numLabels] = getLabelIndexImg(labelImage);
+% [c_cells2WSregions,c_internalEdgeIDs,c_extEdgeIDs,c_internalNodeInds,c_extNodeInds]...
+%             = getCells2WSregions(labelImg_indexed,ws,numLabels,setOfRegions,...
+%             edgeListInds,edges2nodes);
+% 
+% activeEdgeIDs = getElementsFromCell(c_extEdgeIDs);
+% [~,activeEdgeListInds] = intersect(edgeListInds,activeEdgeIDs);
+% 
+% activeWSregionListInds = getElementsFromCell(c_cells2WSregions);
+% 
+% activeRegionListInds = activeWSregionListInds - 1;
+% 
+% activeNodeListInds = getElementsFromCell(c_extNodeInds);
+% 
+% numEdges = size(edges2nodes,1);
 
 %% visualize training data
-
-strDataVisualization = visualizeStrData...
-        (c_internalEdgeIDs,c_extEdgeIDs,edgeListInds,edgepixels,...
-        c_internalNodeInds,c_extNodeInds,nodeInds,connectedJunctionIDs,...
-        c_cells2WSregions,ws,numLabels,sizeR,sizeC);
-
-labelVector = getLabelVector...
-    (activeEdgeListInds,activeNodeListInds,activeRegionListInds,...
-    numEdges,numRegions,jEdges,junctionTypeListInds,edgeListInds);    
-
-visLV = visualizeXall(labelVector,sizeR,sizeC,numEdges,numRegions,edgepixels,...
-            junctionTypeListInds,nodeInds,connectedJunctionIDs,...
-            nodeEdges,edgeListInds,wsIDsForRegions,ws,twoRegionEdges,edges2regions,...
-            output,showIntermediate);
-        
+% 
+% strDataVisualization = visualizeStrData...
+%         (c_internalEdgeIDs,c_extEdgeIDs,edgeListInds,edgepixels,...
+%         c_internalNodeInds,c_extNodeInds,nodeInds,connectedJunctionIDs,...
+%         c_cells2WSregions,ws,numLabels,sizeR,sizeC);
+% 
+% labelVector = getLabelVector...
+%     (activeEdgeListInds,activeNodeListInds,activeRegionListInds,...
+%     numEdges,numRegions,jEdges,junctionTypeListInds,edgeListInds);    
+% 
+% visLV = visualizeXall(labelVector,sizeR,sizeC,numEdges,numRegions,edgepixels,...
+%             junctionTypeListInds,nodeInds,connectedJunctionIDs,...
+%             nodeEdges,edgeListInds,wsIDsForRegions,ws,twoRegionEdges,edges2regions,...
+%             output,showIntermediate);
+%         
 
 % TODO:
 % labelVectorVisual = visualizeX(labelVector,sizeR,sizeC,numEdges,numRegions,edgepixels,...
@@ -338,7 +348,7 @@ visLV = visualizeXall(labelVector,sizeR,sizeC,numEdges,numRegions,edgepixels,...
 %             nodeEdges,edgeListInds,faceAdj,setOfRegions,wsIDsForRegions,ws,...
 %             marginSize);
 
-%% QP
+%% ILP
 % cost function to minimize
 % state vector x: {edges*2}{J3*4}{J4*7}
 
@@ -395,55 +405,55 @@ end
 % ubArray(1:(numBinaryVar+numParam)) = 1;
 
 %% Write files for structured learninig bmrm
-featureMat = writeFeaturesFile(f,jEdges,numEdges,numRegions);
-
-constraints = writeConstraintsFile(Aeq,beq,senseArray);
-
-features = writeLabelsFile(labelVector);
+% featureMat = writeFeaturesFile(f,jEdges,numEdges,numRegions);
+% 
+% constraints = writeConstraintsFile(Aeq,beq,senseArray);
+% 
+% features = writeLabelsFile(labelVector);
 
 %% solver
-% if(useGurobi)
-%     disp('using Gurobi ILP solver...');
-%     model.A = sparse(Aeq);
-%     model.rhs = beq;
-%     model.obj = f';
-%     model.sense = senseArray;
-%     model.vtype = vtypeArray;
-%     model.vtype = 'C';
-%     model.lb = lbArray;
-%     model.ub = ubArray;
-%     model.modelname = 'contourDetectionILP1';
-%     
-%     
-%     params.LogFile = 'gurobi.log';
-%     params.Presolve = 0;
-%     params.ResultFile = 'modelfile.mps';
-%     params.InfUnbdInfo = 1;
-% 
-%     resultGurobi = gurobi(model,params);
-%     x = resultGurobi.x;
-%     
-%     
-% else
-%     % Matlab ILP solver
-%     disp('using MATLAB ILP solver...');
-%     Initial values for the state variables
-%     x0 = getInitValues(numEdges,numJ3,numJ4);  % TODO: infeasible. fix it!!
-%     numStates = size(f,1);
-%     maxIterationsILP = numStates * 1000000;
-%     options = optimset('MaxIter',maxIterationsILP,...
-%                     'MaxTime',5000000);
-%     options = struct('MaxTime', 5000000);
-%     disp('running ILP...');
-%     t1 = cputime;
-%     [x,fval,exitflag,optOutput] = bintprog(f,[],[],Aeq,beq,[],options);
-%     t2 = cputime;
-%     timetaken = t2-t1
-% end
-% 
-% 
-% %% visualize
-% segmentationOut = visualizeX(x,sizeR,sizeC,numEdges,numRegions,edgepixels,...
-%             junctionTypeListInds,nodeInds,connectedJunctionIDs,edges2nodes,...
-%             nodeEdges,edgeListInds,faceAdj,setOfRegions,wsIDsForRegions,ws,...
-%             marginSize);
+if(useGurobi)
+    disp('using Gurobi ILP solver...');
+    model.A = sparse(Aeq);
+    model.rhs = beq;
+    model.obj = f';
+    model.sense = senseArray;
+    % model.vtype = vtypeArray;
+    model.vtype = 'B';
+    % model.lb = lbArray;
+    % model.ub = ubArray;
+    model.modelname = 'contourDetectionILP1';
+    
+    
+    params.LogFile = 'gurobi.log';
+    params.Presolve = 0;
+    params.ResultFile = 'modelfile.mps';
+    params.InfUnbdInfo = 1;
+
+    resultGurobi = gurobi(model,params);
+    x = resultGurobi.x;
+    
+    
+else
+    % Matlab ILP solver
+    disp('using MATLAB ILP solver...');
+    Initial values for the state variables
+    x0 = getInitValues(numEdges,numJ3,numJ4);  % TODO: infeasible. fix it!!
+    numStates = size(f,1);
+    maxIterationsILP = numStates * 1000000;
+    options = optimset('MaxIter',maxIterationsILP,...
+                    'MaxTime',5000000);
+    options = struct('MaxTime', 5000000);
+    disp('running ILP...');
+    t1 = cputime;
+    [x,fval,exitflag,optOutput] = bintprog(f,[],[],Aeq,beq,[],options);
+    t2 = cputime;
+    timetaken = t2-t1
+end
+
+
+%% visualize
+segmentationOut = visualizeX(x,sizeR,sizeC,numEdges,numRegions,edgepixels,...
+            junctionTypeListInds,nodeInds,connectedJunctionIDs,edges2nodes,...
+            nodeEdges,edgeListInds,faceAdj,setOfRegions,wsIDsForRegions,ws,...
+            marginSize,showIntermediate);

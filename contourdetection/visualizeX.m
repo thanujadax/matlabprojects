@@ -1,7 +1,7 @@
 function segmentationOut = visualizeX(x,sizeR,sizeC,numEdges,numRegions,edgepixels,...
             junctionTypeListInds,nodeInds,connectedJunctionIDs,edges2nodes,...
             nodeEdges,edgeListInds,faceAdj,setOfRegions,wsIDsForRegions,ws,...
-            marginSize)
+            marginSize,showIntermediate)
 
 ilpSegmentation = zeros(sizeR,sizeC);
 % active edges
@@ -138,4 +138,4 @@ end
 % figure;imshow(visualizeCells);
 segmentationOut = removeThickBorder(visualizeCells,marginSize);
 
-fh = imshow(segmentationOut);
+figure;imshow(segmentationOut);
