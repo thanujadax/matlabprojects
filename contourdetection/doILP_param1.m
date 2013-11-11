@@ -1,4 +1,4 @@
-% function segmentationOut = doILPseg(imagePath)
+% function segmentationOut = doILPseg(imagePath,labelPath)
 
 % ILP script 5
 % with the new cost calculation at the junctions, incorporating the
@@ -16,11 +16,11 @@ fromInputImage = 1;
 % imagePath = '/home/thanuja/Dropbox/data/RF_training_edge/I05_trainingImage.tif';
 % imagePath = '/home/thanuja/Dropbox/data/evaldata/input/I11_raw05.tif';
 
-% imagePath = '/home/thanuja/Dropbox/data/evaldata/input/I03_raw05.tif';
-% labelImagePath = '/home/thanuja/Dropbox/data/evaldata/labels/I03_neuronLabels05.tif';
+imagePath = '/home/thanuja/Dropbox/data/evaldata/input/I05_raw05.tif';
+labelImagePath = '/home/thanuja/Dropbox/data/evaldata/labels/I05_neuronLabels05.tif';
 
-imagePath = '/home/thanuja/Dropbox/data/evaldata2/input/I03_raw06.tif';
-labelImagePath = '/home/thanuja/Dropbox/data/evaldata2/labels/I03_neuronLabels06.tif';
+% imagePath = '/home/thanuja/Dropbox/data/evaldata2/input/I03_raw06.tif';
+% labelImagePath = '/home/thanuja/Dropbox/data/evaldata2/labels/I03_neuronLabels06.tif';
 
 orientationStepSize = 10;
 orientations = 0:orientationStepSize:350;
@@ -311,6 +311,7 @@ activeRegionListInds = activeWSregionListInds - 1;
 
 activeNodeListInds = getElementsFromCell(c_extNodeInds);
 
+numEdges = size(edges2nodes,1);
 
 %% visualize training data
 
@@ -338,7 +339,7 @@ visLV = visualizeXall(labelVector,sizeR,sizeC,numEdges,numRegions,edgepixels,...
 %% QP
 % cost function to minimize
 % state vector x: {edges*2}{J3*4}{J4*7}
-numEdges = size(edges2nodes,1);
+
 numJunctions = numel(nodeInds);
 % tot num of int variables = 2*numEdges + 4*numJ3 + 7*numJ4
 % coeff (unary prior) for turning off each edge = +edgePriors (col vector)
@@ -380,16 +381,16 @@ senseArray(1:numEq) = '=';
 if(numLt>0)
     senseArray((numEq+1):(numEq+numLt)) = '<';
 end
-if(numel(gt_rowID)>0)
-   senseArray(gt_rowID) = '>'; 
-end
+% if(numel(gt_rowID)>0)
+%    senseArray(gt_rowID) = '>'; 
+% end
 % variable types
-vtypeArray(1:numBinaryVar) = 'B'; % binary
-vtypeArray((numBinaryVar+1):(numBinaryVar+numParam)) = 'C'; % continuous
+% vtypeArray(1:numBinaryVar) = 'B'; % binary
+% vtypeArray((numBinaryVar+1):(numBinaryVar+numParam)) = 'C'; % continuous
 % lower bounds
-lbArray(1:(numBinaryVar+numParam)) = 0;
+% lbArray(1:(numBinaryVar+numParam)) = 0;
 % upper bounds
-ubArray(1:(numBinaryVar+numParam)) = 1;
+% ubArray(1:(numBinaryVar+numParam)) = 1;
 
 %% Write files for structured learninig bmrm
 featureMat = writeFeaturesFile(f,jEdges,numEdges,numRegions);
@@ -406,7 +407,7 @@ features = writeLabelsFile(labelVector);
 %     model.obj = f';
 %     model.sense = senseArray;
 %     model.vtype = vtypeArray;
-%     % model.vtype = 'C';
+%     model.vtype = 'C';
 %     model.lb = lbArray;
 %     model.ub = ubArray;
 %     model.modelname = 'contourDetectionILP1';

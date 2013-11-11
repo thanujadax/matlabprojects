@@ -125,7 +125,7 @@ end
 
 %%  write to file
 for i=1:numVar
-   fprintf(fileID, '%d ', featureMat(i,:));
+   fprintf(fileID, '%4.6f ', featureMat(i,:));
    fprintf(fileID, '\n');
 end
 fclose(fileID);
