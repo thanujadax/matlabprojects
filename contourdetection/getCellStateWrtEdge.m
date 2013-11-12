@@ -27,6 +27,8 @@ if(numel(numOfUniqueAngles)<numel(nodeAlphas_0))
 end
 
 % get direction to search (clockwise or counter clockwise)
+% to get the next edge which is part of an interior.
+% if that is part of the current cell, then the current cell is interior
 inputEdgePos = find(nodeEdgeIDs_0==edgeID);
 alpha_inputEdge = nodeAlphas_0(inputEdgePos);
 directionToSearch = cosd(edgeOrientation - alpha_inputEdge);
