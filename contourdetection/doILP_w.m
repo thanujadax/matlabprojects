@@ -1,4 +1,4 @@
-% function segmentationOut = doILPseg(imagePath,labelPath)
+function segmentationOut = doILP_w(imagePath)
 
 % using learned param, get segmentation
 
@@ -18,7 +18,7 @@ fromInputImage = 1;
 % imagePath = '/home/thanuja/Dropbox/data/RF_training_edge/I05_trainingImage.tif';
 % imagePath = '/home/thanuja/Dropbox/data/evaldata/input/I11_raw05.tif';
 
-imagePath = '/home/thanuja/Dropbox/data/evaldata/input/I08_raw05.tif';
+% imagePath = '/home/thanuja/Dropbox/data/evaldata/input/I08_raw05.tif';
 
 % labelImagePath = '/home/thanuja/Dropbox/data/evaldata/labels/I05_neuronLabels05.tif';
 

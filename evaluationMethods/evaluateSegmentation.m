@@ -1,10 +1,10 @@
 % evaluation script
 
-function [VI, ME, SE, totNumNeur] = evaluateSegmentation()
+function [VI, ME, SE, totNumNeur] = evaluateSegmentation(trueLabelDir,segDir)
 
 
-trueLabelDir = '/home/thanuja/Dropbox/data/evaldata/labels2/';
-segDir = '/home/thanuja/Dropbox/data/evaldata/output/';
+% trueLabelDir = '/home/thanuja/Dropbox/data/evaldata/labels/';
+% segDir = '/home/thanuja/Dropbox/data/evaldata/output/';
 
 LEN_IMG_IND = 3;
 
