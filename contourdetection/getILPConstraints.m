@@ -1,5 +1,5 @@
 function [A,b,senseArray,numEdges,numNodeConf,numRegions,nodeTypeStats]...
-    = getILPConstraints(edgeListInds,edges2nodes,nodeEdges,junctionTypeListInds,...
+    = getILPConstraints(edgeListInds,edges2nodes,nodeEdgeIDs,junctionTypeListInds,...
         jEdges,twoRegionEdges,edges2regions,setOfRegionsMat)
 
 % version 3:
@@ -27,7 +27,8 @@ numRegions = size(setOfRegionsMat,1);
 [~, numJtypes] = size(jEdges);
 % number of nodes for each type of junction
 % col1: n.o nodes of this type
-% col2: n.o tot junction activation variables \sum nc2 * 2
+% col2: n.o tot junction activation variables \sum (nc2 * 2 + 1); +1 for
+% offState
 nodeTypeStats = zeros(numJtypes,2);
 % 
 for i=1:numJtypes
@@ -41,8 +42,8 @@ for i=1:numJtypes
         nodeTypeStats(i,1) = numJ_i; % n.o nodes
         
         numEdgeCombinations = nchoosek(numEdges_i,2); 
-        numActivationVar = numEdgeCombinations * 2 * numJ_i; % n.o active conf in tot_i
-        nodeTypeStats(i,2) = numActivationVar;
+        numNodeConfVar_j = numEdgeCombinations *2 + 1; % n.o conf per node
+        nodeTypeStats(i,2) = numNodeConfVar_j;
     end
 end
 
@@ -84,18 +85,18 @@ senseArray(1:totNumConstraints) = '=';
 
 %% Equality constraint node activation: 
 % only one configuration per each node can be active the most.
-colStop = 0;
+% first nodeConf is the inactivation of the node
+colStop = numEdges*2;
 rowStop = 0;
 for jType = 1:numJtypes
     % for each junction type
     numNodes_j = nodeTypeStats(jType,1);
-    numEdgePJ = jType + 1;      % number of edges per junction
-    numCoef = nchoosek(numEdgePJ,2)*2 + 1; % num edge pair combinations + inactivation  
+    numCoef = nodeTypeStats(jType,2); % n.o nodeState var per node, incl offState
     rowStart = rowStop + 1; 
-    rowStop = rowStart - 1 + numNodes_j;
+    rowStop = rowStop + numNodes_j;
     for row=rowStart:rowStop
         colStart = colStop + 1;
-        colStop = colStart - 1 + numCoef;
+        colStop = colStop + numCoef;
         A(row,colStart:colStop) = 1;
         b(row) = 1;
         % senseArray already contains the correct symbol '='
@@ -103,17 +104,74 @@ for jType = 1:numJtypes
 end
 
 %% Equallity constraint: edge directionality at active nodes 
-
+% each node configuration is an active configuration where exactly 2 edges
+% have to be active.
+% the polarity of the edge is set to 0 if the direction implied in
+% edges2nodes is compliant with
+nodeConfStop = numEdges * 2; % points to the last filled node conf col ind in x
 if(withCD)
-   % directionality and closedness constraint for node activation
+
    for jType=1:numJtypes
        numJ_i = nodeTypeStats(jType,1);
        numEdges_i = jType +1;
        numEdgeComb = nchoosek(numEdges_i,2);
+       numNodeConf_j = numEdgeComb * 2;
+       edgeSeq = 1:numEdges_i;
+       edgeCombinationList = nchoosek(edgeSeq,2);
        for j=1:numJ_i
+            % what edges are connected to this node
+            nodeListInd_j = junctionTypeListInds(j,jType);
+            nodeEdgeIDs_j = nodeEdgeIDs(nodeListInd_j,:);
+            nodeEdgeIDs_j = nodeEdgeIDs_j(nodeEdgeIDs_j>0);
+            [~,nodeEdgeListInds_j] = intersect(edgeListInds,nodeEdgeIDs_j);
+            % edgeListInds are the same as the col id for each edge
+            
+            % polarity (in/out) at each node
+            edgePolarities_j = getEdgePolarity(edgeListInds,edges2nodes,nodeListInd_j);
+            
+
+            % off state: all edges and all nodeConfs turned off (0)
+            rowStop = rowStop + 1;
+            b(rowStop) = 2;
+            % senseArray(rowStop) = '='; default value
+            nodeConfStop = nodeConfStop + 1;
+            A(rowStop,nodeConfStop) = 2;
+            A(rowStop,nodeEdgeListInds_j) = 1;
+
+            for k=1:numEdgeComb
+                % for each edge combination
+                edgePosInd = edgeCombinationList(k,:); % (1,2), (1,3) ..
+                edgeLIDsInComb_k = nodeEdgeListInds_j(edgePosInd);
+                polarities_k = edgePolarities_j(edgeLIDsInComb_k);
+                % depending on the polarities make the two possible active
+                % edge configurations where one edge comes in and the other
+                % goes out
+                edgeLID_1 = edgeLIDsInComb_k(1);
+                edgeLID_2 = edgeLIDsInComb_k(2);
+                sumPolarities_k = sum(polarities_k);
+                rowStop = rowStop + 1;
+                nodeConfStop = nodeConfStop + 1;
+                if(sumPolarities_k==2 || sumPolarities_k==0)
+                    % assign opposing polarizations to the edges
+                elseif(sumPolarities_k==1)
+                    % assign the same polarization to the edges
+                else
+                    disp('ERROR1:getILPConstraints.m problem with polarity calculation')
+                    disp('jType = %d   jInd = %d',jType,j)
+                end
+                
+                % conf k1 (k)
+                
+                % conf k2 (k+1)
+                
+                
+            end
            
        end
         
    end
 end
+
+%% Edge and region co-activation
+
 

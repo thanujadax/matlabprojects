@@ -1,6 +1,8 @@
 function edgePolarities = getEdgePolarity(edgeListInds,edges2nodes,nodeListInd)
 
-% returns edge polarities for each edge given in edgeListInds
+% returns edge polarities for each edge given in edgeListInds, wrt to the
+% assigned direction for the edges according to edges2nodes.
+
 % +1 for out
 % -1 for in
 
