@@ -148,11 +148,20 @@ if(withCD)
                 % goes out
                 edgeLID_1 = edgeLIDsInComb_k(1);
                 edgeLID_2 = edgeLIDsInComb_k(2);
+                colPolarityEdge_1 = numEdges + edgeLID_1;
+                colPolarityEdge_2 = numEdges + edgeLID_2;
                 sumPolarities_k = sum(polarities_k);
-                rowStop = rowStop + 1;
-                nodeConfStop = nodeConfStop + 1;
+                
+                
                 if(sumPolarities_k==2 || sumPolarities_k==0)
                     % assign opposing polarizations to the edges
+                    nodeConfStop = nodeConfStop + 1;
+                    rowStop = rowStop + 1;
+                    A(rowStop,colPolarityEdge_1) = 1;
+                    A(rowStop,colPolarityEdge_2) = 0;
+                    A(rowStop,nodeConfStop) = -1;
+                    b(rowStop) = 0;
+                    senseArray(rowStop) = '<';
                 elseif(sumPolarities_k==1)
                     % assign the same polarization to the edges
                 else
