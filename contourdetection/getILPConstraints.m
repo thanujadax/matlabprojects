@@ -150,18 +150,36 @@ if(withCD)
                 edgeLID_2 = edgeLIDsInComb_k(2);
                 colPolarityEdge_1 = numEdges + edgeLID_1;
                 colPolarityEdge_2 = numEdges + edgeLID_2;
-                sumPolarities_k = sum(polarities_k);
-                
+                sumPolarities_k = sum(polarities_k); 
+                % sumPolarities_k gives an idea whether the edges are in
+                % the same direction or opposing directions wrt to the
+                % original direction assignment in edges2nodes.
                 
                 if(sumPolarities_k==2 || sumPolarities_k==0)
+                    % the 2 edges are in the same direction
                     % assign opposing polarizations to the edges
+
+                    % constraint for edge_1 of the pair: 1 0
+                    % edge1p = 1
                     nodeConfStop = nodeConfStop + 1;
+
                     rowStop = rowStop + 1;
+                    
                     A(rowStop,colPolarityEdge_1) = 1;
                     A(rowStop,colPolarityEdge_2) = 0;
                     A(rowStop,nodeConfStop) = -1;
-                    b(rowStop) = 0;
-                    senseArray(rowStop) = '<';
+                    b(rowStop) = -0.1;
+                    senseArray(rowStop) = '>';
+
+                    % constraint for edge_2 of the pair 1 0
+                    rowStop = rowStop + 1;
+                    
+                    A(rowStop,colPolarityEdge_1) = 0;
+                    A(rowStop,colPolarityEdge_2) = 1;
+                    A(rowStop,nodeConfStop) = -1;  % edge2p = 0
+                    b(rowStop) = -0.1;
+                    senseArray(rowStop) = '>';
+
                 elseif(sumPolarities_k==1)
                     % assign the same polarization to the edges
                 else
