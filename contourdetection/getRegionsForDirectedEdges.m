@@ -1,0 +1,1 @@
+function dEdges2regionsOnOff = getRegionsForDirectedEdges(edges2nodes)

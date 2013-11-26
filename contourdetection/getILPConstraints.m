@@ -11,6 +11,7 @@ function [A,b,senseArray,numEdges,numNodeConf,numRegions,nodeTypeStats]...
 % Outputs:
 %   A - coefficient matrix for constraint equations. each row is a
 %   constraint expression
+%   columns of A: {e e' pairs}{nodeConf}{regions}
 %   b - RHS of constraint equations
 %   senseArray - char array of =,<,> for each equation
 %   numEdges - 
@@ -59,6 +60,7 @@ numColsA = numEdges * 2 + numNodeConf + numRegions;
 withCD = 1;
 withER = 1;
 
+
 if(withCD)
     numCDeqns = numNodeConf;  % 
     disp('directionality & closedness constraint for node activation: ON ')
@@ -83,11 +85,25 @@ A = zeros(totNumConstraints,numColsA);
 b = zeros(totNumConstraints,1);
 senseArray(1:totNumConstraints) = '=';
 
+%% Equality constraint - edge activation
+% Each edge in the graph correspond to 2 edge activation variables
+% corresponding to the two directional edges between the pair of nodes
+% connected by the original edge. One one of each pair can be maximally
+% active. The first direction corresponds to N1->N2 where N1 and N2 are
+% given by the first and second cols of edges2nodes respectively.
+colStop = 0;
+for rowStop=1:numEdges
+    colStart = colStop + 1;
+    colStop = colStop + 2;
+    A(rowStop,colStart:colStop) = 1;
+    b(colStart:colStop) = 1.1;
+    senseArray(colStart:colStop) = '<';
+end
+
 %% Equality constraint node activation: 
 % only one configuration per each node can be active the most.
 % first nodeConf is the inactivation of the node
 colStop = numEdges*2;
-rowStop = 0;
 for jType = 1:numJtypes
     % for each junction type
     numNodes_j = nodeTypeStats(jType,1);
@@ -201,4 +217,13 @@ end
 
 %% Edge and region co-activation
 
+if(withER)
+    for i=1:numEdges
+        % each edge gives rise to 2 directional edge activation variables
+        % find the two regions for the edge and if they're on or off
+        
+
+        % make entries in A for the two directions
+    end 
+end
 
