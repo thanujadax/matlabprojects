@@ -263,6 +263,20 @@ boundaryNodeEdgeListIDs = numel(boundaryNodeEdges);
 for i=1:numel(boundaryNodeEdges)
     boundaryNodeEdgeListIDs(i) = find(edgeListInds==boundaryNodeEdges(i));
 end
+%% Directional edges and corresponding regions
+% corresponding on/off regions for the directional edges in edges2nodes
+% the first direction is N1->N2
+
+edges2nodes_reverse = [edges2nodes(:,2) edges2nodes(:,1)];
+
+edges2nodes_directional = [edges2nodes; edges2nodes_reverse];
+
+c_edgesForRegions_cw = getOrderedRegionComponents(setOfRegions,edges2nodes_directional); 
+
+dEdges2regionsOnOff = getRegionsForDirectedEdges...
+                (edges2nodes,c_edgesForRegions_cw,c_nodesForRegions_cw);
+% edgeListInd | onRegion | offRegion  : dir N1->N2
+
 
 %% Removing misoriented edges
 % uses the compatibility of the orientation of the adjoining pixels of each
@@ -316,37 +330,37 @@ end
 % figure;imshow(imgBBEdges); title('visualization of backbone - constr - 2 ')
 %% Get training labels for the image
 % 
-% [labelImg_indexed,numLabels] = getLabelIndexImg(labelImage);
-% [c_cells2WSregions,c_internalEdgeIDs,c_extEdgeIDs,c_internalNodeInds,c_extNodeInds]...
-%             = getCells2WSregions(labelImg_indexed,ws,numLabels,setOfRegions,...
-%             edgeListInds,edges2nodes);
-% 
-% activeEdgeIDs = getElementsFromCell(c_extEdgeIDs);
-% [~,activeEdgeListInds] = intersect(edgeListInds,activeEdgeIDs);
-% 
-% activeWSregionListInds = getElementsFromCell(c_cells2WSregions);
-% 
-% activeRegionListInds = activeWSregionListInds - 1;
-% 
-% activeNodeListInds = getElementsFromCell(c_extNodeInds);
-% 
-% numEdges = size(edges2nodes,1);
+[labelImg_indexed,numLabels] = getLabelIndexImg(labelImage);
+[c_cells2WSregions,c_internalEdgeIDs,c_extEdgeIDs,c_internalNodeInds,c_extNodeInds]...
+            = getCells2WSregions(labelImg_indexed,ws,numLabels,setOfRegions,...
+            edgeListInds,edges2nodes);
+
+activeEdgeIDs = getElementsFromCell(c_extEdgeIDs);
+[~,activeEdgeListInds] = intersect(edgeListInds,activeEdgeIDs);
+
+activeWSregionListInds = getElementsFromCell(c_cells2WSregions);
+
+activeRegionListInds = activeWSregionListInds - 1;
+
+activeNodeListInds = getElementsFromCell(c_extNodeInds);
+
+numEdges = size(edges2nodes,1);
 
 %% visualize training data
 % 
-% strDataVisualization = visualizeStrData...
-%         (c_internalEdgeIDs,c_extEdgeIDs,edgeListInds,edgepixels,...
-%         c_internalNodeInds,c_extNodeInds,nodeInds,connectedJunctionIDs,...
-%         c_cells2WSregions,ws,numLabels,sizeR,sizeC);
-% 
-% labelVector = getLabelVector...
-%     (activeEdgeListInds,activeNodeListInds,activeRegionListInds,...
-%     numEdges,numRegions,jEdges,junctionTypeListInds,edgeListInds);    
-% 
-% visLV = visualizeXall(labelVector,sizeR,sizeC,numEdges,numRegions,edgepixels,...
-%             junctionTypeListInds,nodeInds,connectedJunctionIDs,...
-%             nodeEdges,edgeListInds,wsIDsForRegions,ws,twoRegionEdges,edges2regions,...
-%             output,showIntermediate);
+strDataVisualization = visualizeStrData...
+        (c_internalEdgeIDs,c_extEdgeIDs,edgeListInds,edgepixels,...
+        c_internalNodeInds,c_extNodeInds,nodeInds,connectedJunctionIDs,...
+        c_cells2WSregions,ws,numLabels,sizeR,sizeC);
+
+labelVector = getLabelVector...
+    (activeEdgeListInds,activeNodeListInds,activeRegionListInds,...
+    numEdges,numRegions,jEdges,junctionTypeListInds,edgeListInds);    
+
+visLV = visualizeXall(labelVector,sizeR,sizeC,numEdges,numRegions,edgepixels,...
+            junctionTypeListInds,nodeInds,connectedJunctionIDs,...
+            nodeEdges,edgeListInds,wsIDsForRegions,ws,twoRegionEdges,edges2regions,...
+            output,showIntermediate);
 %         
 
 % TODO:
