@@ -1,5 +1,6 @@
-function c_edgeLIDsForRegions_cw = getOrderedRegionEdgeListIndsDir...
-        (setOfRegions,edges2nodes_directional,nodeEdges,jAnglesAll_alpha,...
+function [c_edgeLIDsForRegions_cw,setOfRegions_edgeLIDs] ...
+        = getOrderedRegionEdgeListIndsDir...
+        (setOfRegions,edges2nodes_directional,jAnglesAll_alpha,...
         junctionTypeListInds,nodeEdgeIDs,edgeListIndsAll)
 
 % Inputs:
@@ -10,6 +11,7 @@ function c_edgeLIDsForRegions_cw = getOrderedRegionEdgeListIndsDir...
 
 numRegions = size(setOfRegions,1);
 c_edgeLIDsForRegions_cw = cell(numRegions,1);
+setOfRegions_edgeLIDs = setOfRegions;
 
 
 for i=1:numRegions
@@ -17,18 +19,22 @@ for i=1:numRegions
     edgeIDsOfRegion_i = edgeIDsOfRegion_i(edgeIDsOfRegion_i>0);
     % arrange the edges in clockwise order of node traversal
     [~,edgeLIDsForRegion] = intersect(edgeListInds,edgeIDsOfRegion_i);
-    nodeLIdsForRegion = edges2nodes(edgeLIDsForRegion,:);
+    
+    numE_region = numel(edgeLIDsForRegion);
+    setOfRegions_edgeLIDs(i,1:numE_region) = edgeLIDsForRegion;
+
+    nodeLIdsForRegion = edges2nodes_directional(edgeLIDsForRegion,:);
     nodeLIdsForRegion = unique(nodeLIdsForRegion);
     c_edgeLIDsForRegions_cw{i} = getCwOrderedEdgesForRegion...
             (edgeLIDsForRegion,edges2nodes_directional,junctionTypeListInds,...
-            nodeEdgeIDs,jAnglesAll_alpha,edgeListIndsAll);
+            nodeEdgeIDs,jAnglesAll_alpha,edgeListIndsAll,nodeLIdsForRegion);
     
 end
 
 
 function cwOrderedEdgeListInds = getCwOrderedEdgesForRegion...
             (edgeListInds_region,edges2nodes_directional,junctionTypeListInds,...
-            nodeEdgeIDs,jAnglesAll_alpha,edgeListIndsAll)
+            nodeEdgeIDs,jAnglesAll_alpha,edgeListIndsAll,nodeLIdsForRegion)
 % Pick one edge (1st in the list)
 edgeLId_1 = edgeListInds_region(1);
 edgeID_1 = edgeListInds(edgLId_1);
@@ -59,7 +65,8 @@ else
     end
     
     cwOrderedEdgeListInds = getCwSetOfEdges(edgeLId_1,nextCwEdgeLId_inRegion,...
-                    nodeLId_0,edges2nodes_directional,edgeListInds_region);
+                    nodeLId_0,edges2nodes_directional,edgeListInds_region,...
+                    nodeLIdsForRegion);
     
 end
 

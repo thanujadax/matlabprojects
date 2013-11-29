@@ -271,11 +271,15 @@ edges2nodes_reverse = [edges2nodes(:,2) edges2nodes(:,1)];
 
 edges2nodes_directional = [edges2nodes; edges2nodes_reverse];
 
-c_edgesForRegions_cw = getOrderedRegionComponents(setOfRegions,edges2nodes_directional); 
+[c_edgeLIDsForRegions_cw ,setOfRegions_edgeLIDs]= getOrderedRegionComponents(setOfRegions,edges2nodes_directional); 
+% each cell contains directed edgeLIDs in cw order. For the activation of
+% each edge, the corresponding region is active. The other region bounded
+% by the same edge is inactive.
 
 dEdges2regionsOnOff = getRegionsForDirectedEdges...
-                (edges2nodes,c_edgesForRegions_cw,c_nodesForRegions_cw);
-% edgeListInd | onRegion | offRegion  : dir N1->N2
+                (edges2nodes,c_edgeLIDsForRegions_cw,c_nodesForRegions_cw,...
+                setOfRegions_edgeLIDs);
+% edgeListInd (rowID) | onRegion (col1) | offRegion (col2)  : dir N1->N2
 
 
 %% Removing misoriented edges
