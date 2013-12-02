@@ -1,6 +1,6 @@
 function [A,b,senseArray,numEdges,numNodeConf,numRegions,nodeTypeStats]...
     = getILPConstraints(edgeListInds,edges2nodes,nodeEdgeIDs,junctionTypeListInds,...
-        jEdges,twoRegionEdges,edges2regions,setOfRegionsMat)
+        jEdges,dirEdges2regionsOnOff,setOfRegionsMat)
 
 % version 3:
 % 2013 11 12
@@ -16,7 +16,7 @@ function [A,b,senseArray,numEdges,numNodeConf,numRegions,nodeTypeStats]...
 %   senseArray - char array of =,<,> for each equation
 %   numEdges - 
 %   numNodeConf - number of active node configurations
-%   numRegions - 
+%   numRegions - first region is the image border.
 
 %% Initialize
 
@@ -91,11 +91,13 @@ senseArray(1:totNumConstraints) = '=';
 % connected by the original edge. One one of each pair can be maximally
 % active. The first direction corresponds to N1->N2 where N1 and N2 are
 % given by the first and second cols of edges2nodes respectively.
-colStop = 0;
+% directional edge of eLID = i is i+numEdges.
+col_1 = 0;
 for rowStop=1:numEdges
-    colStart = colStop + 1;
-    colStop = colStop + 2;
-    A(rowStop,colStart:colStop) = 1;
+    col_1 = col_1 + 1;
+    col_2 = col_1 + numEdges;
+    A(rowStop,col_1) = 1;
+    A(rowStop,col_2) = 1;
     b(colStart:colStop) = 1.1;
     senseArray(colStart:colStop) = '<';
 end
@@ -122,8 +124,7 @@ end
 %% Equallity constraint: edge directionality at active nodes 
 % each node configuration is an active configuration where exactly 2 edges
 % have to be active.
-% the polarity of the edge is set to 0 if the direction implied in
-% edges2nodes is compliant with
+
 nodeConfStop = numEdges * 2; % points to the last filled node conf col ind in x
 if(withCD)
 
@@ -144,15 +145,18 @@ if(withCD)
             
             % polarity (in/out) at each node
             edgePolarities_j = getEdgePolarity(edgeListInds,edges2nodes,nodeListInd_j);
+            % +1 for out. -1 for in
             
-
             % off state: all edges and all nodeConfs turned off (0)
             rowStop = rowStop + 1;
             b(rowStop) = 2;
             % senseArray(rowStop) = '='; default value
+            nodeEdgeListInds_j_complementary = nodeEdgeListInds_j + numEdges;
+            nodeEdgeListInds_j_dir = [nodeEdgeListInds_j nodeEdgeListInds_j_complementary];
+            
             nodeConfStop = nodeConfStop + 1;
             A(rowStop,nodeConfStop) = 2;
-            A(rowStop,nodeEdgeListInds_j) = 1;
+            A(rowStop,nodeEdgeListInds_j_dir) = 1;
 
             for k=1:numEdgeComb
                 % for each edge combination
@@ -164,15 +168,15 @@ if(withCD)
                 % goes out
                 edgeLID_1 = edgeLIDsInComb_k(1);
                 edgeLID_2 = edgeLIDsInComb_k(2);
-                colPolarityEdge_1 = numEdges + edgeLID_1;
-                colPolarityEdge_2 = numEdges + edgeLID_2;
+                complementaryEdgeLID_1 = numEdges + edgeLID_1;
+                complementaryEdgeLID_2 = numEdges + edgeLID_2;
                 sumPolarities_k = sum(polarities_k); 
                 % sumPolarities_k gives an idea whether the edges are in
                 % the same direction or opposing directions wrt to the
                 % original direction assignment in edges2nodes.
                 
                 if(sumPolarities_k==2 || sumPolarities_k==0)
-                    % the 2 edges are in the same direction
+                    % the 2 edges are in the same direction (in-in or out-out)
                     % assign opposing polarizations to the edges
 
                     % constraint for edge_1 of the pair: 1 0
@@ -181,8 +185,9 @@ if(withCD)
 
                     rowStop = rowStop + 1;
                     
-                    A(rowStop,colPolarityEdge_1) = 1;
-                    A(rowStop,colPolarityEdge_2) = 0;
+                    A(rowStop,complementaryEdgeLID_1) = 1;
+                    A(rowStop,edgeLID_2) = 1;
+                    
                     A(rowStop,nodeConfStop) = -1;
                     b(rowStop) = -0.1;
                     senseArray(rowStop) = '>';
@@ -190,14 +195,35 @@ if(withCD)
                     % constraint for edge_2 of the pair 1 0
                     rowStop = rowStop + 1;
                     
-                    A(rowStop,colPolarityEdge_1) = 0;
-                    A(rowStop,colPolarityEdge_2) = 1;
+                    A(rowStop,edgeLID_1) = 1;
+                    A(rowStop,complementaryEdgeLID_2) = 1;
                     A(rowStop,nodeConfStop) = -1;  % edge2p = 0
                     b(rowStop) = -0.1;
                     senseArray(rowStop) = '>';
 
                 elseif(sumPolarities_k==1)
-                    % assign the same polarization to the edges
+                    % don't modify relative polarities
+                    
+                    % 1. normal pair
+                    rowStop = rowStop + 1;
+                    
+                    A(rowStop,edgeLID_1) = 1;
+                    A(rowStop,edgeLID_2) = 1;
+                    
+                    A(rowStop,nodeConfStop) = -1;
+                    b(rowStop) = -0.1;
+                    senseArray(rowStop) = '>';
+                    
+                    % 2. complementary pair
+                    rowStop = rowStop + 1;
+                    
+                    A(rowStop,complementaryEdgeLID_1) = 1;
+                    A(rowStop,complementaryEdgeLID_2) = 1;
+                    
+                    A(rowStop,nodeConfStop) = -1;
+                    b(rowStop) = -0.1;
+                    senseArray(rowStop) = '>';
+                    
                 else
                     disp('ERROR1:getILPConstraints.m problem with polarity calculation')
                     disp('jType = %d   jInd = %d',jType,j)
@@ -218,10 +244,21 @@ end
 %% Edge and region co-activation
 
 if(withER)
-    for i=1:numEdges
+    r_offset = numEdges*2 + numNodeConf;
+    % TODO: this for loop can be modified by considering the pair of
+    % complementary edges inside the same loop. this can also be used to
+    % check the accuracy of dirEdges2regionsOnOff
+    for i=1:numEdges*2
         % each edge gives rise to 2 directional edge activation variables
         % find the two regions for the edge and if they're on or off
+        rowStop = rowStop + 1;
+        A(rowStop,i) = 1;
         
+        rID_on = dirEdges2regionsOnOff(i,1);
+        rID_off = dirEdges2regionsOnOff(i,2); 
+        
+        A(rowStop,(rID_on + r_offset)) = 1;
+        A(rowStop,(rID_off + r_offset)) = -1;
 
         % make entries in A for the two directions
     end 

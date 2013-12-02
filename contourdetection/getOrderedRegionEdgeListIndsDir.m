@@ -1,4 +1,4 @@
-function [c_edgeLIDsForRegions_cw,setOfRegions_edgeLIDs] ...
+function [c_edgeLIDsForRegions_dir_cw,setOfRegions_edgeLIDs] ...
         = getOrderedRegionEdgeListIndsDir...
         (setOfRegions,edges2nodes_directional,jAnglesAll_alpha,...
         junctionTypeListInds,nodeEdgeIDs,edgeListIndsAll)
@@ -6,11 +6,16 @@ function [c_edgeLIDsForRegions_cw,setOfRegions_edgeLIDs] ...
 % Inputs:
 %   setOfRegions: edgeIDs for each region as a row vector
 
+% Outputs:
+%   c_edgeLIDsForRegions_cw: set of cells each containing directional
+%   edgeLIDs for the corresponding region
+%   setOfRegions_edgeLIDs: edgeLIDs for each region (undirected)
+
 % at each node take a right turn. get the edge. check if that edge is in
 % the set of edges
 
 numRegions = size(setOfRegions,1);
-c_edgeLIDsForRegions_cw = cell(numRegions,1);
+c_edgeLIDsForRegions_dir_cw = cell(numRegions,1);
 setOfRegions_edgeLIDs = setOfRegions;
 
 
@@ -18,14 +23,14 @@ for i=1:numRegions
     edgeIDsOfRegion_i = setOfRegions(i,:);
     edgeIDsOfRegion_i = edgeIDsOfRegion_i(edgeIDsOfRegion_i>0);
     % arrange the edges in clockwise order of node traversal
-    [~,edgeLIDsForRegion] = intersect(edgeListInds,edgeIDsOfRegion_i);
+    [~,edgeLIDsForRegion] = intersect(edgeListIndsAll,edgeIDsOfRegion_i);
     
     numE_region = numel(edgeLIDsForRegion);
     setOfRegions_edgeLIDs(i,1:numE_region) = edgeLIDsForRegion;
 
     nodeLIdsForRegion = edges2nodes_directional(edgeLIDsForRegion,:);
     nodeLIdsForRegion = unique(nodeLIdsForRegion);
-    c_edgeLIDsForRegions_cw{i} = getCwOrderedEdgesForRegion...
+    c_edgeLIDsForRegions_dir_cw{i} = getCwOrderedEdgesForRegion...
             (edgeLIDsForRegion,edges2nodes_directional,junctionTypeListInds,...
             nodeEdgeIDs,jAnglesAll_alpha,edgeListIndsAll,nodeLIdsForRegion);
     
