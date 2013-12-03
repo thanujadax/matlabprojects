@@ -1,6 +1,6 @@
 function [c_edgeLIDsForRegions_dir_cw,setOfRegions_edgeLIDs] ...
         = getOrderedRegionEdgeListIndsDir...
-        (setOfRegions,edges2nodes_directional,jAnglesAll_alpha,...
+        (setOfRegions,edges2nodes,jAnglesAll_alpha,...
         junctionTypeListInds,nodeEdgeIDs,edgeListIndsAll)
 
 % Inputs:
@@ -18,6 +18,10 @@ numRegions = size(setOfRegions,1);
 c_edgeLIDsForRegions_dir_cw = cell(numRegions,1);
 setOfRegions_edgeLIDs = setOfRegions;
 
+edges2nodes_complements = edges2nodes;
+edges2nodes_complements(:,1) = edges2nodes(:,2);
+edges2nodes_complements(:,2) = edges2nodes(:,1);
+edges2nodes_directional = [edges2nodes; edges2nodes_complements];
 
 for i=1:numRegions
     edgeIDsOfRegion_i = setOfRegions(i,:);

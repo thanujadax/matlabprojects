@@ -1,6 +1,6 @@
 function [A,b,senseArray,numEdges,numNodeConf,numRegions,nodeTypeStats]...
     = getILPConstraints(edgeListInds,edges2nodes,nodeEdgeIDs,junctionTypeListInds,...
-        jEdges,dirEdges2regionsOnOff,setOfRegionsMat)
+        jEdges,dirEdges2regionsOnOff,setOfRegions)
 
 % version 3:
 % 2013 11 12
@@ -21,7 +21,7 @@ function [A,b,senseArray,numEdges,numNodeConf,numRegions,nodeTypeStats]...
 %% Initialize
 
 numEdges = numel(edgeListInds);
-numRegions = size(setOfRegionsMat,1);
+numRegions = size(setOfRegions,1) + 1;
 
 % node stats
 % type 1 is J2 - junction with just 2 edges
@@ -70,7 +70,7 @@ else
 end
 
 if(withER)
-    numEReqns = numRegions;
+    numEReqns = numEdges*2 + 1;
     disp('region and edge co-activation constraint: ON')
 else
     numEReqns = 0;
@@ -244,6 +244,8 @@ end
 %% Edge and region co-activation
 
 if(withER)
+    dirEdges2regionsOnOff = dirEdges2regionsOnOff + 1; 
+    % regionID = 1 is for the image border, which should be off.
     r_offset = numEdges*2 + numNodeConf;
     % TODO: this for loop can be modified by considering the pair of
     % complementary edges inside the same loop. this can also be used to
@@ -252,7 +254,7 @@ if(withER)
         % each edge gives rise to 2 directional edge activation variables
         % find the two regions for the edge and if they're on or off
         rowStop = rowStop + 1;
-        A(rowStop,i) = 1;
+        A(rowStop,i) = -1;
         
         rID_on = dirEdges2regionsOnOff(i,1);
         rID_off = dirEdges2regionsOnOff(i,2); 
@@ -260,7 +262,14 @@ if(withER)
         A(rowStop,(rID_on + r_offset)) = 1;
         A(rowStop,(rID_off + r_offset)) = -1;
 
-        % make entries in A for the two directions
+        b(rowStop) = 0;
+        % senseArray(rowStop) = '='; % default value
     end 
+    % region 1 (image border) is off
+    rowStop = rowStop + 1;
+    rID_off = 1 + r_offset;
+    A(rowStop,rID_off) = 1;
+    b(rowStop) = 0;
+    % senseArray(rowStop) = '='; % default value
 end
 
