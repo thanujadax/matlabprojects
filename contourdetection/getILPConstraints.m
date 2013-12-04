@@ -85,7 +85,7 @@ A = zeros(totNumConstraints,numColsA);
 b = zeros(totNumConstraints,1);
 senseArray(1:totNumConstraints) = '=';
 
-%% Equality constraint - edge activation
+%% Inequality constraint - edge activation
 % Each edge in the graph correspond to 2 edge activation variables
 % corresponding to the two directional edges between the pair of nodes
 % connected by the original edge. One one of each pair can be maximally
@@ -198,12 +198,12 @@ if(withCD)
                     A(rowStop,edgeLID_1) = 1;
                     A(rowStop,complementaryEdgeLID_2) = 1;
                     A(rowStop,nodeConfStop) = -1;  % edge2p = 0
-                    b(rowStop) = -0.1;
-                    senseArray(rowStop) = '>';
+                    b(rowStop) = 1;
+                    senseArray(rowStop) = '=';
 
                 elseif(sumPolarities_k==1)
                     % don't modify relative polarities
-                    
+                    % TODO increment nodeConfStop ?????????????????
                     % 1. normal pair
                     rowStop = rowStop + 1;
                     
@@ -221,8 +221,8 @@ if(withCD)
                     A(rowStop,complementaryEdgeLID_2) = 1;
                     
                     A(rowStop,nodeConfStop) = -1;
-                    b(rowStop) = -0.1;
-                    senseArray(rowStop) = '>';
+                    b(rowStop) = 1;
+                    senseArray(rowStop) = '=';
                     
                 else
                     disp('ERROR1:getILPConstraints.m problem with polarity calculation')
