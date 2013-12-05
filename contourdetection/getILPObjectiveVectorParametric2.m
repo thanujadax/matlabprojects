@@ -1,5 +1,5 @@
-function f = getILPObjectiveVectorParametric2(edgeUnary,nodeAngleCosts,...
-            regionUnary,w_off_e,w_on_e,w_off_n,w_on_n,w_off_r,w_on_r,...
+function f = getILPObjectiveVectorParametric2(edgeUnary_directed,nodeAngleCosts,...
+            regionUnary,w_on_e,w_off_n,w_on_n,w_on_r,...
             nodeTypeStats)
         
 % version 2 with directed edges - 2013.12.03
@@ -9,16 +9,18 @@ function f = getILPObjectiveVectorParametric2(edgeUnary,nodeAngleCosts,...
 %   nodeTypeStats: each row corresponds to a junctionType (n.o edges connected)
 %       col1: number of nodes of  this junctionType
 %       col2: total number of junction variables = \sum (nc2 * 2 + 1); +1 for this type 
+%   edgeUnary: unary cost for directed edge activation in the order given
+%   in edgesListInds_directional
 
 
-numEdges = size(edgeUnary,1);
+numEdges_directed = size(edgeUnary_directed,1);
 
 [~, numJtypes] = size(nodeAngleCosts);
 % type 1 is J2 - junction with just 2 edges
 
 totJunctionVar = sum(nodeTypeStats(:,2));
 numRegions = numel(regionUnary);
-numElements = numEdges*2 + totJunctionVar + numRegions*2;
+numElements = numEdges_directed + totJunctionVar + numRegions*2;
 f = zeros(numElements,1);
 % order of elements in f
 %[{edgeInactive},{edgeActive},{J2inactive},{J2Active},{J3inactive},{J4Active_3}...]
@@ -38,12 +40,12 @@ f = zeros(numElements,1);
 %     j = j+1;
 % end
 
-for i=1:numEdges
-    f(i) = edgeUnary(i) * w_on_e;
-    f(i+numEdges) = edgeUnary(i) * w_on_e;
+for i=1:numEdges_directed
+    f(i) = edgeUnary_directed(i) * w_on_e;
+%     f(i+numEdges) = edgeUnary(i) * w_on_e;
 end
 
-f_stop_ind = numEdges*2;
+f_stop_ind = numEdges_directed;
 
 %%  junction variables
 for i=1:numJtypes

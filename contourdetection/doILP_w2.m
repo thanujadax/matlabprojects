@@ -23,7 +23,6 @@ fromInputImage = 1;
 imagePath = '/home/thanuja/Dropbox/data/evaldata/input/I08_raw05.tif';
 
 % labelImagePath = '/home/thanuja/Dropbox/data/evaldata/labels/I05_neuronLabels05.tif';
-
 % imagePath = '/home/thanuja/Dropbox/data/evaldata2/input/I03_raw06.tif';
 % labelImagePath = '/home/thanuja/Dropbox/data/evaldata2/labels/I03_neuronLabels06.tif';
 
