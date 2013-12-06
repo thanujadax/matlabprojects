@@ -109,15 +109,13 @@ orderedNodeLIDs = zeros(numEdges_cell,2);
 
 orderedNodeLIDs(1) = nextNodeLID;
 
-[r,c] = find(edges2nodes_cell==next)
-
 for i=1:numEdges_cell
-    
-    theOtherNodeLID = setdiff(nodesOfNextEdge,nextNodeLID);
-    
-    
+    % get the other node for the current edge
+    nextNodeLID = setdiff(nodesOfNextEdge,nextNodeLID);
+    % get the two edges connected to the other node
+    [connectedEdges_toCurrentNode_eLIDs,~] = find(edges2nodes==theOtherNodeLID);
     % nextEdge is the other connected to the current node
-    nextEdgeLID = 
+    nextEdgeLID = setdiff(connectedEdges_toCurrentNode_eLIDs,nextEdgeLID);
     
     % nextNode is the other node of the next edge
     orderedNodeLIDs(i+1) = nextNodeLID;
@@ -125,6 +123,7 @@ for i=1:numEdges_cell
     orderedEdgeLIDs_N1N2(i) = nextEdgeLID;
 end
 % determine if the order is cw (or ccw)
+
 
 % reverse the order if ccw
 
