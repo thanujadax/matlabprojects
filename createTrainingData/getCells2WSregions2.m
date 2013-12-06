@@ -1,4 +1,4 @@
-function [c_wsIDsInCell,c_internalEdgeLIDsInCell,c_extEdgeLIDsInCell,...
+function [c_wsIDsInCell,c_internalEdgeLIDsInCell,c_extDirectedEdgeLIDsInCell,...
           c_internalNodeListInds,c_extNodeListInds]...
             = getCells2WSregions2(labelImg_indexed,ws,numLabels,setOfRegions,...
             edgeListInds,edges2nodes)
@@ -23,7 +23,7 @@ threshFrac = 0.33; % fraction of WSregion pixels allowed to be OUTSIDE of the ce
 
 c_wsIDsInCell = cell(numLabels,1);
 c_internalEdgeLIDsInCell = cell(numLabels,1); % off edges - both directions
-c_extEdgeLIDsInCell = cell(numLabels,1); % boundary edges LIDs
+c_extDirectedEdgeLIDsInCell = cell(numLabels,1); % boundary edges LIDs
 c_internalNodeListInds = cell(numLabels,1); % off nodes
 c_extNodeListInds = cell(numLabels,1);
 
@@ -58,10 +58,15 @@ parfor i=1:numLabels
     internalEdgeIDs_i = edgeIDs_unique_i(edgeCounts_i>1);
     c_internalEdgeLIDsInCell{i} = internalEdgeIDs_i;
     
+    edges2nodes_complements = edges2nodes;
+    edges2nodes_complements(:,1) = edges2nodes(:,2);
+    edges2nodes_complements(:,2) = edges2nodes(:,1);
+    edges2nodes_directional = [edges2nodes; edges2nodes_complements];
+    
     % the other edges are external
     extEdgeIDs_i = setdiff(edgeIDs_unique_i,internalEdgeIDs_i);
-    extEdgeLIDs_i = getCwComponentOfEdges(extEdgeIDs_i);
-    c_extEdgeLIDsInCell{i} = extEdgeLIDs_i; 
+    extEdgeLIDs_directed_i = getCwComponentOfEdges(extEdgeIDs_i);
+    c_extDirectedEdgeLIDsInCell{i} = extEdgeLIDs_directed_i; 
     
     % all nodes where 2 internal edges meet are internal nodes    
     % nodes where at least 1 external edge meets with other nodes, are
@@ -73,10 +78,59 @@ parfor i=1:numLabels
             
 end
 
-function extEdgeLIDs_i = getCwComponentOfEdges(extEdgeIDs_i)
-% TODO %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+function extDirectedEdgeLIDs_i = getCwComponentOfEdges(extEdgeIDs_i,...
+        setOfNodeLIDs,edges2nodes_cell,edges2nodes_directional)
+% get the clockwise directed edgeLIDs for  the edgeIDs for this cell
+% (extEdgeIDs_i)
+% 
+% pick a node (n1) from the boundary of this cell
+n1 = setOfNodeLIDs(1);
+% get the two edges (e1,e2) attached to n1
+[edgeLIDs_n1,c] = find(edge2nodes);
 
-function wsIDs_filtered = getGoodWSregions(wsIDsForLabel_i,ws,pixForLabel_j_logical,threshFrac)
+% order them in clockwise directed order
+cwOrderedEdgeLIDPair = arrangeNodeEdgeCw(edgeLIDs_n1);
+% find the clockwise directed cycle using the entire set of edges
+
+
+function cwOrderedEdgeLIDPair = arrangeNodeEdgeCw(edgeLIDs_n1,nodeList_cell,...
+            edges2nodes_directed,edgeListInds_cell)
+% order the nodes and edges in order (cw/ccw)
+nextEdgeLID = edgeLIstInds_cell(1);
+nodesOfNextEdge = edges2nodes_directed(nextEdgeLID,:);
+nextNodeLID = nodesOfNextEdge(1);
+
+
+numNodes_cell = numel(nodeList_cell);
+numEdges_cell = numNodes_cell - 1;
+edges2nodes_cell = edges2nodes(edgeListInds_cell,:);
+orderedEdgeLIDs_N1N2 = zeros(numEdges_cell,2);
+orderedNodeLIDs = zeros(numEdges_cell,2);
+
+orderedNodeLIDs(1) = nextNodeLID;
+
+[r,c] = find(edges2nodes_cell==next)
+
+for i=1:numEdges_cell
+    
+    theOtherNodeLID = setdiff(nodesOfNextEdge,nextNodeLID);
+    
+    
+    % nextEdge is the other connected to the current node
+    nextEdgeLID = 
+    
+    % nextNode is the other node of the next edge
+    orderedNodeLIDs(i+1) = nextNodeLID;
+    
+    orderedEdgeLIDs_N1N2(i) = nextEdgeLID;
+end
+% determine if the order is cw (or ccw)
+
+% reverse the order if ccw
+
+
+function wsIDs_filtered = getGoodWSregions(wsIDsForLabel_i,ws,...
+                            pixForLabel_j_logical,threshFrac)
 wsIDs_filtered = [];
 numWsRegions = numel(wsIDsForLabel_i);
 for i=1:numWsRegions
