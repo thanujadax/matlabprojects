@@ -9,6 +9,7 @@ function [c_wsIDsInCell,c_internalEdgeLIDsInCell,c_extDirectedEdgeLIDsInCell,...
 %   setOfRegions: contains edgeIDs for each wsRegion
 %   nodeEdges: edgeIDs for each nodePixelInd
 %   connectedJunctionIDs: 
+%   edges2nodes: gives 2 nodeLIDs for each edgeID
 
 % Outputs:
 %     c_wsIDsInCell
@@ -83,29 +84,40 @@ function extDirectedEdgeLIDs_i = getCwComponentOfEdges(extEdgeIDs_i,...
 % get the clockwise directed edgeLIDs for  the edgeIDs for this cell
 % (extEdgeIDs_i)
 % 
+% get set of nodes from edgeIDs_i
+edges2nodes_cell = edges2nodes_directional(extEdgeIDs_i,:);
+nodeList_cell = unique(edges2nodes_cell(edges2nodes_cell>0));
+
 % pick a node (n1) from the boundary of this cell
-n1 = setOfNodeLIDs(1);
+n1 = edges2nodes_cell(1);
 % get the two edges (e1,e2) attached to n1
-[edgeLIDs_n1,c] = find(edge2nodes);
+[edgePairLIDsCell_n1,c] = find(edges2nodes_cell==n1);
 
-% order them in clockwise directed order
-cwOrderedEdgeLIDPair = arrangeNodeEdgeCw(edgeLIDs_n1);
-% find the clockwise directed cycle using the entire set of edges
+% order these two edges in clockwise directed order
+cwOrderedEdgeLIDPair = arrangeNodeEdgeCw(edgePairLIDsCell_n1,nodeList_cell);
+
+% find the clockwise directed cycle using the entire set of edges and the
+% starting 2 directed edges
+extDirectedEdgeLIDs_i = getDirectedCycleEdgeLIDs(cwOrderedEdgeLIDPair,...
+                edges2nodes_cell);
 
 
-function cwOrderedEdgeLIDPair = arrangeNodeEdgeCw(edgeLIDs_n1,nodeList_cell,...
-            edges2nodes_directed,edgeListInds_cell)
+function cwOrderedEdgeLIDPair = arrangeNodeEdgeCw(edgePairLIDs_n1,nodeList_cell,...
+            edges2nodes_directed,edgeListInds_cell,edge2nodes_cell)
 % order the nodes and edges in order (cw/ccw)
-nextEdgeLID = edgeLIstInds_cell(1);
-nodesOfNextEdge = edges2nodes_directed(nextEdgeLID,:);
-nextNodeLID = nodesOfNextEdge(1);
 
+% pick up first edgeLID_dir_cell
+nextEdgeLID = edgeLIstInds_cell(1); 
+nodesOfNextEdge = edges2nodes_directed(nextEdgeLID,:);
+% pick up one node of this edge
+nextNodeLID = nodesOfNextEdge(1);
 
 numNodes_cell = numel(nodeList_cell);
 numEdges_cell = numNodes_cell - 1;
-edges2nodes_cell = edges2nodes(edgeListInds_cell,:);
-orderedEdgeLIDs_N1N2 = zeros(numEdges_cell,2);
-orderedNodeLIDs = zeros(numEdges_cell,2);
+
+% to store ordered edgeLIDs and nodeLIDs
+orderedEdgeLIDs_N1N2 = zeros(numEdges_cell,1); % initialize
+orderedNodeLIDs = zeros(numNodes_cell,1);
 
 orderedNodeLIDs(1) = nextNodeLID;
 
@@ -126,6 +138,7 @@ end
 
 
 % reverse the order if ccw
+
 
 
 function wsIDs_filtered = getGoodWSregions(wsIDsForLabel_i,ws,...
