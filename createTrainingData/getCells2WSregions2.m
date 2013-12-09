@@ -103,41 +103,57 @@ extDirectedEdgeLIDs_i = getDirectedCycleEdgeLIDs(cwOrderedEdgeLIDPair,...
 
 
 function cwOrderedEdgeLIDPair = arrangeNodeEdgeCw(edgePairLIDs_n1,nodeList_cell,...
-            edges2nodes_directed,edgeListInds_cell,edge2nodes_cell)
+            edges2nodes_directed,edgeListInds,edgeListInds_cell,edge2nodes_cell,...
+            edges2nodes)
 % order the nodes and edges in cw order
+% outputs cw_directed_edge_LIDs
 
 % pick up first edgeLID_dir_cell
 nextEdgeLID = edgeLIstInds_cell(1); 
 nodesOfNextEdge = edges2nodes_directed(nextEdgeLID,:);
 % pick up one node of this edge
-nextNodeLID = nodesOfNextEdge(1);
 
 numNodes_cell = numel(nodeList_cell);
 numEdges_cell = numNodes_cell - 1;
 
 % to store ordered edgeLIDs and nodeLIDs
-orderedEdgeLIDs_N1N2 = zeros(numEdges_cell,1); % initialize
+orderedEdgeLIDs = zeros(numEdges_cell,1); % initialize
 orderedNodeLIDs = zeros(numNodes_cell,1);
 
-orderedNodeLIDs(1) = nextNodeLID;
+orderedNodeLIDs(1) = nodesOfNextEdge(1);
+nextNodeLID = nodesOfNextEdge(2);
+orderedNodeLIDs(2) = nextNodeLID;
 
-for i=1:numEdges_cell
-    % get the other node for the current edge
-    nextNodeLID = setdiff(nodesOfNextEdge,nextNodeLID);
+orderedEdgeLIDs(1) = nextEdgeLID;
+
+for i=2:numEdges_cell    
     % get the two edges connected to the other node
-    [connectedEdges_toCurrentNode_eLIDs,~] = find(edges2nodes==theOtherNodeLID);
-    % nextEdge is the other connected to the current node
-    nextEdgeLID = setdiff(connectedEdges_toCurrentNode_eLIDs,nextEdgeLID);
-    
+    [connectedEdgeIDs_toCurrentNode,~] = find(edges2nodes==nextNodeLID);
+    % nextEdge is the other connected to the current node    
+    [~,connectedEdgeLIDs_toCurrentNode] = intersect...
+                        (edgeListInds,connectedEdgeIDs_toCurrentNode);
+    % keep the one that is part of this cell
+    connectedEdgeLIDs_toCurrentNode = intersect...
+                    (edgeListInds_cell,connectedEdgeLIDs_toCurrentNode);
+                
+    nextEdgeLID = setdiff(connectedEdgeLIDs_toCurrentNode,nextEdgeLID);
+    nextEdgeID = edgeListInds(nextEdgeLID);
     % nextNode is the other node of the next edge
+    nextNodes_tmp = edges2nodes(nextEdgeID,:);
+    nextNodeLID = setdiff(nextNodes_tmp,nextNodeLID);
     orderedNodeLIDs(i+1) = nextNodeLID;
     
-    orderedEdgeLIDs_N1N2(i) = nextEdgeLID;
+    orderedEdgeLIDs(i) = nextEdgeLID;
 end
-% determine if the order is cw (or ccw)
 
+% determine if the order is cw (or ccw)
+isCw = checkEdgeLIDsCw();
 
 % reverse the order if ccw
+cwOrderedEdgeLIDPair = cwOrderedDirectedEdgeLIDs(isCw,orderedEdgeLIDs,orderedNodeLIDs);
+
+
+function isCw = checkEdgeLIDsCw()
 
 
 
