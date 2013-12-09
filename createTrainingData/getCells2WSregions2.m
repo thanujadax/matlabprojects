@@ -104,7 +104,7 @@ extDirectedEdgeLIDs_i = getDirectedCycleEdgeLIDs(cwOrderedEdgeLIDPair,...
 
 function cwOrderedEdgeLIDPair = arrangeNodeEdgeCw(edgePairLIDs_n1,nodeList_cell,...
             edges2nodes_directed,edgeListInds_cell,edge2nodes_cell)
-% order the nodes and edges in order (cw/ccw)
+% order the nodes and edges in cw order
 
 % pick up first edgeLID_dir_cell
 nextEdgeLID = edgeLIstInds_cell(1); 
