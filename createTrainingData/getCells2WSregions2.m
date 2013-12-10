@@ -1,7 +1,7 @@
 function [c_wsIDsInCell,c_internalEdgeLIDsInCell,c_extDirectedEdgeLIDsInCell,...
           c_internalNodeListInds,c_extNodeListInds]...
             = getCells2WSregions2(labelImg_indexed,ws,numLabels,setOfRegions,...
-            edgeListInds,edges2nodes)
+            edgeListInds,edges2nodes,junctionTypeListInds)
 
 % version 2. with directed edges. outputs edgeLIDs instead of eIDs.
         
@@ -62,69 +62,55 @@ parfor i=1:numLabels
     edges2nodes_complements = edges2nodes;
     edges2nodes_complements(:,1) = edges2nodes(:,2);
     edges2nodes_complements(:,2) = edges2nodes(:,1);
-    edges2nodes_directional = [edges2nodes; edges2nodes_complements];
+    edges2nodes_directed = [edges2nodes; edges2nodes_complements];
     
     % the other edges are external
     extEdgeIDs_i = setdiff(edgeIDs_unique_i,internalEdgeIDs_i);
-    extEdgeLIDs_directed_i = getCwComponentOfEdges(extEdgeIDs_i);
-    c_extDirectedEdgeLIDsInCell{i} = extEdgeLIDs_directed_i; 
     
     % all nodes where 2 internal edges meet are internal nodes    
     % nodes where at least 1 external edge meets with other nodes, are
     % external nodes
     [internalNodeListInds,extNodeListInds] = getNodes...
                 (internalEdgeIDs_i,extEdgeIDs_i,edges2nodes,edgeListInds);
+    
+    
+    [cwOrderedEdgeLIDs,cwOrderedNodeLIDs] = getOrderedEdgeLIDsCw(extNodeListInds,...
+            edges2nodes_directed,edgeListInds,extEdgeIDs_i,...
+            edges2nodes,junctionTypeListInds);
+    
+    c_extDirectedEdgeLIDsInCell{i} = cwOrderedEdgeLIDs; 
+    
+    
     c_internalNodeListInds{i} = internalNodeListInds;
-    c_extNodeListInds{i} = extNodeListInds;
-            
+    
+    c_extNodeListInds{i} = cwOrderedNodeLIDs;
+                
 end
 
-function extDirectedEdgeLIDs_i = getCwComponentOfEdges(extEdgeIDs_i,...
-        setOfNodeLIDs,edges2nodes_cell,edges2nodes_directional)
-% get the clockwise directed edgeLIDs for  the edgeIDs for this cell
-% (extEdgeIDs_i)
-% 
-% get set of nodes from edgeIDs_i
-edges2nodes_cell = edges2nodes_directional(extEdgeIDs_i,:);
-nodeList_cell = unique(edges2nodes_cell(edges2nodes_cell>0));
-
-% pick a node (n1) from the boundary of this cell
-n1 = edges2nodes_cell(1);
-% get the two edges (e1,e2) attached to n1
-[edgePairLIDsCell_n1,c] = find(edges2nodes_cell==n1);
-
-% order these two edges in clockwise directed order
-cwOrderedEdgeLIDPair = arrangeNodeEdgeCw(edgePairLIDsCell_n1,nodeList_cell);
-
-% find the clockwise directed cycle using the entire set of edges and the
-% starting 2 directed edges
-extDirectedEdgeLIDs_i = getDirectedCycleEdgeLIDs(cwOrderedEdgeLIDPair,...
-                edges2nodes_cell);
 
 
-function cwOrderedEdgeLIDPair = arrangeNodeEdgeCw(edgePairLIDs_n1,nodeList_cell,...
-            edges2nodes_directed,edgeListInds,edgeListInds_cell,edge2nodes_cell,...
-            edges2nodes)
+function [cwOrderedEdgeLIDs,cwOrderedNodeLIDs] = getOrderedEdgeLIDsCw(nodeList_cell,...
+            edges2nodes_directed,edgeListInds,edgeListInds_cell,...
+            edges2nodes,junctionTypeListInds)
 % order the nodes and edges in cw order
 % outputs cw_directed_edge_LIDs
 
 % pick up first edgeLID_dir_cell
-nextEdgeLID = edgeLIstInds_cell(1); 
+nextEdgeLID = edgeListInds_cell(1); 
 nodesOfNextEdge = edges2nodes_directed(nextEdgeLID,:);
 % pick up one node of this edge
-
 numNodes_cell = numel(nodeList_cell);
-numEdges_cell = numNodes_cell - 1;
+numEdges_cell = numNodes_cell;
 
 % to store ordered edgeLIDs and nodeLIDs
-orderedEdgeLIDs = zeros(numEdges_cell,1); % initialize
-orderedNodeLIDs = zeros(numNodes_cell,1);
+orderedEdgeLIDs_cell = zeros(numEdges_cell,1); % initialize
+orderedNodeLIDs_cell = zeros(numNodes_cell,1);
 
-orderedNodeLIDs(1) = nodesOfNextEdge(1);
+orderedNodeLIDs_cell(1) = nodesOfNextEdge(1);
 nextNodeLID = nodesOfNextEdge(2);
-orderedNodeLIDs(2) = nextNodeLID;
+orderedNodeLIDs_cell(2) = nextNodeLID;
 
-orderedEdgeLIDs(1) = nextEdgeLID;
+orderedEdgeLIDs_cell(1) = nextEdgeLID;
 
 for i=2:numEdges_cell    
     % get the two edges connected to the other node
@@ -141,21 +127,118 @@ for i=2:numEdges_cell
     % nextNode is the other node of the next edge
     nextNodes_tmp = edges2nodes(nextEdgeID,:);
     nextNodeLID = setdiff(nextNodes_tmp,nextNodeLID);
-    orderedNodeLIDs(i+1) = nextNodeLID;
+    orderedNodeLIDs_cell(i+1) = nextNodeLID;
     
-    orderedEdgeLIDs(i) = nextEdgeLID;
+    orderedEdgeLIDs_cell(i) = nextEdgeLID;
 end
 
 % determine if the order is cw (or ccw)
-isCw = checkEdgeLIDsCw();
+isCw = checkEdgeLIDsCw(orderedNodeLIDs_cell,orderedEdgeLIDs_cell,...
+            junctionTypeListInds,jEdges,jAnglesAll_alpha,edgeListInds);
 
 % reverse the order if ccw
-cwOrderedEdgeLIDPair = cwOrderedDirectedEdgeLIDs(isCw,orderedEdgeLIDs,orderedNodeLIDs);
+[cwOrderedEdgeLIDs,cwOrderedNodeLIDs,directedNodeListN1N2] = orderEdgesNodes...
+            (isCw,orderedNodeLIDs_cell,edges2nodes_directed);
 
 
-function isCw = checkEdgeLIDsCw()
+function [cwOrderedEdgeLIDs,cwOrderedNodeLIDs,directedNodeListN1N2]...
+            = orderEdgesNodes...
+            (isCw,orderedNodeLIDs_cell,edges2nodes_directed)
+
+if(~isCw)
+    % is ccw. reverse order
+     % orderedEdgeLIDs_cell = flipud(orderedEdgeLIDs_cell);
+     orderedNodeLIDs_cell = flipud(orderedNodeLIDs_cell);
+end
+[cwOrderedEdgeLIDs,cwOrderedNodeLIDs,directedNodeListN1N2] = getDirectionalEdgeLIDs...
+        (orderedNodeLIDs_cell,edges2nodes_directed);
 
 
+function [directedEdgeLIDs, directedNodeListN1N2] = getDirectionalEdgeLIDs...
+        (orderedNodeLIDs_cell,edges2nodes_directional)
+% append a copy of the first node at the end of the list
+orderedNodeLIDs_cell(end+1) = orderedNodeLIDs_cell(1); 
+numNodes_cell = numel(orderedNodeLIDs_cell);
+numEdges_cell = numNodes_cell - 1;
+
+directedEdgeLIDs = zeros(numEdges_cell,1);
+directedNodeListN1N2 = zeros(numEdges_cell,2);
+
+for i=1:numEdges_cell
+    directedNodeListN1N2(i,1) = orderedNodeLIDs_cell(i);
+    directedNodeListN1N2(i,2) = orderedNodeLIDs_cell(i+1);
+    
+    N1_logical = (edges2nodes_directional==directedNodeListN1N2(i,1));
+    N2_logical = (edges2nodes_directional==directedNodeListN1N2(i,2));
+    
+    sum_logical_ind = N1_logical + N2_logical;
+    
+    directedEdgeLIDs(i) = find(sum_logical_ind==2);    
+end
+
+      
+        
+function isCw = checkEdgeLIDsCw(orderedNodeLIDs_cell,orderedEdgeLIDs_cell,...
+            junctionTypeListInds,jEdges,jAnglesAll_alpha,edgeListInds)
+
+numNodes_cell = numel(orderedNodeLIDs_cell);
+increaseOfDirection = zeros(numNodes_cell);
+orderedEdgeIDs_cell = edgeListInds(orderedEdgeLIDs_cell);
+
+% rearrange the set of nodes
+% N1 should go to N_end
+nodeList_tmp = orderedNodeLIDs_cell;
+nodeList_tmp(1:(end-1)) = orderedNodeLIDs_cell(2:end);
+nodeList_tmp(end) = orderedNodeLIDs_cell(1);
+orderedNodeLIDs_cell = nodeList_tmp;
+
+for i=1:numNodesCell
+    [nodeTypeLID,jType] = find(junctionTypeListInds==orderedNodeLIDs_cell(i));
+    
+    % get edgeIn and edgeOut
+    edgeID_in = orderedEdgeIDs_cell(i);
+    if(i<numNodesCell)
+        edgeID_out = orderedEdgeIDs_cell(i+1);
+    else
+        edgeID_out = orderedEdgeIDs_cell(1);
+    end
+    
+    nodeEdgeIDsAll_jType = jEdges{jType};
+    nodeEdgeIDsAll_i = nodeEdgeIDs(nodeTypeLID,:);  
+    
+    alpha_jType = jAnglesAll_alpha{jType};
+    alphasAll_node = alpha_jType(nodeTypeLID);
+    
+    % get the position of edgeIn and edgeOut in nodeEdges vector
+    pos_edgeIn_logical = (nodeEdgeIDsAll_i==edgeID_in);
+    pos_edgeOut_logical = (nodeEdgeIDsAll_i==edgeID_out);
+    
+    % get alpha1(edgeIn) and alpha2(edgeOut)
+    alphaIn = alphasAll_node(pos_edgeIn_logical);
+    % gammaIn is the leaving angle of edgeIn at the current node
+    gammaIn = getGamma(alphaIn);
+    alphaOut = alphasAll_node(pos_edgeOut_logical);
+    
+    % get the increase of direction and store in array
+    increaseOfDirection(i) = alphaOut - gammaIn;
+end
+
+numIncreases = sum(increaseOfDirection>0);
+
+fractionIncreases = numIncreases/numNodes_cell;
+if(fractionIncreases>=0)
+    isCw = 1;
+else
+    isCw = 0;
+end
+
+
+function gammaAngle = getGamma(alphaAngle)
+if(alphaAngle >= 180)
+    gammaAngle = alphaAngle - 180;
+else
+    gammaAngle = alphaAngle + 180;
+end
 
 function wsIDs_filtered = getGoodWSregions(wsIDsForLabel_i,ws,...
                             pixForLabel_j_logical,threshFrac)

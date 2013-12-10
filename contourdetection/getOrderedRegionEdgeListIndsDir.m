@@ -88,7 +88,7 @@ cwOrderedEdgeListInds = zeros(numEdges_region);
 N1 = nodeLId_0;
 % N2 is at the other end of the edge edgeLId_2;
 nodeLIds_temp = edges2nodes_directional(edgeLId_2,:);
-N2 = setDiff(nodeLIds_temp,N1);
+N2 = setdiff(nodeLIds_temp,N1);
 
 %cwOrderedEdgeListInds(1) = edgeLId_2; % is it in the right direction
 
