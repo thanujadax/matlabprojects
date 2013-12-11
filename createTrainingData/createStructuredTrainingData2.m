@@ -54,7 +54,7 @@ ws = watershed(OFR_mag);
 
 [adjacencyMat,nodeEdges,edges2nodes,edges2pixels,connectedJunctionIDs,selfEdgePixelSet] ...
     = getGraphFromWS(ws,HSVmat,showIntermediate);
-
+junctionTypeListInds = getJunctionTypeListInds(nodeEdges);
 nodeInds = nodeEdges(:,1);                  % indices of the junction nodes
 edgeListInds = edges2pixels(:,1);
 

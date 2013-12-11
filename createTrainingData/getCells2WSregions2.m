@@ -31,7 +31,7 @@ c_extNodeListInds = cell(numLabels,1);
 % regionID = wsID - 1;
 
 
-parfor i=1:numLabels
+for i=1:numLabels
     % label_i corresponds to cell_i
     ws_i = ws;
     setOfRegions_i = setOfRegions;
@@ -74,9 +74,9 @@ parfor i=1:numLabels
     [internalNodeListInds,extNodeListInds] = getNodes...
                 (internalEdgeIDs_i,extEdgeIDs_i,edges2nodes,edgeListInds);
     
-    
+    [~,extEdgeLIDs_i] = intersect(edgeListInds,extEdgeIDs_i);
     [cwOrderedEdgeLIDs,cwOrderedNodeLIDs] = getOrderedEdgeLIDsCw(extNodeListInds,...
-            edges2nodes_directed,edgeListInds,extEdgeIDs_i,...
+            edges2nodes_directed,edgeListInds,extEdgeLIDs_i,...
             edges2nodes,junctionTypeListInds);
     
     c_extDirectedEdgeLIDsInCell{i} = cwOrderedEdgeLIDs; 
