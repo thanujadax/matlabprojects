@@ -57,7 +57,8 @@ parfor i=1:numLabels
     edgeIDs_unique_i = unique(edgesForCell_i);
     edgeCounts_i = histc(edgesForCell_i,edgeIDs_unique_i);
     internalEdgeIDs_i = edgeIDs_unique_i(edgeCounts_i>1);
-    c_internalEdgeLIDsInCell{i} = internalEdgeIDs_i;
+    [~,internalEdgeLIDs_i] = intersect(edgeListInds,internalEdgeIDs_i);
+    c_internalEdgeLIDsInCell{i} = internalEdgeLIDs_i;
     
     edges2nodes_complements = edges2nodes;
     edges2nodes_complements(:,1) = edges2nodes(:,2);

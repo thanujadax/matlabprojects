@@ -1,5 +1,5 @@
-function [c_cells2WSregions,c_internalEdgeIDs,c_extEdgeIDs,c_internalNodeInds,...
-    c_extNodeInds,inactiveEdgeIDs,edgeListInds,edgepixels,OFR,edgePriors,OFR_mag,...
+function [c_cells2WSregions,c_internalEdgeLIDs,c_extDirectedEdgeLIDs,c_internalNodeInds,...
+    c_extNodeInds,inactiveEdgeLIDs,edgeListInds,edgepixels,OFR,edgePriors,OFR_mag,...
     boundaryEdgeIDs] = ...
     createStructuredTrainingData2(rawImagePath,labelImagePath)
 % create structured training labels: edges, nodes and regions
@@ -78,10 +78,15 @@ edgePriors = getEdgeUnaryAbs(edgepixels,OFR_mag);
 %% get regions that matches individual neurons (connected components)
 
 [labelImg_indexed,numLabels] = getLabelIndexImg(labelImage);
-[c_cells2WSregions,c_internalEdgeIDs,c_extEdgeIDs,c_internalNodeInds,c_extNodeInds]...
+[c_cells2WSregions,c_internalEdgeLIDs,c_extDirectedEdgeLIDs,c_internalNodeInds,c_extNodeInds]...
             = getCells2WSregions2(labelImg_indexed,ws,numLabels,setOfRegions,...
-            edgeListInds,edges2nodes);
-inactiveEdgeIDs = edgeListInds;     % initializing the list of inactive edgeIDs outside cells
+            edgeListInds,edges2nodes,junctionTypeListInds);
+% c_extEdgeIDs: contains directed_edgeLIDs
+
+numEdges = numel(edgeListInds);
+edgeLIDsequence = 1:numEdges;
+
+inactiveEdgeLIDs = edgeLIDsequence;     % initializing the list of inactive edgeIDs outside cells
 
 % visualize internal and external edges
 strDataVisualization = zeros(sizeR,sizeC,3);
@@ -106,26 +111,33 @@ for i=1:numLabels
     G_en = rand(1);
     B_en = rand(1);
     
-    internalEdgeIDs_i = c_internalEdgeIDs{i};
+    internalEdgeLIDs_i = c_internalEdgeLIDs{i};
     
-    % update inactive edgeID list
-    inactiveEdgeIDs = setdiff(inactiveEdgeIDs,internalEdgeIDs_i);
+    % update inactive edgeLID list
+    inactiveEdgeLIDs = setdiff(inactiveEdgeLIDs,internalEdgeLIDs_i);
     
-    internalEdgeListInds_logical = ismember(edgeListInds,internalEdgeIDs_i);
-    internalEdgePixels = edgepixels(internalEdgeListInds_logical,:);
+    % internalEdgeListInds_logical = ismember(edgeListInds,internalEdgeLIDs_i);
+    internalEdgePixels = edgepixels(internalEdgeLIDs_i,:);
     internalEdgePixels = internalEdgePixels(internalEdgePixels>0);
     
     edgeMat2D_R(internalEdgePixels) = R_i;
     edgeMat2D_G(internalEdgePixels) = G_i;
     edgeMat2D_B(internalEdgePixels) = B_i;
     
-    extEdgeIDs_i = c_extEdgeIDs{i};
+    extDirectedEdgeLIDs_i = c_extDirectedEdgeLIDs{i};
     
     % update inactive edgeID list
-    inactiveEdgeIDs = setdiff(inactiveEdgeIDs,extEdgeIDs_i);
+    inactiveEdgeLIDs = setdiff(inactiveEdgeLIDs,extDirectedEdgeLIDs_i);
     
-    extEdgeListInds_logical = ismember(edgeListInds,extEdgeIDs_i);
-    extEdgePixels = edgepixels(extEdgeListInds_logical,:);
+    % get edgeLIDs from directedEdgeLIDs
+    extEdgeLIDs_i = extDirectedEdgeLIDs_i; % init
+    % replace dirLIDs>numEdges
+    toReplace_logical = (extDirectedEdgeLIDs_i>numEdges);
+    toReplaceWith_edgeLIDs_i = extDirectedEdgeLIDs_i(toReplace_logical) - numEdges;
+    extEdgeLIDs_i(toReplace_logical) = toReplaceWith_edgeLIDs_i;
+    
+    % extEdgeListInds_logical = ismember(edgeListInds,extEdgeLIDs_i);
+    extEdgePixels = edgepixels(extEdgeLIDs_i,:);
     extEdgePixels = extEdgePixels(extEdgePixels>0);
     
     edgeMat2D_R(extEdgePixels) = R_e;
@@ -147,13 +159,12 @@ for i=1:numLabels
     edgeMat2D_R(extNodePixInds) = R_en;
     edgeMat2D_G(extNodePixInds) = G_en;
     edgeMat2D_B(extNodePixInds) = B_en;
-    
-        
+            
 end
 
 % visualize inactive edges outside cells
-inactiveEdgeListInds_logical = ismember(edgeListInds,inactiveEdgeIDs);
-inactiveEdgePixels = edgepixels(inactiveEdgeListInds_logical,:);
+% inactiveEdgeListInds_logical = ismember(edgeListInds,inactiveEdgeLIDs);
+inactiveEdgePixels = edgepixels(inactiveEdgeLIDs,:);
 inactiveEdgePixels = inactiveEdgePixels(inactiveEdgePixels>0);
 R_ina = rand(1);
 G_ina = rand(1);
