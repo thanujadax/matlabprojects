@@ -1,7 +1,8 @@
-function [c_cells2WSregions,c_internalEdgeLIDs,c_extDirectedEdgeLIDs,c_internalNodeInds,...
-    c_extNodeInds,inactiveEdgeLIDs,edgeListInds,edgepixels,OFR,edgePriors,OFR_mag,...
-    boundaryEdgeIDs] = ...
-    createStructuredTrainingData2(rawImagePath,labelImagePath)
+function [c_wsIDsInCell,c_internalEdgeIDsInCell,c_extEdgeIDsInCell,...
+          c_internalNodeListInds,c_extNodeListInds,edgeListInds,edgepixels,nodeInds,ws,...
+            inactiveEdgeLIDs,offWsIDs,setOfRegions,edges2regions,...
+            rawImage,labelImage] = ...
+    getInitialStructuredLabels(rawImagePath,labelImagePath)
 % create structured training labels: edges, nodes and regions
 % version 2. 2013.12.05
 % uses directed edges instead of undirected edges
@@ -11,9 +12,12 @@ function [c_cells2WSregions,c_internalEdgeLIDs,c_extDirectedEdgeLIDs,c_internalN
 %   labels for the raw image: neurons, mitochondria? (later)
 
 % Outputs:
-% ...
-% inactiveEdgeIDs - inactive edges that are outside of cells
-% ...
+%   for each cell, contains
+%           extEdgeLIDs
+%           internalEdgeIDs
+%           extNodeLIDs
+%           internalNodeLIDs
+%           wsIDs
 
 %% Parameters
 showIntermediate = 0;
@@ -78,10 +82,16 @@ edgePriors = getEdgeUnaryAbs(edgepixels,OFR_mag);
 %% get regions that matches individual neurons (connected components)
 
 [labelImg_indexed,numLabels] = getLabelIndexImg(labelImage);
-[c_cells2WSregions,c_internalEdgeLIDs,c_extDirectedEdgeLIDs,c_internalNodeInds,c_extNodeInds]...
-            = getCells2WSregions2(labelImg_indexed,ws,numLabels,setOfRegions,...
-            edgeListInds,edges2nodes,junctionTypeListInds,nodeInds,edgepixels);
-% c_extEdgeIDs: contains directed_edgeLIDs
+[c_wsIDsInCell,c_internalEdgeIDsInCell,c_extEdgeIDsInCell,...
+          c_internalNodeListInds,c_extNodeListInds]...
+            = getCells2WSregions(labelImg_indexed,ws,numLabels,setOfRegions,...
+            edgeListInds,edges2nodes);
+        
+% get offWsIDs
+allCellWsIDs = getElementsFromCell(c_wsIDsInCell);
+numWsRegions = max(max(ws));
+wsRegionSequence = 1:numWsRegions;
+offWsIDs = setdiff(wsRegionSequence,allCellWsIDs);
 
 numEdges = numel(edgeListInds);
 edgeLIDsequence = 1:numEdges;

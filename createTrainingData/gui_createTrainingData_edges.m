@@ -22,7 +22,7 @@ function varargout = gui_createTrainingData_edges(varargin)
 
 % Edit the above text to modify the response to help gui_createTrainingData_edges
 
-% Last Modified by GUIDE v2.5 29-Aug-2013 16:58:13
+% Last Modified by GUIDE v2.5 12-Dec-2013 17:36:43
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -133,18 +133,23 @@ function txt = myupdatefcn(~, event_obj)
   txt = {'Point to Compute'};
   set(0,'userdata',pos);
 
-function edit_edges2pixels_path_Callback(hObject, eventdata, handles)
-% hObject    handle to edit_edges2pixels_path (see GCBO)
+
+
+function rawImgPath_Callback(hObject, eventdata, handles)
+% hObject    handle to rawImgPath (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hints: get(hObject,'String') returns contents of edit_edges2pixels_path as text
-%        str2double(get(hObject,'String')) returns contents of edit_edges2pixels_path as a double
+% Hints: get(hObject,'String') returns contents of rawImgPath as text
+%        str2double(get(hObject,'String')) returns contents of rawImgPath as a double
+% rawImgPath = get(hObject,'String');
+
+
 
 
 % --- Executes during object creation, after setting all properties.
-function edit_edges2pixels_path_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to edit_edges2pixels_path (see GCBO)
+function rawImgPath_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to rawImgPath (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
@@ -155,31 +160,35 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
 end
 
 
-% --- Executes on button press in push_loadEdgePixelsList.
-function push_loadEdgePixelsList_Callback(hObject, eventdata, handles)
-% hObject    handle to push_loadEdgePixelsList (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-str=get(handles.edit_edges2pixels_path, 'string');
-load(str); % loads edges2pixels
-handles.edgeIDs = edges2pixels(:,1);
-edges2pixels(:,1) = [];
-handles.edgepixelsList = edges2pixels; 
-
-
-
-function edit_onEdgeStates_path_Callback(hObject, eventdata, handles)
-% hObject    handle to edit_onEdgeStates_path (see GCBO)
+% --- Executes on button press in pushbutton_rawImg.
+function pushbutton_rawImg_Callback(hObject, eventdata, handles)
+% hObject    handle to pushbutton_rawImg (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hints: get(hObject,'String') returns contents of edit_onEdgeStates_path as text
-%        str2double(get(hObject,'String')) returns contents of edit_onEdgeStates_path as a double
+rawImgPath = get(handles.rawImgPath,'String');
+labelImgPath = get(handles.labelImgPath,'String');
+
+[c_wsIDsInCell,c_internalEdgeIDsInCell,c_extEdgeIDsInCell,...
+          c_internalNodeListInds,c_extNodeListInds,edgeListInds,edgepixels,nodeInds,ws,...
+            inactiveEdgeLIDs,offWsIDs,setOfRegions,edges2regions,...
+            rawImage,labelImage] = ...
+    getInitialStructuredLabels(rawImgPath,labelImgPath);
+
+
+
+function labelImgPath_Callback(hObject, eventdata, handles)
+% hObject    handle to labelImgPath (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of labelImgPath as text
+%        str2double(get(hObject,'String')) returns contents of labelImgPath as a double
 
 
 % --- Executes during object creation, after setting all properties.
-function edit_onEdgeStates_path_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to edit_onEdgeStates_path (see GCBO)
+function labelImgPath_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to labelImgPath (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
@@ -188,16 +197,3 @@ function edit_onEdgeStates_path_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
-
-
-% --- Executes on button press in push_loadOnEdgeStateList.
-function push_loadOnEdgeStateList_Callback(hObject, eventdata, handles)
-% hObject    handle to push_loadOnEdgeStateList (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-str=get(handles.edit_onEdgeStates_path, 'string');
-load(str); % loads onEdgeStates
-handles.onEdgeStates = onEdgeStates;
-% display onEdgeStates in the uitable
-set(handles.uitable_onEdgeStates, 'Data',handles.onEdgeStates);
