@@ -22,7 +22,7 @@ function varargout = gui_createTrainingData_edges(varargin)
 
 % Edit the above text to modify the response to help gui_createTrainingData_edges
 
-% Last Modified by GUIDE v2.5 12-Dec-2013 17:36:43
+% Last Modified by GUIDE v2.5 13-Dec-2013 13:56:16
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -169,12 +169,23 @@ function pushbutton_rawImg_Callback(hObject, eventdata, handles)
 rawImgPath = get(handles.rawImgPath,'String');
 labelImgPath = get(handles.labelImgPath,'String');
 
-[c_wsIDsInCell,c_internalEdgeIDsInCell,c_extEdgeIDsInCell,...
-          c_internalNodeListInds,c_extNodeListInds,edgeListInds,edgepixels,nodeInds,ws,...
+% obtain initial set of connected components
+[c_cells2WSregions,c_internalEdgeIDs,c_extEdgeIDs,c_internalNodeInds,...
+    c_extNodeInds,edgeListInds,edgepixels,nodeInds,ws,...
             inactiveEdgeLIDs,offWsIDs,setOfRegions,edges2regions,...
-            rawImage,labelImage] = ...
+            rawImage,labelImage,strDataVisualization] = ...
     getInitialStructuredLabels(rawImgPath,labelImgPath);
 
+handles.componentMat = strDataVisualization;
+imageHandle = imshow(handles.componentMat,[]);
+set(imageHandle,'ButtonDownFcn',@ImageClickCallback);
+
+function ImageClickCallback (objectHandle,eventData)
+axesHandle  = get(objectHandle,'Parent');
+coordinates = get(axesHandle,'CurrentPoint'); 
+coordinates = floor(coordinates(1,1:2));
+message     = sprintf('x: %d , y: %d',coordinates (1) ,coordinates (2));
+helpdlg(message);
 
 
 function labelImgPath_Callback(hObject, eventdata, handles)
@@ -197,3 +208,12 @@ function labelImgPath_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
+
+
+% --- Executes during object creation, after setting all properties.
+function mainFigure_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to mainFigure (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: place code in OpeningFcn to populate mainFigure
