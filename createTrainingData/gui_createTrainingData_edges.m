@@ -169,25 +169,50 @@ function pushbutton_rawImg_Callback(hObject, eventdata, handles)
 rawImgPath = get(handles.rawImgPath,'String');
 labelImgPath = get(handles.labelImgPath,'String');
 
-% obtain initial set of connected components
-[c_cells2WSregions,c_internalEdgeIDs,c_extEdgeIDs,c_internalNodeInds,...
-    c_extNodeInds,edgeListInds,edgepixels,nodeInds,ws,...
-            inactiveEdgeLIDs,offWsIDs,setOfRegions,edges2regions,...
-            rawImage,labelImage,strDataVisualization] = ...
-    getInitialStructuredLabels(rawImgPath,labelImgPath);
+% % obtain initial set of connected components
+% [c_cells2WSregions,c_internalEdgeIDs,c_extEdgeIDs,c_internalNodeInds,...
+%     c_extNodeInds,edgeListInds,edgepixels,nodeInds,ws,...
+%             inactiveEdgeLIDs,offWsIDs,setOfRegions,edges2regions,...
+%             rawImage,labelImage,strDataVisualization] = ...
+%     getInitialStructuredLabels(rawImgPath,labelImgPath);
+
+strDataVisualization = ones(100);
 
 handles.componentMat = strDataVisualization;
 imageHandle = imshow(handles.componentMat,[]);
+
+% dataPassing = ApplicationData;
+% set(imageHandle, 'ButtonDownFcn', @(x,y) mouseClickCapture(x,y,dataPassing));
+% set(handles, 'ResizeFcn',     @(x,y) updateXY(x,y, dataPassing));
+
+
+
 % handles.imageHandle = imageHandle;
 
 set(imageHandle,'ButtonDownFcn',@ImageClickCallback);
-% set(handles,'ButtonDownFcn',@ImageClickCallback);
+% set(imageHandle,'ButtonDownFcn',@ImageClickCallback);
+
+% update text box
+cp = get( gcf, 'UserData');
+x = cp.coordinates(1);
+y = cp.coordinates(2);
+x_str = int2str(x);
+set(handles.edit_xcoordinate,'String',x_str);
+y_str = int2str(y);
+set(handles.edit_ycoordinate,'String',y_str);
+
+function mouseClickCapture(hAxis, ignored, dataPassingClass)
+mousePositionData = get(hAxis,'CurrentPoint');
+dataPassingClass.x = mousePositionData(1,1);
+dataPassingClass.y = mousePositionData(1,2);
+
 
 function ImageClickCallback (objectHandle,eventData,handles)
 axesHandle  = get(objectHandle,'Parent');
 coordinates = get(axesHandle,'CurrentPoint'); 
 coordinates = floor(coordinates(1,1:2));
-setXYcoordinates(coordinates(1),coordinates(2),handles);
+set( gcf, 'UserData', coordinates(1:2) );
+% setXYcoordinates(coordinates(1),coordinates(2),handles);
 message     = sprintf('x: %d , y: %d',coordinates(1),coordinates(2));
 helpdlg(message);
 
