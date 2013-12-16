@@ -22,7 +22,7 @@ function varargout = gui_createTrainingData_edges(varargin)
 
 % Edit the above text to modify the response to help gui_createTrainingData_edges
 
-% Last Modified by GUIDE v2.5 13-Dec-2013 13:56:16
+% Last Modified by GUIDE v2.5 16-Dec-2013 12:16:41
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -178,14 +178,25 @@ labelImgPath = get(handles.labelImgPath,'String');
 
 handles.componentMat = strDataVisualization;
 imageHandle = imshow(handles.componentMat,[]);
-set(imageHandle,'ButtonDownFcn',@ImageClickCallback);
+% handles.imageHandle = imageHandle;
 
-function ImageClickCallback (objectHandle,eventData)
+set(imageHandle,'ButtonDownFcn',@ImageClickCallback);
+% set(handles,'ButtonDownFcn',@ImageClickCallback);
+
+function ImageClickCallback (objectHandle,eventData,handles)
 axesHandle  = get(objectHandle,'Parent');
 coordinates = get(axesHandle,'CurrentPoint'); 
 coordinates = floor(coordinates(1,1:2));
-message     = sprintf('x: %d , y: %d',coordinates (1) ,coordinates (2));
+setXYcoordinates(coordinates(1),coordinates(2),handles);
+message     = sprintf('x: %d , y: %d',coordinates(1),coordinates(2));
 helpdlg(message);
+
+function setXYcoordinates(x,y,handles)
+x_str = int2str(x);
+set(handles.edit_xcoordinate,'String',x_str);
+y_str = int2str(y);
+set(handles.edit_ycoordinate,'String',y_str);
+
 
 
 function labelImgPath_Callback(hObject, eventdata, handles)
@@ -217,3 +228,118 @@ function mainFigure_CreateFcn(hObject, eventdata, handles)
 % handles    empty - handles not created until after all CreateFcns called
 
 % Hint: place code in OpeningFcn to populate mainFigure
+
+
+% --- Executes on selection change in popupmenu_type.
+function popupmenu_type_Callback(hObject, eventdata, handles)
+% hObject    handle to popupmenu_type (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: contents = cellstr(get(hObject,'String')) returns popupmenu_type contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from popupmenu_type
+
+
+% --- Executes during object creation, after setting all properties.
+function popupmenu_type_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to popupmenu_type (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: popupmenu controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function edit_compState_Callback(hObject, eventdata, handles)
+% hObject    handle to edit_compState (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of edit_compState as text
+%        str2double(get(hObject,'String')) returns contents of edit_compState as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function edit_compState_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to edit_compState (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function edit_compInd_Callback(hObject, eventdata, handles)
+% hObject    handle to edit_compInd (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of edit_compInd as text
+%        str2double(get(hObject,'String')) returns contents of edit_compInd as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function edit_compInd_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to edit_compInd (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function edit_xcoordinate_Callback(hObject, eventdata, handles)
+% hObject    handle to edit_xcoordinate (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of edit_xcoordinate as text
+%        str2double(get(hObject,'String')) returns contents of edit_xcoordinate as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function edit_xcoordinate_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to edit_xcoordinate (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function edit_ycoordinate_Callback(hObject, eventdata, handles)
+% hObject    handle to edit_ycoordinate (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of edit_ycoordinate as text
+%        str2double(get(hObject,'String')) returns contents of edit_ycoordinate as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function edit_ycoordinate_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to edit_ycoordinate (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
