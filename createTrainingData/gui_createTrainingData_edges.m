@@ -185,21 +185,19 @@ imageHandle = imshow(handles.componentMat,[]);
 % set(imageHandle, 'ButtonDownFcn', @(x,y) mouseClickCapture(x,y,dataPassing));
 % set(handles, 'ResizeFcn',     @(x,y) updateXY(x,y, dataPassing));
 
-
-
-% handles.imageHandle = imageHandle;
-
-set(imageHandle,'ButtonDownFcn',@ImageClickCallback);
+handles.imageHandle = imageHandle;
+handles.setXY_fhandle = @setXYcoordinates;
+set(handles.imageHandle,'ButtonDownFcn',{@ImageClickCallback,handles});
 % set(imageHandle,'ButtonDownFcn',@ImageClickCallback);
 
-% update text box
-cp = get( gcf, 'UserData');
-x = cp.coordinates(1);
-y = cp.coordinates(2);
-x_str = int2str(x);
-set(handles.edit_xcoordinate,'String',x_str);
-y_str = int2str(y);
-set(handles.edit_ycoordinate,'String',y_str);
+% % update text box
+% cp = get( gcf, 'UserData');
+% x = cp.coordinates(1);
+% y = cp.coordinates(2);
+% x_str = int2str(x);
+% set(handles.edit_xcoordinate,'String',x_str);
+% y_str = int2str(y);
+% set(handles.edit_ycoordinate,'String',y_str);
 
 function mouseClickCapture(hAxis, ignored, dataPassingClass)
 mousePositionData = get(hAxis,'CurrentPoint');
@@ -211,8 +209,11 @@ function ImageClickCallback (objectHandle,eventData,handles)
 axesHandle  = get(objectHandle,'Parent');
 coordinates = get(axesHandle,'CurrentPoint'); 
 coordinates = floor(coordinates(1,1:2));
-set( gcf, 'UserData', coordinates(1:2) );
-% setXYcoordinates(coordinates(1),coordinates(2),handles);
+% set( gcf, 'UserData', coordinates(1:2) );
+x = coordinates(1);
+y = coordinates(2);
+%setXYcoordinates(x,y,handles);
+handles.setXY_fhandle(x,y,handles);
 message     = sprintf('x: %d , y: %d',coordinates(1),coordinates(2));
 helpdlg(message);
 
