@@ -22,7 +22,7 @@ function varargout = gui_createTrainingData_edges(varargin)
 
 % Edit the above text to modify the response to help gui_createTrainingData_edges
 
-% Last Modified by GUIDE v2.5 16-Dec-2013 12:16:41
+% Last Modified by GUIDE v2.5 17-Dec-2013 16:11:30
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -176,6 +176,20 @@ labelImgPath = get(handles.labelImgPath,'String');
 %             rawImage,labelImage,strDataVisualization] = ...
 %     getInitialStructuredLabels(rawImgPath,labelImgPath);
 
+% assign handles:
+handles.edgeListInds = edgeListInds;
+handles.edgepixels = edgepixels;
+handles.nodeIndsAll = nodeInds;
+handles.ws = ws;
+handles.edges2regions = edges2regions;
+handles.edgeIDSetRegions = setOfRegions;
+handles.edges2nodes = edges2nodes;
+
+handles.activeEdgeLIDs = activeEdgeLIDs;
+handles.activeWsIDs = activeWsIDs;
+handles.activeNodeLIDs = activeNodeLIDs;
+
+
 strDataVisualization = ones(100);
 
 handles.componentMat = strDataVisualization;
@@ -188,16 +202,7 @@ imageHandle = imshow(handles.componentMat,[]);
 handles.imageHandle = imageHandle;
 handles.setXY_fhandle = @setXYcoordinates;
 set(handles.imageHandle,'ButtonDownFcn',{@ImageClickCallback,handles});
-% set(imageHandle,'ButtonDownFcn',@ImageClickCallback);
 
-% % update text box
-% cp = get( gcf, 'UserData');
-% x = cp.coordinates(1);
-% y = cp.coordinates(2);
-% x_str = int2str(x);
-% set(handles.edit_xcoordinate,'String',x_str);
-% y_str = int2str(y);
-% set(handles.edit_ycoordinate,'String',y_str);
 
 function mouseClickCapture(hAxis, ignored, dataPassingClass)
 mousePositionData = get(hAxis,'CurrentPoint');
@@ -369,3 +374,10 @@ function edit_ycoordinate_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
+
+
+% --- Executes on button press in pushbutton_apply.
+function pushbutton_apply_Callback(hObject, eventdata, handles)
+% hObject    handle to pushbutton_apply (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
