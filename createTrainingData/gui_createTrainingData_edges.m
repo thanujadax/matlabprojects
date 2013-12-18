@@ -22,7 +22,7 @@ function varargout = gui_createTrainingData_edges(varargin)
 
 % Edit the above text to modify the response to help gui_createTrainingData_edges
 
-% Last Modified by GUIDE v2.5 17-Dec-2013 16:11:30
+% Last Modified by GUIDE v2.5 18-Dec-2013 10:15:59
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -169,14 +169,14 @@ function pushbutton_rawImg_Callback(hObject, eventdata, handles)
 rawImgPath = get(handles.rawImgPath,'String');
 labelImgPath = get(handles.labelImgPath,'String');
 
-% % obtain initial set of connected components
-% [c_cells2WSregions,c_internalEdgeIDs,c_extEdgeIDs,c_internalNodeInds,...
-%     c_extNodeInds,edgeListInds,edgepixels,nodeInds,ws,...
-%             inactiveEdgeLIDs,offWsIDs,setOfRegions,edges2regions,...
-%             rawImage,labelImage,strDataVisualization] = ...
-%     getInitialStructuredLabels(rawImgPath,labelImgPath);
+% obtain initial set of connected components
+[c_cells2WSregions,c_internalEdgeIDs,c_extEdgeIDs,c_internalNodeInds,...
+    c_extNodeInds,edgeListInds,edgepixels,nodeInds,ws,...
+            inactiveEdgeLIDs,offWsIDs,setOfRegions,edges2regions,...
+            rawImage,labelImage,strDataVisualization] = ...
+    getInitialStructuredLabels(rawImgPath,labelImgPath);
 
-% assign handles:
+% assign to handles:
 handles.edgeListInds = edgeListInds;
 handles.edgepixels = edgepixels;
 handles.nodeIndsAll = nodeInds;
@@ -185,9 +185,9 @@ handles.edges2regions = edges2regions;
 handles.edgeIDSetRegions = setOfRegions;
 handles.edges2nodes = edges2nodes;
 
-handles.activeEdgeLIDs = activeEdgeLIDs;
-handles.activeWsIDs = activeWsIDs;
-handles.activeNodeLIDs = activeNodeLIDs;
+handles.edgeLID_confVector = edgeLID_confVector;
+handles.wsID_confVector = wsID_confVector;
+handles.nodeLID_confVector = nodeLID_confVector;
 
 
 strDataVisualization = ones(100);
@@ -201,6 +201,8 @@ imageHandle = imshow(handles.componentMat,[]);
 
 handles.imageHandle = imageHandle;
 handles.setXY_fhandle = @setXYcoordinates;
+% handles.getCompProps_fhandle = @getComponentProperties;
+
 set(handles.imageHandle,'ButtonDownFcn',{@ImageClickCallback,handles});
 
 
@@ -219,8 +221,9 @@ x = coordinates(1);
 y = coordinates(2);
 %setXYcoordinates(x,y,handles);
 handles.setXY_fhandle(x,y,handles);
-message     = sprintf('x: %d , y: %d',coordinates(1),coordinates(2));
-helpdlg(message);
+% handles.getCompProps_fhandle(x,y,handles);
+% message     = sprintf('x: %d , y: %d',coordinates(1),coordinates(2));
+% helpdlg(message);
 
 function setXYcoordinates(x,y,handles)
 x_str = int2str(x);
@@ -292,6 +295,9 @@ function edit_compState_Callback(hObject, eventdata, handles)
 
 % Hints: get(hObject,'String') returns contents of edit_compState as text
 %        str2double(get(hObject,'String')) returns contents of edit_compState as a double
+
+handles.compState = str2double(get(hObject,'String'));
+
 
 
 % --- Executes during object creation, after setting all properties.
@@ -381,3 +387,17 @@ function pushbutton_apply_Callback(hObject, eventdata, handles)
 % hObject    handle to pushbutton_apply (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+
+% get value set in state (conf)
+
+% update state vector of relevant component type
+% type 1: edge
+% type 2: node
+% type 3: region
+
+% update label vectors
+
+% update image
+
+
+

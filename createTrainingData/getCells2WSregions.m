@@ -66,8 +66,7 @@ parfor i=1:numLabels
     [internalNodeListInds,extNodeListInds] = getNodes...
                 (internalEdgeIDs_i,extEdgeIDs_i,edges2nodes,edgeListInds);
     c_internalNodeListInds{i} = internalNodeListInds;
-    c_extNodeListInds{i} = extNodeListInds;
-            
+    c_extNodeListInds{i} = extNodeListInds;            
 end
 
 
