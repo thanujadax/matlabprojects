@@ -35,9 +35,9 @@ for dim=1:numJtypes
         numOrientations = size(orientedScoreSpace3D,3);
         for i=1:numJ
             % for each node
-            if(i==1142)
-                abc = 11;
-            end
+%             if(i==42)
+%                 abc = 11;
+%             end
             edges_i = jEdges(i,:);
             nodeListInd = junctionTypeListInds(i,dim);% get the index of the node in concern
             nodeInd = nodeInds(nodeListInd); 

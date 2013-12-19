@@ -11,7 +11,7 @@ function [A,b,senseArray,numEdges,numNodeConf,numRegions,nodeTypeStats]...
 % Outputs:
 %   A - coefficient matrix for constraint equations. each row is a
 %   constraint expression
-%   columns of A: {e e' pairs}{nodeConf}{regions}
+%   columns of A: {eLIDs, eLIDs_complementary}{nodeConf}{regions}
 %   b - RHS of constraint equations
 %   senseArray - char array of =,<,> for each equation
 %   numEdges - 
@@ -88,18 +88,18 @@ senseArray(1:totNumConstraints) = '=';
 %% Inequality constraint - edge activation
 % Each edge in the graph correspond to 2 edge activation variables
 % corresponding to the two directional edges between the pair of nodes
-% connected by the original edge. One one of each pair can be maximally
-% active. The first direction corresponds to N1->N2 where N1 and N2 are
+% connected by the original edge. Both components can't be active at the
+% same time. The first direction corresponds to N1->N2 where N1 and N2 are
 % given by the first and second cols of edges2nodes respectively.
-% directional edge of eLID = i is i+numEdges.
+% directional_edge_inds of of eLID = eLID, eLID+numEdges.
 col_1 = 0;
 for rowStop=1:numEdges
     col_1 = col_1 + 1;
     col_2 = col_1 + numEdges;
     A(rowStop,col_1) = 1;
     A(rowStop,col_2) = 1;
-    b(colStart:colStop) = 1.1;
-    senseArray(colStart:colStop) = '<';
+    b(rowStop) = 1.1;
+    senseArray(rowStop) = '<';
 end
 
 %% Equality constraint node activation: 
