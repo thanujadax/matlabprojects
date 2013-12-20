@@ -28,16 +28,19 @@ for i=1:numRegions
     edgeIDsOfRegion_i = edgeIDsOfRegion_i(edgeIDsOfRegion_i>0);
     % arrange the edges in clockwise order of node traversal
     [~,edgeLIDsForRegion] = intersect(edgeListIndsAll,edgeIDsOfRegion_i);
-    
-    numE_region = numel(edgeLIDsForRegion);
-    setOfRegions_edgeLIDs(i,1:numE_region) = edgeLIDsForRegion;
+    if(numel(edgeLIDsForRegion)==0)
+        c_edgeLIDsForRegions_dir_cw{i} = 0;
+    else
+        numE_region = numel(edgeLIDsForRegion);
+        setOfRegions_edgeLIDs(i,1:numE_region) = edgeLIDsForRegion;
 
-    nodeLIdsForRegion = edgeLIDs2nodes_directional(edgeLIDsForRegion,:);
-    nodeLIdsForRegion = unique(nodeLIdsForRegion);
-    c_edgeLIDsForRegions_dir_cw{i} = getCwOrderedEdgesForRegion...
-            (edgeLIDsForRegion,edgeLIDs2nodes_directional,junctionTypeListInds,...
-            nodeEdgeIDs,jAnglesAll_alpha,edgeListIndsAll,nodeLIdsForRegion,...
-            edges2nodes);
+        nodeLIdsForRegion = edgeLIDs2nodes_directional(edgeLIDsForRegion,:);
+        nodeLIdsForRegion = unique(nodeLIdsForRegion);
+        c_edgeLIDsForRegions_dir_cw{i} = getCwOrderedEdgesForRegion...
+                (edgeLIDsForRegion,edgeLIDs2nodes_directional,junctionTypeListInds,...
+                nodeEdgeIDs,jAnglesAll_alpha,edgeListIndsAll,nodeLIdsForRegion,...
+                edges2nodes);
+    end
     
 end
 
@@ -51,9 +54,9 @@ edgeLId_1 = edgeListInds_region(1);
 edgeID_1 = edgeListIndsAll(edgeLId_1);
 
 % start debug
-if(edgeLId_1==352)
-    aa = 99;
-end
+% if(edgeLId_1==352)
+%     aa = 99;
+% end
 % end debug
 
 % Get the nodes at each end of the edge. At each node get the next edge as
@@ -129,17 +132,23 @@ nodeLIds_temp = edges2nodes_directional(nextEdgeLID,:);
 N2 = setdiff(nodeLIds_temp,N1);
 
 %cwOrderedEdgeListInds(1) = edgeLId_2; % is it in the right direction
+if(numEdges_region>2)
+    for i = 3:numEdges_region
+        nextNodePair = edges2nodes(nextEdgeLID,:);
+        nextNodeLID = setdiff(nextNodePair,nextNodeLID);
+        cwOrderedNodeListInds(i-1) = nextNodeLID;
 
-for i = 3:numEdges_region
-    nextNodePair = edges2nodes(nextEdgeLID,:);
-    nextNodeLID = setdiff(nextNodePair,nextNodeLID);
-    cwOrderedNodeListInds(i-1) = nextNodeLID;
-    
-    allEdgeIDsForNextNode = nodeEdgeIDs(nextNodeLID,:);
-    [~,allEdgeLIDsForNextNode] = intersect(edgeListIndsAll,allEdgeIDsForNextNode);
-    nodeEdgeLIDpair = intersect(edgeListInds_region,allEdgeLIDsForNextNode);
-    nextEdgeLID = setdiff(nodeEdgeLIDpair,nextEdgeLID);
-    cwOrderedEdgeListInds(i) = nextEdgeLID;
+        allEdgeIDsForNextNode = nodeEdgeIDs(nextNodeLID,:);
+        [~,allEdgeLIDsForNextNode] = intersect(edgeListIndsAll,allEdgeIDsForNextNode);
+        nodeEdgeLIDpair = intersect(edgeListInds_region,allEdgeLIDsForNextNode);
+        nextEdgeLID = setdiff(nodeEdgeLIDpair,nextEdgeLID);
+        % start debug
+        if(isempty(nextEdgeLID))
+            a=99;
+        end
+        % end debug
+        cwOrderedEdgeListInds(i) = nextEdgeLID;
+    end
 end
 
 % for i=1:numEdges_region

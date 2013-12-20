@@ -35,6 +35,11 @@ for dim=1:numJtypes
         for i=1:numJ
             % for each node
             edges_i = jEdges(i,:);
+            % start debug
+%             if(i==42)
+%                 aa = 99;
+%             end
+            % end debug
             nodeListInd = junctionTypeListInds(i,dim);% get the index of the node in concern
             nodeInd = nodeInds(nodeListInd); 
             [rNode,cNode] = ind2sub([sizeR sizeC],nodeInd);
@@ -60,8 +65,8 @@ for dim=1:numJtypes
                     [rP,cP] = ind2sub([sizeR sizeC],nodePixels');
                     numEdgePix = numel(nodePixels);
 %                     orientations = zeros(numEdgePix,1);
-                    if(numEdgePix==1)
-                        % just one edge pixel
+                    if(numEdgePix<4)
+                        %
                         % get the 2 junction nodes
                         edgeNodes = edges2nodes(edgeListInd,:);
                         if(edgeNodes(1)==nodeListInd)
