@@ -36,6 +36,12 @@ maxNumEdgesPerRegion = 0;
 k = 0; % index for cells to store sets of edges of each region
 for i=start:numWsFaces
     clear intPix_i edgePix_i edgeSet_i
+    
+    % start debug
+    if(i==733)
+        a = 88;
+    end
+    % end debug
     % get internal pixels
     intPix_i = (ws==i);
     % get edge pixels
@@ -114,6 +120,9 @@ for j=topRow:botRow
         newPix = [j eRight];
         edgePix = [edgePix; newPix];
     end
+    
+    edgePix_inbred = getEdgePixFromInbreadRegions(row_j,horizontal);
+    
 end
 
 % each col
@@ -137,6 +146,54 @@ end
 
 edgePix = sub2ind([sizeR sizeC],edgePix(:,1),edgePix(:,2));
 edgePix = unique(edgePix);
+
+
+
+function edgePix_inbred = getEdgePixFromInbreadRegions(rowIndsPix,...
+                colID,vertical,ws,wsID)
+% returns edge pixels bordering inbread regions
+% Inputs:
+%   rowIndsPix: vector of row/col ids of pixels
+%   colID:  value of the col/row (one value)
+%   vertical =1 if first arguement is a vector containinig row pixels inds
+%   for a colID given by the 2nd arguement. 0 otherwise.
+
+% how many contiguous blocks are there?
+% if more than 2, the first and the last blocks belong to this region
+c_contiguousBlocks = getContiguousBlocks(inputVector);
+% which of the  blocks belong to this region
+
+% for the regions with wsID, take the top/bottom +1 pixels to find bounding
+% edges
+
+start = min(rowIndsPix);
+stop = max(rowIndsPix);
+
+[sizeR,sizeC] = size(ws);
+
+completeIndSequence = start:stop;
+numRowInds = numel(rowIndsPix);
+
+if(vertical)
+    r = rowIndsPix; 
+    c = ones(numRowInds,1) .* colID;
+else
+    c = rowIndsPix; 
+    r = ones(numRowInds,1) .* colID;
+end
+
+% regionPixColInds = sub2ind([sizeR sizeC],r,c);
+
+inbreadPixInds = setdiff(completeIndSequence,rowIndsPix); % includes edge pixels
+
+
+
+function c_contiguousBlocks = getContiguousBlocks(inputVector)
+diffVect = diff(inputVector);
+numBlocks = sum(diffVect>1);
+blockEndInds_logical = (diffVect>1);
+
+
 
 function edgeIDset = getEdgeSetFromEdgePixSet(edgePix,edges2pixels)
 numEdgePix = numel(edgePix);
