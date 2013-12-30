@@ -116,6 +116,12 @@ end
 function cwOrderedEdgeListInds = getCwSetOfEdges(edgeLId_1,nextEdgeLID,...
                         nextNodeLID,edges2nodes_directional,edgeListInds_region,...
                         nodeLIdsForRegion,nodeEdgeIDs,edgeListIndsAll,edges2nodes)
+% start debug
+if(edgeLId_1==1923)
+    a=97;
+end
+% end degbug
+                    
                     
 numEdges_region = numel(edgeListInds_region);
 cwOrderedEdgeListInds = zeros(numEdges_region,1);
@@ -139,6 +145,7 @@ if(numEdges_region>2)
         cwOrderedNodeListInds(i-1) = nextNodeLID;
 
         allEdgeIDsForNextNode = nodeEdgeIDs(nextNodeLID,:);
+        allEdgeIDsForNextNode(1) = []; % 1st element is nodePixInd
         [~,allEdgeLIDsForNextNode] = intersect(edgeListIndsAll,allEdgeIDsForNextNode);
         nodeEdgeLIDpair = intersect(edgeListInds_region,allEdgeLIDsForNextNode);
         nextEdgeLID = setdiff(nodeEdgeLIDpair,nextEdgeLID);
