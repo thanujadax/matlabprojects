@@ -120,9 +120,11 @@ for j=topRow:botRow
         newPix = [j eRight];
         edgePix = [edgePix; newPix];
     end
-    
-    edgePix_inbred = getEdgePixFromInbreadRegions(row_j,horizontal);
-    
+    vertical = 0;
+    edgePix_inbred = getEdgePixFromInbreadRegions(row_j,...
+                    j,vertical,ws);
+    [ibr ibc] = ind2sub([sizeR sizeC],edgePix_inbred);
+    edgePix = [edgePix; [ibr' ibc']];
 end
 
 % each col
@@ -142,6 +144,12 @@ for j=leftCol:rightCol
         newPix = [ebottom j];
         edgePix = [edgePix; newPix];
     end
+    vertical = 1;
+    edgePix_inbred = getEdgePixFromInbreadRegions(col_j,...
+                j,vertical,ws);
+    % edgePix is in [r c] format
+    [ibr ibc] = ind2sub([sizeR sizeC],edgePix_inbred);
+    edgePix = [edgePix; [ibr' ibc']];
 end
 
 edgePix = sub2ind([sizeR sizeC],edgePix(:,1),edgePix(:,2));
@@ -150,48 +158,62 @@ edgePix = unique(edgePix);
 
 
 function edgePix_inbred = getEdgePixFromInbreadRegions(rowIndsPix,...
-                colID,vertical,ws,wsID)
+                colID,vertical,ws)
 % returns edge pixels bordering inbread regions
 % Inputs:
 %   rowIndsPix: vector of row/col ids of pixels
 %   colID:  value of the col/row (one value)
 %   vertical =1 if first arguement is a vector containinig row pixels inds
 %   for a colID given by the 2nd arguement. 0 otherwise.
-
+edgePix_inbred = [];
 % how many contiguous blocks are there?
 % if more than 2, the first and the last blocks belong to this region
-c_contiguousBlocks = getContiguousBlocks(inputVector);
-% which of the  blocks belong to this region
-
-% for the regions with wsID, take the top/bottom +1 pixels to find bounding
-% edges
-
-start = min(rowIndsPix);
-stop = max(rowIndsPix);
+c_contiguousBlocks = getContiguousBlocks(rowIndsPix);
+% each block belongs to the current wsRegion
+numBlocks = size(c_contiguousBlocks,2);
 
 [sizeR,sizeC] = size(ws);
 
-completeIndSequence = start:stop;
-numRowInds = numel(rowIndsPix);
+if(numBlocks>1)
+% for the regions with wsID, take the top/bottom +1 pixels to find bounding
+% edges
+    if(vertical)
+        for i=1:(numBlocks-1)
+            block_i = c_contiguousBlocks{i};
+            % pos1 = block_i(1) - 1;
+            pos1 = block_i(end) + 1;
+            edgePix_1 = sub2ind([sizeR sizeC],pos1,colID);
+            % edgePix_2 = sub2ind([sizeR sizeC],pos2,colID);
+            edgePix_inbred = [edgePix_inbred edgePix_1];
+        end
+    else
+        for i=1:(numBlocks-1)
+            block_i = c_contiguousBlocks{i};
+            % pos1 = block_i(1) - 1;
+            pos1 = block_i(end) + 1;
+            edgePix_1 = sub2ind([sizeR sizeC],colID,pos1);
+            % edgePix_2 = sub2ind([sizeR sizeC],pos2,colID);
+            edgePix_inbred = [edgePix_inbred edgePix_1];
+        end
+    end
 
-if(vertical)
-    r = rowIndsPix; 
-    c = ones(numRowInds,1) .* colID;
 else
-    c = rowIndsPix; 
-    r = ones(numRowInds,1) .* colID;
+    edgePix_inbred = [];
 end
-
-% regionPixColInds = sub2ind([sizeR sizeC],r,c);
-
-inbreadPixInds = setdiff(completeIndSequence,rowIndsPix); % includes edge pixels
-
 
 
 function c_contiguousBlocks = getContiguousBlocks(inputVector)
 diffVect = diff(inputVector);
-numBlocks = sum(diffVect>1);
-blockEndInds_logical = (diffVect>1);
+numBlocks = sum(diffVect>1) + 1;
+blockEndInds = find(diffVect>1);
+blockEndInds = [blockEndInds numel(inputVector)];
+start = 1;
+c_contiguousBlocks = {};
+for i=1:numBlocks
+    stop = blockEndInds(i);
+    c_contiguousBlocks{i} = inputVector(start:stop);
+    start = stop+1;
+end
 
 
 
@@ -202,6 +224,8 @@ edgepixels(:,1) = [];
 [x1,x2] = ismember(edgepixels,edgePix);
 x1sum = sum(x1,2); % sum each row
 edgeIDset = edges2pixels((x1sum>0),1);
+
+
 
 function c_setOfRegions = updateRegionsWithInsideEdges(ws,c_setOfRegions,...
             underUtilizedEdgeIDs,edges2pixels)
