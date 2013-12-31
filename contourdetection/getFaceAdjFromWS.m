@@ -37,11 +37,6 @@ k = 0; % index for cells to store sets of edges of each region
 for i=start:numWsFaces
     clear intPix_i edgePix_i edgeSet_i
     
-    % start debug
-    if(i==733)
-        a = 88;
-    end
-    % end debug
     % get internal pixels
     intPix_i = (ws==i);
     % get edge pixels

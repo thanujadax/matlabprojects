@@ -14,7 +14,7 @@ twoRegionEdgeLIDs = zeros(numEdges,2);
 
 for i=1:numEdges
     % for each edgeLID, look for the regionIDs that it is being used
-    [rIDs,~] = find(setOfRegions_eLID==i);
+    [rIDs,~] = find(setOfRegions_eLIDs==i);
     if(~isempty(rIDs))
         numR_forEdge = numel(rIDs);
         % update twoRegionEdgeLIDs
