@@ -20,20 +20,25 @@ numEdgesDirectional = size(edges2nodes_directional,1);
 dirEdges2regionsOnOff = zeros(numEdgesDirectional,2);
 
 edgeLIDs2regions = getRegionsForEdgeLIDs(setOfRegions_edgeLIDs,numEdges);
-
+% numDirEdges = numEdges * 2;
 for i=1:numRegions
+    
     edgeLIDs_dir_region = c_edgeLIDsForRegions_cw{i};
+    if(sum(edgeLIDs_dir_region>0)==0)
+        continue
+    end
     
     % get logical indices for edgeLID_dir
-    numDirEdge_region = numel(edgeLIDs_dir_region);
-    edgeLID_dir_sequence = 1:numDirEdge_region;
-    edgeLIDs_dir_region_logical = (edgeLID_dir_sequence==edgeLIDs_dir_region);
+%     numDirEdge_region = numel(edgeLIDs_dir_region);
+    % edgeLID_dir_sequence = 1:numDirEdges;
+%     [~,edgeLIDs_dir_region_logical] = ...
+%                 intersect(edgeLID_dir_sequence,edgeLIDs_dir_region);
     
-    dirEdges2regionsOnOff(edgeLIDs_dir_region_logical,1) = i; % =rID_on
+    dirEdges2regionsOnOff(edgeLIDs_dir_region,1) = i; % =rID_on
     
     % get rID_off
     rID_off = getOffRID(edgeLIDs2regions,i);
-    dirEdges2regionsOnOff(edgeLIDs_dir_region_logical,2) = rID_off; % rID_off  
+    dirEdges2regionsOnOff(edgeLIDs_dir_region,2) = rID_off; % rID_off  
 
 end
 
