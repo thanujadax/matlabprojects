@@ -139,12 +139,14 @@ if(withCD)
             % what edges are connected to this node
             nodeListInd_j = junctionTypeListInds(j,jType);
             nodeEdgeIDs_j = nodeEdgeIDs(nodeListInd_j,:);
+            nodeEdgeIDs_j(1) = [];  % first element is nodeInd
             nodeEdgeIDs_j = nodeEdgeIDs_j(nodeEdgeIDs_j>0);
             [~,nodeEdgeListInds_j] = intersect(edgeListInds,nodeEdgeIDs_j);
             % edgeListInds are the same as the col id for each edge
             
             % polarity (in/out) at each node
-            edgePolarities_j = getEdgePolarity(edgeListInds,edges2nodes,nodeListInd_j);
+            edgePolarities_j = getEdgePolarity(edgeListInds,edges2nodes,nodeListInd_j,...
+                    nodeEdgeListInds_j);
             % +1 for out. -1 for in
             
             % off state: all edges and all nodeConfs turned off (0)
@@ -162,7 +164,7 @@ if(withCD)
                 % for each edge combination
                 edgePosInd = edgeCombinationList(k,:); % (1,2), (1,3) ..
                 edgeLIDsInComb_k = nodeEdgeListInds_j(edgePosInd);
-                polarities_k = edgePolarities_j(edgeLIDsInComb_k);
+                polarities_k = edgePolarities_j(edgePosInd);
                 % depending on the polarities make the two possible active
                 % edge configurations where one edge comes in and the other
                 % goes out
@@ -175,7 +177,7 @@ if(withCD)
                 % the same direction or opposing directions wrt to the
                 % original direction assignment in edges2nodes.
                 
-                if(sumPolarities_k==2 || sumPolarities_k==0)
+                if(sumPolarities_k==2 || sumPolarities_k==-2)
                     % the 2 edges are in the same direction (in-in or out-out)
                     % assign opposing polarizations to the edges
 
@@ -201,7 +203,7 @@ if(withCD)
                     b(rowStop) = 1;
                     senseArray(rowStop) = '=';
 
-                elseif(sumPolarities_k==1)
+                elseif(sumPolarities_k==0)
                     % don't modify relative polarities
                     % TODO increment nodeConfStop ?????????????????
                     % 1. normal pair
@@ -226,7 +228,7 @@ if(withCD)
                     
                 else
                     disp('ERROR1:getILPConstraints.m problem with polarity calculation')
-                    disp('jType = %d   jInd = %d',jType,j)
+                    % disp('jType = %d   jInd = %d',jType,j)
                 end
                 
                 % conf k1 (k)

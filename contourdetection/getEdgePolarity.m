@@ -1,4 +1,5 @@
-function edgePolarities = getEdgePolarity(edgeListInds,edges2nodes,nodeListInd)
+function edgePolarities = getEdgePolarity(edgeListInds,edges2nodes,nodeListInd,...
+                nodeEdgeLIDs)
 
 % returns edge polarities for each edge given in edgeListInds, wrt to the
 % assigned direction for the edges according to edges2nodes.
@@ -9,13 +10,13 @@ function edgePolarities = getEdgePolarity(edgeListInds,edges2nodes,nodeListInd)
 % in edges2nodes, the 1st col is the start node, 2nd col is the end node.
 % the edge is assumed to go from node1(out) to node2(in)
 
-numEdges = numel(edgeListInds);
+numNodeEdges = numel(nodeEdgeLIDs);
 
-edgePolarities = zeros(numEdges,1);
+edgePolarities = zeros(numNodeEdges,1);
 
-for i=1:numEdges
+for i=1:numNodeEdges
     % for each edge, check the position of nodeListInd (1 or 2)
-    nodes_i = edges2nodes(edgeListInds(i),:);
+    nodes_i = edges2nodes(nodeEdgeLIDs(i),:);
     if(nodes_i(1)==nodeListInd)
         % outwards
         edgePolarities(i) = 1;
