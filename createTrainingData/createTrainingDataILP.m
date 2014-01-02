@@ -402,7 +402,10 @@ dirEdges2regionsOnOff = getRegionsForDirectedEdges...
 %             regionUnary,w_on_e,w_off_n,w_on_n,w_on_r,...
 %             nodeTypeStats);
         
-f = getILPObjVect_Tr(labelImage,ws,edgeListInds,edgepixels);
+
+f = getILPObjVect_Tr(labelImage,ws,edgeListInds,...
+                setOfRegions,edges2nodes,numEdges,numNodeConf,numRegions,...
+                edgeUnary);
 
 % senseArray(1:numEq) = '=';
 % if(numLt>0)
@@ -429,8 +432,8 @@ f = getILPObjVect_Tr(labelImage,ws,edgeListInds,edgepixels);
 %% solver
 if(useGurobi)
     disp('using Gurobi ILP solver...');
-    model.A = sparse(Aeq);
-    model.rhs = beq;
+    model.A = sparse(double(A));
+    model.rhs = b;
     model.obj = f';
     model.sense = senseArray;
     % model.vtype = vtypeArray;

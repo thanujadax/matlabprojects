@@ -11,12 +11,20 @@ ilpSegmentation = zeros(sizeR,sizeC);
 % this since we use edgepixels array which is already sans the skipped
 
 % edges
-onStateEdgeXind = 1:numEdges;
-onEdgeStates = x(onStateEdgeXind);
-onEdgeInd = find(onEdgeStates>0.5);
-offEdgeListInd = find(onEdgeStates<0.5);
+onStateEdgeXind_set1 = 1:numEdges;
+onEdgeStates_set1 = x(onStateEdgeXind_set1);
+
+onStateEdgeXind_set2 = (numEdges+1):numEdges*2;
+onEdgeStates_set2 = x(onStateEdgeXind_set2);
+
+onEdgeInd_set1_logical = onEdgeStates_set1>0.5;
+onEdgeInd_set2_logical = onEdgeStates_set2>0.5;
+
+onEdgeInd = onEdgeInd_set1_logical | onEdgeInd_set2_logical;
+
+% offEdgeListInd = find(onEdgeStates<0.5);
 onEdgePixelInds = getPixSetFromEdgeIDset(onEdgeInd,edgepixels);
-offEdgePixelInds = getPixSetFromEdgeIDset(offEdgeListInd,edgepixels);
+% offEdgePixelInds = getPixSetFromEdgeIDset(offEdgeListInd,edgepixels);
 ilpSegmentation(onEdgePixelInds) = 1;
 
 % active nodes 
@@ -34,7 +42,7 @@ for i=1:numJtypes
         numJnodes_i = numel(junctionNodesListInds_i);
         % get the indices (wrt x) for the inactivation of the junctions
         numEdgePJ_i = i+1;
-        numStatePJ_i = nchoosek(numEdgePJ_i,2)+1; % 1 is for the inactive case
+        numStatePJ_i = nchoosek(numEdgePJ_i,2)*2 +1; % 1 is for the inactive case
         fIndStart = fIndStop + 1;
         fIndStop = fIndStart -1 + numJnodes_i*numStatePJ_i;
         fIndsToLook = fIndStart:numStatePJ_i:fIndStop; % indices of inactive state
@@ -67,10 +75,10 @@ inactiveNodePixInds = setdiff(nodeInds,nodeIndsActive);
 offNodeIndList = find(ismember(nodeInds,inactiveNodePixInds));
 
 totX = numel(x);
-numRegionVars = numRegions*2;
-% get active foreground cells
-regionStartPos = totX - numRegionVars + 2;
-regionActivationVector = x(regionStartPos:2:totX);
+% numRegionVars = numRegions*2;
+%%  get active foreground cells
+regionStartPos = totX - numRegions + 1; % first variable is for the border
+regionActivationVector = x(regionStartPos:totX);
 activeRegionInd = find(regionActivationVector>0);
 
 %% store extracted geometry in datastructures
