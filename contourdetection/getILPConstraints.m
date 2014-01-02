@@ -12,16 +12,18 @@ function [A,b,senseArray,numEdges,numNodeConf,numRegions,nodeTypeStats]...
 %   A - coefficient matrix for constraint equations. each row is a
 %   constraint expression
 %   columns of A: {eLIDs, eLIDs_complementary}{nodeConf}{regions}
+%       nodeConf = [{off,act1, act1',...}...]
 %   b - RHS of constraint equations
 %   senseArray - char array of =,<,> for each equation
 %   numEdges - 
 %   numNodeConf - number of active node configurations
 %   numRegions - first region is the image border.
+%   nodeTypeStats - 
 
 %% Initialize
 
 numEdges = numel(edgeListInds);
-numRegions = size(setOfRegions,1) + 1;
+numRegions = size(setOfRegions,1) + 1; % + 1 for border
 
 % node stats
 % type 1 is J2 - junction with just 2 edges
@@ -30,7 +32,7 @@ numRegions = size(setOfRegions,1) + 1;
 % col1: n.o nodes of this type
 % col2: n.o tot junction activation variables \sum (nc2 * 2 + 1); +1 for
 % offState
-nodeTypeStats = zeros(numJtypes,2);
+nodeTypeStats = zeros(numJtypes,3);
 % 
 for i=1:numJtypes
     jEdges_i = jEdges{i};
@@ -45,10 +47,11 @@ for i=1:numJtypes
         numEdgeCombinations = nchoosek(numEdges_i,2); 
         numNodeConfVar_j = numEdgeCombinations *2 + 1; % n.o conf per node
         nodeTypeStats(i,2) = numNodeConfVar_j;
+        nodeTypeStats(i,3) = numNodeConfVar_j * numJ_i; % num node confs for typeJ
     end
 end
 
-numNodeConf = sum(nodeTypeStats(:,2)); % tot. n.o. activation conf for all node types
+numNodeConf = sum(nodeTypeStats(:,3)); % tot. n.o. activation conf for all node types
 
 numColsA = numEdges * 2 + numNodeConf + numRegions;
 % {edgeActivation}{edgePolarity}{nodeConfigurations}{regionActivation}
@@ -78,11 +81,11 @@ else
 end
 
 
-totNumConstraints = numCDeqns + numEReqns;
+totNumConstraints = numEdges + numNodeConf + numCDeqns + numEReqns;
 
 % Initialize outputs
-A = zeros(totNumConstraints,numColsA);
-b = zeros(totNumConstraints,1);
+A = int8(zeros(totNumConstraints,numColsA));
+b = single(zeros(totNumConstraints,1));
 senseArray(1:totNumConstraints) = '=';
 
 %% Inequality constraint - edge activation
@@ -199,19 +202,22 @@ if(withCD)
                     
                     A(rowStop,edgeLID_1) = 1;
                     A(rowStop,complementaryEdgeLID_2) = 1;
+                    
+                    nodeConfStop = nodeConfStop + 1;
                     A(rowStop,nodeConfStop) = -1;  % edge2p = 0
-                    b(rowStop) = 1;
-                    senseArray(rowStop) = '=';
+                    b(rowStop) = -0.1;
+                    senseArray(rowStop) = '>';
 
                 elseif(sumPolarities_k==0)
                     % don't modify relative polarities
-                    % TODO increment nodeConfStop ?????????????????
+
                     % 1. normal pair
                     rowStop = rowStop + 1;
                     
                     A(rowStop,edgeLID_1) = 1;
                     A(rowStop,edgeLID_2) = 1;
                     
+                    nodeConfStop = nodeConfStop + 1;
                     A(rowStop,nodeConfStop) = -1;
                     b(rowStop) = -0.1;
                     senseArray(rowStop) = '>';
@@ -222,9 +228,10 @@ if(withCD)
                     A(rowStop,complementaryEdgeLID_1) = 1;
                     A(rowStop,complementaryEdgeLID_2) = 1;
                     
+                    nodeConfStop = nodeConfStop + 1;
                     A(rowStop,nodeConfStop) = -1;
-                    b(rowStop) = 1;
-                    senseArray(rowStop) = '=';
+                    b(rowStop) = -0.1;
+                    senseArray(rowStop) = '>';
                     
                 else
                     disp('ERROR1:getILPConstraints.m problem with polarity calculation')
