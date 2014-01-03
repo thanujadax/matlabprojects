@@ -1,6 +1,6 @@
 function [A,b,senseArray,numEdges,numNodeConf,numRegions,nodeTypeStats]...
     = getILPConstraints(edgeListInds,edges2nodes,nodeEdgeIDs,junctionTypeListInds,...
-        jEdges,dirEdges2regionsOnOff,setOfRegions)
+        jEdges,dirEdges2regionsOnOff,setOfRegions,activeWSregionListInds_tr)
 
 % version 3:
 % 2013 11 12
@@ -62,7 +62,7 @@ numColsA = numEdges * 2 + numNodeConf + numRegions;
 
 withCD = 1;
 withER = 1;
-
+enforceActiveRegions = 1;
 
 if(withCD)
     numCDeqns = numNodeConf;  % 
@@ -80,8 +80,16 @@ else
     disp('region and edge co-activation constraint: OFF')
 end
 
+if(enforceActiveRegions)
+        numEnforceRegionsEqns = 1;
+        disp('Enforce active regions from training labels: ON')
+else
+    numEnforceRegionsEqns = 0;
+    disp('Enforce active regions from training labels: ON')
+end
 
-totNumConstraints = numEdges + numNodeConf + numCDeqns + numEReqns;
+totNumConstraints = numEdges + numNodeConf + numCDeqns + numEReqns ...
+                    + numEnforceRegionsEqns;
 
 % Initialize outputs
 A = sparse(totNumConstraints,numColsA);
@@ -280,5 +288,15 @@ if(withER)
     A(rowStop,rID_off) = 1;
     b(rowStop) = 0;
     % senseArray(rowStop) = '='; % default value
+end
+
+%% Enforce Active regions
+if(enforceActiveRegions)
+    numActiveRegions = numel(activeWSregionListInds_tr);
+    r_offset = numEdges*2 + numNodeConf;
+    offset_activeRegionWSInds = r_offset + activeWSregionListInds_tr;
+    rowStop = rowStop + 1;
+    A(rowStop,offset_activeRegionWSInds) = 1;
+    b(rowStop) = numActiveRegions;
 end
 

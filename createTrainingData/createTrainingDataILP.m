@@ -23,7 +23,7 @@ fromInputImage = 1;
 % rawImagePath = '/home/thanuja/Dropbox/data/evaldata/input/I08_raw05.tif';
 
 rawImagePath = '/home/thanuja/Dropbox/data/evaldata/input/I10_raw05.tif';
-labelImagePath = '/home/thanuja/Dropbox/data/evaldata/labels/I08_neuronLabels05.tif';
+labelImagePath = '/home/thanuja/Dropbox/data/evaldata/labels/I10_neuronLabels05.tif';
 
 % labelImagePath = '/home/thanuja/Dropbox/data/evaldata/labels/I05_neuronLabels05.tif';
 % imagePath = '/home/thanuja/Dropbox/data/evaldata2/input/I03_raw06.tif';
@@ -372,9 +372,15 @@ dirEdges2regionsOnOff = getRegionsForDirectedEdges...
 % dEdges2regionsOnOff = edgeListInd_dir (=rowID) | onRegion | offRegion  : dir N1->N2
 %   regionID = 0 is for the image border.
 
+[labelImg_indexed,numLabels] = getLabelIndexImg(labelImage);
+[c_cells2WSregions,c_internalEdgeIDs,c_extEdgeIDs,c_internalNodeInds,c_extNodeInds]...
+            = getCells2WSregions(labelImg_indexed,ws,numLabels,setOfRegions,...
+            edgeListInds,edges2nodes);
+activeWSregionListInds_tr = getElementsFromCell(c_cells2WSregions);        
+
 [model.A,b,senseArray,numEdges,numNodeConf,numRegions,nodeTypeStats]...
     = getILPConstraints(edgeListInds,edges2nodes,nodeEdges,junctionTypeListInds,...
-        jEdges,dirEdges2regionsOnOff,setOfRegions);
+        jEdges,dirEdges2regionsOnOff,setOfRegions,activeWSregionListInds_tr);
         
 
 % last 7 variables are continuous RVs corresponding to the parameters to be
