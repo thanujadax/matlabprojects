@@ -7,7 +7,7 @@ numVar = numEdges * 2 + numNodeConf + numRegions;
 f = zeros(numVar,1); % init
 
 edgeCostCoef = 100;
-regionCostCoef = 500;            
+regionCostCoef = 50000;            
 %% Get initial training labels for the image
 
 [labelImg_indexed,numLabels] = getLabelIndexImg(labelImage);
@@ -46,7 +46,7 @@ f(offSet_ActiveRegionLIDs) = -regionCostCoef; % reward
 regionSeq = 1:numRegions;
 inactiveWSregionListInds = setdiff(regionSeq,activeWSregionListInds);
 offSet_InactiveWSregionLIDs = inactiveWSregionListInds + offSet_regionVar;
-f(offSet_InactiveWSregionLIDs) = regionCostCoef; % penalty
+f(offSet_InactiveWSregionLIDs) = 0; % penalty
 
 
 

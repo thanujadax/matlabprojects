@@ -1,6 +1,9 @@
 function [c_cellBorderEdgeIDs,c_cellBorderNodeIDs] = getCellBorderComponents(onEdgeInd,...
         edges2nodes,nodeEdges,edgeListInds)
     
+% inputs:
+%   edges2nodes - row index is edgeListInd
+    
 usedEdgeInds = [];
 
 numEdges = size(onEdgeInd,1);

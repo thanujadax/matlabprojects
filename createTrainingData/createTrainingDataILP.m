@@ -372,7 +372,7 @@ dirEdges2regionsOnOff = getRegionsForDirectedEdges...
 % dEdges2regionsOnOff = edgeListInd_dir (=rowID) | onRegion | offRegion  : dir N1->N2
 %   regionID = 0 is for the image border.
 
-[A,b,senseArray,numEdges,numNodeConf,numRegions,nodeTypeStats]...
+[model.A,b,senseArray,numEdges,numNodeConf,numRegions,nodeTypeStats]...
     = getILPConstraints(edgeListInds,edges2nodes,nodeEdges,junctionTypeListInds,...
         jEdges,dirEdges2regionsOnOff,setOfRegions);
         
@@ -432,7 +432,7 @@ f = getILPObjVect_Tr(labelImage,ws,edgeListInds,...
 %% solver
 if(useGurobi)
     disp('using Gurobi ILP solver...');
-    model.A = sparse(double(A));
+    % model.A = sparse(double(A));
     model.rhs = b;
     model.obj = f';
     model.sense = senseArray;

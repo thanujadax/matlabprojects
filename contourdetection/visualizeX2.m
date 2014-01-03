@@ -20,9 +20,11 @@ onEdgeStates_set2 = x(onStateEdgeXind_set2);
 onEdgeInd_set1_logical = onEdgeStates_set1>0.5;
 onEdgeInd_set2_logical = onEdgeStates_set2>0.5;
 
-onEdgeInd = onEdgeInd_set1_logical | onEdgeInd_set2_logical;
+onEdgeInd_logical = onEdgeInd_set1_logical | onEdgeInd_set2_logical;
 
-% offEdgeListInd = find(onEdgeStates<0.5);
+onEdgeInd = find(onEdgeInd_logical);
+
+offEdgeListInd = find(onEdgeInd_logical==0);
 onEdgePixelInds = getPixSetFromEdgeIDset(onEdgeInd,edgepixels);
 % offEdgePixelInds = getPixSetFromEdgeIDset(offEdgeListInd,edgepixels);
 ilpSegmentation(onEdgePixelInds) = 1;

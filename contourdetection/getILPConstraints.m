@@ -84,8 +84,8 @@ end
 totNumConstraints = numEdges + numNodeConf + numCDeqns + numEReqns;
 
 % Initialize outputs
-A = int8(zeros(totNumConstraints,numColsA));
-b = single(zeros(totNumConstraints,1));
+A = sparse(totNumConstraints,numColsA);
+b = zeros(totNumConstraints,1);
 senseArray(1:totNumConstraints) = '=';
 
 %% Inequality constraint - edge activation
