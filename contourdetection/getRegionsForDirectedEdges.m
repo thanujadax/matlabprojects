@@ -36,12 +36,33 @@ for i=1:numRegions
     
     dirEdges2regionsOnOff(edgeLIDs_dir_region,1) = i; % =rID_on
     
+    % get complementary edgeLIDs_dir for the set of edges
+    edgeLID_dir_complementary = getComplementaryEdgeLID_dir...
+                    (numEdges,edgeLIDs_dir_region);
+    % for the complementary directions of these edges, region i is off
+    dirEdges2regionsOnOff(edgeLID_dir_complementary,2) = i; % =rID_off
     % get rID_off
-    rID_off = getOffRID(edgeLIDs2regions,i);
-    dirEdges2regionsOnOff(edgeLIDs_dir_region,2) = rID_off; % rID_off  
+    % rID_off = getOffRID(edgeLIDs2regions,i);
+    % dirEdges2regionsOnOff(edgeLIDs_dir_region,2) = rID_off; % rID_off  
 
 end
 
+function edgeLID_dir_complementary = getComplementaryEdgeLID_dir...
+                    (numEdges,edgeLIDs_dir_region)
+numRegionEdges = numel(edgeLIDs_dir_region);
+
+edgeLID_dir_complementary = zeros(numRegionEdges,1);
+
+addOffSetInds_logical = (edgeLIDs_dir_region<=numEdges);
+
+edgeLID_dir_complementary(addOffSetInds_logical) = ...
+        edgeLIDs_dir_region(addOffSetInds_logical) + numEdges;
+
+subtractOffSetInds_logical = (edgeLIDs_dir_region>numEdges);
+edgeLID_dir_complementary(subtractOffSetInds_logical) = ...
+        edgeLIDs_dir_region(subtractOffSetInds_logical) - numEdges;
+    
+    
 
 function rID_off = getOffRID(twoRegionEdgeLIDs,rID_on)
 % col1
