@@ -60,9 +60,10 @@ numColsA = numEdges * 2 + numNodeConf + numRegions;
 % 1. Closedness with edge directionality (withCD)
 % 2. Edge-region co-activation (withER)
 
-withCD = 0;
+withCD = 1;
 withER = 1;
-enforceActiveRegions = 1;
+enforceActiveRegions = 0;
+enforceInactiveRegions = 0;
 
 if(withCD)
     numCDeqns = numNodeConf;  % 
@@ -88,8 +89,16 @@ else
     disp('Enforce active regions from training labels: OFF')
 end
 
+if(enforceActiveRegions)
+        numEnforceRegionInactEqns = 1;
+        disp('Enforce inactive regions from training labels: ON')
+else
+    numEnforceRegionInactEqns = 0;
+    disp('Enforce inactive regions from training labels: OFF')
+end
+
 totNumConstraints = numEdges + numNodeConf + numCDeqns + numEReqns ...
-                    + numEnforceRegionsEqns;
+                    + numEnforceRegionsEqns + numEnforceRegionInactEqns;
 
 % Initialize outputs
 A = sparse(totNumConstraints,numColsA);
@@ -328,11 +337,24 @@ end
 
 %% Enforce Active regions
 if(enforceActiveRegions)
-    numActiveRegions = numel(activeWSregionListInds_tr);
+    
+    numActiveRegions_tr = numel(activeWSregionListInds_tr);
     r_offset = numEdges*2 + numNodeConf;
     offset_activeRegionWSInds = r_offset + activeWSregionListInds_tr;
     rowStop = rowStop + 1;
     A(rowStop,offset_activeRegionWSInds) = 1;
-    b(rowStop) = numActiveRegions;
+    b(rowStop) = numActiveRegions_tr;
+end
+
+if(enforceInactiveRegions)
+   regionSeq = 1:numRegions;
+   inactiveWsRegionListInds_tr = setdiff(regionSeq,activeWSregionListInds_tr);
+   r_offset = numEdges*2 + numNodeConf;
+   offset_inactiveRegionWsInds = r_offset + inactiveWsRegionListInds_tr;
+   
+   rowStop = rowStop + 1;
+   A(rowStop,offset_inactiveRegionWsInds) = 1;
+   b(rowStop) = 0;
+    
 end
 

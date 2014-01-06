@@ -7,7 +7,7 @@ numVar = numEdges * 2 + numNodeConf + numRegions;
 f = zeros(numVar,1); % init
 
 edgeCostCoef = 100;
-regionCostCoef = 50000;            
+regionCostCoef = 500;            
 %% Get initial training labels for the image
 
 [labelImg_indexed,numLabels] = getLabelIndexImg(labelImage);
@@ -38,15 +38,31 @@ activeRegionListInds = activeWSregionListInds - 1;
 % f(inactiveEdgeListInds_complementary) = -edgeUnary(inactiveEdgeListInds);
 
 %%  region variables
-offSet_regionVar = numVar - numRegions; % first region variable is the border
 
-offSet_ActiveRegionLIDs = offSet_regionVar + activeWSregionListInds;
-f(offSet_ActiveRegionLIDs) = -regionCostCoef; % reward
+% % get overlap to active label
+% % get overlap to inactive label
+% 
+% 
+% offSet_regionVar = numVar - numRegions; % first region variable is the border
+% 
+% offSet_ActiveRegionLIDs = offSet_regionVar + activeWSregionListInds;
+% f(offSet_ActiveRegionLIDs) = -regionCostCoef; % reward
+% 
+% regionSeq = 1:numRegions;
+% inactiveWSregionListInds = setdiff(regionSeq,activeWSregionListInds);
+% offSet_InactiveWSregionLIDs = inactiveWSregionListInds + offSet_regionVar;
+% f(offSet_InactiveWSregionLIDs) = 0; % penalty
 
-regionSeq = 1:numRegions;
-inactiveWSregionListInds = setdiff(regionSeq,activeWSregionListInds);
-offSet_InactiveWSregionLIDs = inactiveWSregionListInds + offSet_regionVar;
-f(offSet_InactiveWSregionLIDs) = 0; % penalty
+%% proporional reward/cost for regions
+
+regionRewards = getRegionOverlapScore(ws,labelImg_indexed);
+% on regions have a score (reward) close to +1 and off regions have a score close to
+% -1
+regionStartInd = numVar - numRegions + 1;
+regionStopInd = numVar;
+
+f(regionStartInd:regionStopInd) = regionRewards(1:numRegions) .* ...
+                    (-regionCostCoef);
 
 
 
