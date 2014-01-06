@@ -81,7 +81,7 @@ totX = numel(x);
 %%  get active foreground cells
 regionStartPos = totX - numRegions + 1; % first variable is for the border
 regionActivationVector = x(regionStartPos:totX);
-activeRegionInd = find(regionActivationVector>0);
+activeRegionInd = find(regionActivationVector>0) - 1;
 
 %% store extracted geometry in datastructures
 [c_cellBorderEdgeIDs,c_cellBorderNodeIDs] = getCellBorderComponents(onEdgeInd,...

@@ -8,7 +8,7 @@
 % with the new cost calculation at the junctions, incorporating the
 % directionality of the 
 
-showIntermediate = 1;
+showIntermediate = 0;
 useGurobi = 1;
 fromInputImage = 1;
 % imagePath = '/home/thanuja/Dropbox/data/mitoData/emJ_00_170x.png';
