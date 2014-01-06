@@ -4,7 +4,7 @@ function [adjacencyMat,nodeEdges,edges2nodes,edges2pixels,connectedJunctionIDs,.
 % Outputs:
 % nodeEdges: contains the set of edgeIDs for each nodePixInd
 
-saveMatrices = 1;  % to save some of the generated matrices
+saveMatrices = 0;  % to save some of the generated matrices
 
 % % test input ws
 % ws = imread('toyWS.png');

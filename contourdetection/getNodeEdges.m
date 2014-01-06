@@ -14,8 +14,13 @@ function [nodeEdges,nodeIndsNoDuplicates] = getNodeEdges(nodeInds,edgePixLabels,
 
 % for each node, get the neighbors
 % get the edgeID of the neighbors
-numClusters = max(connectedJunctionIDs(:,2));
-numClusteredNodes = size(connectedJunctionIDs,1);
+if(size(connectedJunctionIDs,2)==2)
+    numClusters = max(connectedJunctionIDs(:,2));
+    numClusteredNodes = size(connectedJunctionIDs,1);
+else
+    numClusters = 0;
+    numClusteredNodes = 0;
+end
 % number of nodes after combining clusters
 numNodes0 = numel(nodeInds);
 numNodesCombined = numNodes0 - numClusteredNodes + numClusters;

@@ -8,7 +8,7 @@
 % with the new cost calculation at the junctions, incorporating the
 % directionality of the 
 
-showIntermediate = 0;
+showIntermediate = 1;
 useGurobi = 1;
 fromInputImage = 1;
 % imagePath = '/home/thanuja/Dropbox/data/mitoData/emJ_00_170x.png';
@@ -22,12 +22,17 @@ fromInputImage = 1;
 
 % rawImagePath = '/home/thanuja/Dropbox/data/evaldata/input/I08_raw05.tif';
 
-rawImagePath = '/home/thanuja/Dropbox/data/evaldata/input/I10_raw05.tif';
-labelImagePath = '/home/thanuja/Dropbox/data/evaldata/labels/I10_neuronLabels05.tif';
-
 % labelImagePath = '/home/thanuja/Dropbox/data/evaldata/labels/I05_neuronLabels05.tif';
 % imagePath = '/home/thanuja/Dropbox/data/evaldata2/input/I03_raw06.tif';
 % labelImagePath = '/home/thanuja/Dropbox/data/evaldata2/labels/I03_neuronLabels06.tif';
+
+
+% rawImagePath = '/home/thanuja/Dropbox/data/evaldata/input/I10_raw05.tif';
+% labelImagePath = '/home/thanuja/Dropbox/data/evaldata/labels/I10_neuronLabels05.tif';
+
+rawImagePath = '/home/thanuja/Dropbox/data/testImg/testImg11.png';
+labelImagePath = '/home/thanuja/Dropbox/data/testImg/testImg11_labels.png';
+
 
 orientationStepSize = 10;
 orientations = 0:orientationStepSize:350;
@@ -106,6 +111,11 @@ w_on_r = -1.07527;
 disp('using image file:')
 disp(rawImagePath);
 imgIn0 = double(imread(rawImagePath));
+[a,b,c] = size(imgIn0);
+if(c==3)
+    imgIn0 = rgb2gray(imgIn0);
+end
+
 labelImage = imread(labelImagePath);
 
 % add thick border
@@ -146,11 +156,17 @@ edgeListInds = edges2pixels(:,1);
 junctionTypeListInds = getJunctionTypeListInds(nodeEdges);
 % col1 has the listInds of type J2, col2: J3 etc. listInds are wrt
 % nodeInds list of pixel indices of the detected junctions
-clusterNodeIDs = connectedJunctionIDs(:,1); % indices of the clustered junction nodes
+if(size(connectedJunctionIDs,2)==2)
+    clusterNodeIDs = connectedJunctionIDs(:,1); % indices of the clustered junction nodes
+else
+    clusterNodeIDs = 0;
+end
 disp('graph created!')
 wsRegionBoundariesFromGraph = zeros(sizeR,sizeC);
 wsRegionBoundariesFromGraph(nodeInds) = 0.7;          % junction nodes
-wsRegionBoundariesFromGraph(clusterNodeIDs) = 0.5;    % cluster nodes
+if(size(connectedJunctionIDs,2)==2)
+    wsRegionBoundariesFromGraph(clusterNodeIDs) = 0.5;    % cluster nodes
+end
 [nre,nce] = size(edges2pixels);  % first column is the edgeID
 edgepixels = edges2pixels(:,2:nce);
 wsRegionBoundariesFromGraph(edgepixels(edgepixels>0)) = 1; % edge pixels

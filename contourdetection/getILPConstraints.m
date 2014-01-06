@@ -85,7 +85,7 @@ if(enforceActiveRegions)
         disp('Enforce active regions from training labels: ON')
 else
     numEnforceRegionsEqns = 0;
-    disp('Enforce active regions from training labels: ON')
+    disp('Enforce active regions from training labels: OFF')
 end
 
 totNumConstraints = numEdges + numNodeConf + numCDeqns + numEReqns ...
@@ -152,7 +152,7 @@ if(withCD)
             nodeEdgeIDs_j = nodeEdgeIDs(nodeListInd_j,:);
             nodeEdgeIDs_j(1) = [];  % first element is nodeInd
             nodeEdgeIDs_j = nodeEdgeIDs_j(nodeEdgeIDs_j>0);
-            [~,nodeEdgeListInds_j] = intersect(edgeListInds,nodeEdgeIDs_j);
+            [~,nodeEdgeListInds_j] = intersect(edgeListInds',nodeEdgeIDs_j);
             % edgeListInds are the same as the col id for each edge
             
             % polarity (in/out) at each node
@@ -165,7 +165,7 @@ if(withCD)
             b(rowStop) = 2;
             % senseArray(rowStop) = '='; default value
             nodeEdgeListInds_j_complementary = nodeEdgeListInds_j + numEdges;
-            nodeEdgeListInds_j_dir = [nodeEdgeListInds_j nodeEdgeListInds_j_complementary];
+            nodeEdgeListInds_j_dir = [nodeEdgeListInds_j; nodeEdgeListInds_j_complementary];
             
             nodeConfStop = nodeConfStop + 1;
             A(rowStop,nodeConfStop) = 2;
@@ -201,9 +201,16 @@ if(withCD)
                     A(rowStop,complementaryEdgeLID_1) = 1;
                     A(rowStop,edgeLID_2) = 1;
                     
-                    A(rowStop,nodeConfStop) = -1;
-                    b(rowStop) = -0.1;
+                    A(rowStop,nodeConfStop) = -2;
+                    b(rowStop) = -0.5;
                     senseArray(rowStop) = '>';
+                    
+                    rowStop = rowStop + 1;
+                    A(rowStop,complementaryEdgeLID_1) = 1;
+                    A(rowStop,edgeLID_2) = 1;
+                    A(rowStop,nodeConfStop) = -2;
+                    b(rowStop) = 1.5;
+                    senseArray(rowStop) = '<';
 
                     % constraint for edge_2 of the pair 1 0
                     rowStop = rowStop + 1;
@@ -212,9 +219,16 @@ if(withCD)
                     A(rowStop,complementaryEdgeLID_2) = 1;
                     
                     nodeConfStop = nodeConfStop + 1;
-                    A(rowStop,nodeConfStop) = -1;  % edge2p = 0
-                    b(rowStop) = -0.1;
+                    A(rowStop,nodeConfStop) = -2;  % edge2p = 0
+                    b(rowStop) = -0.5;
                     senseArray(rowStop) = '>';
+                    
+                    rowStop = rowStop + 1;
+                    A(rowStop,edgeLID_1) = 1;
+                    A(rowStop,complementaryEdgeLID_2) = 1;
+                    A(rowStop,nodeConfStop) = -2;
+                    b(rowStop) = 1.5;
+                    senseArray(rowStop) = '<';
 
                 elseif(sumPolarities_k==0)
                     % don't modify relative polarities
@@ -226,9 +240,16 @@ if(withCD)
                     A(rowStop,edgeLID_2) = 1;
                     
                     nodeConfStop = nodeConfStop + 1;
-                    A(rowStop,nodeConfStop) = -1;
-                    b(rowStop) = -0.1;
+                    A(rowStop,nodeConfStop) = -2;
+                    b(rowStop) = -0.5;
                     senseArray(rowStop) = '>';
+                    
+                    rowStop = rowStop + 1;
+                    A(rowStop,edgeLID_1) = 1;
+                    A(rowStop,edgeLID_2) = 1;
+                    A(rowStop,nodeConfStop) = -2;
+                    b(rowStop) = 1.5;
+                    senseArray(rowStop) = '<';
                     
                     % 2. complementary pair
                     rowStop = rowStop + 1;
@@ -237,9 +258,16 @@ if(withCD)
                     A(rowStop,complementaryEdgeLID_2) = 1;
                     
                     nodeConfStop = nodeConfStop + 1;
-                    A(rowStop,nodeConfStop) = -1;
-                    b(rowStop) = -0.1;
+                    A(rowStop,nodeConfStop) = -2;
+                    b(rowStop) = -0.5;
                     senseArray(rowStop) = '>';
+                    
+                    rowStop = rowStop + 1;
+                    A(rowStop,complementaryEdgeLID_1) = 1;
+                    A(rowStop,complementaryEdgeLID_2) = 1;
+                    A(rowStop,nodeConfStop) = -2;
+                    b(rowStop) = 1.5;
+                    senseArray(rowStop) = '<';
                     
                 else
                     disp('ERROR1:getILPConstraints.m problem with polarity calculation')
