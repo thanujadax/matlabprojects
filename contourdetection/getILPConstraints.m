@@ -60,7 +60,7 @@ numColsA = numEdges * 2 + numNodeConf + numRegions;
 % 1. Closedness with edge directionality (withCD)
 % 2. Edge-region co-activation (withER)
 
-withCD = 1;
+withCD = 0;
 withER = 1;
 enforceActiveRegions = 1;
 
@@ -300,6 +300,14 @@ if(withER)
         % find the two regions for the edge and if they're on or off
         rowStop = rowStop + 1;
         A(rowStop,i) = -1;
+        
+        % complementary edgeLID 
+        if(i<=numEdges)
+            edgeLID_comp = i + numEdges;
+        else
+            edgeLID_comp = i - numEdges;
+        end
+        A(rowStop,edgeLID_comp) = 1;
         
         rID_on = dirEdges2regionsOnOff(i,1);
         rID_off = dirEdges2regionsOnOff(i,2); 
