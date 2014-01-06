@@ -1,13 +1,9 @@
-% function segmentationOut = createTrainingDataILP(rawImagePath,labelImagePath)
+function segmentationOut = doILP_w_dir(rawImagePath)
 
-% version 2. 2013.11.29
+% version 3. 2014.01.06
 
-% using learned param, get segmentation
-
-% ILP script 5
-% with the new cost calculation at the junctions, incorporating the
-% directionality of the 
-
+% each edge in the ws graph is represented by 2 (oppositely) directed edges 
+produceBMRMfiles = 1;
 showIntermediate = 0;
 useGurobi = 1;
 fromInputImage = 1;
@@ -28,7 +24,7 @@ fromInputImage = 1;
 
 
 rawImagePath = '/home/thanuja/Dropbox/data/evaldata/input/I10_raw05.tif';
-labelImagePath = '/home/thanuja/Dropbox/data/evaldata/labels/I10_neuronLabels05.tif';
+% labelImagePath = '/home/thanuja/Dropbox/data/evaldata/labels/I10_neuronLabels05.tif';
 
 % rawImagePath = '/home/thanuja/Dropbox/data/testImg/testImg11.png';
 % labelImagePath = '/home/thanuja/Dropbox/data/testImg/testImg11_labels.png';
@@ -54,8 +50,7 @@ priorThreshFracBB = 0.55; % threshold of edgePrior for an edge to be considered 
 minNumActEdgesPercentage = 0;  % percentage of the tot num edges to retain (min)
 
 % param
-numParam = 0;       % number of params to learn. refer QP section
-% edgeOff,edgeOff,nodeoff,nodePos,nodeNeg,regionOff,regionOn
+
 
 cEdge = 1;        % general scaling factor for edge priors
 cCell = 1;        % positive scaling factor for cell priors
@@ -75,28 +70,13 @@ boundaryEdgeReward = 1;     % prior value for boundary edges so that
 %   4. w_on_n
 %   5. w_off_r
 %   6. w_on_r
-
-% w_off_e = 1;
-% w_on_e = 1;
-% w_off_n = 1;
-% w_on_n = 1;
-% w_off_r = 1;
-% w_on_r = 1;
-
-% w_off_e = -11.8404;
-% w_on_e = 11.8404;
-% w_off_n = 6.33708;
-% w_on_n = 10.6658;
-% w_off_r = -2.55561;
-% w_on_r = 2.55561;
-
-w_off_e = 16.8913;
-w_on_e = -16.8913;
-w_off_n = -10.6301;
-w_on_n = 9.27912;
-w_off_r = 1.07527;
-w_on_r = -1.07527;
-
+if(produceBMRMfiles)
+    % set all parameters to  be learned to 1
+    
+else
+    % use pre-learned parameters
+    
+end
 
 
 % tot num of int variables = 2*numEdges + 4*numJ3 + 7*numJ4
@@ -445,11 +425,13 @@ f = getILPObjVect_Tr(labelImage,ws,edgeListInds,...
 % ubArray(1:(numBinaryVar+numParam)) = 1;
 
 %% Write files for structured learninig bmrm
-% featureMat = writeFeaturesFile(f,jEdges,numEdges,numRegions);
-% 
-% constraints = writeConstraintsFile(Aeq,beq,senseArray);
-% 
-% features = writeLabelsFile(labelVector);
+if(produceBMRMfiles)
+    featureMat = writeFeaturesFile(f,jEdges,numEdges,numRegions);
+
+    constraints = writeConstraintsFile(Aeq,beq,senseArray);
+
+    features = writeLabelsFile(labelVector);
+end
 
 %% solver
 if(useGurobi)
