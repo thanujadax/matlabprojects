@@ -127,7 +127,7 @@ end
 cwOrderedDirEdgeListInds(1) = nextEdgeLID_dir; % do just (this) one
 
 cwOrderedNodeListInds(1) = nextNodeLID;
-
+nextNodePair = edges2nodes(nextEdgeLID,:);
 N1 = nextNodeLID;
 % N2 is at the other end of the edge edgeLId_2;
 nodeLIds_temp = edges2nodes_directional(nextEdgeLID,:);
@@ -136,7 +136,7 @@ N2 = setdiff(nodeLIds_temp,N1);
 %cwOrderedEdgeListInds(1) = edgeLId_2; % is it in the right direction
 if(numEdges_region>1)
     for i = 2:numEdges_region
-        nextNodePair = edges2nodes(nextEdgeLID,:);
+        % nextNodePair = edges2nodes(nextEdgeLID,:);
         nextNodeLID = setdiff(nextNodePair,nextNodeLID);
         cwOrderedNodeListInds(i) = nextNodeLID;
 
@@ -145,7 +145,7 @@ if(numEdges_region>1)
         [~,allEdgeLIDsForNextNode] = intersect(edgeListIndsAll,allEdgeIDsForNextNode);
         nodeEdgeLIDpair = intersect(edgeListInds_region,allEdgeLIDsForNextNode);
         nextEdgeLID = setdiff(nodeEdgeLIDpair,nextEdgeLID);
-
+        nextNodePair = edges2nodes(nextEdgeLID,:);
         if(nextNodePair(1)==nextNodeLID)
             nextEdgeLID_dir = nextEdgeLID;
         else
