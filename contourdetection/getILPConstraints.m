@@ -1,9 +1,9 @@
-function [A,b,senseArray,numEdges,numNodeConf,numRegions,nodeTypeStats]...
+function [A,b,senseArray,numEdges,numNodeConf,numRegions,nodeTypeStats,obj]...
     = getILPConstraints(edgeListInds,edges2nodes,nodeEdgeIDs,junctionTypeListInds,...
-        jEdges,dirEdges2regionsOnOff,setOfRegions,activeWSregionListInds_tr)
+        jEdges,dirEdges2regionsOnOff,setOfRegions,activeWSregionListInds_tr,)
 
-% version 3:
-% 2013 11 12
+% version 3.1:
+% 2014.01.07
 
 % Inputs:
 %   
@@ -19,6 +19,8 @@ function [A,b,senseArray,numEdges,numNodeConf,numRegions,nodeTypeStats]...
 %   numNodeConf - number of active node configurations
 %   numRegions - first region is the image border.
 %   nodeTypeStats - 
+%   obj - objective vector for the ILP, in the same order as the variables
+%   used for the constraints
 
 %% Initialize
 
@@ -104,6 +106,7 @@ totNumConstraints = numEdges + numNodeConf + numCDeqns + numEReqns ...
 A = sparse(totNumConstraints,numColsA);
 b = zeros(totNumConstraints,1);
 senseArray(1:totNumConstraints) = '=';
+obj = zeros(numColsA,1);
 
 %% Inequality constraint - edge activation
 % Each edge in the graph correspond to 2 edge activation variables

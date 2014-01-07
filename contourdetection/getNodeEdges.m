@@ -9,6 +9,7 @@ function [nodeEdges,nodeIndsNoDuplicates] = getNodeEdges(nodeInds,edgePixLabels,
 % Output:
 %   nodeEdges - array with edge labels corresponding to each junction. each
 %   row -> jn,edge1,edge2,edge3,edge4
+%       edgeIDs sorted in ascending order 20140107
 %   nodeIndsNoDuplicates - list of the pixel indices of the nodes provided
 %   in nodeEdges. For the detected clustered nodes in connectedJunctions 
 
@@ -86,5 +87,11 @@ for i=1:numNodesCombined
             
             
         end
+    end
+    % sort edgeIDs in ascending order
+    if(k>1)
+        edgeList_i = nodeEdges(i,2:k);
+        edgeList_i = sort(edgeList_i);
+        nodeEdges(i,2:k) = edgeList_i;
     end
 end
