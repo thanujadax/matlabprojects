@@ -81,7 +81,7 @@ if(produceBMRMfiles)
     w_on_r = 1;     % region weight
 else
     % use pre-learned parameters
-    w_on_e = -16;     % edge weight
+    w_on_e = 11;     % edge weight
     w_off_n = -10;    % node off weight
     w_on_n = 10;     % node on weight
     w_on_r = -1;     % region weight
@@ -105,11 +105,11 @@ if(c==3)
     imgIn0 = rgb2gray(imgIn0);
 end
 
-imgIn0 = imgIn0(1:128,:);
+% imgIn0 = imgIn0(1:128,:);
 
 if(produceBMRMfiles)
     labelImage = imread(labelImagePath);
-    labelImage = labelImage(1:128,:,:);
+    % labelImage = labelImage(1:128,:,:);
 end
 % add thick border
 if(b_imWithBorder)

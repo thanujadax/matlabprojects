@@ -63,6 +63,7 @@ numColsA = numEdges * 2 + numNodeConf + numRegions;
 
 withCD = 1;
 withER = 1;
+regionVarBin = 1;
 enforceActiveRegions = 0;
 enforceInactiveRegions = 0;
 
@@ -82,6 +83,14 @@ else
     disp('region and edge co-activation constraint: OFF')
 end
 
+if(regionVarBin)
+    numRVB = numRegions;
+    disp('binary constraint for region variables: ON')
+else
+    numRVB = 0;
+    disp('binary constraint for region variables: OFF')
+end
+
 if(enforceActiveRegions)
         numEnforceRegionsEqns = 1;
         disp('Enforce active regions from training labels: ON')
@@ -99,7 +108,8 @@ else
 end
 
 totNumConstraints = numEdges + numNodeConf + numCDeqns + numEReqns ...
-                    + numEnforceRegionsEqns + numEnforceRegionInactEqns;
+                    + numEnforceRegionsEqns + numEnforceRegionInactEqns...
+                    + numRVB;
 
 % Initialize outputs
 A = sparse(totNumConstraints,numColsA);
@@ -336,6 +346,20 @@ if(withER)
     % senseArray(rowStop) = '='; % default value
 end
 
+%% Region variables should be binary 
+if(regionVarBin)
+    % each region var should be <=1
+    colStart = numEdges*2 + numNodeConf + 1;
+    colStop = numColsA;
+    
+    for i=colStart:colStop
+        rowStop = rowStop + 1;
+        A(rowStop,i) = 1;
+        b(rowStop) = 1.1;
+        senseArray(rowStop) = '<';
+    end
+    
+end
 %% Enforce Active regions
 if(enforceActiveRegions)
     
