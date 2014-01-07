@@ -83,9 +83,7 @@ for i=1:numNodesCombined
                         nodeEdges(i,k) = edgeId;
                     end
                 end
-            end
-            
-            
+            end                        
         end
     end
     % sort edgeIDs in ascending order

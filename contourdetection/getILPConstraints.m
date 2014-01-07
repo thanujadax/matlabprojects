@@ -1,6 +1,6 @@
-function [A,b,senseArray,numEdges,numNodeConf,numRegions,nodeTypeStats,obj]...
+function [A,b,senseArray,numEdges,numNodeConf,numRegions,nodeTypeStats]...
     = getILPConstraints(edgeListInds,edges2nodes,nodeEdgeIDs,junctionTypeListInds,...
-        jEdges,dirEdges2regionsOnOff,setOfRegions,activeWSregionListInds_tr,)
+        jEdges,dirEdges2regionsOnOff,setOfRegions,activeWSregionListInds_tr)
 
 % version 3.1:
 % 2014.01.07
@@ -19,8 +19,7 @@ function [A,b,senseArray,numEdges,numNodeConf,numRegions,nodeTypeStats,obj]...
 %   numNodeConf - number of active node configurations
 %   numRegions - first region is the image border.
 %   nodeTypeStats - 
-%   obj - objective vector for the ILP, in the same order as the variables
-%   used for the constraints
+
 
 %% Initialize
 
@@ -106,7 +105,6 @@ totNumConstraints = numEdges + numNodeConf + numCDeqns + numEReqns ...
 A = sparse(totNumConstraints,numColsA);
 b = zeros(totNumConstraints,1);
 senseArray(1:totNumConstraints) = '=';
-obj = zeros(numColsA,1);
 
 %% Inequality constraint - edge activation
 % Each edge in the graph correspond to 2 edge activation variables
@@ -214,14 +212,14 @@ if(withCD)
                     A(rowStop,edgeLID_2) = 1;
                     
                     A(rowStop,nodeConfStop) = -2;
-                    b(rowStop) = -0.5;
+                    b(rowStop) = -0.1;
                     senseArray(rowStop) = '>';
                     
                     rowStop = rowStop + 1;
                     A(rowStop,complementaryEdgeLID_1) = 1;
                     A(rowStop,edgeLID_2) = 1;
                     A(rowStop,nodeConfStop) = -2;
-                    b(rowStop) = 1.5;
+                    b(rowStop) = 1.1;
                     senseArray(rowStop) = '<';
 
                     % constraint for edge_2 of the pair 1 0
@@ -232,14 +230,14 @@ if(withCD)
                     
                     nodeConfStop = nodeConfStop + 1;
                     A(rowStop,nodeConfStop) = -2;  % edge2p = 0
-                    b(rowStop) = -0.5;
+                    b(rowStop) = -0.1;
                     senseArray(rowStop) = '>';
                     
                     rowStop = rowStop + 1;
                     A(rowStop,edgeLID_1) = 1;
                     A(rowStop,complementaryEdgeLID_2) = 1;
                     A(rowStop,nodeConfStop) = -2;
-                    b(rowStop) = 1.5;
+                    b(rowStop) = 1.1;
                     senseArray(rowStop) = '<';
 
                 elseif(sumPolarities_k==0)
@@ -253,14 +251,14 @@ if(withCD)
                     
                     nodeConfStop = nodeConfStop + 1;
                     A(rowStop,nodeConfStop) = -2;
-                    b(rowStop) = -0.5;
+                    b(rowStop) = -0.1;
                     senseArray(rowStop) = '>';
                     
                     rowStop = rowStop + 1;
                     A(rowStop,edgeLID_1) = 1;
                     A(rowStop,edgeLID_2) = 1;
                     A(rowStop,nodeConfStop) = -2;
-                    b(rowStop) = 1.5;
+                    b(rowStop) = 1.1;
                     senseArray(rowStop) = '<';
                     
                     % 2. complementary pair
@@ -271,14 +269,14 @@ if(withCD)
                     
                     nodeConfStop = nodeConfStop + 1;
                     A(rowStop,nodeConfStop) = -2;
-                    b(rowStop) = -0.5;
+                    b(rowStop) = -0.1; 
                     senseArray(rowStop) = '>';
                     
                     rowStop = rowStop + 1;
                     A(rowStop,complementaryEdgeLID_1) = 1;
                     A(rowStop,complementaryEdgeLID_2) = 1;
                     A(rowStop,nodeConfStop) = -2;
-                    b(rowStop) = 1.5;
+                    b(rowStop) = 1.1;
                     senseArray(rowStop) = '<';
                     
                 else

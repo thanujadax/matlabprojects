@@ -3,10 +3,14 @@ function segmentationOut = doILP_w_dir(rawImagePath)
 % version 3. 2014.01.06
 
 % each edge in the ws graph is represented by 2 (oppositely) directed edges 
+
 produceBMRMfiles = 1;
+generateStructuredLabelVectX = 0;
 showIntermediate = 0;
 useGurobi = 1;
 fromInputImage = 1;
+
+
 % imagePath = '/home/thanuja/Dropbox/data/mitoData/emJ_00_170x.png';
 % imagePath = '/home/thanuja/Dropbox/data/testImg/testCurves1.png';
 % imagePath = '/home/thanuja/Dropbox/data/mitoData/stem1_256by256.png';
@@ -24,7 +28,7 @@ fromInputImage = 1;
 
 
 rawImagePath = '/home/thanuja/Dropbox/data/evaldata/input/I10_raw05.tif';
-% labelImagePath = '/home/thanuja/Dropbox/data/evaldata/labels/I10_neuronLabels05.tif';
+labelImagePath = '/home/thanuja/Dropbox/data/evaldata/labels/I10_neuronLabels05.tif';
 
 % rawImagePath = '/home/thanuja/Dropbox/data/testImg/testImg11.png';
 % labelImagePath = '/home/thanuja/Dropbox/data/testImg/testImg11_labels.png';
@@ -72,10 +76,16 @@ boundaryEdgeReward = 1;     % prior value for boundary edges so that
 %   6. w_on_r
 if(produceBMRMfiles)
     % set all parameters to  be learned to 1
-    
+    w_on_e = 1;     % edge weight
+    w_off_n = 1;    % node off weight
+    w_on_n = 1;     % node on weight
+    w_on_r = 1;     % region weight
 else
     % use pre-learned parameters
-    
+    w_on_e = -16;     % edge weight
+    w_off_n = -10;    % node off weight
+    w_on_n = 10;     % node on weight
+    w_on_r = -1;     % region weight
 end
 
 
@@ -95,13 +105,15 @@ imgIn0 = double(imread(rawImagePath));
 if(c==3)
     imgIn0 = rgb2gray(imgIn0);
 end
-
-labelImage = imread(labelImagePath);
-
+if(produceBMRMfiles)
+    labelImage = imread(labelImagePath);
+end
 % add thick border
 if(b_imWithBorder)
     imgIn = addThickBorder(imgIn0,marginSize,marginPixVal);
-    labelImage = addThickBorder(labelImage,marginSize,marginPixVal);
+    if(produceBMRMfiles)
+        labelImage = addThickBorder(labelImage,marginSize,marginPixVal);
+    end
 end
 
 
@@ -368,11 +380,15 @@ dirEdges2regionsOnOff = getRegionsForDirectedEdges...
 % dEdges2regionsOnOff = edgeListInd_dir (=rowID) | onRegion | offRegion  : dir N1->N2
 %   regionID = 0 is for the image border.
 
-[labelImg_indexed,numLabels] = getLabelIndexImg(labelImage);
-[c_cells2WSregions,c_internalEdgeIDs,c_extEdgeIDs,c_internalNodeInds,c_extNodeInds]...
-            = getCells2WSregions(labelImg_indexed,ws,numLabels,setOfRegions,...
-            edgeListInds,edges2nodes);
-activeWSregionListInds_tr = getElementsFromCell(c_cells2WSregions);        
+if(produceBMRMfiles)
+    [labelImg_indexed,numLabels] = getLabelIndexImg(labelImage);
+    [c_cells2WSregions,c_internalEdgeIDs,c_extEdgeIDs,c_internalNodeInds,c_extNodeInds]...
+                = getCells2WSregions(labelImg_indexed,ws,numLabels,setOfRegions,...
+                edgeListInds,edges2nodes);
+    activeWSregionListInds_tr = getElementsFromCell(c_cells2WSregions);  
+else
+    activeWSregionListInds_tr = [];
+end
 
 [model.A,b,senseArray,numEdges,numNodeConf,numRegions,nodeTypeStats]...
     = getILPConstraints(edgeListInds,edges2nodes,nodeEdges,junctionTypeListInds,...
@@ -404,10 +420,15 @@ activeWSregionListInds_tr = getElementsFromCell(c_cells2WSregions);
 %             regionUnary,w_on_e,w_off_n,w_on_n,w_on_r,...
 %             nodeTypeStats);
         
-
-f = getILPObjVect_Tr(labelImage,ws,edgeListInds,...
+if(produceBMRMfiles)
+    f = getILPObjVect_Tr(labelImage,ws,edgeListInds,...
                 setOfRegions,edges2nodes,numEdges,numNodeConf,numRegions,...
                 edgeUnary);
+else            
+    f = getILPObjectiveVectorParametric2(edgeUnary,nodeAngleCosts,...
+            regionUnary,w_on_e,w_off_n,w_on_n,w_on_r,...
+            nodeTypeStats);
+end
 
 % senseArray(1:numEq) = '=';
 % if(numLt>0)
@@ -424,14 +445,6 @@ f = getILPObjVect_Tr(labelImage,ws,edgeListInds,...
 % upper bounds
 % ubArray(1:(numBinaryVar+numParam)) = 1;
 
-%% Write files for structured learninig bmrm
-if(produceBMRMfiles)
-    featureMat = writeFeaturesFile(f,jEdges,numEdges,numRegions);
-
-    constraints = writeConstraintsFile(Aeq,beq,senseArray);
-
-    features = writeLabelsFile(labelVector);
-end
 
 %% solver
 if(useGurobi)
@@ -474,7 +487,15 @@ else
     t2 = cputime;
     timetaken = t2-t1
 end
-
+%% write BMRM files
+if (produceBMRMfiles)
+    f = getILPObjectiveVectorParametric2(edgeUnary,nodeAngleCosts,...
+            regionUnary,w_on_e,w_off_n,w_on_n,w_on_r,...
+            nodeTypeStats); % w's are set to 1.
+    featureMat = writeFeaturesFile2(f,jEdges,numEdges,numRegions);
+    constraints = writeConstraintsFile(model.A,b,senseArray);
+    labels = writeLabelsFile(x);
+end
 
 %% visualize
 segmentationOut = visualizeX2(x,sizeR,sizeC,numEdges,numRegions,edgepixels,...
