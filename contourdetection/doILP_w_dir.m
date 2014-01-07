@@ -1,11 +1,10 @@
-function segmentationOut = doILP_w_dir(rawImagePath)
+% function segmentationOut = doILP_w_dir(rawImagePath)
 
 % version 3. 2014.01.06
 
 % each edge in the ws graph is represented by 2 (oppositely) directed edges 
 
 produceBMRMfiles = 1;
-generateStructuredLabelVectX = 0;
 showIntermediate = 0;
 useGurobi = 1;
 fromInputImage = 1;
@@ -105,8 +104,12 @@ imgIn0 = double(imread(rawImagePath));
 if(c==3)
     imgIn0 = rgb2gray(imgIn0);
 end
+
+imgIn0 = imgIn0(1:128,:);
+
 if(produceBMRMfiles)
     labelImage = imread(labelImagePath);
+    labelImage = labelImage(1:128,:,:);
 end
 % add thick border
 if(b_imWithBorder)

@@ -24,6 +24,11 @@ onEdgeInd_logical = onEdgeInd_set1_logical | onEdgeInd_set2_logical;
 
 onEdgeInd = find(onEdgeInd_logical);
 
+if(isempty(onEdgeInd))
+    disp('none of the edges were activated!')
+    segmentationOut = 0;
+else
+
 offEdgeListInd = find(onEdgeInd_logical==0);
 onEdgePixelInds = getPixSetFromEdgeIDset(onEdgeInd,edgepixels);
 % offEdgePixelInds = getPixSetFromEdgeIDset(offEdgeListInd,edgepixels);
@@ -151,3 +156,4 @@ end
 segmentationOut = removeThickBorder(visualizeCells,marginSize);
 
 figure;imshow(segmentationOut);
+end
