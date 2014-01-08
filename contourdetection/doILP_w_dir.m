@@ -4,7 +4,7 @@
 
 % each edge in the ws graph is represented by 2 (oppositely) directed edges 
 
-produceBMRMfiles = 0;
+produceBMRMfiles = 1;
 showIntermediate = 0;
 useGurobi = 1;
 fromInputImage = 1;
@@ -495,7 +495,7 @@ end
 %% write BMRM files
 if (produceBMRMfiles)
     f = getILPObjectiveVectorParametric2(edgeUnary,nodeAngleCosts,...
-            regionUnary,w_on_e,w_off_n,w_on_n,w_on_r,...
+            regionUnary,w_on_e,w_off_e,w_off_n,w_on_n,w_on_r,w_off_r,...
             nodeTypeStats); % w's are set to 1.
     featureMat = writeFeaturesFile2(f,jEdges,numEdges,numRegions);
     constraints = writeConstraintsFile(model.A,b,senseArray);

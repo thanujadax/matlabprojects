@@ -353,7 +353,7 @@ end
 if(regionVarBin)
     % each region var should be <=1
     colStart = numEdges*3 + numNodeConf + 1;
-    colStop = numColsA;
+    colStop = numColsA - numRegions;
     
     for i=colStart:colStop
         rowStop = rowStop + 1;
