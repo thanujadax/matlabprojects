@@ -11,7 +11,7 @@ function [A,b,senseArray,numEdges,numNodeConf,numRegions,nodeTypeStats]...
 % Outputs:
 %   A - coefficient matrix for constraint equations. each row is a
 %   constraint expression
-%   columns of A: {eLIDs, eLIDs_complementary}{nodeConf}{regions}
+%   columns of A: {eLIDs, eLIDs_complementary,eLIDs_off}{nodeConf}{regionsOn,regionsOff}
 %       nodeConf = [{off,act1, act1',...}...]
 %   b - RHS of constraint equations
 %   senseArray - char array of =,<,> for each equation
@@ -54,8 +54,8 @@ end
 
 numNodeConf = sum(nodeTypeStats(:,3)); % tot. n.o. activation conf for all node types
 
-numColsA = numEdges * 2 + numNodeConf + numRegions;
-% {edgeActivation}{edgePolarity}{nodeConfigurations}{regionActivation}
+numColsA = numEdges * 3 + numNodeConf + numRegions * 2;
+% {edgeDir1}{edgeDir2}{edgeOff}{nodeConfigurations}{regionActive}{regionInactive}
 
 % constraints types
 % 1. Closedness with edge directionality (withCD)
@@ -116,7 +116,7 @@ A = sparse(totNumConstraints,numColsA);
 b = zeros(totNumConstraints,1);
 senseArray(1:totNumConstraints) = '=';
 
-%% Inequality constraint - edge activation
+%% Equality constraint - edge activation
 % Each edge in the graph correspond to 2 edge activation variables
 % corresponding to the two directional edges between the pair of nodes
 % connected by the original edge. Both components can't be active at the
@@ -127,16 +127,18 @@ col_1 = 0;
 for rowStop=1:numEdges
     col_1 = col_1 + 1;
     col_2 = col_1 + numEdges;
+    col_3 = col_2 + numEdges;
     A(rowStop,col_1) = 1;
     A(rowStop,col_2) = 1;
-    b(rowStop) = 1.1;
-    senseArray(rowStop) = '<';
+    A(rowStop,col_3) = 1;
+    b(rowStop) = 1;
+    senseArray(rowStop) = '=';
 end
 
 %% Equality constraint node activation: 
 % only one configuration per each node can be active the most.
 % first nodeConf is the inactivation of the node
-colStop = numEdges*2;
+colStop = numEdges*3;
 for jType = 1:numJtypes
     % for each junction type
     numNodes_j = nodeTypeStats(jType,1);
@@ -156,7 +158,7 @@ end
 % each node configuration is an active configuration where exactly 2 edges
 % have to be active.
 
-nodeConfStop = numEdges * 2; % points to the last filled node conf col ind in x
+nodeConfStop = numEdges * 3; % points to the last filled node conf col ind in x
 if(withCD)
 
    for jType=1:numJtypes
@@ -311,7 +313,7 @@ end
 if(withER)
     dirEdges2regionsOnOff = dirEdges2regionsOnOff + 1; 
     % regionID = 1 is for the image border, which should be off.
-    r_offset = numEdges*2 + numNodeConf;
+    r_offset = numEdges*3 + numNodeConf;
     % TODO: this for loop can be modified by considering the pair of
     % complementary edges inside the same loop. this can also be used to
     % check the accuracy of dirEdges2regionsOnOff
@@ -346,17 +348,21 @@ if(withER)
     % senseArray(rowStop) = '='; % default value
 end
 
-%% Region variables should be binary 
+%% Region variables should be binary
+% rOn + rOff = 1;
 if(regionVarBin)
     % each region var should be <=1
-    colStart = numEdges*2 + numNodeConf + 1;
+    colStart = numEdges*3 + numNodeConf + 1;
     colStop = numColsA;
     
     for i=colStart:colStop
         rowStop = rowStop + 1;
-        A(rowStop,i) = 1;
-        b(rowStop) = 1.1;
-        senseArray(rowStop) = '<';
+        regionOnInd = i;
+        regionOffInd = i+numRegions;
+        A(rowStop,regionOnInd) = 1;
+        A(rowStop,regionOffInd) = 1;
+        b(rowStop) = 1;
+        senseArray(rowStop) = '=';
     end
     
 end
