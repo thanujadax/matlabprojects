@@ -1,5 +1,5 @@
 function f = getILPObjectiveVectorParametric2(edgeUnary,nodeAngleCosts,...
-            regionUnary,w_on_e,w_off_n,w_on_n,w_on_r,...
+            regionUnary,w_on_e,w_off_e,w_off_n,w_on_n,w_on_r,w_off_r,...
             nodeTypeStats)
         
 % version 2 with directed edges - 2014.01.07
@@ -21,10 +21,10 @@ numEdges_directed = numEdges * 2;
 
 totJunctionVar = sum(nodeTypeStats(:,3));
 numRegions = numel(regionUnary) + 1; % region 1 is image border
-numElements = numEdges_directed + totJunctionVar + numRegions;
+numElements = numEdges*3 + totJunctionVar + numRegions*2;
 f = zeros(numElements,1);
 % order of elements in f
-%[{edges ... edges_comp},{j01,j11,..,j02,j12,...},{r1,r2,...}]
+%[{edges ... edges_comp ... edgeOff },{j01,j11,..,j02,j12,...},{rOn... rOff}]
 
 %% edge variables
 % for each edge, there are 2 possible active states. Only one of those can
@@ -44,10 +44,11 @@ f = zeros(numElements,1);
 for i=1:numEdges
     f(i) = edgeUnary(i) * w_on_e;
     f(i+numEdges) = edgeUnary(i) * w_on_e;
+    f(i+numEdges*2) = edgeUnary(i) * w_off_e;
 %     
 end
 
-f_stop_ind = numEdges_directed;
+f_stop_ind = numEdges*3;
 
 %%  junction variables
 for i=1:numJtypes
@@ -80,8 +81,10 @@ k=1;
 % regionID = 1 is the image border. this is inactive (see constraints file)
 f_stop_ind = f_stop_ind + 1;
 f(f_stop_ind) = 0; % for the border
+
 f_stop_ind = f_stop_ind + 1;
 for i=(f_stop_ind):(f_stop_ind+numRegions-2)
     f(i) = regionUnary(k) * w_on_r; % activation
+    f(i+numRegions) = regionUnary(k) * w_off_r; % inactivation
     k = k + 1;
 end

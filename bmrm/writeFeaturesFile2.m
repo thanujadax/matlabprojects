@@ -17,7 +17,7 @@ function featureMat = writeFeaturesFile2(f,jEdges,numEdges,numRegions)
 % #
 % # different training sets can just be concatenated
 
-numFeatures = 4;
+numFeatures = 6;
 numRows = numel(f);
 
 featureMat = zeros(numRows,numFeatures);
@@ -37,14 +37,19 @@ numVar = numel(f);
 
 
 %% edges
-
+% edge on dir1 & dir2
 featInd = 0;
 for i=1:numEdges*2
     featInd = i;
     featVal = f(featInd);  
-    featureMat(featInd,1) = featVal;  % (1) w_e_on 
-
-    
+    featureMat(featInd,1) = featVal;  % (1) w_e_on     
+end
+% edge off
+featInd = numEdges * 2;
+for i=1:numEdges
+    featInd = featInd + 1;
+    featVal = f(featInd); 
+    featureMat(featInd,2) = featVal;  % (2) w_e_off 
 end
 
 %% nodes
@@ -92,23 +97,29 @@ for i=1:numJtypes
         for j=1:numNodes_i
             featInd = featInd + 1;
             featVal = f(featInd);
-            featureMat(featInd,2) = featVal; % (2) w_n_off
+            featureMat(featInd,3) = featVal; % (3) w_n_off
             
             featStart = featInd + 1;
             featInd = featInd + numActiveStates;
             
-            featureMat(featStart:featInd,3) = f(featStart:featInd); % (3) w_n_on
+            featureMat(featStart:featInd,4) = f(featStart:featInd); % (4) w_n_on
         end
     end
 end
 
 
 %% regions
-
+% rOn
 for i=1:numRegions
     featInd = featInd + 1;
     featVal = f(featInd);
-    featureMat(featInd,4) = featVal;  % (4) w_r_off
+    featureMat(featInd,5) = featVal;  % (5) w_r_on
+end
+% rOff
+for i=1:numRegions
+    featInd = featInd + 1;
+    featVal = f(featInd);
+    featureMat(featInd,5) = featVal;  % (6) w_r_off
 end
 
 %%  write to file
