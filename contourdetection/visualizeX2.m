@@ -35,7 +35,7 @@ onEdgePixelInds = getPixSetFromEdgeIDset(onEdgeInd,edgepixels);
 ilpSegmentation(onEdgePixelInds) = 1;
 
 % active nodes 
-fIndStop = 2*numEdges;
+fIndStop = 3*numEdges;
 nodeInactiveStates_x = [];
 nodeActivationVector = zeros(numel(nodeInds),1);    % stores 1 for active node list inds
 nodeIndsActive = [];
@@ -84,8 +84,8 @@ offNodeIndList = find(ismember(nodeInds,inactiveNodePixInds));
 totX = numel(x);
 % numRegionVars = numRegions*2;
 %%  get active foreground cells
-regionStartPos = totX - numRegions + 1; % first variable is for the border
-regionActivationVector = x(regionStartPos:totX);
+regionStartPos = totX - numRegions*2 + 1; % first variable is for the border
+regionActivationVector = x(regionStartPos:(totX-numRegions));
 activeRegionInd = find(regionActivationVector>0) - 1;
 
 %% store extracted geometry in datastructures

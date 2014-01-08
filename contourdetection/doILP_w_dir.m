@@ -76,9 +76,11 @@ boundaryEdgeReward = 1;     % prior value for boundary edges so that
 if(produceBMRMfiles)
     % set all parameters to  be learned to 1
     w_on_e = 1;     % edge weight
+    w_off_e = 1;
     w_off_n = 1;    % node off weight
     w_on_n = 1;     % node on weight
     w_on_r = 1;     % region weight
+    w_off_r = 1;
 else
     % use pre-learned parameters
     w_on_e = -4.24;     % edge weight
@@ -429,7 +431,7 @@ if(produceBMRMfiles)
                 edgeUnary);
 else            
     f = getILPObjectiveVectorParametric2(edgeUnary,nodeAngleCosts,...
-            regionUnary,w_on_e,w_off_n,w_on_n,w_on_r,...
+            regionUnary,w_on_e,w_off_e,w_off_n,w_on_n,w_on_r,w_off_r,...
             nodeTypeStats);
 end
 
