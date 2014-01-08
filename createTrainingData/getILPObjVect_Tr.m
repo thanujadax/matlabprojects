@@ -3,7 +3,7 @@ function f = getILPObjVect_Tr(labelImage,ws,edgeListInds,...
                 edgeUnary)
 
 % objective to be minimized (costs are positive, rewards are negative)
-numVar = numEdges * 2 + numNodeConf + numRegions;
+numVar = numEdges * 3 + numNodeConf + numRegions*2;
 f = zeros(numVar,1); % init
 
 edgeCostCoef = 100;
@@ -58,14 +58,17 @@ activeRegionListInds = activeWSregionListInds - 1;
 regionRewards = getRegionOverlapScore(ws,labelImg_indexed);
 % on regions have a score (reward) close to +1 and off regions have a score close to
 % -1
-regionStartInd = numVar - numRegions + 1;
-regionStopInd = numVar;
+regionStartInd_on = numVar - numRegions*2 + 1;
+regionStopInd_on = numVar - numRegions;
 
-f(regionStartInd:regionStopInd) = regionRewards(1:numRegions) .* ...
+f(regionStartInd_on:regionStopInd_on) = regionRewards(1:numRegions) .* ...
                     (-regionCostCoef);
 
 
+regionStartInd_off = numVar - numRegions + 1;
+regionStopInd_off = numVar;
 
+f(regionStartInd_off:regionStopInd_off) = -1.*f(regionStartInd_on:regionStopInd_on);
 
 
 
