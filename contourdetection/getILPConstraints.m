@@ -370,22 +370,23 @@ end
 if(enforceActiveRegions)
     
     numActiveRegions_tr = numel(activeWSregionListInds_tr);
-    r_offset = numEdges*2 + numNodeConf;
+    r_offset = numEdges*3 + numNodeConf;
     offset_activeRegionWSInds = r_offset + activeWSregionListInds_tr;
     rowStop = rowStop + 1;
     A(rowStop,offset_activeRegionWSInds) = 1;
-    b(rowStop) = numActiveRegions_tr;
+    b(rowStop) = numActiveRegions_tr - 10;
+    senseArray(rowStop) = '>';
 end
 
 if(enforceInactiveRegions)
    regionSeq = 1:numRegions;
    inactiveWsRegionListInds_tr = setdiff(regionSeq,activeWSregionListInds_tr);
-   r_offset = numEdges*2 + numNodeConf;
+   r_offset = numEdges*3 + numNodeConf;
    offset_inactiveRegionWsInds = r_offset + inactiveWsRegionListInds_tr;
    
    rowStop = rowStop + 1;
    A(rowStop,offset_inactiveRegionWsInds) = 1;
-   b(rowStop) = 0;
-    
+   b(rowStop) = 10;
+   senseArray(rowStop) = '<';
 end
 
