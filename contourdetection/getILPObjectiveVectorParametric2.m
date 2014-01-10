@@ -42,9 +42,9 @@ f = zeros(numElements,1);
 % end
 
 for i=1:numEdges
-    f(i) = edgeUnary(i) * w_on_e;
-    f(i+numEdges) = edgeUnary(i) * w_on_e;
-    f(i+numEdges*2) = edgeUnary(i) * w_off_e;
+    f(i) = edgeUnary(i) * w_on_e;               % dir1
+    f(i+numEdges) = edgeUnary(i) * w_on_e;      % dir2
+    f(i+numEdges*2) = (1-edgeUnary(i)) * w_off_e;   % off
 %     
 end
 
@@ -84,7 +84,7 @@ f(f_stop_ind) = 0; % for the border
 
 f_stop_ind = f_stop_ind + 1;
 for i=(f_stop_ind):(f_stop_ind+numRegions-2)
-    f(i) = regionUnary(k) * w_on_r; % activation
-    f(i+numRegions) = regionUnary(k) * w_off_r; % inactivation
+    f(i) = regionUnary(k) * w_on_r;             % activation
+    f(i+numRegions) = (1-regionUnary(k)) * w_off_r; % inactivation
     k = k + 1;
 end

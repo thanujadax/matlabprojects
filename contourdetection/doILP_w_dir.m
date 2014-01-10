@@ -83,10 +83,12 @@ if(produceBMRMfiles)
     w_off_r = 1;
 else
     % use pre-learned parameters
-    w_on_e = -4.24;     % edge weight
-    w_off_n = -3.68;    % node off weight
-    w_on_n = -4.41;     % node on weight
-    w_on_r = -3.38;     % region weight
+    w_on_e = -4.30773;     % edge weight
+    w_off_e = 4.30773;
+    w_off_n = -5.01662;    % node off weight
+    w_on_n = -6.49848;     % node on weight
+    w_on_r = -4.5594;     % region weight
+    w_off_r = 0;
 end
 
 
