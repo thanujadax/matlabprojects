@@ -4,7 +4,7 @@
 
 % each edge in the ws graph is represented by 2 (oppositely) directed edges 
 
-produceBMRMfiles = 1;
+produceBMRMfiles = 0;
 showIntermediate = 0;
 useGurobi = 1;
 fromInputImage = 1;
@@ -65,8 +65,11 @@ offEdgeReward = 1;
 bbJunctionReward = 1;       % inactivation cost for bbjunction
 boundaryEdgeReward = 1;     % prior value for boundary edges so that
                             % they won't have too much weight
+%% Set parameters
+regionOffThreshold = 0.21;  % threshold to pick likely off regions to set off score 
+% to +1*w_off_r in the objective
                             
-% learned parameters
+%%  learned parameters
 %   1. w_off_e
 %   2. w_on_e
 %   3. w_off_n
@@ -83,12 +86,12 @@ if(produceBMRMfiles)
     w_off_r = 1;
 else
     % use pre-learned parameters
-    w_on_e = -4.30773;     % edge weight
-    w_off_e = 4.30773;
-    w_off_n = -5.01662;    % node off weight
-    w_on_n = -6.49848;     % node on weight
-    w_on_r = -4.5594;     % region weight
-    w_off_r = 0;
+    w_on_e = -6.35215;     % edge weight
+    w_off_e = -9;
+    w_off_n = -0.646086;    % node off weight
+    w_on_n = -0.0455184;     % node on weight
+    w_on_r = 2;     % region weight
+    w_off_r = -8;
 end
 
 
@@ -240,7 +243,7 @@ for i=1:numJtypes
                                 edgePriors_i,w_on_n);
     end
 end
-%% Faces of wsgraph -> cell types (between pairs of cells)
+%% Faces of wsgraph -> region types (between pairs of regions)
 disp('calculating adjacency graph of regions ...')
 [faceAdj,edges2regions,setOfRegions,twoRegionEdges,wsIDsForRegions] ...
     = getFaceAdjFromWS(ws,edges2pixels,b_imWithBorder,boundaryEdgeIDs);
@@ -251,7 +254,7 @@ edgeOrientations = (edgeOrientationsInds-1).*orientationStepSize;
 % normalize input image
 normalizedInputImage = imgIn./(max(max(imgIn)));
 
-% get cell priors from RFC probability map
+%% get region priors from RFC probability map
 if ~exist('forest.mat','file')
     disp('RF for membrane classification not found. Training new classifier...')
     forest = trainRandomForest_pixelProb();
@@ -434,7 +437,7 @@ if(produceBMRMfiles)
 else            
     f = getILPObjectiveVectorParametric2(edgeUnary,nodeAngleCosts,...
             regionUnary,w_on_e,w_off_e,w_off_n,w_on_n,w_on_r,w_off_r,...
-            nodeTypeStats);
+            nodeTypeStats,offEdgeListIDs,regionOffThreshold,numNodeConf);
 end
 
 % senseArray(1:numEq) = '=';
@@ -467,8 +470,7 @@ if(useGurobi)
     model.modelname = 'contourDetectionILP1';
     % initial guess
     % model.start = labelVector;
-    
-    
+        
     params.LogFile = 'gurobi.log';
     params.Presolve = 0;
     params.ResultFile = 'modelfile.mps';
@@ -476,8 +478,7 @@ if(useGurobi)
 
     resultGurobi = gurobi(model,params);
     x = resultGurobi.x;
-    
-    
+        
 else
     % Matlab ILP solver
     disp('using MATLAB ILP solver...');
@@ -498,7 +499,7 @@ end
 if (produceBMRMfiles)
     f = getILPObjectiveVectorParametric2(edgeUnary,nodeAngleCosts,...
             regionUnary,w_on_e,w_off_e,w_off_n,w_on_n,w_on_r,w_off_r,...
-            nodeTypeStats); % w's are set to 1.
+            nodeTypeStats,offEdgeListIDs,regionOffThreshold,numNodeConf); % w's are set to 1.
     featureMat = writeFeaturesFile2(f,jEdges,numEdges,numRegions);
     constraints = writeConstraintsFile(model.A,b,senseArray);
     labels = writeLabelsFile(x);

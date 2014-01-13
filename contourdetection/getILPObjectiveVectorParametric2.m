@@ -1,6 +1,6 @@
 function f = getILPObjectiveVectorParametric2(edgeUnary,nodeAngleCosts,...
             regionUnary,w_on_e,w_off_e,w_off_n,w_on_n,w_on_r,w_off_r,...
-            nodeTypeStats)
+            nodeTypeStats,offEdgeListIDs,regionOffThreshold,numNodeConf)
         
 % version 2 with directed edges - 2014.01.07
 % {edges}{edges_complementary}{nodeConfigurations}{border,regionActivation}
@@ -20,7 +20,7 @@ numEdges_directed = numEdges * 2;
 % type 1 is J2 - junction with just 2 edges
 
 totJunctionVar = sum(nodeTypeStats(:,3));
-numRegions = numel(regionUnary) + 1; % region 1 is image border
+numRegions = numel(regionUnary) + +1; % region 1 is image border
 numElements = numEdges*3 + totJunctionVar + numRegions*2;
 f = zeros(numElements,1);
 % order of elements in f
@@ -44,9 +44,13 @@ f = zeros(numElements,1);
 for i=1:numEdges
     f(i) = edgeUnary(i) * w_on_e;               % dir1
     f(i+numEdges) = edgeUnary(i) * w_on_e;      % dir2
-    f(i+numEdges*2) = (1-edgeUnary(i)) * w_off_e;   % off
+    % f(i+numEdges*2) = (1-edgeUnary(i)) * w_off_e;   % off
 %     
 end
+
+% offEdgeIDs should have an offScore of +1
+offEdgeLIDs_offset = offEdgeListIDs + numEdges * 2;
+f(offEdgeLIDs_offset) = w_off_e;
 
 f_stop_ind = numEdges*3;
 
@@ -58,7 +62,8 @@ for i=1:numJtypes
     notNaN = sum(sum(~isnan(nodeAngleCost_i)))>0;
     if(~isempty(nodeAngleCost_i) && notNaN)
         [numJ,numc] = size(nodeAngleCost_i);
-        nodeAngleCost_bidir_i = zeros(numJ,(numc*2));
+        % nodeAngleCost_bidir_i = zeros(numJ,(numc*2));
+        nodeAngleCost_bidir_i = [nodeAngleCost_i nodeAngleCost_i];
         nodeAngleCost_bidir_i = nodeAngleCost_bidir_i .* w_on_n;
 
         % inactivation cost - comes from learned param
@@ -85,6 +90,12 @@ f(f_stop_ind) = 0; % for the border
 f_stop_ind = f_stop_ind + 1;
 for i=(f_stop_ind):(f_stop_ind+numRegions-2)
     f(i) = regionUnary(k) * w_on_r;             % activation
-    f(i+numRegions) = (1-regionUnary(k)) * w_off_r; % inactivation
+    % f(i+numRegions) = (1-regionUnary(k)) * w_off_r; % inactivation
     k = k + 1;
 end
+
+% regionsLikely to be turned off: set offScore to +1
+offset_for_regionOff_LIDs = numEdges*3 + numNodeConf + numRegions;
+likelyOffRegionIDs = find(regionUnary<regionOffThreshold) +1; % +1 for border region
+likelyOffRegionIDs_offset = likelyOffRegionIDs + offset_for_regionOff_LIDs;
+f(likelyOffRegionIDs_offset) = w_off_r;
