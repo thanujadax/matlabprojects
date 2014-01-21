@@ -5,6 +5,7 @@ function imageGrid = getImageGrid(imageIn,ofr)
 %   ofr: oriented edge filter response
 
 % Output:
+%   image
 
 % Parameters
 gridResolution = 3;     % pixels
@@ -32,8 +33,9 @@ nodePix = sub2ind([sizeR sizeC],nodeY,nodeX);
 
 % define edges2nodes
 
+% for each node define tt
+
 % edges2pixels ?
 
-% nodeEdges
-
+% nodeEdges: edgeIDs connected to each nodeID
 
