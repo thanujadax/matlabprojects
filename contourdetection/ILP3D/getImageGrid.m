@@ -32,6 +32,7 @@ y_pos = gridStartY:gridResolution:sizeR;
 nodePix = sub2ind([sizeR sizeC],nodeY,nodeX);
 
 % define edges2nodes
+edges2nodes = getEdges2nodes_grid();
 
 % for each node define tt
 
