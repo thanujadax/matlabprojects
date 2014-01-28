@@ -1,39 +1,32 @@
-function imageGrid = getImageGrid(imageIn,ofr)
+function imageGrid = getImageGrid(imageIn,ofr,verbose)
 
 % Inputs: 
 %   imageIn: input image
 %   ofr: oriented edge filter response
 
 % Output:
-%   image
+%   ws_grid_equivalent = imageGrid
+%   nodeEdges
+%   edges2nodes
+%   edges2pixels
+%   nodeInds
 
 % Parameters
-gridResolution = 3;     % pixels
+gridResolution = 4;     % pixels
 
 [sizeR,sizeC] = size(imageIn);
 
 imageGrid = zeros(sizeR,sizeC);
 
+%% node layout - triangular grid
 % define nodes
-numEdgesX = floor(sizeC/gridResolution);
-marginPix_X = mod(sizeC,gridResolution);
-gridStartX = floor(marginPix_X/2);
+nodePix = getGridNodeLayout_sq(sizeR,sizeC,gridResolution);
 
-numEdgesY = floor(sizeR/gridResolution);
-marginPix_Y = mod(sizeC,gridResolution);
-gridStartY = floor(marginPix_Y/2);
-
-% define node positions
-x_pos = gridStartX:gridResolution:sizeC;
-y_pos = gridStartY:gridResolution:sizeR;
-
-[nodeX, nodeY] = meshgrid(x_pos,y_pos);
-
-nodePix = sub2ind([sizeR sizeC],nodeY,nodeX);
-
+%% edge layout (node neighborhood) - triangular grid
 % define edges2nodes
+adjacencyMat = getNodeAdjacency(nodePix);
 edges2nodes = getEdges2nodes_grid();
-
+edges2pixels = getEdges2pixels_grid();
 % for each node define tt
 
 % edges2pixels ?
