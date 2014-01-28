@@ -25,7 +25,7 @@ nodePix = getGridNodeLayout_sq(sizeR,sizeC,gridResolution);
 %% edge layout (node neighborhood) - square grid
 % define edges2nodes
 adjacencyMat = getNodeAdjacency(nodePix);
-edges2nodes = getEdges2nodes_grid();
+edges2nodes = getEdges2nodes_grid(adjacencyMat);
 edges2pixels = getEdges2pixels_grid();
 % for each node define tt
 
