@@ -12,7 +12,7 @@ function imageGrid = getImageGrid(imageIn,ofr,verbose)
 %   nodeInds
 
 % Parameters
-gridResolution = 4;     % pixels
+gridResolution = 6;     % pixels
 
 [sizeR,sizeC] = size(imageIn);
 
@@ -21,12 +21,13 @@ imageGrid = zeros(sizeR,sizeC);
 %% node layout - square grid
 % define nodes
 nodePix = getGridNodeLayout_sq(sizeR,sizeC,gridResolution);
-
+% nodePix: matrix containing the nodesPixInds in meshgrid format.
 %% edge layout (node neighborhood) - square grid
 % define edges2nodes
-adjacencyMat = getNodeAdjacency(nodePix);
+[adjacencyMat,nodeIndsVect] = getNodeAdjacency(nodePix);
 edges2nodes = getEdges2nodes_grid(adjacencyMat);
-edges2pixels = getEdges2pixels_grid();
+edges2pixels = getEdges2pixels_grid(edges2nodes,nodeIndsVect,sizeR,sizeC);
+ws_grid = getWSfromGrid(nodeIndsVect,edges2pixels,sizeR,sizeC);
 % for each node define tt
 
 % edges2pixels ?

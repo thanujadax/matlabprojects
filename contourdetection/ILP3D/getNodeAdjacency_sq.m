@@ -1,4 +1,4 @@
-function adjacencyMat = getNodeAdjacency_sq(nodePix)
+function [adjacencyMat,nodeIndsVect] = getNodeAdjacency_sq(nodePix)
 
 % returns adjacency matrix for the given nodePix laid out on a triagular
 % grid
