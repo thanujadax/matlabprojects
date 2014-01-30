@@ -1,4 +1,4 @@
-function nodePix = getGridNodeLayout_sq(sizeR,sizeC,gridResolution)
+function [nodePix,numEdgesX,numEdgesY] = getGridNodeLayout_sq(sizeR,sizeC,gridResolution)
 
 % Output:
 %   nodePix: matrix containing the nodesPixInds in meshgrid format.
@@ -22,3 +22,5 @@ y_pos = gridStartY:gridResolution:sizeR;
 [nodeX, nodeY] = meshgrid(x_pos,y_pos);
 
 nodePix = sub2ind([sizeR sizeC],nodeY,nodeX);
+
+% numGrids = numEdgesX * numEdgesY;

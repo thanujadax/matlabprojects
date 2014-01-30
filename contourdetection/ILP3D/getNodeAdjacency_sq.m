@@ -1,7 +1,8 @@
 function [adjacencyMat,nodeIndsVect] = getNodeAdjacency_sq(nodePix)
 
 % returns adjacency matrix for the given nodePix laid out on a triagular
-% grid
+% grid.
+% coefficients of the matrix are the edgeIDs connecting two nodes
 
 % input:
 %    nodePix - sizeR x sizeC matrix. Conserves the order of the square grid
@@ -20,6 +21,7 @@ adjacencyMat = zeros(numNodes);
 
 % for all non boundary grid nodes
 % row updates of adjacency matrix
+
 for i=2:numNodes
     for j=2:numNodes
         nodePix_i = nodePix(i,j);
@@ -147,6 +149,12 @@ nodeListInd_i = find(nodeIndsVect==nodePix_i);
 % update adjacencyMat row
 adjacencyMat(nodeListInd_i,twoN) = nodeListInd_i;
 
+% assigning edgeIDs for coefficients
+adjacencyMat = triu(adjacencyMat,1);
+numEdges = sum(sum(adjacencyMat>0));
+edgeIDseq = 1: numEdges;
+adjacencyMat(adjacencyMat>0) = edgeIDseq;
+adjacencyMat = triu(adjacencyMat,1) + triu(adjacencyMat,1)';
 %% supplementary functions
 function threeN = get3N_LRD(i,j,nodePix,isTopRow)
 % left right 2N and below/above
