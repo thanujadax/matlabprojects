@@ -1,5 +1,5 @@
-function [ws_grid,edgeSetRegions] = getWSfromGrid_sq(nodeIndsVect,edges2pixels,nodeEdges,sizeR,sizeC,...
-                    gridResolution,numGridsX,numGridsY)
+function [ws_grid,edgeSetRegions] = getWSfromGrid_sq(nodeIndsVect,edges2pixels,...
+                    nodeEdges,sizeR,sizeC,numGridsX,numGridsY)
                 
 % Const
 NUM_SIDES = 4; % number of sides per  grid cell - 4 for square shaped grid cells

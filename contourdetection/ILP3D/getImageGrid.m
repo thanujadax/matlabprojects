@@ -1,4 +1,6 @@
-function imageGrid = getImageGrid(imageIn,ofr,verbose)
+function [ws_grid,edgeSetRegions,edges2pixels,edges2nodes,nodeEdges,...
+            adjacencyMat,nodeIndsVect]...
+                                        = getImageGrid(imageIn,verbose)
 
 % Inputs: 
 %   imageIn: input image
@@ -16,8 +18,6 @@ gridResolution = 6;     % pixels
 
 [sizeR,sizeC] = size(imageIn);
 
-imageGrid = zeros(sizeR,sizeC);
-
 %% node layout - square grid
 % define nodes
 [nodePix,numGridsX,numGridsY] = getGridNodeLayout_sq(sizeR,sizeC,gridResolution);
@@ -27,11 +27,7 @@ imageGrid = zeros(sizeR,sizeC);
 [adjacencyMat,nodeIndsVect] = getNodeAdjacency(nodePix);
 [edges2nodes,nodeEdges] = getEdges2nodes_grid(adjacencyMat);
 edges2pixels = getEdges2pixels_grid(edges2nodes,nodeIndsVect,sizeR,sizeC);
-ws_grid = getWSfromGrid(nodeIndsVect,edges2pixels,nodeEdges,sizeR,sizeC,...
-                gridResolution,numGridsX,numGridsY);
-% for each node define tt
+[ws_grid, edgeSetRegions] = getWSfromGrid(nodeIndsVect,edges2pixels,nodeEdges,...
+                sizeR,sizeC,numGridsX,numGridsY);
 
-% edges2pixels ?
-
-% nodeEdges: edgeIDs connected to each nodeID
-
+%% project OFR on to the grid
