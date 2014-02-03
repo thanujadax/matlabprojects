@@ -1,6 +1,7 @@
 function [ws_grid,edgeSetRegions,edges2pixels,edges2nodes,nodeEdges,...
-            adjacencyMat,nodeIndsVect]...
-                                        = getImageGrid(imageIn,verbose)
+            adjacencyMat,nodeIndsVect,edges2regions,boundaryEdgeIDs,...
+            twoRegionEdges]...
+                                        = getImageGrid(imageIn,gridResolution,verbose)
 
 % Inputs: 
 %   imageIn: input image
@@ -14,7 +15,7 @@ function [ws_grid,edgeSetRegions,edges2pixels,edges2nodes,nodeEdges,...
 %   nodeInds
 
 % Parameters
-gridResolution = 6;     % pixels
+% gridResolution = 6;     % pixels
 
 [sizeR,sizeC] = size(imageIn);
 
@@ -23,11 +24,26 @@ gridResolution = 6;     % pixels
 [nodePix,numGridsX,numGridsY] = getGridNodeLayout_sq(sizeR,sizeC,gridResolution);
 % nodePix: matrix containing the nodesPixInds in meshgrid format.
 %% edge layout (node neighborhood) - square grid
-% define edges2nodes
-[adjacencyMat,nodeIndsVect] = getNodeAdjacency(nodePix);
-[edges2nodes,nodeEdges] = getEdges2nodes_grid(adjacencyMat);
-edges2pixels = getEdges2pixels_grid(edges2nodes,nodeIndsVect,sizeR,sizeC);
-[ws_grid, edgeSetRegions] = getWSfromGrid(nodeIndsVect,edges2pixels,nodeEdges,...
-                sizeR,sizeC,numGridsX,numGridsY);
 
-%% project OFR on to the grid
+[adjacencyMat,nodeIndsVect] = getNodeAdjacency_sq(nodePix);
+
+[edges2nodes,nodeEdges] = getEdges2nodes_grid(adjacencyMat);
+
+edges2pixels = getEdges2pixels_grid(edges2nodes,nodeIndsVect,sizeR,sizeC,gridResolution);
+
+[ws_grid,edgeSetRegions,edges2regions] = getWSfromGrid_sq(nodePix,nodeIndsVect,...
+                edges2pixels,nodeEdges,sizeR,sizeC,numGridsX,numGridsY);
+            
+boundaryEdgeIDs = getBoundaryEdgeIDs(edges2regions);
+
+numEdges = size(edges2nodes,1);
+allEdgesSeq = 1:numEdges;
+twoRegionEdges = setdiff(allEdgesSeq,boundaryEdgeIDs);
+
+%% Project OFR on to the grid
+
+%% Supplementary functions
+
+function boundaryEdgeIDs = getBoundaryEdgeIDs(edges2regions)
+% edges bordering region 0 (col2) are boundary edges
+boundaryEdgeIDs = find(edges2regions(:,2)==0);

@@ -1,6 +1,6 @@
 function [adjacencyMat,nodeIndsVect] = getNodeAdjacency_sq(nodePix)
 
-% returns adjacency matrix for the given nodePix laid out on a triagular
+% returns adjacency matrix for the given nodePix laid out on a square
 % grid.
 % coefficients of the matrix are the edgeIDs connecting two nodes
 
@@ -19,16 +19,18 @@ nodeIndsVect = reshape(nodePix,numNodes,1);
 % TODO: make adjacencyMat a sparse matrix
 adjacencyMat = zeros(numNodes);
 
+
+[sizeR,sizeC] = size(nodePix);
 % for all non boundary grid nodes
 % row updates of adjacency matrix
 
-for i=2:numNodes
-    for j=2:numNodes
+for i=2:(sizeR-1)
+    for j=2:(sizeC-1)
         nodePix_i = nodePix(i,j);
         % current pix
         nodeListInd_i = find(nodeIndsVect==nodePix_i);
         % get 4-neighbors
-        fourN = get4N(i,j,nodePix);
+        fourN = get4N(i,j,nodePix,nodeIndsVect);
         % update row for nodeListInd_i
         adjacencyMat(nodeListInd_i,fourN) = nodeListInd_i;
     end
@@ -39,7 +41,7 @@ end
 i=1;
 for j=2:(sizeC-1)
     isTopRow = 1;
-    threeN = get3N_LRD(i,j,nodePix,isTopRow);
+    threeN = get3N_LRD(i,j,nodePix,isTopRow,nodeIndsVect);
     % get NodeListInd_i (row ID to be updated)
     nodePix_i = nodePix(i,j);
     % current pix
@@ -51,7 +53,7 @@ end
 i=sizeR;
 for j=2:(sizeC-1)
     isTopRow = 0;
-    threeN = get3N_LRD(i,j,nodePix,isTopRow);
+    threeN = get3N_LRD(i,j,nodePix,isTopRow,nodeIndsVect);
     % get NodeListInd_i (row ID to be updated)
     nodePix_i = nodePix(i,j);
     % current pix
@@ -63,7 +65,7 @@ end
 j=1;
 for i=2:(sizeR-1)
     isRight = 0;
-    threeN = get3N_UDR(i,j,nodePix,isRight);    
+    threeN = get3N_UDR(i,j,nodePix,isRight,nodeIndsVect);    
     % get NodeListInd_i (row ID to be updated)
     nodePix_i = nodePix(i,j);
     % current pix
@@ -75,7 +77,7 @@ end
 j=sizeC;
 for i=2:(sizeR-1)
     isRight = 1;
-    threeN = get3N_UDR(i,j,nodePix,isRight);    
+    threeN = get3N_UDR(i,j,nodePix,isRight,nodeIndsVect);    
     % get NodeListInd_i (row ID to be updated)
     nodePix_i = nodePix(i,j);
     % current pix
@@ -99,6 +101,7 @@ nodePix_i = nodePix(i,j);
 % current pix
 nodeListInd_i = find(nodeIndsVect==nodePix_i);    
 % update adjacencyMat row
+[~,twoN] = intersect(nodeIndsVect,twoN);
 adjacencyMat(nodeListInd_i,twoN) = nodeListInd_i;
 
 % 2 - bottom left corner
@@ -115,12 +118,13 @@ nodePix_i = nodePix(i,j);
 % current pix
 nodeListInd_i = find(nodeIndsVect==nodePix_i);    
 % update adjacencyMat row
+[~,twoN] = intersect(nodeIndsVect,twoN);
 adjacencyMat(nodeListInd_i,twoN) = nodeListInd_i;
 
 % 3 - bottom right corner
 twoN = zeros(2,1);
 i = sizeR;
-j=1;
+j=sizeC;
 x = i;
 y = j-1;
 twoN(1) = nodePix(x,y);
@@ -131,12 +135,13 @@ nodePix_i = nodePix(i,j);
 % current pix
 nodeListInd_i = find(nodeIndsVect==nodePix_i);    
 % update adjacencyMat row
+[~,twoN] = intersect(nodeIndsVect,twoN);
 adjacencyMat(nodeListInd_i,twoN) = nodeListInd_i;
 
 % 4 - top right corner
 twoN = zeros(2,1);
-i = sizeR;
-j=1;
+i = 1;
+j=sizeC;
 x = i;
 y = j-1;
 twoN(1) = nodePix(x,y);
@@ -147,6 +152,7 @@ nodePix_i = nodePix(i,j);
 % current pix
 nodeListInd_i = find(nodeIndsVect==nodePix_i);    
 % update adjacencyMat row
+[~,twoN] = intersect(nodeIndsVect,twoN);
 adjacencyMat(nodeListInd_i,twoN) = nodeListInd_i;
 
 % assigning edgeIDs for coefficients
@@ -156,7 +162,7 @@ edgeIDseq = 1: numEdges;
 adjacencyMat(adjacencyMat>0) = edgeIDseq;
 adjacencyMat = triu(adjacencyMat,1) + triu(adjacencyMat,1)';
 %% supplementary functions
-function threeN = get3N_LRD(i,j,nodePix,isTopRow)
+function threeN_LID = get3N_LRD(i,j,nodePix,isTopRow,nodeIndsVect)
 % left right 2N and below/above
 threeN = zeros(2,1);
 x = i;
@@ -174,9 +180,10 @@ x = i-1;
 end
 y=j;
 threeN(3) = nodePix(x,y);
+[~,threeN_LID] = intersect(nodeIndsVect,threeN);
 
 
-function threeN = get3N_UDR(i,j,nodePix,isRight)
+function threeN_LID = get3N_UDR(i,j,nodePix,isRight,nodeIndsVect)
 % up down 2N and left/right
 threeN = zeros(2,1);
 x = i-1;
@@ -194,8 +201,10 @@ else
 end
 x = i;
 threeN(3) = nodePix(x,y);
+[~,threeN_LID] = intersect(nodeIndsVect,threeN);
 
-function fourN = get4N(i,j,nodePix)    
+
+function fourN_LID = get4N(i,j,nodePix,nodeIndsVect)    
     fourN = zeros(4,1);
     x = i;
     y = j-1;
@@ -212,4 +221,5 @@ function fourN = get4N(i,j,nodePix)
     x = i+1;
     y = j;
     fourN(4) = nodePix(x,y);
+[~,fourN_LID] = intersect(nodeIndsVect,fourN);
     

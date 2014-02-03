@@ -1,6 +1,14 @@
-function [ws_grid,edgeSetRegions] = getWSfromGrid_sq(nodeIndsVect,edges2pixels,...
+function [ws_grid,edgeSetRegions,edges2regions] = getWSfromGrid_sq...
+                    (nodePix,nodeIndsVect,edges2pixels,...
                     nodeEdges,sizeR,sizeC,numGridsX,numGridsY)
                 
+% Outputs:
+%   ws_grid: watershed like output for the image organized in a uniform
+%   square grid
+%   edges2regions: rowID = edgeID, col1= regionID, col2= regionID.
+%   regionIDs start with 1 without considering the image border
+%   edgeSetRegions: rowID = regionID, without considering the image border
+% 
 % Const
 NUM_SIDES = 4; % number of sides per  grid cell - 4 for square shaped grid cells
 
@@ -20,6 +28,9 @@ edges2pixels(:,1) = [];
 allEdgePixelInds = edges2pixels(edges2pixels>0);
 ws_grid(allEdgePixelInds) = 0;
 
+numEdges = size(edges2pixels,1);
+edges2regions = zeros(numEdges,2);
+
 % assign unique region IDs (starting from 2)
 % (using the fact that the grid cells are squares)
 
@@ -27,16 +38,21 @@ numGridRegions = numGridsX * numGridsY;
 % init
 edgeSetRegions = zeros(numGridRegions,NUM_SIDES);
 nodes4_tmp = zeros(4,1);
-edgeSet_region_i = zeros(4,1);
+edgeSet_region_k = zeros(4,1);
 k = 0;
 for i=1:(numGridsY-1)
     for j=1:(numGridsX-1)
     % get the 4 nodes for grid_i
     k = k+1;
     nodes4_tmp(1) = nodePix(i,j);
+    [~,nodes4_tmp(1)] = intersect(nodeIndsVect,nodes4_tmp(1));
     nodes4_tmp(2) = nodePix(i,(j+1));
+    [~,nodes4_tmp(2)] = intersect(nodeIndsVect,nodes4_tmp(2));
     nodes4_tmp(3) = nodePix((i+1),(j+1));
+    [~,nodes4_tmp(3)] = intersect(nodeIndsVect,nodes4_tmp(3));
     nodes4_tmp(4) = nodePix((i+1),j);
+    [~,nodes4_tmp(4)] = intersect(nodeIndsVect,nodes4_tmp(4));
+    
     % get the 4 edges using the node info -> edgeSetRegions
     nodeEdgeSets_tmp1 = nodeEdges(nodes4_tmp(1),:);
     nodeEdgeSets_tmp1 = nodeEdgeSets_tmp1(nodeEdgeSets_tmp1>0);
@@ -47,14 +63,27 @@ for i=1:(numGridsY-1)
     nodeEdgeSets_tmp4 = nodeEdges(nodes4_tmp(4),:);
     nodeEdgeSets_tmp4 = nodeEdgeSets_tmp4(nodeEdgeSets_tmp4>0);
     % get region pixels -> ws_grid
-    edgeSet_region_i(1) = intersect(nodeEdgeSets_tmp1,nodeEdgeSets_tmp2);
-    edgeSet_region_i(2) = intersect(nodeEdgeSets_tmp2,nodeEdgeSets_tmp3);
-    edgeSet_region_i(3) = intersect(nodeEdgeSets_tmp3,nodeEdgeSets_tmp4);
-    edgeSet_region_i(4) = intersect(nodeEdgeSets_tmp4,nodeEdgeSets_tmp1);
+    edgeSet_region_k(1) = intersect(nodeEdgeSets_tmp1,nodeEdgeSets_tmp2);
+    edgeSet_region_k(2) = intersect(nodeEdgeSets_tmp2,nodeEdgeSets_tmp3);
+    edgeSet_region_k(3) = intersect(nodeEdgeSets_tmp3,nodeEdgeSets_tmp4);
+    edgeSet_region_k(4) = intersect(nodeEdgeSets_tmp4,nodeEdgeSets_tmp1);
     
-    edgeSet_region_i = edgeSet_region_i(edgeSet_region_i>0);
+    edgeSet_region_k = edgeSet_region_k(edgeSet_region_k>0);
     k = k+1;
-    edgeSetRegions(k,1:4) = edgeSet_region_i;    
+    edgeSetRegions(k,1:4) = edgeSet_region_k;    
+    
+    % update edges2regions (regionID = k)
+    numEdgesForRegion_k = numel(edgeSet_region_k);
+    for m=1:numEdgesForRegion_k
+        edgeID_m = edgeSet_region_k(m);
+        if(edges2regions(edgeID_m,1)==0)
+            % 1st col is still empty. update 1st col
+            edges2regions(edgeID_m,1) = k;
+        else
+            % 1st col is not empty. update 2nd col
+            edges2regions(edgeID_m,2) = k;
+        end
+    end
     
     % regionIDs (=k)
     % get the pixels for the grid region

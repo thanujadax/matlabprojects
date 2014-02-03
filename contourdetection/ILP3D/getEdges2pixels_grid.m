@@ -32,5 +32,5 @@ for i=numEdges
     edgePix_i = sub2ind([sizeR sizeC],yq,xq);
     edgeLen_i = numel(edgePix_i);
     edges2pixels(i,1) = i; % edgeID (=edgeLID)
-    edges2pixels(i,2:edgeLen_i) = edgePix_i; 
+    edges2pixels(i,2:(edgeLen_i+1)) = edgePix_i; 
 end

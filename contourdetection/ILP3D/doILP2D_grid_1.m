@@ -4,6 +4,8 @@
 % with the new cost calculation at the junctions, incorporating the
 % directionality of the 
 
+gridResolution = 6;
+
 showIntermediate = 1;
 useGurobi = 1;
 fromInputImage = 1;
@@ -32,7 +34,7 @@ b_imWithBorder = 1; % add thick dark border around the image
 % param
 cEdge = 10;        % general scaling factor for edge priors
 % cNode = 100;        % scaling factor for the node cost coming from gaussian normal distr.
-cCell = 1000;        % positive scaling factor for cell priors
+cCell = 100;        % positive scaling factor for cell priors
 % sig = 50;         % standard deviation(degrees) for the node cost function's gaussian distr.
 % midPoint = 180;   % angle difference of an edge pair (in degrees) for maximum cost 
 lenThresh = 25;     % max length of edges to be checked for misorientations
@@ -41,7 +43,7 @@ priorThreshFracBB = 0.55; % threshold of edgePrior for an edge to be considered 
 
 % cPos = 1000;        % scaling factor for positive nodeAngleCosts
 % cNeg = 10;          % scaling factor for negative nodeAngleCosts
-w_on_n = 100;
+w_on_n = 100;       % scaling factor for nodeAngleCosts
 
 minNumActEdgesPercentage = 0;  % percentage of the tot num edges to retain (min)
 bbEdgeReward = 1500;
@@ -79,18 +81,31 @@ if(showIntermediate)
 end
 
 %% watershed segmentation
-ws = watershed(OFR_mag);
+%ws = watershed(OFR_mag);
+[ws,setOfRegions,edges2pixels,edges2nodes,nodeEdges,adjacencyMat,...
+            nodeInds,edges2regions,boundaryEdgeListInds,twoRegionEdges]...
+                            = getImageGrid(imgIn,gridResolution,showIntermediate);
+                                    
 [sizeR,sizeC] = size(ws);
+connectedJunctionIDs = [];
+selfEdgePixelSet = [];
+
+numRegions = size(setOfRegions,1);
+wsIDsForRegions = 2:numRegions;
 %% generate graph from the watershed edges
 disp('creating graph from watershed boundaries...');
-[adjacencyMat,nodeEdges,edges2nodes,edges2pixels,connectedJunctionIDs,selfEdgePixelSet] ...
-    = getGraphFromWS(ws,output,showIntermediate);
-nodeInds = nodeEdges(:,1);                  % indices of the junction nodes
+% [adjacencyMat,nodeEdges,edges2nodes,edges2pixels,connectedJunctionIDs,selfEdgePixelSet] ...
+%     = getGraphFromWS(ws,output,showIntermediate);
+% nodeInds = nodeEdges(:,1);                  % indices of the junction nodes
+
 edgeListInds = edges2pixels(:,1);
 junctionTypeListInds = getJunctionTypeListInds(nodeEdges);
+
 % col1 has the listInds of type J2, col2: J3 etc. listInds are wrt
 % nodeInds list of pixel indices of the detected junctions
-clusterNodeIDs = connectedJunctionIDs(:,1); % indices of the clustered junction nodes
+% clusterNodeIDs = connectedJunctionIDs(:,1); % indices of the clustered junction nodes
+clusterNodeIDs = [];
+
 disp('graph created!')
 wsRegionBoundariesFromGraph = zeros(sizeR,sizeC);
 wsRegionBoundariesFromGraph(nodeInds) = 0.7;          % junction nodes
@@ -102,11 +117,11 @@ if(showIntermediate)
     figure;imagesc(wsRegionBoundariesFromGraph);title('boundaries from graph') 
 end
 % boundary edges
-boundaryEdgeIDs = getBoundaryEdges2(wsRegionBoundariesFromGraph,barLength,edgepixels,...
-    nodeEdges,edgeListInds,showIntermediate);
-numBoundaryEdges = numel(boundaryEdgeIDs);
+% boundaryEdgeIDs = getBoundaryEdges2(wsRegionBoundariesFromGraph,barLength,edgepixels,...
+%     nodeEdges,edgeListInds,showIntermediate);
+numBoundaryEdges = numel(boundaryEdgeListInds);
 
-[~,boundaryEdgeListInds] = intersect(edgeListInds,boundaryEdgeIDs); 
+% [~,boundaryEdgeListInds] = intersect(edgeListInds,boundaryEdgeListInds); 
 
 
 disp('preparing coefficients for ILP solver...')
@@ -155,8 +170,8 @@ for i=1:numJtypes
 end
 %% Faces of wsgraph -> cell types (between pairs of cells)
 disp('calculating adjacency graph of regions ...')
-[faceAdj,edges2regions,setOfRegions,twoRegionEdges,wsIDsForRegions] ...
-    = getFaceAdjFromWS(ws,edges2pixels,b_imWithBorder,boundaryEdgeIDs);
+% [faceAdj,edges2regions,setOfRegions,twoRegionEdges,wsIDsForRegions] ...
+%     = getFaceAdjFromWS(ws,edges2pixels,b_imWithBorder,boundaryEdgeListInds);
 
 [~,edgeOrientationsInds] = getEdgePriors(orientedScoreSpace3D,edges2pixels);
 edgeOrientations = (edgeOrientationsInds-1).*orientationStepSize;
@@ -369,174 +384,3 @@ for i=1:numJtypes
         end
     end
 end
-
-inactiveNodePixInds = setdiff(nodeInds,nodeIndsActive);
-offNodeIndList = find(ismember(nodeInds,inactiveNodePixInds));
-
-activeContourPixels = find(ilpSegmentation);
-
-% figure;imagesc(ilpSegmentation);title('ILP contours');
-% reconstruct the edges with the values from the orientation filters (HSV)
-% [output rgbimg] = reconstructHSVgauss_mv(orientedScoreSpace3D,orientations,...
-%             barLength,barWidth,threshFrac,medianFilterH);
-% get the active pixels
-%output(:,:,3) = ilpSegmentation;
-totX = numel(x);
-numRegions = numel(regionPriors);
-% get active foreground cells
-regionStartPos = totX - numRegionVars + 2;
-regionActivationVector = x(regionStartPos:2:totX);
-activeRegionInd = find(regionActivationVector>0);
-% get internal pixels for foreground cells
-foregroundPixels = [];
-
-% wsIDs = getWsIDsForCellIDs(ws,setOfCells,edges2pixels,nodeInds,...
-%             edges2nodes,edgeListInds);
-
-for i=1:numel(activeRegionInd)
-    wsID_i = wsIDsForRegions(activeRegionInd(i));
-    if(wsID_i==0)
-        disp('problem with wsid check')
-    else
-%         cellPixInds_i = find(ws==wsID_i);
-        cellPixInds_i = getInternalPixForCell(ws,wsID_i);
-        foregroundPixels = [foregroundPixels; cellPixInds_i];
-    end
-end
-
-% foregroundPixels = setdiff(foregroundPixels,offEdgePixelInds);
-
-% make inactive edges inside foreground regions show as foreground
-[inEdgeListInds,inEdgeIDs] = getInEdges(twoRegionEdges,regionActivationVector,...
-                onEdgeStates,edges2regions,edgeListInds);
-            
-if(~isempty(inEdgeListInds))
-    inEdgePixels = [];
-    for i=1:numel(inEdgeListInds)
-        inEdgePixels_i = edgepixels(inEdgeListInds(i),:);
-        inEdgePixels_i = inEdgePixels_i(inEdgePixels_i>0);
-        inEdgePixels = [inEdgePixels; inEdgePixels_i'];
-    end
-    foregroundPixels = [foregroundPixels; inEdgePixels];
-end
-
-% make inactive nodes inside foreground regions show as foreground
-% nodeActivationVector = ~nodeInactiveStates_x;
-
-inNodePixels = getInNodePixels(inEdgeIDs,nodeEdges,...
-        nodeActivationVector,connectedJunctionIDs);
-foregroundPixels = [foregroundPixels; inNodePixels];
-
-
-foregroundPixels = setdiff(foregroundPixels,activeContourPixels);
-
-
-% first visualize the contours
-output_h = output(:,:,1);
-output_s = output(:,:,2);
-output_v = ilpSegmentation;
-
-% create HSV image
-% hsvImage = cat(3,output(:,:,1),output(:,:,2),ilpSegmentation);
-hsvImage = cat(3,output_h,output_s,output_v);
-% convert it to an RGB image
-RGBimg = hsv2rgb(hsvImage);
-% titleStr = sprintf('C = %d : lambda = %d',cNode,decayRate);
-% titleStr = sprintf('C = %d',maxCost_direction);
-if(showIntermediate)
-    figure;imshow(RGBimg)
-end
-
-% assign white to active (foreground) cells
-
-output_h(foregroundPixels) = 1; 
-output_s(foregroundPixels) = 0;
-output_v(foregroundPixels) = 1;
-
-% create HSV image
-% hsvImage = cat(3,output(:,:,1),output(:,:,2),ilpSegmentation);
-hsvImage_foreground = cat(3,output_h,output_s,output_v);
-% convert it to an RGB image
-RGBimg_foreground = hsv2rgb(hsvImage_foreground);
-% titleStr = sprintf('C = %d : lambda = %d',cNode,decayRate);
-% titleStr = sprintf('C = %d',maxCost_direction);
-if(showIntermediate)
-    figure;imshow(RGBimg_foreground)
-end
-%% store extracted geometry in datastructures
-[c_cellBorderEdgeIDs,c_cellBorderNodeIDs] = getCellBorderComponents(onEdgeInd,...
-        edges2nodes,nodeEdges,edgeListInds);
-
-cellBorderPixels = getCellBorderPixels(c_cellBorderEdgeIDs,...
-            c_cellBorderNodeIDs,edgepixels,nodeInds,connectedJunctionIDs);
-        
-visualizeCellBorders = zeros(sizeR,sizeC);
-visualizeCellBorders(cellBorderPixels) = 1;
-if(showIntermediate)
-    figure;imshow(visualizeCellBorders)
-end
-% regions aggregating to form cells
-% offEdgeIDList = edgeListInds(ismember(edgeListInds,offEdgeListInd)); 
-offEdgeIDList = edgeListInds(offEdgeListInd);
-
-[c_cells2regions,c_cellInternalEdgeIDs,c_cellIntNodeListInds] = getRegionsForOnCells(...
-            faceAdj,activeRegionInd,offEdgeIDList,setOfRegions,wsIDsForRegions,ws,...
-            offNodeIndList,edges2nodes,edgeListInds);
-                
-% visualize each cell in different colors
-visualizeCells = zeros(sizeR,sizeC,3);
-numCs = numel(c_cells2regions);
-rMat = zeros(sizeR,sizeC);
-gMat = zeros(sizeR,sizeC);
-bMat = zeros(sizeR,sizeC);
-for i=1:numCs
-    % pick random color (RGB vals)
-    R = rand(1); G = rand(1); B = rand(1);
-    
-    % get regions for this cell and the internal pixels. set RGB
-    cellRegionList_i = c_cells2regions{i};
-    regionPixels = getRegionPixels(cellRegionList_i,wsIDsForRegions,ws);
-    rMat(regionPixels) = R;
-    gMat(regionPixels) = G;
-    bMat(regionPixels) = B;
-    
-    
-    % get internal edges for this cell. set RGB.
-    regionIntEdgeIDs = c_cellInternalEdgeIDs{i};
-    regionIntEdgeListInds_logicalInd = ismember(edgeListInds,regionIntEdgeIDs);
-    regionIntEdgePixels = edgepixels(regionIntEdgeListInds_logicalInd,:);
-    regionIntEdgePixels = regionIntEdgePixels(regionIntEdgePixels>0);
-    
-    rMat(regionIntEdgePixels) = R;
-    gMat(regionIntEdgePixels) = G;
-    bMat(regionIntEdgePixels) = B;
-      
-    % get internal nodes for this cell. set RGB
-    regionIntNodeListInds = c_cellIntNodeListInds{i};
-    regionIntNodePixInds = getNodePixelsFromNodeInd...
-                (regionIntNodeListInds,nodeInds,connectedJunctionIDs);
-    
-    rMat(regionIntNodePixInds) = R;
-    gMat(regionIntNodePixInds) = G;
-    bMat(regionIntNodePixInds) = B;
-    
-    visualizeCells(:,:,1) = rMat;
-    visualizeCells(:,:,2) = gMat;
-    visualizeCells(:,:,3) = bMat;
-            
-    
-end
-
-% figure;imshow(visualizeCells);
-segmentationOut = removeThickBorder(visualizeCells,marginSize);
-% figure; imshow(normalizedInputImage);
-% hold on
-fh = imshow(segmentationOut);
-% hold off
-% imAlphaData = ones(sizeR,sizeC) .* 0.5;
-% set(fh,'AlphaData',imAlphaData);
-% pp = 00;
-
-
-
-
