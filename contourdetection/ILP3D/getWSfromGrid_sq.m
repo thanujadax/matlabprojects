@@ -37,30 +37,32 @@ edges2regions = zeros(numEdges,2);
 numGridRegions = numGridsX * numGridsY;
 % init
 edgeSetRegions = zeros(numGridRegions,NUM_SIDES);
-nodes4_tmp = zeros(4,1);
+nodePixInds4_tmp = zeros(4,1);
+nodeListInds4_tmp = zeros(4,1);
+
 edgeSet_region_k = zeros(4,1);
 k = 0;
-for i=1:(numGridsY-1)
-    for j=1:(numGridsX-1)
+for i=1:numGridsY
+    for j=1:numGridsX
     % get the 4 nodes for grid_i
-    k = k+1;
-    nodes4_tmp(1) = nodePix(i,j);
-    [~,nodes4_tmp(1)] = intersect(nodeIndsVect,nodes4_tmp(1));
-    nodes4_tmp(2) = nodePix(i,(j+1));
-    [~,nodes4_tmp(2)] = intersect(nodeIndsVect,nodes4_tmp(2));
-    nodes4_tmp(3) = nodePix((i+1),(j+1));
-    [~,nodes4_tmp(3)] = intersect(nodeIndsVect,nodes4_tmp(3));
-    nodes4_tmp(4) = nodePix((i+1),j);
-    [~,nodes4_tmp(4)] = intersect(nodeIndsVect,nodes4_tmp(4));
+    
+    nodePixInds4_tmp(1) = nodePix(i,j);
+    [~,nodeListInds4_tmp(1)] = intersect(nodeIndsVect,nodePixInds4_tmp(1));
+    nodePixInds4_tmp(2) = nodePix(i,(j+1));
+    [~,nodeListInds4_tmp(2)] = intersect(nodeIndsVect,nodePixInds4_tmp(2));
+    nodePixInds4_tmp(3) = nodePix((i+1),(j+1));
+    [~,nodeListInds4_tmp(3)] = intersect(nodeIndsVect,nodePixInds4_tmp(3));
+    nodePixInds4_tmp(4) = nodePix((i+1),j);
+    [~,nodeListInds4_tmp(4)] = intersect(nodeIndsVect,nodePixInds4_tmp(4));
     
     % get the 4 edges using the node info -> edgeSetRegions
-    nodeEdgeSets_tmp1 = nodeEdges(nodes4_tmp(1),:);
+    nodeEdgeSets_tmp1 = nodeEdges(nodeListInds4_tmp(1),:);
     nodeEdgeSets_tmp1 = nodeEdgeSets_tmp1(nodeEdgeSets_tmp1>0);
-    nodeEdgeSets_tmp2 = nodeEdges(nodes4_tmp(2),:);
+    nodeEdgeSets_tmp2 = nodeEdges(nodeListInds4_tmp(2),:);
     nodeEdgeSets_tmp2 = nodeEdgeSets_tmp2(nodeEdgeSets_tmp2>0);
-    nodeEdgeSets_tmp3 = nodeEdges(nodes4_tmp(3),:);
+    nodeEdgeSets_tmp3 = nodeEdges(nodeListInds4_tmp(3),:);
     nodeEdgeSets_tmp3 = nodeEdgeSets_tmp3(nodeEdgeSets_tmp3>0);
-    nodeEdgeSets_tmp4 = nodeEdges(nodes4_tmp(4),:);
+    nodeEdgeSets_tmp4 = nodeEdges(nodeListInds4_tmp(4),:);
     nodeEdgeSets_tmp4 = nodeEdgeSets_tmp4(nodeEdgeSets_tmp4>0);
     % get region pixels -> ws_grid
     edgeSet_region_k(1) = intersect(nodeEdgeSets_tmp1,nodeEdgeSets_tmp2);
@@ -87,7 +89,7 @@ for i=1:(numGridsY-1)
     
     % regionIDs (=k)
     % get the pixels for the grid region
-    [rNodes,cNodes] = ind2sub([sizeR sizeC],nodes4_tmp);
+    [rNodes,cNodes] = ind2sub([sizeR sizeC],nodePixInds4_tmp);
     rStart = rNodes(1) + 1;
     rStop = rNodes(3) - 1;
     cStart = cNodes(1) + 1;

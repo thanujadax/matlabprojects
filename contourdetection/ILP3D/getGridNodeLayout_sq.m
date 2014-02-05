@@ -1,5 +1,8 @@
 function [nodePix,numEdgesX,numEdgesY] = getGridNodeLayout_sq(sizeR,sizeC,gridResolution)
 
+% Inputs:
+%   gridResolution - num pixels between 2 adjacenct nodes (edge length)
+
 % Output:
 %   nodePix: matrix containing the nodesPixInds in meshgrid format.
 
@@ -7,12 +10,12 @@ function [nodePix,numEdgesX,numEdgesY] = getGridNodeLayout_sq(sizeR,sizeC,gridRe
 % define a square grid layout spanning the image and return the node
 % pixels and the edges according to 4-neighborhood
 
-numEdgesX = floor(sizeC/gridResolution);
-marginPix_X = mod(sizeC,gridResolution);
+numEdgesX = floor((sizeC-1)/(gridResolution));
+marginPix_X = mod((sizeC-1),(gridResolution));
 gridStartX = floor(marginPix_X/2);
 
-numEdgesY = floor(sizeR/gridResolution);
-marginPix_Y = mod(sizeC,gridResolution);
+numEdgesY = floor((sizeR-1)/(gridResolution));
+marginPix_Y = mod((sizeC-1),(gridResolution));
 gridStartY = floor(marginPix_Y/2);
 
 % define node positions

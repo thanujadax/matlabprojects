@@ -82,8 +82,8 @@ end
 
 %% watershed segmentation
 %ws = watershed(OFR_mag);
-[ws,setOfRegions,edges2pixels,edges2nodes,nodeEdges,adjacencyMat,...
-            nodeInds,edges2regions,boundaryEdgeListInds,twoRegionEdges]...
+[ws,setOfRegions,edges2pixels,edges2nodes,nodeEdges,adjacencyMat,nodeInds,...
+    edges2regions,boundaryEdgeListInds,twoRegionEdges,faceAdj,wsIDsForRegions]...
                             = getImageGrid(imgIn,gridResolution,showIntermediate);
                                     
 [sizeR,sizeC] = size(ws);
@@ -91,7 +91,7 @@ connectedJunctionIDs = [];
 selfEdgePixelSet = [];
 
 numRegions = size(setOfRegions,1);
-wsIDsForRegions = 2:numRegions;
+
 %% generate graph from the watershed edges
 disp('creating graph from watershed boundaries...');
 % [adjacencyMat,nodeEdges,edges2nodes,edges2pixels,connectedJunctionIDs,selfEdgePixelSet] ...
@@ -327,60 +327,7 @@ end
 
 
 %% visualize
-% get active edges and active nodes from x
-ilpSegmentation = zeros(sizeR,sizeC);
-% active edges
-% consider the edgeID given in the first col of edges2pixels?? no need for
-% this since we use edgepixels array which is already sans the skipped
-
-% edges
-onStateEdgeXind = 2:2:(numEdges*2);
-onEdgeStates = x(onStateEdgeXind);
-onEdgeInd = find(onEdgeStates>0.5);
-offEdgeListInd = find(onEdgeStates<0.5);
-onEdgePixelInds = getPixSetFromEdgeIDset(onEdgeInd,edgepixels);
-offEdgePixelInds = getPixSetFromEdgeIDset(offEdgeListInd,edgepixels);
-ilpSegmentation(onEdgePixelInds) = 1;
-
-% active nodes 
-fIndStop = 2*numEdges;
-nodeInactiveStates_x = [];
-nodeActivationVector = zeros(numel(nodeInds),1);    % stores 1 for active node list inds
-nodeIndsActive = [];
-for i=1:numJtypes
-    % for each junction type
-    % get the list of junctions and check their states in vector 'x'
-    junctionNodesListListInds_i = find(junctionTypeListInds(:,i));
-    if(~isempty(junctionNodesListListInds_i))
-        junctionNodesListInds_i = junctionTypeListInds(junctionNodesListListInds_i,i);
-        numJnodes_i = numel(junctionNodesListInds_i);
-        % get the indices (wrt x) for the inactivation of the junctions
-        numEdgePJ_i = i+1;
-        numStatePJ_i = nchoosek(numEdgePJ_i,2)+1; % 1 is for the inactive case
-        fIndStart = fIndStop + 1;
-        fIndStop = fIndStart -1 + numJnodes_i*numStatePJ_i;
-        fIndsToLook = fIndStart:numStatePJ_i:fIndStop; % indices of inactive state
-        inactiveness_nodes_i = x(fIndsToLook);
-        nodeInactiveStates_x = [nodeInactiveStates_x; inactiveness_nodes_i];
-        activeStateNodeListInd = find(inactiveness_nodes_i<0.5);
-        if(~isempty(activeStateNodeListInd))
-            nodeListInd_i = junctionNodesListInds_i(activeStateNodeListInd);
-            nodeActivationVector(nodeListInd_i) = 1;
-            nodeIndsActive_i = nodeInds(nodeListInd_i);
-            % if any of the active nodes are in the connectionJunction set,
-            % make the other nodes in the same set active as well.
-            for j=1:numel(nodeIndsActive_i)
-                indx = find(connectedJunctionIDs(:,1)==nodeIndsActive_i(j));
-                if(~isempty(indx))
-                    % this is one of the cluster pixels
-                    clusLabel = connectedJunctionIDs(indx,2);
-                    clusNodeListInds = find(connectedJunctionIDs(:,2)==clusLabel); 
-                    clusNodes = connectedJunctionIDs(clusNodeListInds,1);
-                    ilpSegmentation(clusNodes) = 1;
-                end
-            end
-            ilpSegmentation(nodeIndsActive_i) = 1;
-            nodeIndsActive = [nodeIndsActive; nodeIndsActive_i];
-        end
-    end
-end
+segmentationOut = visualizeX(x,sizeR,sizeC,numEdges,numRegions,edgepixels,...
+            junctionTypeListInds,nodeInds,connectedJunctionIDs,edges2nodes,...
+            nodeEdges,edgeListInds,faceAdj,setOfRegions,wsIDsForRegions,ws,...
+            marginSize,showIntermediate);

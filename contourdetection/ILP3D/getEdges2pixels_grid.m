@@ -10,7 +10,7 @@ numEdges = size(edges2nodes,1);
 
 edges2pixels = zeros(numEdges,(maxEdgeLenPix+1));
 
-for i=numEdges
+for i=1:numEdges
     % get the two end points (nodes) for this edge
     nodes_i = edges2nodes(i,:);
     nodeInds_i = nodeIndsVect(nodes_i);

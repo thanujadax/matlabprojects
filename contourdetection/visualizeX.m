@@ -46,14 +46,17 @@ for i=1:numJtypes
             % if any of the active nodes are in the connectionJunction set,
             % make the other nodes in the same set active as well.
             for j=1:numel(nodeIndsActive_i)
-                indx = find(connectedJunctionIDs(:,1)==nodeIndsActive_i(j));
-                if(~isempty(indx))
-                    % this is one of the cluster pixels
-                    clusLabel = connectedJunctionIDs(indx,2);
-                    clusNodeListInds = find(connectedJunctionIDs(:,2)==clusLabel); 
-                    clusNodes = connectedJunctionIDs(clusNodeListInds,1);
-                    ilpSegmentation(clusNodes) = 1;
+                if(~isempty(connectedJunctionIDs))
+                    indx = find(connectedJunctionIDs(:,1)==nodeIndsActive_i(j));
+                    if(~isempty(indx))
+                        % this is one of the cluster pixels
+                        clusLabel = connectedJunctionIDs(indx,2);
+                        clusNodeListInds = find(connectedJunctionIDs(:,2)==clusLabel); 
+                        clusNodes = connectedJunctionIDs(clusNodeListInds,1);
+                        ilpSegmentation(clusNodes) = 1;
+                    end
                 end
+                
             end
             ilpSegmentation(nodeIndsActive_i) = 1;
             nodeIndsActive = [nodeIndsActive; nodeIndsActive_i];

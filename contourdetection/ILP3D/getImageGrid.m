@@ -1,6 +1,6 @@
 function [ws_grid,edgeSetRegions,edges2pixels,edges2nodes,nodeEdges,...
             adjacencyMat,nodeIndsVect,edges2regions,boundaryEdgeIDs,...
-            twoRegionEdges]...
+            twoRegionEdges,faceAdj,wsIDsForRegions]...
                                         = getImageGrid(imageIn,gridResolution,verbose)
 
 % Inputs: 
@@ -39,6 +39,13 @@ boundaryEdgeIDs = getBoundaryEdgeIDs(edges2regions);
 numEdges = size(edges2nodes,1);
 allEdgesSeq = 1:numEdges;
 twoRegionEdges = setdiff(allEdgesSeq,boundaryEdgeIDs);
+
+% add the cellList (index) as the first col of setOfCells. This is done so
+% that we can reuse getAdjacencyMat() to creage faceAdj.
+numRegions = size(edgeSetRegions,1);
+wsIDsForRegions = 2:(numRegions+1);
+setOfRegionsMat_2 = [wsIDsForRegions' edgeSetRegions];
+[faceAdj,~,~,~] = getAdjacencyMat(setOfRegionsMat_2);
 
 %% Project OFR on to the grid
 
