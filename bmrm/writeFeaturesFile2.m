@@ -103,6 +103,13 @@ for i=1:numJtypes
             featInd = featInd + numActiveStates;
             
             featureMat(featStart:featInd,4) = f(featStart:featInd); % (4) w_n_on
+            
+            % w_n_on complementary directions of edges (same feature vales)
+            featStart = featInd + 1;
+            featInd = featInd + numActiveStates;
+            
+            featureMat(featStart:featInd,4) = f(featStart:featInd); % (4) w_n_on
+            
         end
     end
 end
@@ -119,7 +126,7 @@ end
 for i=1:numRegions
     featInd = featInd + 1;
     featVal = f(featInd);
-    featureMat(featInd,5) = featVal;  % (6) w_r_off
+    featureMat(featInd,6) = featVal;  % (6) w_r_off
 end
 
 %%  write to file

@@ -20,11 +20,11 @@ numEdges_directed = numEdges * 2;
 % type 1 is J2 - junction with just 2 edges
 
 totJunctionVar = sum(nodeTypeStats(:,3));
-numRegions = numel(regionUnary) + +1; % region 1 is image border
+numRegions = numel(regionUnary) +1; % region 1 is image border
 numElements = numEdges*3 + totJunctionVar + numRegions*2;
 f = zeros(numElements,1);
 % order of elements in f
-%[{edges ... edges_comp ... edgeOff },{j01,j11,..,j02,j12,...},{rOn... rOff}]
+%[{edges ... edges_comp ... edgeOff },{j01,j11,..,j02,j12,...},{rOn... rOff...}]
 
 %% edge variables
 % for each edge, there are 2 possible active states. Only one of those can
@@ -44,7 +44,7 @@ f = zeros(numElements,1);
 for i=1:numEdges
     f(i) = edgeUnary(i) * w_on_e;               % dir1
     f(i+numEdges) = edgeUnary(i) * w_on_e;      % dir2
-    % f(i+numEdges*2) = (1-edgeUnary(i)) * w_off_e;   % off
+    f(i+numEdges*2) = (1-edgeUnary(i)) * w_off_e;   % off
 %     
 end
 
@@ -87,15 +87,15 @@ k=1;
 f_stop_ind = f_stop_ind + 1;
 f(f_stop_ind) = 0; % for the border
 
-f_stop_ind = f_stop_ind + 1;
-for i=(f_stop_ind):(f_stop_ind+numRegions-2)
+f_start_ind = f_stop_ind + 1; % 
+for i=(f_start_ind):(f_start_ind+numRegions-2)
     f(i) = regionUnary(k) * w_on_r;             % activation
-    % f(i+numRegions) = (1-regionUnary(k)) * w_off_r; % inactivation
+    f(i+numRegions) = (1-regionUnary(k)) * w_off_r; % inactivation
     k = k + 1;
 end
 
 % regionsLikely to be turned off: set offScore to +1
-offset_for_regionOff_LIDs = numEdges*3 + numNodeConf + numRegions;
+offset_for_regionOff_LIDs = numEdges*3 + totJunctionVar + numRegions;
 likelyOffRegionIDs = find(regionUnary<regionOffThreshold) +1; % +1 for border region
 likelyOffRegionIDs_offset = likelyOffRegionIDs + offset_for_regionOff_LIDs;
 f(likelyOffRegionIDs_offset) = w_off_r;

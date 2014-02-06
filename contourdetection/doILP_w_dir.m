@@ -4,7 +4,7 @@
 
 % each edge in the ws graph is represented by 2 (oppositely) directed edges 
 
-produceBMRMfiles = 0;
+produceBMRMfiles = 1;
 showIntermediate = 0;
 useGurobi = 1;
 fromInputImage = 1;
