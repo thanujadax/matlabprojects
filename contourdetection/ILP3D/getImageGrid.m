@@ -27,7 +27,7 @@ function [ws_grid,edgeSetRegions,edges2pixels,edges2nodes,nodeEdges,...
 
 [adjacencyMat,nodeIndsVect] = getNodeAdjacency_sq(nodePix);
 
-[edges2nodes,nodeEdges] = getEdges2nodes_grid(adjacencyMat);
+[edges2nodes,nodeEdges] = getEdges2nodes_grid(adjacencyMat,nodeIndsVect);
 
 edges2pixels = getEdges2pixels_grid(edges2nodes,nodeIndsVect,sizeR,sizeC,gridResolution);
 

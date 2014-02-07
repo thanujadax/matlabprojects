@@ -41,6 +41,9 @@ nodePixInds4_tmp = zeros(4,1);
 nodeListInds4_tmp = zeros(4,1);
 
 edgeSet_region_k = zeros(4,1);
+
+% get rid of the first column of nodeEdges (it contains nodeInds)
+nodeEdges(:,1) = [];
 k = 0;
 for i=1:numGridsY
     for j=1:numGridsX

@@ -56,4 +56,9 @@ while(sum(visitedEdges==edgeInd_i)==0 && numel(node_i)==1)
     nextNode_listInd = (nextNodes==node_i);
     nextNode_listInd = ~nextNode_listInd;
     node_i = nextNodes(nextNode_listInd);
+    % start debug
+    if(isempty(edgeInd_i))
+        aa = 99;
+    end
+    % end debug
 end
