@@ -37,11 +37,17 @@ for i=1:numEdges
 end
 
 function edgeResp = calculateEdgeResp_circular...
-            (OFR,ofrOrientations,edges2pixels)
+            (edgeID,OFR,ofrOrientations,edges2pixels)
 %   calculates edge response around a circular region in the proximity
 %   of the mid point of the edge for the given edge orientation +- epsilon,
 %   for the default edgeOrientation (col1 of edgeOrientations)
 
+% calculate the relevant pix inds, in the proximity of this edge
+edgePixels_i = edges2pixels(edgeID,:);
+edgePixels_i(1) = []; % first element is the edgeID
+pixIndOfr = getEdgeProximity_circular(edgePixels_i,sizeR,sizeC);
+% get the edge response from OFR
+edgeResp = calculateWeightedEdgeResp(pixIndOfr,OFR);
 
 
 function [theta,theta_comp] = calculateEdgeOrientaion(nodesForEdge,sizeR,sizeC)
