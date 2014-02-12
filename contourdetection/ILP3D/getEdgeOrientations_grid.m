@@ -5,9 +5,11 @@ function [edgeOrientations, edgeResponses] = getEdgeOrientations_grid...
 % Outputs:
 %   edgeOrientations (theta): col1 gives default orientation in the order of nodes
 %   given in edges2nodes. col2 gives the complementary orientation
-%   edgeResponses: edge response around a circular region in the proximity
+%   edgeResponses: edge response in rectangular region in the proximity
 %   of the mid point of the edge for the given edge orientation +- epsilon,
-%   for the default edgeOrientation (col1 of edgeOrientations)
+%   for the default edgeOrientation (col1 of edgeOrientations). Sign of the
+%   edge response suggest whether to use col1(+) or col2(-) in the case of
+%   undirected graph version of ILP.
 
 % Inputs:
 %   eps_orientation: tolerance on edge orientation for accumulating edge

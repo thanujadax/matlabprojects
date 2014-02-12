@@ -2,9 +2,10 @@ function edgeResp = calculateEdgeResp(pixIndOfr,OFR,...
                 orientation,eps_orientation,ofr_stepSize)
             
 % Output:
-%   edgeResp: unweighted edge response around the edge in concern
+%   edgeResp: unweighted signed edge response around the edge in concern
 %   obtained from OFR 3D matrix using the pixels in the proximity of the
-%   edge (pixIndOfr)
+%   edge (pixIndOfr), for the given 'orientation' which is one of two
+%   possible complementary orientations per each edge.
 
 % Inputs:
 %   pixIndOfr: pixels in the proximity of the edge, for which
@@ -59,7 +60,7 @@ resp = 0;
 for i=1:numDimsToLook
     ofr_dim = OFR(:,:,dimSeq(i));
     resp_dim = ofr_dim(pixIndOfr);
-    resp = resp + abs(sum(sum(resp_dim)));
+    resp = resp + sum(sum(resp_dim));
 end
 
 % normalize by the number of dimensions and pixels

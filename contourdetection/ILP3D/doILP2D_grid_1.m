@@ -30,7 +30,10 @@ threshFrac = 0.1;
 medianFilterH = 0;
 invertImg = 1;      % 1 for EM images when input image is taken from imagePath
 b_imWithBorder = 1; % add thick dark border around the image
-
+eps_orientation = 25; % for edge response calculation from OFR.
+                    % range of orientations = orientation +- eps_orientation
+barHalfWidth = 2;  % for edge response calculation from OFR. Additional thickness
+                % on each side of the edge to consider OFR around it.
 % param
 cEdge = 10;        % general scaling factor for edge priors
 % cNode = 100;        % scaling factor for the node cost coming from gaussian normal distr.
@@ -145,10 +148,23 @@ jEdges = getEdgesForAllNodeTypes(nodeEdges,junctionTypeListInds);
 % jEdges{i} - cell array. each cell corresponds to the set of edges for the
 % junction of type i (type1 = J2). A row of a cell corresponds to a node of
 % that type of junction.
-jAnglesAll = getNodeAnglesForAllJtypes(junctionTypeListInds,...
-    nodeInds,jEdges,edges2pixels,orientedScoreSpace3D,sizeR,sizeC,orientationStepSize);
+
+% jAnglesAll = getNodeAnglesForAllJtypes(junctionTypeListInds,...
+%     nodeInds,jEdges,edges2pixels,orientedScoreSpace3D,sizeR,sizeC,orientationStepSize);
+
 % jAnglesAll{i} - cell array. each row of a cell corresponds to the set of angles for each
 % edge at each junction of type 1 (= J2)
+
+[edgeOrientationsList, edgeResponses_signed] = getEdgeOrientations_grid...
+            (edges2nodes,sizeR,sizeC,eps_orientation,orientedScoreSpace3D,...
+            edges2pixels,gridResolution,barHalfWidth,orientationStepSize);
+% edgeOrientationsList: col1- default orientation, col2-complementary
+% orientation
+% edgeResponses: edge response (signed) to the default orientation
+
+jAnglesAll = getNodeAnglesFromEdgeOrientations...
+            (junctionTypeListInds,jEdges,edgeOrientationsList,...
+            edgeResponses_signed);
 
 % get the angles for the edges based on its position in the graph
 jAnglesAll_alpha = getNodeAngles_fromGraph_allJtypes(junctionTypeListInds,...
