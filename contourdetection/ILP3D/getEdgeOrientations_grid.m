@@ -1,6 +1,6 @@
 function [edgeOrientations, edgeResponses] = getEdgeOrientations_grid...
-            (edges2nodes,sizeR,sizeC,eps_orientation,OFR,ofrOrientations,...
-            edges2pixels)
+            (edges2nodes,sizeR,sizeC,eps_orientation,OFR,...
+            edges2pixels,gridResolution,barHalfWidth,ofr_stepSize)
 
 % Outputs:
 %   edgeOrientations (theta): col1 gives default orientation in the order of nodes
@@ -14,9 +14,12 @@ function [edgeOrientations, edgeResponses] = getEdgeOrientations_grid...
 %   responses
 %   OFR: 3D matrix containing edge responses in the order of
 %   ofrOrientations
-%   ofrOrientations: vector containing the angles in the order corresponding to
-%   OFR matrix
+%   OFR matrix:
 %   edges2pixels: first col is edgeID. rest of the row gives pixInds
+%   gridResolution: dimension (length) of one side of a grid cell
+%   barHalfWidth: padding to the edge on one side to calculate edge
+%   coverage for edge response calculation
+%   ofr_stepSize: difference between adjacent orientation dimensions of ofr in degrees
 
 numEdges = size(edges2nodes,1);
 
@@ -31,8 +34,18 @@ for i=1:numEdges
     edgeOrientations(i,1) = theta;
     edgeOrientations(i,2) = theta_comp;
     
+    edgesPixels = edges2pixels(i,:);
+    edgePixels(1) = []; % first element is the edgeID
+    edgePixels = edgePixels(edgePixels>0);
+    edgeLength = gridResolution;
+    
+    edgeOrientation = theta;
+    
+    pixIndOfr = getEdgeCoverage_rect(edgePixels,edgeLength,...
+            sizeR,sizeC,edgeOrientation,barHalfWidth);
     % calculating edge response for default orientation
-    edgeResp_i = calculateEdgeResp_rect();
+    edgeResponses(i) = calculateEdgeResp(pixIndOfr,OFR,...
+                edgeOrientation,eps_orientation,ofr_stepSize);
     
 end
 
