@@ -4,9 +4,9 @@
 % with the new cost calculation at the junctions, incorporating the
 % directionality of the 
 
-gridResolution = 6;
+gridResolution = 4;
 
-showIntermediate = 1;
+showIntermediate = 0;
 useGurobi = 1;
 fromInputImage = 1;
 imagePath = '/home/thanuja/Dropbox/data/mitoData/emJ_00_170x.png';
@@ -129,8 +129,35 @@ numBoundaryEdges = numel(boundaryEdgeListInds);
 
 disp('preparing coefficients for ILP solver...')
 %% Edge unary values
+jEdges = getEdgesForAllNodeTypes(nodeEdges,junctionTypeListInds);
+% jEdges{i} - cell array. each cell corresponds to the set of edges for the
+% junction of type i (type1 = J2). A row of a cell corresponds to a node of
+% that type of junction.
+
+% jAnglesAll = getNodeAnglesForAllJtypes(junctionTypeListInds,...
+%     nodeInds,jEdges,edges2pixels,orientedScoreSpace3D,sizeR,sizeC,orientationStepSize);
+
+% jAnglesAll{i} - cell array. each row of a cell corresponds to the set of angles for each
+% edge at each junction of type 1 (= J2)
+
+[edgeOrientationsList, edgeResponses] = getEdgeOrientations_grid...
+            (edges2nodes,sizeR,sizeC,eps_orientation,orientedScoreSpace3D,...
+            edges2pixels,gridResolution,barHalfWidth,orientationStepSize,...
+            nodeInds);
+% edgeOrientationsList: col1- default orientation, col2-complementary
+% orientation
+% edgeResponses: edge response (signed) to the default orientation
+
+jAnglesAll = getNodeAnglesFromEdgeOrientations...
+            (jEdges,edgeOrientationsList);
+
+% get the angles for the edges based on its position in the graph
+jAnglesAll_alpha = getNodeAngles_fromGraph_allJtypes(junctionTypeListInds,...
+    nodeInds,jEdges,edges2pixels,sizeR,sizeC,edges2nodes);
+
 % edge priors - from orientation filters
-edgePriors = getEdgeUnaryAbs(edgepixels,output(:,:,3));
+% edgePriors = getEdgeUnaryAbs(edgepixels,output(:,:,3));
+edgePriors = edgeResponses .* 10;
 
 % assigning predetermined edgePriors for boundaryEdges before nodeAngleCost
 % calculation
@@ -143,32 +170,6 @@ if(showIntermediate)
 end
 %% Edge pairs - Junction costs
 [maxNodesPerJtype, numJtypes] = size(junctionTypeListInds);
-
-jEdges = getEdgesForAllNodeTypes(nodeEdges,junctionTypeListInds);
-% jEdges{i} - cell array. each cell corresponds to the set of edges for the
-% junction of type i (type1 = J2). A row of a cell corresponds to a node of
-% that type of junction.
-
-% jAnglesAll = getNodeAnglesForAllJtypes(junctionTypeListInds,...
-%     nodeInds,jEdges,edges2pixels,orientedScoreSpace3D,sizeR,sizeC,orientationStepSize);
-
-% jAnglesAll{i} - cell array. each row of a cell corresponds to the set of angles for each
-% edge at each junction of type 1 (= J2)
-
-[edgeOrientationsList, edgeResponses_signed] = getEdgeOrientations_grid...
-            (edges2nodes,sizeR,sizeC,eps_orientation,orientedScoreSpace3D,...
-            edges2pixels,gridResolution,barHalfWidth,orientationStepSize);
-% edgeOrientationsList: col1- default orientation, col2-complementary
-% orientation
-% edgeResponses: edge response (signed) to the default orientation
-
-jAnglesAll = getNodeAnglesFromEdgeOrientations...
-            (junctionTypeListInds,jEdges,edgeOrientationsList,...
-            edgeResponses_signed);
-
-% get the angles for the edges based on its position in the graph
-jAnglesAll_alpha = getNodeAngles_fromGraph_allJtypes(junctionTypeListInds,...
-    nodeInds,jEdges,edges2pixels,sizeR,sizeC,edges2nodes);
 
 % angle costs
 nodeAngleCosts = cell(1,numJtypes);

@@ -18,19 +18,20 @@ for i=1:numCells
     
     cellBorderPixels = [cellBorderPixels; cellBorderNodePixels_i];
     
-    % if this is a cluster nodes, add the entire cluster to the list
-    clusID_indList = ismember(connectedJunctionIDs(:,1),cellBorderNodePixels_i);
-    clusIDs = connectedJunctionIDs(clusID_indList,2);
-    clusIDs = unique(clusIDs);
+    clusIDs = [];
     
-    if(isempty(clusIDs))
-        % not a cluster node
+    % if this is a cluster node, add the entire cluster to the list
+    if(~isempty(connectedJunctionIDs))
+        clusID_indList = ismember(connectedJunctionIDs(:,1),cellBorderNodePixels_i);
+        clusIDs = connectedJunctionIDs(clusID_indList,2);
+        clusIDs = unique(clusIDs);
         
-    else
+        if(~isempty(clusIDs))
         % cluster node
         clusPixListInds = ismember(connectedJunctionIDs(:,2),clusIDs);
         clusPix_i = connectedJunctionIDs(clusPixListInds,1);
         cellBorderPixels = [cellBorderPixels; clusPix_i];
+        end
     end
     
 end

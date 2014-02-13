@@ -24,8 +24,7 @@ rotatedBar = imrotate(bar,(-edgeOrientation));
 shiftR = rCenter - rotBarCentR;
 shiftC = cCenter - rotBarCentC;
 % shift bar pix inds
-barPixInds = find(rotatedBar);
-[barR,barC] = ind2sub([sizeR sizeC],barPixInds);
+[barR,barC] = find(rotatedBar);
 barR = barR + shiftR;
 barC = barC + shiftC;
 

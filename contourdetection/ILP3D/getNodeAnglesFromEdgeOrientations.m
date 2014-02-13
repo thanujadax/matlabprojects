@@ -1,6 +1,5 @@
 function jAnglesAll = getNodeAnglesFromEdgeOrientations...
-            (junctionTypeListInds,jEdges,edgeOrientationsList,...
-            edgeResponses_signed)
+            (jEdges,edgeOrientationsList)
         
 % Output:
 % jAnglesAll: for each node given in the order of junctionTypeListInds,
@@ -8,4 +7,17 @@ function jAnglesAll = getNodeAnglesFromEdgeOrientations...
 % jEdges.
 
 % Inputs:
-% edgeOrientationsList: col1: default orientation (N1->N2)
+% edgeOrientationsList: orientations for positive edge response
+% edgeResponses: 
+% jEdges: edgeIDs at each node. Organized in a cell array. Each cell
+% corresponds to a jType (numEdgesPerJn-1)
+
+[~,numJtypes]=size(jEdges);
+jAnglesAll = {};
+
+for i=1:numJtypes
+    jEdges_i = jEdges{i};
+    
+    jAngles_i = edgeOrientationsList(jEdges_i);
+    jAnglesAll{i} = jAngles_i;
+end
