@@ -29,8 +29,8 @@ barR = barR + shiftR;
 barC = barC + shiftC;
 
 % retain only the positive valued pixels
-barR_pos_logical = barR>0;
-barC_pos_logical = barC>0;
+barR_pos_logical = barR>0 & barR<=sizeR;
+barC_pos_logical = barC>0 & barC<=sizeC;
 % when both are positive
 pos_ind_logical = barR_pos_logical & barC_pos_logical;
 barR_pos = barR(pos_ind_logical);
