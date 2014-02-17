@@ -9,14 +9,14 @@ gridResolution = 4;
 showIntermediate = 0;
 useGurobi = 1;
 fromInputImage = 1;
-imagePath = '/home/thanuja/Dropbox/data/mitoData/emJ_00_170x.png';
+% imagePath = '/home/thanuja/Dropbox/data/mitoData/emJ_00_170x.png';
 % imagePath = '/home/thanuja/Dropbox/data/testImg/testCurves1.png';
 % imagePath = '/home/thanuja/Dropbox/data/mitoData/stem1_256by256.png';
 % imagePath = '/home/thanuja/Dropbox/data/thanuja/emchallenge-class/competition-final0000.tif';
 % hard coded back bone edge 1962
 % imagePath = '/home/thanuja/Dropbox/data/RF_training_edge/I15_testingImage.tif';
 % imagePath = '/home/thanuja/Dropbox/data/RF_training_edge/I05_trainingImage.tif';
-% imagePath = '/home/thanuja/Dropbox/data/evaldata/input/I11_raw05.tif';
+imagePath = '/home/thanuja/Dropbox/data/evaldata/input/I10_raw05.tif';
 % imagePath = '/home/thanuja/Dropbox/data/edgeTraining2/trainingRaw/I00_raw05.tif';
 
 orientationStepSize = 10;

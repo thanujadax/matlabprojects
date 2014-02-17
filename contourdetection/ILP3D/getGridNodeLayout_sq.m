@@ -13,10 +13,12 @@ function [nodePix,numEdgesX,numEdgesY] = getGridNodeLayout_sq(sizeR,sizeC,gridRe
 numEdgesX = floor((sizeC-1)/(gridResolution));
 marginPix_X = mod((sizeC-1),(gridResolution));
 gridStartX = floor(marginPix_X/2);
+gridStartX = max(1,gridStartX);
 
 numEdgesY = floor((sizeR-1)/(gridResolution));
 marginPix_Y = mod((sizeC-1),(gridResolution));
 gridStartY = floor(marginPix_Y/2);
+gridStartY = max(1,gridStartY);
 
 % define node positions
 x_pos = gridStartX:gridResolution:sizeC;

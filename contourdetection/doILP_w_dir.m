@@ -4,7 +4,7 @@
 
 % each edge in the ws graph is represented by 2 (oppositely) directed edges 
 
-produceBMRMfiles = 1;
+produceBMRMfiles = 0;
 showIntermediate = 0;
 useGurobi = 1;
 fromInputImage = 1;
@@ -86,12 +86,13 @@ if(produceBMRMfiles)
     w_off_r = 1;
 else
     % use pre-learned parameters
-    w_on_e = -6.92386;     % edge weight
-    w_off_e = -3.10529;
-    w_off_n = -3.89387;    % node off weight
-    w_on_n = -5.91482;     % node on weight
-    w_on_r = -3.67346;     % region weight
-    w_off_r = 0;
+    % optimial w is [-7.52064, -7.38296, 0.468054, 0.403942, -7.79221, -5.75401]
+    w_on_e = -7.52064;     % edge weight
+    w_off_e = -7.38296;
+    w_off_n = 0.468054;    % node off weight
+    w_on_n = 0.403942;     % node on weight
+    w_on_r = -7.79221;     % region weight
+    w_off_r = -5.75401;
 end
 
 
