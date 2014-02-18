@@ -10,11 +10,13 @@ function tIndsForEdge = getTIndsForEdgeGivenSectionPair(Ts,edgeID,sectID)
 % Output:
 %   tIndsForEdge - T inds as given by the rowID of Ts_i
 
+sect1ID_col = 1;
+edgeID_col = 2;
+
 % get all row IDs for sect1(col1) = sectID
-rowIDsForSectionID = find(Ts(:,1) == sectID);
+rowIDsForSectionID = find(Ts(:,sect1ID_col) == sectID);
 % out of those rowIDs, pick the ones that have col2==edgeID.
 TsForSection1 = Ts(rowIDsForSectionID,:);
-rowIDsForEdgeIDs_logical = (TsForSection1(:,2)==edgeID);
+rowIDsForEdgeIDs_logical = (TsForSection1(:,edgeID_col)==edgeID);
 
 tIndsForEdge = rowIDsForSectionID(rowIDsForEdgeIDs_logical);
-
