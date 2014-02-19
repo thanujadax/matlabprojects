@@ -5,7 +5,7 @@ function [A,b,senseArray] = getILPConstraints3Dtoy...
 
 % Outputs:
 %   A - sparse matrix containing coefficients for ILP
-%   [sect1:{edges}{nodes}{regions}][sect2:...][]...[Ts_1,2][Ts_2,3]...
+%   [sect1:{edges}{nodes}{regions}][sect2:...][]...[Ts_1-2][Ts_2-3]...
 %   b - 
 %   senseArray - 
 
@@ -40,6 +40,8 @@ senseArray(1:totNumConstraints) = '=';
 
 %% 3D constraints
 % formulated for each adjacent pair of sections
+%% T activation - binary constraint
+% 
 %% T activation - no overlapping Ts
 % for each pair of sections, get the set of Ts based on each edge.
 
@@ -53,12 +55,12 @@ for secPair = 1:numSectionPairs
         
         tInds_edge_i = getTIndsForEdgeGivenSectionPair...
                 (Ts_i,edgeID_in_sect_i,sectIDforEdge_i); 
-        % includes t_offState
+        % does not include t_offStates
         
         tInds_edge_i_offset = tInds_edge_i + offSetTInds;
         rowStop = rowStop + 1;
-        A(rowStop,tInds_edge_i_offset) = 1;
-        senseArray(rowStop) = '=';
+        A(rowStop,tInds_edge_i_offset) = 1.1;
+        senseArray(rowStop) = '<'; 
         b(rowStop) = 1;
     end
 end
