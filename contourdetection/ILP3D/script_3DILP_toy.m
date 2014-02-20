@@ -8,8 +8,10 @@
 %   corresponding to a pair of adjacent sections
 
 
+
 %%  ILP formulation
-[model.A,b,senseArray] = getILPConstraints3Dtoy();
+[model.A,b,senseArray] = getILPConstraints3Dtoy...
+                (c_edgeIDs,c_Ts_on,sectVarStats,c_TsetsWithCommonEdges);
 f = getILPObj3Dtoy();
 
 %% ILP solver
