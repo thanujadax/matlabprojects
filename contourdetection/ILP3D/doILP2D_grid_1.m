@@ -4,7 +4,7 @@
 % with the new cost calculation at the junctions, incorporating the
 % directionality of the 
 
-gridResolution = 4;
+gridResolution = 6;
 
 showIntermediate = 0;
 useGurobi = 1;
