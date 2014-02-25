@@ -13,7 +13,7 @@ w_on_n = 9.27912;
 w_off_r = 1.07527;
 w_on_r = -1.07527;
 
-%%  Define set of toy slices (2D grids)
+%%  Toy inputs (2D grids)
 %   with appropriate feature values for edges, regions and triangles
 %   2D variables (edges,nodes,regions) for each section are stored in a
 %   cell array
