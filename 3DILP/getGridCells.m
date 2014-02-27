@@ -1,4 +1,4 @@
-function griIDs_sectionIDs_pixIDs = getGridCells...
+function griIDs_sectionIDs_rootPixIDsRel = getGridCells...
             (numR,numC,numZ,gridResX,gridResY,gridResZ)
 
 % Input:
@@ -6,8 +6,9 @@ function griIDs_sectionIDs_pixIDs = getGridCells...
 %       includes membrane cells around the borders
 
 % Output:
-%   griIDs_sectionIDs_pixIDs - matrix where each col is suggested by name
-%   pixID is the pixInd of the start pixel (0,0,0) of each cell
+%   griIDs_sectionIDs_rootPixIDs - matrix where each col is suggested by name
+%   rootPixID is the pixInd of the start pixel (0,0,0) of each cell,
+%   wrt each slice (relative coordinates in each slice)
 
 
 % grid dimensions (numCells in each dim)
@@ -38,3 +39,19 @@ nodePixList_section = sub2ind([numR numC],nodeY,nodeX);
 numGridCellsPerSection = numEdgesX * numEdgesY;
 totGridCells = numGridCellsPerSection * numZ;
 
+griIDs_sectionIDs_rootPixIDsRel = zeros(totGridCells,3);
+gridCounter = 0;
+for k=1:numZ
+    for j=1:numEdgesX
+        for i=1:numEdgesY
+            gridCounter = gridCounter + 1;
+            % gridCellInd
+            griIDs_sectionIDs_rootPixIDsRel(gridCounter,1) = gridCounter;
+            % section_ID
+            griIDs_sectionIDs_rootPixIDsRel(gridCounter,2) = k;
+            % rootPixInd
+            griIDs_sectionIDs_rootPixIDsRel(gridCounter,3)...
+                = sub2ind([numR numC],nodeY(i),nodeX(j));
+        end
+    end
+end

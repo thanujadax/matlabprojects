@@ -53,8 +53,13 @@ end
 % vector: gridID|sectionID|pixels
 
 % Membrane cubes are added to the boundary
-griIDs_sectionIDs_pixIDs = getGridCells(inputImageStackMat);
-numCells = size(griIDs_sectionIDs_pixIDs,1);
+griIDs_sectionIDs_rootPixIDsRel = getGridCells...
+            (numR,numC,numZ,gridResX,gridResY,gridResZ);
+%   griIDs_sectionIDs_rootPixIDsRel - matrix where each col is suggested by name
+%   rootPixID is the pixInd of the start pixel (0,0,0) of each cell,
+%   wrt each slice (relative coordinates in each slice)        
+        
+numCells = size(griIDs_sectionIDs_rootPixIDsRel,1);
 %% Unary activation scores from RFCs
 unaryScoreMat = zeros(numCells,NUM_VAR_PER_CELL);
 
