@@ -92,38 +92,38 @@ if(~usePrecomputedFeatureMatrices)
       
 end
 %% Unary activation scores from RFCs
-unaryScoreMat = zeros(numCells,NUM_VAR_PER_CELL);
+unaryScoresMat = zeros(numCells,NUM_VAR_PER_CELL);
 
 % load RFC
 % load fm
-unaryScoreMat(:,1) = getRFCprob(fm,RFC,numTrees); % gridCellProbs_interior
+unaryScoresMat(:,1) = getRFCprob(fm,RFC,numTrees); % gridCellProbs_interior
 % clear RFC
 % clear fm
 
 % load RFC
 % load fm
-unaryScoreMat(:,2) = getRFCprob(fm,RFC,numTrees); % gridCellFaceProbs_xy_1 
+unaryScoresMat(:,2) = getRFCprob(fm,RFC,numTrees); % gridCellFaceProbs_xy_1 
 % clear fm
 % load fm
-unaryScoreMat(:,3) = getRFCprob(fm,RFC,numTrees); % gridCellFaceProbs_xy_2 
+unaryScoresMat(:,3) = getRFCprob(fm,RFC,numTrees); % gridCellFaceProbs_xy_2 
 % clear RFC
 % clear fm
 
 % load RFC
 % load fm
-unaryScoreMat(:,4) = getRFCprob(fm,RFC,numTrees); % gridCellFaceProbs_yz_3 
+unaryScoresMat(:,4) = getRFCprob(fm,RFC,numTrees); % gridCellFaceProbs_yz_3 
 % clear fm
 
 % load fm
-unaryScoreMat(:,5) = getRFCprob(fm,RFC,numTrees); % gridCellFaceProbs_yz_4 
+unaryScoresMat(:,5) = getRFCprob(fm,RFC,numTrees); % gridCellFaceProbs_yz_4 
 % clear fm
 
 % load fm
-unaryScoreMat(:,6) = getRFCprob(fm,RFC,numTrees); % gridCellFaceProbs_xz_5 
+unaryScoresMat(:,6) = getRFCprob(fm,RFC,numTrees); % gridCellFaceProbs_xz_5 
 % clear fm
 
 % load fm
-unaryScoreMat(:,7) = getRFCprob(fm,RFC,numTrees); % gridCellFaceProbs_xz_6 
+unaryScoresMat(:,7) = getRFCprob(fm,RFC,numTrees); % gridCellFaceProbs_xz_6 
 % clear fm
 % clear RFC
 %% ILP formulation
@@ -131,7 +131,7 @@ unaryScoreMat(:,7) = getRFCprob(fm,RFC,numTrees); % gridCellFaceProbs_xz_6
 % constraints
 [model.A,b,senseArray] = getILP3DGridConstraints(cellStats);
 % objective to minimize
-f = getILP3DGridObjective(W,unaryScoreMat);
+f = getILP3DGridObjective(W,unaryScoresMat);
 
 %% ILP solver
 disp('using Gurobi ILP solver...');

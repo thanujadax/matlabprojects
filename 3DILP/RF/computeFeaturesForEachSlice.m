@@ -21,6 +21,6 @@ for i=1:numZ
             (imageStack3D(:,:,i), oriFiltLen, halfWidth_strucEl, csHist);
     % save 
     fm_name = sprintf('fm_slice_%d.mat',i);
-    saveFile = fullfile(saveFilePath,fm_name);
-    save(saveFile,fm);
+    saveFileName = fullfile(saveFilePath,fm_name);
+    save(saveFileName,fm);
 end
