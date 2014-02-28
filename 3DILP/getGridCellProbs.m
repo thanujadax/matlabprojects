@@ -1,6 +1,5 @@
 function gridCellInteriorUnary = getGridCellProbs...
-            (inputImageStackMat,gridIDs_sectionIDs_rootPixIDsRel,...
-            forestCellInteriorProb,gridStats,numTrees)
+            (fm,forestCellInteriorProb,numTrees)
 
 % Inputs:
 %   inputImageStackMat - 3D matrix containing adjacent slices of a stack,
@@ -20,7 +19,7 @@ function gridCellInteriorUnary = getGridCellProbs...
 
 
 % get features for gridCells
-fm = getCellFeatureMat(inputImageStackMat,gridIDs_sectionIDs_rootPixIDsRel);
+
 % Run classifier
 [y_h,v] = classRF_predict(double(fm), forestCellInteriorProb);
 

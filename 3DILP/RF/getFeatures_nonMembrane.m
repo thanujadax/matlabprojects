@@ -14,10 +14,8 @@ function [fm]  = getFeatures_nonMembrane(imIn, oriFiltLen, halfWidth_strucEl, cs
 
 % Output:
 %   fm - feature matrix (3D)
-%       each entry in the 3rd dim stands for a a feature
-%       takes into account the sections before and after. Therefore, should
-%       not call for the first and last sections. Keep first and last
-%       sections as buffer.
+%       Each entry in the 3rd dim stands for a a feature
+%       Does not take into account the sections before and after.
 
 %% Init
 
