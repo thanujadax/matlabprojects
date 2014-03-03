@@ -90,42 +90,13 @@ if(~usePrecomputedFeatureMatrices)
     
     computeFmGridFaces(pathToFeatureMat);
       
+else
+    % using precomputed feature matrices
+    % check if available in the given path.
 end
 %% Unary activation scores from RFCs
-unaryScoresMat = zeros(numCells,NUM_VAR_PER_CELL);
+unaryScoresMat = computeUnaryScoreMatRFC();
 
-% load RFC
-% load fm
-unaryScoresMat(:,1) = getRFCprob(fm,RFC,numTrees); % gridCellProbs_interior
-% clear RFC
-% clear fm
-
-% load RFC
-% load fm
-unaryScoresMat(:,2) = getRFCprob(fm,RFC,numTrees); % gridCellFaceProbs_xy_1 
-% clear fm
-% load fm
-unaryScoresMat(:,3) = getRFCprob(fm,RFC,numTrees); % gridCellFaceProbs_xy_2 
-% clear RFC
-% clear fm
-
-% load RFC
-% load fm
-unaryScoresMat(:,4) = getRFCprob(fm,RFC,numTrees); % gridCellFaceProbs_yz_3 
-% clear fm
-
-% load fm
-unaryScoresMat(:,5) = getRFCprob(fm,RFC,numTrees); % gridCellFaceProbs_yz_4 
-% clear fm
-
-% load fm
-unaryScoresMat(:,6) = getRFCprob(fm,RFC,numTrees); % gridCellFaceProbs_xz_5 
-% clear fm
-
-% load fm
-unaryScoresMat(:,7) = getRFCprob(fm,RFC,numTrees); % gridCellFaceProbs_xz_6 
-% clear fm
-% clear RFC
 %% ILP formulation
 
 % constraints
