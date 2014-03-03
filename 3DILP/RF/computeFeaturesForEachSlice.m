@@ -2,7 +2,7 @@ function computeFeaturesForEachSlice(pathToFm,subDir_sectionFm,imageStack3D,...
                 oriFiltLen, halfWidth_strucEl, csHist)
 
 % computes and saves the feature matrices for each section of the input
-% image stack. fm(i,j,k) corresponds to the feature k of the gridPatch
+% image stack. fm(i,j,k) corresponds to the feature k of the pixel
 % (i,j) of each section.
 
 % path to save section features

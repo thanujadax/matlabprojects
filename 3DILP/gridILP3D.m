@@ -31,6 +31,7 @@ fileNameString = '*.png';
 pathToFeatureMat = '/home/thanuja/Dropbox/data/3D_Grid_ILP/stack1/fm/';
 subDir_sectionFm = 'indivSectionFMs';
 subDir_cellInteriorFm = 'cellInteriorFMs';
+subDir_cellFaceFm = 'cellFaceFMs';
 subDir_cellFaceFMs_xy1 = 'cellFaceFMs_xy1';
 subDir_cellFaceFMs_xy2 = 'cellFaceFMs_xy2';
 subDir_cellFaceFMs_yz1 = 'cellFaceFMs_yz1';
@@ -71,13 +72,14 @@ end
 % vector: gridID|sectionID|pixels
 
 % Membrane cubes are added to the boundary
-gridCIDs_sectionIDs_rootPixIDsRel = getGridCells...
+[gridCIDs_sectionIDs_rootPixIDsRel,numCellsY,numCellsX]...
+            = getGridCells...
             (numR,numC,numZ,gridResX,gridResY,gridResZ);
 %   griIDs_sectionIDs_rootPixIDsRel - matrix where each col is suggested by name
 %   rootPixID is the pixInd of the start pixel (0,0,0) of each cell,
 %   wrt each slice (relative coordinates in each slice)        
         
-numCells = size(gridCIDs_sectionIDs_rootPixIDsRel,1);
+% numCells = size(gridCIDs_sectionIDs_rootPixIDsRel,1);
 
 %% Compute feature matrices for gridCells and gridCellFaces
 if(~usePrecomputedFeatureMatrices)
@@ -86,7 +88,11 @@ if(~usePrecomputedFeatureMatrices)
     computeFeaturesForEachSlice(pathToFeatureMat,subDir_sectionFm,imageStack3D,...
                 oriFiltLen, halfWidth_strucEl, csHist);
     
-    computeFmGridCellInterior(pathToFeatureMat);
+    % writes one file (fm_gridCellInteriorAll.mat) with all gridCells of
+    % all sections
+    computeFmGridCellInterior(pathToFeatureMat,subDir_cellInteriorFm,...
+                subDir_sectionFm,numZ,gridCIDs_sectionIDs_rootPixIDsRel,...
+                gridResX,gridResY);
     
     computeFmGridFaces(pathToFeatureMat);
       

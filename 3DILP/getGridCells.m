@@ -1,4 +1,5 @@
-function griIDs_sectionIDs_rootPixIDsRel = getGridCells...
+function [griIDs_sectionIDs_rootPixIDsRel,numEdgesY,numEdgesX]...
+            = getGridCells...
             (numR,numC,numZ,gridResX,gridResY,gridResZ)
 
 % Input:
@@ -39,7 +40,7 @@ nodePixList_section = sub2ind([numR numC],nodeY,nodeX);
 numGridCellsPerSection = numEdgesX * numEdgesY;
 totGridCells = numGridCellsPerSection * numZ;
 
-griIDs_sectionIDs_rootPixIDsRel = zeros(totGridCells,3);
+griIDs_sectionIDs_rootPixIDsRel = uint8(zeros(totGridCells,3));
 gridCounter = 0;
 for k=1:numZ
     for j=1:numEdgesX
