@@ -40,30 +40,9 @@ subDir_cellFaceFMs_xz1 = 'cellFaceFMs_xz1';
 subDir_cellFaceFMs_xz2 = 'cellFaceFMs_xz2';
 
 %% Read inputs
-inputSections = dir(strcat(pathForInputImages,fileNameString));
-numInputSections = length(inputSections);
-% load images to 3D matrix
-% read the first file to read the dimensions
-inputImage1_FilePath = fullfile(pathForInputImages,inputSections(1).name);
-im1 = uint8(imread(inputImage1_FilePath)); % uint8,single,double are the available options
-[numR,numC] = size(im1);
-clear im1
-% Adjusting image dimensions to include boundary (membrane) cells
-numR = numR + gridResY*2;
-numC = numC + gridResX*2;
-numZ = numInputSections + 2; % Thickness of slices not yet considered
-imageStack3D = uint8(ones(numR,numC,numZ));
-rStart = gridResY + 1;
-rStop = numR - gridResY;
-cStart = gridResX + 1;
-cStop = numC - gridResX;
-for i=2:numInputSections
-    % section 1 is already filled with 1s (membrane)
-    inputImageFilePath = fullfile(pathForInputImages,inputSections(i).name);
-    imageStack3D(rStart:rStop,cStart:cStop,i) = ...
-                uint8(imread(inputImageFilePath)); 
-    % uint8,single,double are the available options
-end
+imageStack3D = readImages2StackWithBoundary...
+                (pathForInputImages,fileNameString,gridResY,gridResX);
+[numR,numC,numZ] = size(imageStack3D);
 
 %% Create 3D grid
 % addressing mechanism: gridID <--> pixels(of particular section)
@@ -71,7 +50,7 @@ end
 % each cube is made by expanding the corresponding anisotropic image patch
 % vector: gridID|sectionID|pixels
 
-% Membrane cubes are added to the boundary
+% Membrane cubes are already added to the boundary
 [gridCIDs_sectionIDs_rootPixIDsRel,numCellsY,numCellsX]...
             = getGridCells...
             (numR,numC,numZ,gridResX,gridResY,gridResZ);
@@ -79,7 +58,9 @@ end
 %   rootPixID is the pixInd of the start pixel (0,0,0) of each cell,
 %   wrt each slice (relative coordinates in each slice)        
         
-% numCells = size(gridCIDs_sectionIDs_rootPixIDsRel,1);
+%   cellStats - number of grid cells along each dimension 
+%       [numR,numC,numZ] = [numY,numX,numZ]
+gridCellStats = [numCellsY, numCellsX,numZ];
 
 %% Compute feature matrices for gridCells and gridCellFaces
 if(~usePrecomputedFeatureMatrices)
@@ -93,8 +74,9 @@ if(~usePrecomputedFeatureMatrices)
     computeFmGridCellInterior(pathToFeatureMat,subDir_cellInteriorFm,...
                 subDir_sectionFm,numZ,gridCIDs_sectionIDs_rootPixIDsRel,...
                 gridResX,gridResY);
-    
-    computeFmGridFaces(pathToFeatureMat);
+    boundaryGridCellInds = getBoundaryCellInds(numCellsY,numCellsX,numZ);
+    computeFmGridFaces(pathToFeatureMat,boundaryGridCellInds,...
+                gridCIDs_sectionIDs_rootPixIDsRel,numZ,numCellsY,numCellsX);
       
 else
     % using precomputed feature matrices
@@ -106,7 +88,7 @@ unaryScoresMat = computeUnaryScoreMatRFC();
 %% ILP formulation
 
 % constraints
-[model.A,b,senseArray] = getILP3DGridConstraints(cellStats);
+[model.A,b,senseArray] = getILP3DGridConstraints(gridCellStats);
 % objective to minimize
 f = getILP3DGridObjective(W,unaryScoresMat);
 
