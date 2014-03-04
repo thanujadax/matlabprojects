@@ -13,9 +13,11 @@ function [gridCellInteriorLabels,gridCellFaceLabels]...
 
 
 %% ILP formulation
-
+disp('Formulating constraints...')
 % constraints
-[model.A,b,senseArray] = getILP3DGridConstraints(cellStats);
+numBorderCells = numel(borderCellIDs);
+[model.A,b,senseArray] = getILP3DGridConstraints(cellStats,numBorderCells);
+disp('done.')
 % objective to minimize
 f = getILP3DGridObjective_traindingLabels(gridCellInteriorInitLabels,borderCellIDs);
 

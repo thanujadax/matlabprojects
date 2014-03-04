@@ -28,8 +28,8 @@ gridCellFaceLabelsFileName = 'gridCellFaceLabels.mat';
 
 %% Params
 fileNameString = '*.png';
-gridResX = 4; % num pix
-gridResY = 4;
+gridResX = 128; % num pix
+gridResY = 128;
 gridResZ = 6; % distance between 2 adjacent slices in pixels
 
 %% Read inputs

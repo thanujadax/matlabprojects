@@ -23,13 +23,13 @@ thresh = 30; % percentage of zero pixel to consider the cell to be exterior
 
 % grid dimensions (numCells in each dim)
 
-numEdgesX = floor((numC-1)/(gridResX));
-marginPix_X = mod((numC-1),(gridResX));
+numEdgesX = floor(numC/gridResX);
+marginPix_X = mod(numC,gridResX);
 gridStartX = floor(marginPix_X/2);
 gridStartX = max(1,gridStartX);
 
-numEdgesY = floor((numR-1)/(gridResY));
-marginPix_Y = mod((numC-1),(gridResY));
+numEdgesY = floor(numR/gridResY);
+marginPix_Y = mod(numC,gridResY);
 gridStartY = floor(marginPix_Y/2);
 gridStartY = max(1,gridStartY);
 
@@ -40,9 +40,12 @@ y_pos = gridStartY:gridResY:numR;
 % Here, a grid node corresponds to the root (0,0,0) of each cube.
 % Therefore, we get rid of the final 'grid node' which is the one at the
 % boundary
-x_pos(end) = [];
-y_pos(end) = [];
-
+if(x_pos(end)==numC)
+    x_pos(end) = [];
+end
+if(y_pos(end)==numR)
+    y_pos(end) = [];
+end
 [nodeX, nodeY] = meshgrid(x_pos,y_pos);
 
 nodePixList_section = sub2ind([numR numC],nodeY,nodeX);
@@ -100,7 +103,7 @@ if(numNonZeroLabels>1)
     label = 1; % cellExterior
 else
     % percentage of zeropixels
-    numZeroPix = sum(gridCellPixVal==0);
+    numZeroPix = sum(sum(gridCellPixVal==0));
     percentageOfZeroPix = numZeroPix*100/(gridResX*gridResY);
     if(percentageOfZeroPix>thresh)
         label = 1; % cellExterior

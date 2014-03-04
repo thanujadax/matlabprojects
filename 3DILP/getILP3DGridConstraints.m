@@ -1,4 +1,4 @@
-function [A,b,senseArray] = getILP3DGridConstraints(cellStats)
+function [A,b,senseArray] = getILP3DGridConstraints(cellStats,numBorderCells)
 
 % version 1.0
 % 2014.02.25
@@ -27,8 +27,8 @@ function [A,b,senseArray] = getILP3DGridConstraints(cellStats)
 
 %% Init
 numCells = cellStats(1) * cellStats(2) * cellStats(3);
-numConstraints = numCells * 6;
-% numVariables = numCells * 7;
+numConstraints = numCells * 6 - 3*numBorderCells ;
+numVariables = numCells * 7;
 
 b = zeros(numConstraints,1);
 senseArray(1:numConstraints) = '=';
@@ -59,7 +59,7 @@ nzElementInd = 0;   % index for ii,jj,ss elements
 for k=1:numZ
     for i=1:numR
         for j=1:numC
-            cellInd = sub2ind([numR numC numC],i,j,k);
+            cellInd = sub2ind([numR numC numZ],i,j,k);
             
             % if face1 has a neighbor (before in z direction)
             % face 1
@@ -111,7 +111,7 @@ for k=1:numZ
             if(j>1)
                 face = 3;
                 face_ind = getFaceIndAbsGivenCell(cellInd,face);
-                face_neighborCellInd = sub2ind([numR numC numC],i,(j-1),k);
+                face_neighborCellInd = sub2ind([numR numC numZ],i,(j-1),k);
                 
                 neighborFace = 4;
                 neighbor_face_ind = getFaceIndAbsGivenCell...
@@ -158,7 +158,7 @@ for k=1:numZ
             if(i>1)
                 face = 5;
                 face_ind = getFaceIndAbsGivenCell(cellInd,face);
-                face_neighborCellInd = sub2ind([numR numC numC],(i-1),j,k);
+                face_neighborCellInd = sub2ind([numR numC numZ],(i-1),j,k);
                 
                 neighborFace = 6;
                 neighbor_face_ind = getFaceIndAbsGivenCell...
@@ -212,7 +212,7 @@ end
 for k=1:numZ
     for i=1:numR
         for j=1:numC
-            cellInd = sub2ind([numR numC numC],i,j,k);
+            cellInd = sub2ind([numR numC numZ],i,j,k);
             
             % face 1
             constraintCount = constraintCount + 1;
@@ -333,9 +333,13 @@ end
 % remove the unwanted zeros at the end of each ii,jj, and ss.
 ii = ii(ii>0);
 jj = jj(jj>0);
-ss = ss(ss>0);
-A = sparse(ii,jj,ss);
-
+numNonZeros = numel(ii);
+ss = ss(1:numNonZeros);
+A = sparse(ii,jj,ss,constraintCount,numVariables);
+if(numel(b)>constraintCount)
+    % trim b
+    b(constraintCount+1:end) = [];
+end
 %% Supplementary functions
 function faceInd = getFaceIndAbsGivenCell(cellInd,face)
 % first variable of each set of 7 vars per cube is the cube internal state
