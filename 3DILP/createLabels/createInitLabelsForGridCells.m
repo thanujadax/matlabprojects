@@ -1,13 +1,14 @@
 function [gridIDs_sectionIDs_rootPixIDsRel,gridCellInteriorlabels,...
             numEdgesY,numEdgesX]...
             = createInitLabelsForGridCells...
-            (imageStack3D_label,numR,numC,numZ,gridResX,gridResY,gridResZ)
+            (imageStack3D_label,numR,numC,numZ,gridResX,gridResY,gridResZ,...
+            thresh_mem)
 
 % Input:
 %   imageStack3D_label - 3D matrix of the image stack. type: uint8
 %       includes membrane cells around the borders
 %       
-
+%   thresh_mem = 30; % min percentage of zero pixel to consider the cell to be exterior
 % Output:
 %   gridIDs_sectionIDs_rootPixIDs - matrix where each col is suggested by name
 %   rootPixID is the pixInd of the start pixel (0,0,0) of each cell,
@@ -18,7 +19,7 @@ function [gridIDs_sectionIDs_rootPixIDsRel,gridCellInteriorlabels,...
 % 
 
 % param 
-thresh = 30; % percentage of zero pixel to consider the cell to be exterior
+% thresh_mem = 30; % percentage of zero pixel to consider the cell to be exterior
 
 
 % grid dimensions (numCells in each dim)
@@ -52,7 +53,7 @@ nodePixList_section = sub2ind([numR numC],nodeY,nodeX);
 numGridCellsPerSection = numEdgesX * numEdgesY;
 totGridCells = numGridCellsPerSection * numZ;
 
-gridIDs_sectionIDs_rootPixIDsRel = uint8(zeros(totGridCells,3));
+gridIDs_sectionIDs_rootPixIDsRel = zeros(totGridCells,3);
 gridCellInteriorlabels = uint8(zeros(totGridCells,1));
 gridCounter = 0;
 for k=1:numZ
@@ -65,13 +66,14 @@ for k=1:numZ
             % section_ID
             gridIDs_sectionIDs_rootPixIDsRel(gridCounter,2) = k;
             % rootPixInd
-            r0 = nodeY(i);
-            c0 = nodeX(j);
+            r0 = nodeY(i,j);
+            c0 = nodeX(i,j);
+            rootPixInd = nodePixList_section(i,j);
             gridIDs_sectionIDs_rootPixIDsRel(gridCounter,3)...
-                = sub2ind([numR numC],r0,c0);
+                = rootPixInd;
             % gridCellLabel
             label = getLabelForCell...
-                    (r0,c0,gridResY,gridResX,labelImage,thresh);
+                    (r0,c0,gridResY,gridResX,labelImage,thresh_mem);
             gridCellInteriorlabels(gridCounter) = label;
             
         end
@@ -101,6 +103,7 @@ uniqueLabels = unique(gridCellPixVal);
 numNonZeroLabels = sum(uniqueLabels>0);
 if(numNonZeroLabels>1)
     label = 1; % cellExterior
+    
 else
     % percentage of zeropixels
     numZeroPix = sum(sum(gridCellPixVal==0));

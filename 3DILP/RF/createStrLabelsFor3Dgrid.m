@@ -28,9 +28,11 @@ gridCellFaceLabelsFileName = 'gridCellFaceLabels.mat';
 
 %% Params
 fileNameString = '*.png';
-gridResX = 128; % num pix
-gridResY = 128;
+gridResX = 16; % num pix
+gridResY = 16;
 gridResZ = 6; % distance between 2 adjacent slices in pixels
+
+thresh_mem = 30; %
 
 %% Read inputs
 % Load images into 3D matrix
@@ -39,7 +41,7 @@ gridResZ = 6; % distance between 2 adjacent slices in pixels
 imageStack3D_raw = readImages2StackWithBoundary...
                 (rawImgPath,fileNameString,gridResY,gridResX);
 disp('Loaded raw images')
-[numR,numC,numZ] = size(imageStack3D_raw);
+[sizeR,sizeC,numZ] = size(imageStack3D_raw);
 % neuron labels
 imageStack3D_label = readImages2StackWithBoundary...
                 (labelImgPath,fileNameString,gridResY,gridResX);
@@ -51,21 +53,33 @@ disp('Creating grid with initial labels assigned to each grid cell..')
 [gridIDs_sectionIDs_rootPixIDsRel,gridCellInteriorInitLabels,...
             numCellsY,numCellsX]...
             = createInitLabelsForGridCells...
-            (imageStack3D_label,numR,numC,numZ,gridResX,gridResY,gridResZ);
+            (imageStack3D_label,sizeR,sizeC,numZ,gridResX,gridResY,gridResZ,...
+            thresh_mem);
 disp('done.')
 
 gridCellStats = [numCellsY, numCellsX,numZ];
+
+
 %% Get cell interior labels for all cells
 % boundary cell ids
 disp('calculating border grid cell IDs')
 borderGridCellIDs = getBoundaryCellInds(numCellsY,numCellsX,numZ);
+% visualize initial gridCell labels
+disp('Visualizing initial grid cell labels..')
+rootPixels = gridIDs_sectionIDs_rootPixIDsRel(1:numCellsPerSection,3);
+simpleVisualizeStack_activationVector...
+                    (gridCellInteriorInitLabels,rootPixels,gridResY,gridResX,sizeR,sizeC,...
+                    numCellsY,numCellsX,numZ);
 % get labels from ILP
 disp('ILP for structured label creation...')
-[gridCellInteriorLabels,gridCellFaceLabels]...
+[gridCellInteriorLabels,gridCellFaceLabels,x]...
                     = getTrainingLabels3DgridILP...
                     (gridCellStats,borderGridCellIDs,gridCellInteriorInitLabels);
-% save file
-% createFaceAndIntLabels
+%% Visualize
+numCellsPerSection = numCellsY * numCellsX;
+
+simpleVisualizeStack(x,rootPixels,gridResY,gridResX,sizeR,sizeC,...
+                    numCellsY,numCellsX,numZ)
 %% Get face labels for all 6 faces of each cell
 % save file 
 % gridCellLabels
