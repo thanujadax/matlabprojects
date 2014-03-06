@@ -75,4 +75,4 @@ end
 % save
 fm_name = sprintf('fm_gridCellFacesAll.mat');
 saveFileName = fullfile(saveFilePath,fm_name);
-save(saveFileName,fm_cellFaces);
+save(saveFileName,'fm_cellFaces');

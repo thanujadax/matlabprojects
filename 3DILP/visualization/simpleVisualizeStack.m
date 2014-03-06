@@ -29,6 +29,6 @@ for i=2:(numSections-1)
     gridCellStates = gridCellStateColumns(:,i);
     section = visualizationOnGridCells_singleSection(gridCellStates,rootPixels,...
                         gridResY,gridResX,sizeR,sizeC);
-    title_str = sprintf('segmentation cell interior: section %d',(i-1));
+    title_str = sprintf('ILP segmentation cell interior: section %d',(i-1));
     figure;imshow(section);title(title_str)
 end

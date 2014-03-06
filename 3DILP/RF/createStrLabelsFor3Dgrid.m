@@ -28,8 +28,8 @@ gridCellFaceLabelsFileName = 'gridCellFaceLabels.mat';
 
 %% Params
 fileNameString = '*.png';
-gridResX = 16; % num pix
-gridResY = 16;
+gridResX = 4; % num pix
+gridResY = 4;
 gridResZ = 6; % distance between 2 adjacent slices in pixels
 
 thresh_mem = 30; %
@@ -51,14 +51,20 @@ disp('Loaded training labels')
 % also, get initial labels for gridCellInteriors
 disp('Creating grid with initial labels assigned to each grid cell..')
 [gridIDs_sectionIDs_rootPixIDsRel,gridCellInteriorInitLabels,...
-            numCellsY,numCellsX]...
+    cellInteriorRGBLabelsAll,numCellsY,numCellsX]...
             = createInitLabelsForGridCells...
             (imageStack3D_label,sizeR,sizeC,numZ,gridResX,gridResY,gridResZ,...
             thresh_mem);
 disp('done.')
 
-gridCellStats = [numCellsY, numCellsX,numZ];
+disp('Assigning initial labels for gridCellFaces..')
 
+gridCellFaceInitLabels = getCellFaceInitLabels...
+                    (cellInteriorRGBLabelsAll,numZ,...
+                    numCellsX,numCellsY);
+
+gridCellStats = [numCellsY, numCellsX,numZ];
+numCellsPerSection = numCellsY * numCellsX;
 
 %% Get cell interior labels for all cells
 % boundary cell ids
@@ -76,10 +82,9 @@ disp('ILP for structured label creation...')
                     = getTrainingLabels3DgridILP...
                     (gridCellStats,borderGridCellIDs,gridCellInteriorInitLabels);
 %% Visualize
-numCellsPerSection = numCellsY * numCellsX;
 
 simpleVisualizeStack(x,rootPixels,gridResY,gridResX,sizeR,sizeC,...
-                    numCellsY,numCellsX,numZ)
+                    numCellsY,numCellsX,numZ);
 %% Get face labels for all 6 faces of each cell
 % save file 
 % gridCellLabels
@@ -89,6 +94,6 @@ disp('Saved labels for grid cells at:')
 disp(saveFileName)
 % gridCellFaceLabels
 saveFileName = fullfile(saveLabelFilePath,gridCellFaceLabelsFileName);
-save(saveFileName,gridCellFaceLabels);
+save(saveFileName,'gridCellFaceLabels');
 disp('Saved labels for grid cell faces at:')
 disp(saveFileName)

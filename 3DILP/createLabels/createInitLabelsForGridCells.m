@@ -1,5 +1,5 @@
 function [gridIDs_sectionIDs_rootPixIDsRel,gridCellInteriorlabels,...
-            numEdgesY,numEdgesX]...
+            gridCellInteriorRGBLabels,numEdgesY,numEdgesX]...
             = createInitLabelsForGridCells...
             (imageStack3D_label,numR,numC,numZ,gridResX,gridResY,gridResZ,...
             thresh_mem)
@@ -55,6 +55,7 @@ totGridCells = numGridCellsPerSection * numZ;
 
 gridIDs_sectionIDs_rootPixIDsRel = zeros(totGridCells,3);
 gridCellInteriorlabels = uint8(zeros(totGridCells,1));
+gridCellInteriorRGBLabels = zeros(totGridCells,1);
 gridCounter = 0;
 for k=1:numZ
     labelImage = imageStack3D_label(:,:,k);
@@ -72,16 +73,18 @@ for k=1:numZ
             gridIDs_sectionIDs_rootPixIDsRel(gridCounter,3)...
                 = rootPixInd;
             % gridCellLabel
-            label = getLabelForCell...
+            [label,RGBlabel] = getLabelForCell...
                     (r0,c0,gridResY,gridResX,labelImage,thresh_mem);
             gridCellInteriorlabels(gridCounter) = label;
+            
+            
             
         end
     end
 end
 
 %% Supplementary functions
-function label = getLabelForCell...
+function [label,RGBlabel] = getLabelForCell...
                     (r0,c0,gridResY,gridResX,labelImage_indexed,thresh)
 % [sizeR,sizeC] = size(labelImage_indexed);
 % get pixels for this cell
@@ -90,25 +93,36 @@ function label = getLabelForCell...
 % (val=0, label=1). thresh 70% ?
 rEnd = r0 + gridResY -1;
 cEnd = c0 + gridResX -1;
-
+numPixInCell = gridResY * gridResX;
 gridCellPixVal = labelImage_indexed(r0:rEnd,c0:cEnd);
-
+gridCellPixVal = reshape(gridCellPixVal,1,numPixInCell);
 % label is 1 (exterior) if either:
 %   there are 2 unique nonzero labels or,
 %   there are more than 30% zero pixels
 
 % init
 label = 0; % default: cellInterior
+RGBlabel = mode(gridCellPixVal);
+% find non-zero RGB label
+
+
 uniqueLabels = unique(gridCellPixVal);
 numNonZeroLabels = sum(uniqueLabels>0);
 if(numNonZeroLabels>1)
+    % case where multiple neuron labels are present
     label = 1; % cellExterior
-    
+    RGBlabel = 0; 
 else
     % percentage of zeropixels
     numZeroPix = sum(sum(gridCellPixVal==0));
-    percentageOfZeroPix = numZeroPix*100/(gridResX*gridResY);
+    percentageOfZeroPix = numZeroPix*100/(numPixInCell);
     if(percentageOfZeroPix>thresh)
         label = 1; % cellExterior
+        RGBlabel = 0;
     end
 end
+
+
+
+
+
