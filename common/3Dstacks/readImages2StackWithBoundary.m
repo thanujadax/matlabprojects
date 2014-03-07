@@ -16,7 +16,7 @@ numZ = numInputSections + 2; % Thickness of slices not yet considered
 if(sizeZ==1)
     imageStack3D = uint8(zeros(numR,numC,numZ));
 else
-    imageStack3D = uint16(zeros(numR,numC,numZ));
+    imageStack3D = single(zeros(numR,numC,numZ));
 end
 rStart = gridResY + 1;
 rStop = numR - gridResY;

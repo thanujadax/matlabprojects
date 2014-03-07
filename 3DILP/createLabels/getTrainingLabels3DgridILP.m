@@ -1,6 +1,7 @@
 function [gridCellInteriorLabels,gridCellFaceLabels,x]...
                     = getTrainingLabels3DgridILP...
-                    (cellStats,borderCellIDs,gridCellInteriorInitLabels)
+                    (cellStats,borderCellIDs,gridCellInteriorInitLabels,...
+                    gridCellFaceInitLabels)
 
 % Inputs:
 %   cellStats - number of grid cells along each dimension 
@@ -19,7 +20,8 @@ numBorderCells = numel(borderCellIDs);
 [model.A,b,senseArray] = getILP3DGridConstraints(cellStats,numBorderCells);
 disp('done.')
 % objective to minimize
-f = getILP3DGridObjective_traindingLabels(gridCellInteriorInitLabels,borderCellIDs);
+f = getILP3DGridObjective_traindingLabels...
+        (gridCellInteriorInitLabels,borderCellIDs,gridCellFaceInitLabels);
 
 %% ILP solver
 disp('using Gurobi ILP solver...');

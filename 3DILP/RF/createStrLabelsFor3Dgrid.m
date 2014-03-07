@@ -20,16 +20,23 @@
 
 disp('Creating structured training labels for 3DgridILP')
 %% File paths
-rawImgPath = '/home/thanuja/Dropbox/data/3D_Grid_ILP/trainingData/raw/';
-labelImgPath = '/home/thanuja/Dropbox/data/3D_Grid_ILP/trainingData/neuron/';
-saveLabelFilePath = '/home/thanuja/Dropbox/data/3D_Grid_ILP/trainingData/';
+% rawImgPath = '/home/thanuja/Dropbox/data/3D_Grid_ILP/trainingData/raw/';
+% labelImgPath = '/home/thanuja/Dropbox/data/3D_Grid_ILP/trainingData/neuron/';
+% saveLabelFilePath = '/home/thanuja/Dropbox/data/3D_Grid_ILP/trainingData/';
+
+% toy
+rawImgPath = '/home/thanuja/Dropbox/data/3D_Grid_ILP/toy1/raw/';
+labelImgPath = '/home/thanuja/Dropbox/data/3D_Grid_ILP/toy1/labels/';
+saveLabelFilePath = '/home/thanuja/Dropbox/data/3D_Grid_ILP/toy1/';
+
+
 gridCellLabelsFileName = 'gridCellLabels.mat';
 gridCellFaceLabelsFileName = 'gridCellFaceLabels.mat';
 
 %% Params
 fileNameString = '*.png';
-gridResX = 4; % num pix
-gridResY = 4;
+gridResX = 128; % num pix
+gridResY = 128;
 gridResZ = 6; % distance between 2 adjacent slices in pixels
 
 thresh_mem = 30; %
@@ -80,7 +87,8 @@ simpleVisualizeStack_activationVector...
 disp('ILP for structured label creation...')
 [gridCellInteriorLabels,gridCellFaceLabels,x]...
                     = getTrainingLabels3DgridILP...
-                    (gridCellStats,borderGridCellIDs,gridCellInteriorInitLabels);
+                    (gridCellStats,borderGridCellIDs,...
+                    gridCellInteriorInitLabels,gridCellFaceInitLabels);
 %% Visualize
 
 simpleVisualizeStack(x,rootPixels,gridResY,gridResX,sizeR,sizeC,...

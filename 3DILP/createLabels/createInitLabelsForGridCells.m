@@ -76,7 +76,7 @@ for k=1:numZ
             [label,RGBlabel] = getLabelForCell...
                     (r0,c0,gridResY,gridResX,labelImage,thresh_mem);
             gridCellInteriorlabels(gridCounter) = label;
-            
+            gridCellInteriorRGBLabels(gridCounter) = RGBlabel;
             
             
         end

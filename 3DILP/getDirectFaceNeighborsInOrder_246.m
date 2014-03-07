@@ -30,7 +30,7 @@ if(cellC<numCellsC)
     face_z = thisCellSectionID;
     face_r = cellR;
     face_c = cellC +1;
-    setOfDirectNeighbors_3(1) ...
+    setOfDirectNeighbors_3(2) ...
         = sub2ind([numCellsR numCellsC numSections],face_r,face_c,face_z);
 end
 
@@ -39,6 +39,6 @@ if(cellR<numCellsR)
     face_z = thisCellSectionID;
     face_r = cellR +1;
     face_c = cellC;
-    setOfDirectNeighbors_3(1) ...
+    setOfDirectNeighbors_3(3) ...
             = sub2ind([numCellsR numCellsC numSections],face_r,face_c,face_z);
 end
