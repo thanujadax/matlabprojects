@@ -27,9 +27,9 @@ for k=1:numSections
     for j=1:numEdgesX
         for i=1:numEdgesY
             % debug
-            if(i==2 && j==2 && k==2)
-                aa=99;
-            end
+%             if(i==2 && j==2 && k==2)
+%                 aa=99;
+%             end
             %
            
             thisCellInd = sub2ind([numEdgesY numEdgesX numSections],i,j,k);
