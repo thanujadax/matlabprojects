@@ -97,7 +97,7 @@ simpleVisualizeStack(x,rootPixels,gridResY,gridResX,sizeR,sizeC,...
 % save file 
 % gridCellLabels
 saveFileName = fullfile(saveLabelFilePath,gridCellLabelsFileName);
-save(saveFileName,gridCellInteriorLabels);
+save(saveFileName,'gridCellInteriorLabels');
 disp('Saved labels for grid cells at:')
 disp(saveFileName)
 % gridCellFaceLabels

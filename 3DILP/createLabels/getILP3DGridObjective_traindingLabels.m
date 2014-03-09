@@ -17,8 +17,8 @@ f = zeros(totNumVar,1);
 onCellIDs = find(gridCellInteriorInitLabels>0);
 offCellIDs = find(gridCellInteriorInitLabels==0);
 
-onVarIDs = (onCellIDs-1) .*7 +1;
-offVarIDs = (offCellIDs-1) .*7 +1;
+% onVarIDs = (onCellIDs-1) .*7 +1;
+% offVarIDs = (offCellIDs-1) .*7 +1;
 borderVarIDs = (borderCellInds-1) .*7 +1;
 
 % f(onVarIDs) = reward;
@@ -35,10 +35,10 @@ stateMatrix(:,2:7) = gridCellFaceInitLabels;
 
 stateMatrix = stateMatrix'; % now each col corresponds to one gridCell
 
-initVariableStates = repmat(stateMatrix,1,totNumVar);
+initVariableStates = reshape(stateMatrix,1,totNumVar);
 
-f(initVariableStates) = reward;
-f(~initVariableStates) = -reward;
+f(logical(initVariableStates)) = reward;
+f(~logical(initVariableStates)) = -reward;
 
 % borderCell states should be 1 (on) => reward on state
 f(borderVarIDs) = borderCellReward;

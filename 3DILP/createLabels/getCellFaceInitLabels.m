@@ -27,7 +27,7 @@ for k=1:numSections
     for j=1:numEdgesX
         for i=1:numEdgesY
             % debug
-            if(j==2)
+            if(i==2 && j==2 && k==2)
                 aa=99;
             end
             %
@@ -162,7 +162,7 @@ end
 %% Supplementary functions
 
 function faceLabels246_135 = getFaceLabels246_135...
-                    (thisCellLabel,neighbor246Labels,numNeighbors)
+                    (thisCellRGBLabel,neighbor246RGBLabels,numNeighbors)
 % Inputs:
 %   thisCellLabel
 %   neighbor246Labels
@@ -172,13 +172,26 @@ function faceLabels246_135 = getFaceLabels246_135...
 %       - col1 has the faceStates(2,4,6) of thisCell
 %       - col2 has the faceStates(1,3,5) of the corresponding neighbors
 
+% logic:
+% thisCellState thisFace thatFace thatCell
+%   0           0           0       0
+%   0           1           1       0
+%   0           1           0       1
+%   1           0           0       1
+
+% RGB labels
+%   x           0           0       x
+%   x           1           1       y
+%   x           1           0       0
+%   0           0           0       0
+
 %numNeighbors = sum(neighbor246Labels>0);
 
 faceLabels246_135 = zeros(numNeighbors,2);
 
-thisCellLabels_3 = ones(1,numNeighbors) .* thisCellLabel;
+thisCellLabels_3 = ones(1,numNeighbors) .* thisCellRGBLabel;
 
-tmp1 = neighbor246Labels' - thisCellLabels_3;
+tmp1 = neighbor246RGBLabels' - thisCellLabels_3;
 % this case is already taken care of by initialization
 %   faceLabels246_135(tmp==0,:) = 0;
 
@@ -188,8 +201,8 @@ if(sum(nzdiff_logicalInd)>0)
     if(sum(tmp2)>0)
         faceLabels246_135(tmp2,1) = 1;
     end
-    tmp3 = nzdiff_logicalInd' & logical(neighbor246Labels);
-    if(sum(tmp2)>0)
+    tmp3 = nzdiff_logicalInd' & logical(neighbor246RGBLabels);
+    if(sum(tmp3)>0)
         faceLabels246_135(tmp3,2) = 1;
     end
 end
