@@ -64,31 +64,68 @@ numGridCellsTot = size(gridCIDs_sectionIDs_rootPixIDsRel,1); % including boundar
 numGridCellFacesTot = numGridCellsTot * 6;
 
 % Init
-fm_cellsAll = readFmFile(pathToGridCellInteriorFeatures,1);
-numGridCellFeatures = size(fm_cellsAll,2);
+fm_cellInteriors = readFmFile(pathToGridCellInteriorFeatures,1);
+numGridCellFeatures = size(fm_cellInteriors,2);
 numCellFaceFeatures = numGridCellFeatures*3;
 fm_cellFaces = zeros(numGridCellFacesTot,numCellFaceFeatures);
-numGridCellsPerSlice = numGridCellsTot / numZ;
-cellFaceIndStop_i = 0;
-for i=1:numGridCellsTot
-    if((sum(boundaryGridCellInds==i))==0)
-        % get ID of direct neighbor for each face in the  given order
-        cell_sectionID = floor(i/numGridCellsPerSlice);
-        cellID_wrtSection = mod(i,numGridCellsPerSlice);
-        [cellR,cellC] = ind2sub([numCellsY numCellsX],cellID_wrtSection);
-
-        setOfDirectNeighbors_6 = getDirectFaceNeighborsInOrder...
-                        (i,cell_sectionID,cellR,cellC,...
-                        numCellsY,numCellsX,numZ);
-        FMs_for_directNeighborSet = readFaceFeatures...
-                        (fm_cellFaces,i,setOfDirectNeighbors_6);
-        
-        cellFaceIndStart_i = cellFaceIndStop_i +1;
-        cellFaceIndStop_i = cellFaceIndStop_i +6;
-        fm_cellFaces(cellFaceIndStart_i:cellFaceIndStop_i,:)...
-                        = FMs_for_directNeighborSet;
-    end
-end
+% numGridCellsPerSlice = numGridCellsTot / numZ;
+% cellNeighborMatrix = zeros(numCells,6); % each element is a cellId corresponding to
+%                             % the relevant face given by the col number for
+%                             % the cellID given by the row number
+ 
+for k=2:numZ-1
+    for j=2:numCellsX-1
+        for i=2:numCellsY-1
+            thisCellInd = sub2ind([numCellsY numCellsX numZ],i,j,k);
+            % if this cell is not a boundary cell, get features of all its
+            % six faces. features of borderCellFaces are automatically kept
+            % zero due to init and are discarded when saving feature mat.
+            if(sum(intersect(boundaryGridCellInds,thisCellInd))==0)
+                % get the neighbor cells
+                setOfDirectNeighbors_6 = getDirectFaceNeighborsInOrder...
+                                (thisCellInd,numCellsY,numCellsX,numZ);                           
+                FMs_for_directNeighborSet = readFaceFeatures...
+                        (fm_cellInteriors,thisCellInd,setOfDirectNeighbors_6);
+                faceIndStart = (thisCellInd-1)*6 +1;
+                faceIndStop = faceIndStart +5;
+                fm_cellFaces(faceIndStart:faceIndStop,:)...
+                                = FMs_for_directNeighborSet;    
+            else 
+                disp('computeFmGridFaces.m - Warning 01!')
+            
+            end % if(sum...) not boundary cell
+        end % for i
+    end % for j
+end % for k
+                                                     
+% cellFaceIndStop_i = 0;
+% for i=1:numGridCellsTot
+%     if((sum(boundaryGridCellInds==i))==0)
+%         % get ID of direct neighbor for each face in the  given order
+% %         cellSectionID = floor(i/numGridCellsPerSlice);
+% %         cellID_wrtSection = mod(i,numGridCellsPerSlice);
+% %         [cellR,cellC] = ind2sub([numCellsY numCellsX],cellID_wrtSection);
+%         [cellR,cellC,cellSectionID] = ind2sub...
+%                         ([numCellsY numCellsX numZ],i);
+%         setOfDirectNeighbors_6 = getDirectFaceNeighborsInOrder...
+%                         (i,cellSectionID,cellR,cellC,...
+%                         numCellsY,numCellsX,numZ);
+%                     
+%         % get rid of zero neighbors?
+%         
+%         FMs_for_directNeighborSet = readFaceFeatures...
+%                         (fm_cellInteriors,i,setOfDirectNeighbors_6);
+%         
+%         cellFaceIndStart_i = cellFaceIndStop_i +1;
+%         cellFaceIndStop_i = cellFaceIndStop_i +6;
+%         fm_cellFaces(cellFaceIndStart_i:cellFaceIndStop_i,:)...
+%                         = FMs_for_directNeighborSet;
+%     else
+%         % boundary cell
+%         
+%     end
+%     
+% end
 %% Saving
 % ignore boundary faces?
 

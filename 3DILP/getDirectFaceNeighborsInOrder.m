@@ -1,6 +1,5 @@
 function setOfDirectNeighbors_6 = getDirectFaceNeighborsInOrder...
-                                (thisCellID,thisCellSectionID,cellR,cellC,...
-                                numCellsR,numCellsC,numSections)
+                                (thisCellID,numCellsR,numCellsC,numSections)
                                 
 % Inputs:
 %   thisCellID
@@ -13,6 +12,8 @@ function setOfDirectNeighbors_6 = getDirectFaceNeighborsInOrder...
 
 % if there is no direct neighbor for a particular face, then it returns
 % zero for that particular face.
+
+[cellR,cellC,thisCellSectionID] = ind2sub([numCellsR numCellsC numSections],thisCellID);
 
 setOfDirectNeighbors_6 = zeros(1,6);
 

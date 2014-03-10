@@ -1,4 +1,4 @@
-function [borderGridCellInds,borderFaceInds]...
+function [borderGridCellInds,borderFaceInds,allFacesOfBorderCells]...
     = getBoundaryCellInds(numCellsR,numCellsC,numSections)
 
 % Output:
@@ -53,7 +53,7 @@ for i=2:numSections-1
     cellIndStart = cellIndStop +1;
     cellIndStop = cellIndStop + numBorderCells_internalSection;
     borderCellIDs_i =  borderCellIDs_internalSection ...
-                + numCellsPerSection + numBorderCells_internalSection*(i-2);
+                + numCellsPerSection*(i-1);
     borderGridCellInds(cellIndStart:cellIndStop) = borderCellIDs_i;
     
     borderFaceIDs_i = borderFaceIDs_internalSection + numCellsPerSection ...
@@ -61,13 +61,29 @@ for i=2:numSections-1
     faceIndStart = faceIndStop + 1;
     faceIndStop = faceIndStop + numel(borderFaceIDs_internalSection);
     borderFaceInds(faceIndStart:faceIndStop) = borderFaceIDs_i;
-    
-    
+        
 end
 % section n (end)
 cellIndStart = cellIndStop +1;
 cellIndStop = cellIndStop + numCellsPerSection;
 borderGridCellInds(cellIndStart:cellIndStop) = inds_sec_n;
+
+borderCellFacesMat = zeros(totNumBorderCells,6);
+% face1
+borderCellFacesMat(:,1) = (borderGridCellInds-1)*6 +1;
+% face2
+borderCellFacesMat(:,2) = (borderGridCellInds-1)*6 +2;
+% face3
+borderCellFacesMat(:,3) = (borderGridCellInds-1)*6 +3;
+% face4
+borderCellFacesMat(:,4) = (borderGridCellInds-1)*6 +4;
+% face5
+borderCellFacesMat(:,5) = (borderGridCellInds-1)*6 +5;
+% face6
+borderCellFacesMat(:,6) = (borderGridCellInds-1)*6 +6;
+
+numBorderFaces = numel(borderGridCellInds) * 6;
+allFacesOfBorderCells = reshape(borderCellFacesMat,numBorderFaces,1);
 
 %% Supplementary functions
 

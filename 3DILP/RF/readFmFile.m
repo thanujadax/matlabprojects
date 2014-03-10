@@ -9,19 +9,21 @@ function fmOut = readFmFile(pathToSliceFeatures,fileIndex,fileName)
 % if file name is not given, it loads the file given by fileIndex,
 % considering all the files available in the directory.
 
+fileNameStr = '/*.mat';
+
 if(nargin<3)
     fileName = [];
 end
 
 if(isempty(fileName))
 
-    inputSections = dir(pathToSliceFeatures);
+    inputSections = dir(strcat(pathToSliceFeatures,fileNameStr));
 
     inputFm_FilePath = fullfile(pathToSliceFeatures,inputSections(fileIndex).name);
 
-    load(inputFm_FilePath);
+    fmOut = importdata(inputFm_FilePath);
 
-    fmOut = fm;
+
     
 else
     % read the file given by file name

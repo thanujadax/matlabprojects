@@ -21,8 +21,8 @@ csHist = oriFiltLen; % window size for histogram creation
 
 doILPlabeling = 0;
 fileNameString = '*.png';
-gridResX = 128; % num pix
-gridResY = 128;
+gridResX = 4; % num pix
+gridResY = 4;
 gridResZ = 6; % distance between 2 adjacent slices in pixels
 
 thresh_mem = 30; % membrane threshold % for initial labels for gridCells
@@ -42,17 +42,18 @@ NUM_VAR_PER_CELL = 7;
 
 subDir_sectionFm = 'indivSectionFMs';
 subDir_cellInteriorFm = 'cellInteriorFMs';
+subDir_cellFaceFm = 'cellFaceFMs';
 
-% rawImgPath = '/home/thanuja/Dropbox/data/3D_Grid_ILP/trainingData/raw/';
-% labelImgPath = '/home/thanuja/Dropbox/data/3D_Grid_ILP/trainingData/neuron/';
-% pathToFeatureMat = '/home/thanuja/Dropbox/data/3D_Grid_ILP/trainingData/fm/';
-% saveLabelFilePath = '/home/thanuja/Dropbox/data/3D_Grid_ILP/trainingData/';
+rawImgPath = '/home/thanuja/Dropbox/data/3D_Grid_ILP/trainingData/raw/';
+labelImgPath = '/home/thanuja/Dropbox/data/3D_Grid_ILP/trainingData/neuron/';
+pathToFeatureMat = '/home/thanuja/Dropbox/data/3D_Grid_ILP/trainingData/fm/';
+saveLabelFilePath = '/home/thanuja/Dropbox/data/3D_Grid_ILP/trainingData/lblmat';
 
 % toy
-rawImgPath = '/home/thanuja/Dropbox/data/3D_Grid_ILP/toy1/raw/';
-labelImgPath = '/home/thanuja/Dropbox/data/3D_Grid_ILP/toy1/labels/';
-pathToFeatureMat = '/home/thanuja/Dropbox/data/3D_Grid_ILP/toy1/fm/';
-saveLabelFilePath = '/home/thanuja/Dropbox/data/3D_Grid_ILP/toy1/';
+% rawImgPath = '/home/thanuja/Dropbox/data/3D_Grid_ILP/toy1/raw/';
+% labelImgPath = '/home/thanuja/Dropbox/data/3D_Grid_ILP/toy1/labels/';
+% pathToFeatureMat = '/home/thanuja/Dropbox/data/3D_Grid_ILP/toy1/fm/';
+% saveLabelFilePath = '/home/thanuja/Dropbox/data/3D_Grid_ILP/toy1/lblmat';
 
 gridCellLabelsFileName = 'gridCellLabels.mat';
 gridFace12LabelsFileName = 'gridCellFace12Labels.mat';
@@ -90,10 +91,10 @@ numCellsPerSection = numCellsY * numCellsX;
 numCells = numCellsY * numCellsX * numZ;
 % boundary cell ids
 disp('calculating border grid cell IDs')
-[borderGridCellInds,borderFaceInds]...
+[borderGridCellInds,borderFaceInds,borderCellFaceInds]...
                 = getBoundaryCellInds(numCellsY,numCellsX,numZ);
 
-%% create x
+%% Get feature matrices
 % File names of feature matrices saved
 %   <subDir_cellInteriorFm>/fm_cellInterior.mat
 %   <subDir_cellFaceFm>/fm_faces12.mat      
@@ -112,15 +113,15 @@ computeFeaturesForEachSlice(pathToFeatureMat,subDir_sectionFm,imageStack3D_raw,.
 disp('Calculating features for grid cells ...')
 computeFmGridCellInterior(pathToFeatureMat,subDir_cellInteriorFm,...
             subDir_sectionFm,numZ,gridCIDs_sectionIDs_rootPixIDsRel,...
-            gridResX,gridResY);
+            gridResX,gridResY,borderGridCellInds);
 
 disp('Calculating features for grid cell faces ...')        
-computeFmGridFaces(pathToFeatureMat,borderGridCellInds,borderFaceInds,...
+computeFmGridFaces(pathToFeatureMat,borderGridCellInds,borderCellFaceInds,...
                 gridCIDs_sectionIDs_rootPixIDsRel,numZ,numCellsY,numCellsX,...
-                subDir_cellInteriorFm,subDir_cellFaceFm)
+                subDir_cellInteriorFm,subDir_cellFaceFm);
 disp('********** Feature calculation done. Results saved. *********')
 
-%% create y
+%% Get label vectors
 % gridCellInteriorInitLabels
 % gridCellFaceInitLabels
 
@@ -165,7 +166,7 @@ face1IDs = (seq-1)*6 + 1;
 face2IDs = (seq-1)*6 + 2;
 face12IDs = [face1IDs face2IDs];
 % remove border face ids
-face12IDs = setdiff(face12IDs,borderFaceInds);
+face12IDs = setdiff(face12IDs,borderCellFaceInds);
 labels_faces12 = faceLabels(face12IDs);
 saveFileName = fullfile(saveLabelFilePath,gridFace12LabelsFileName);
 save(saveFileName,'labels_faces12');
@@ -175,11 +176,11 @@ disp(saveFileName)
 % 2. faces3456
 seq2 = 1: numCells*6;
 face3456IDs = setdiff(seq2,face12IDs);
-face3456IDs = setdiff(face3456IDs,borderFaceInds);
+face3456IDs = setdiff(face3456IDs,borderCellFaceInds);
 labels_faces3456 = faceLabels(face3456IDs);
 
 saveFileName = fullfile(saveLabelFilePath,gridFace3456LabelsFileName);
 save(saveFileName,'labels_faces3456');
 disp('Saved labels for grid cell faces3456 at:')
 disp(saveFileName)
-
+disp('*******label vectors saved *******')

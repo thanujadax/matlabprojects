@@ -1,6 +1,6 @@
 function fm_gridsOfSlice_i = convertPixFmToCellFm...
         (fm_slice,rootPixIndsOfCells,gridResX,gridResY,sizeR,sizeC,...
-        numGridCellsPerSection)
+        numGridCellsPerSection,numGridCellFeatures)
 
 % Using the pixel feature matrix of one slice, compute the feature matrix
 % for gridCells
@@ -27,7 +27,7 @@ fm_gridsOfSlice_i = zeros(numGridCellsPerSection,numGridCellFeatures);
 
 
 % compute relevant grid features (mean,min,max,var,median)
-parfor i=1:numGridCellsPerSection
+for i=1:numGridCellsPerSection
     fm_slice_tmp = fm_slice;
     rCell = rStart(i) : rStop(i);
     cCell = cStart(i) : cStop(i); 

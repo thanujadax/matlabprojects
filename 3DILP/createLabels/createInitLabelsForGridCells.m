@@ -21,7 +21,6 @@ function [gridIDs_sectionIDs_rootPixIDsRel,gridCellInteriorlabels,...
 % param 
 % thresh_mem = 30; % percentage of zero pixel to consider the cell to be exterior
 
-
 % grid dimensions (numCells in each dim)
 
 numEdgesX = floor(numC/gridResX);

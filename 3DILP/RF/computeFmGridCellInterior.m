@@ -39,19 +39,31 @@ for i=1:numZ
     tmp_rowInd_logical = (gridCIDs_sectionIDs_rootPixIDsRel(:,2)==i);
     rootPixIndsOfCells = gridCIDs_sectionIDs_rootPixIDsRel(tmp_rowInd_logical,3);
     gridCellInds = gridCIDs_sectionIDs_rootPixIDsRel(tmp_rowInd_logical,1);
-    gridCellInds = gridCellInds + (i-1) * numGridCellsPerSlice;
+    % gridCellInds = gridCellInds + (i-1) * numGridCellsPerSlice;
     fm_gridsForSlice_i = convertPixFmToCellFm...
         (fm_slice,rootPixIndsOfCells,gridResX,gridResY,sizeR,sizeC,...
-        numGridCellsPerSlice);
+        numGridCellsPerSlice,numGridCellFeatures);
+    nanInds = isnan(fm_gridsForSlice_i);
+    if(sum(sum(nanInds))>0)
+        fm_gridsForSlice_i(nanInds) = 0;
+    end
     % add to feature matrix fm_cellInterior
     % gridIndStart_slice_i = (i-1) * numGridCellsPerSection +1;
     % gridIndStop_slice_i = gridIndStart_slice_i + numGridCellsPerSection -1;
     fm_cellInterior(gridCellInds,:) = fm_gridsForSlice_i;
     clear fm_gridsForSlice_i
 end
-% remove the rows corresponding to borderCellIDs
-fm_cellInterior(borderCellIDs,:) = [];
+
 % save
 fm_name = sprintf('fm_cellInterior.mat');
 saveFileName = fullfile(saveFilePath,fm_name);
 save(saveFileName,'fm_cellInterior');
+
+% save another version without the border cells
+% remove the rows corresponding to borderCellIDs
+fm_cellInterior_sansBorderCells = fm_cellInterior;
+fm_cellInterior_sansBorderCells(borderCellIDs,:) = [];
+fm_name = sprintf('fm_cellInterior_sansBorderCells.mat');
+saveFileName = fullfile(saveFilePath,fm_name);
+save(saveFileName,'fm_cellInterior_sansBorderCells');
+

@@ -7,7 +7,8 @@ function fm_gridForSlice_i = computeGridFeaturesFromPixFeatures...
 % Inputs:
 %   fm_pixCell - 3D matrix containing the features for the grid pixels
 
-[numPix,numPixFeatures] = size(fm_pixCell);
+[numPixR,numPixC,numPixFeatures] = size(fm_pixCell);
+numPix = numPixR * numPixC;
 
 % min,max,mean,var,median of all pixel features
 numGridCellFeatures = numPixFeatures * 5;
@@ -18,7 +19,12 @@ f_ind = 0;
 for i=1:numPixFeatures
 %    startInd = stopInd + 1;
 %    stopInd = stopInd + 5;
+
    pixFeature_i = fm_pixCell(:,:,i);
+   nanInds = isnan(pixFeature_i);
+   if(sum(sum(nanInds))>0)
+       pixFeature_i(nanInds) = 0;
+   end
    pixFeatureVector_i = reshape(pixFeature_i,[1 numPix]);
    % min
    f_ind = f_ind + 1;
