@@ -22,5 +22,5 @@ for i=1:numZ
     % save 
     fm_name = sprintf('fm_slice_%d.mat',i);
     saveFileName = fullfile(saveFilePath,fm_name);
-    save(saveFileName,fm);
+    save(saveFileName,'fm');
 end

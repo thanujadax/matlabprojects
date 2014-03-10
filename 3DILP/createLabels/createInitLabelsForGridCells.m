@@ -8,7 +8,7 @@ function [gridIDs_sectionIDs_rootPixIDsRel,gridCellInteriorlabels,...
 %   imageStack3D_label - 3D matrix of the image stack. type: uint8
 %       includes membrane cells around the borders
 %       
-%   thresh_mem = 30; % min percentage of zero pixel to consider the cell to be exterior
+%   thresh_mem = 30; % min percentage of zero pixels to consider the cell to be exterior
 % Output:
 %   gridIDs_sectionIDs_rootPixIDs - matrix where each col is suggested by name
 %   rootPixID is the pixInd of the start pixel (0,0,0) of each cell,
@@ -104,7 +104,6 @@ gridCellPixVal = reshape(gridCellPixVal,1,numPixInCell);
 label = 0; % default: cellInterior
 RGBlabel = mode(gridCellPixVal);
 % find non-zero RGB label
-
 
 uniqueLabels = unique(gridCellPixVal);
 numNonZeroLabels = sum(uniqueLabels>0);

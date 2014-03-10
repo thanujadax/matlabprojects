@@ -1,5 +1,21 @@
-function computeFmGridFaces(pathToFm,boundaryGridCellInds,...
-                gridCIDs_sectionIDs_rootPixIDsRel,numZ,numCellsY,numCellsX)
+function computeFmGridFaces(pathToFm,boundaryGridCellInds,borderFaceInds,...
+                gridCIDs_sectionIDs_rootPixIDsRel,numZ,numCellsY,numCellsX,...
+                subDir_cellInteriorFm,subDir_cellFaceFm)
+
+% Inputs:
+
+% pathToFm - directory in which the subdirectories containing fm files are
+% located
+% subDir_cellInteriorFm - name of subdirectory in which the feature mats of
+% cell interiors are already saved (inside pathToFm)
+% subDir_cellFaceFm - name of subdirectory in which the feature mats of
+% cell faces are to be saved (inside pathToFm)
+
+% Outputs:
+% no value is returned. The following two files are saved in the specified
+% output path (pathToFm/subDir_cellFaceFm)
+%   fm_faces12.mat
+%   fm_faces3456.mat          
 
 % computes features for each face of eah grid cell
 % takes into account the features of the direct neighbor of the face as
@@ -10,7 +26,7 @@ function computeFmGridFaces(pathToFm,boundaryGridCellInds,...
 % version 1.0
 
 % TODO: version 1.0 takes into account only the direct neighbor of the
-% face. Extend it to consider the features of the neighbors as well.
+% face. Extend it to consider the features of other neighbors as well.
 
 % each grid cell has 6 faces
 % should not consider the boundary cells
@@ -35,10 +51,12 @@ function computeFmGridFaces(pathToFm,boundaryGridCellInds,...
 
 % path to save section features
 saveFilePath = fullfile(pathToFm,subDir_cellFaceFm);
-pathToGridCellInteriorFeatures = fullfile(pathToFm,subDir_Fm);
+
+% path to read already calculated cell interior feature mat
+pathToGridCellInteriorFeatures = fullfile(pathToFm,subDir_cellInteriorFm);
 
 % check if subdirectory exists. Create if not
-checkAndCreateSubDir(pathToFm,subDir_cellInteriorFm);
+checkAndCreateSubDir(pathToFm,subDir_cellFaceFm);
 
 % featureFile.mat name structure: fm_slice_%d.mat
 
@@ -71,8 +89,30 @@ for i=1:numGridCellsTot
                         = FMs_for_directNeighborSet;
     end
 end
+%% Saving
+% ignore boundary faces?
 
-% save
-fm_name = sprintf('fm_gridCellFacesAll.mat');
+% Features of different types of faces go in different places
+% 1. faces xy {1,2,1,2....}
+numXYfaces = numGridCellsTot * 2;
+seq = 1:numGridCellsTot;
+face1IDs = (seq-1)*6 + 1;
+face2IDs = (seq-1)*6 + 2;
+face12IDsAll = [face1IDs face2IDs];
+% remove border face ids
+face12IDsAll = setdiff(face12IDsAll,borderFaceInds);
+fm_faces12 = fm_cellFaces(face12IDsAll,:);
+
+fm_name = sprintf('fm_faces12.mat');
 saveFileName = fullfile(saveFilePath,fm_name);
-save(saveFileName,'fm_cellFaces');
+save(saveFileName,'fm_faces12');
+
+% 2. faces xz and yz {3,4,5,6,3,4,5,6,...}
+seq2 = 1: numGridCellsTot*6;
+face3456IDsAll = setdiff(seq2,face12IDsAll);
+face3456IDsAll = setdiff(face3456IDsAll,borderFaceInds);
+fm_faces3456 = fm_cellFaces(face3456IDsAll,:);
+
+fm_name = sprintf('fm_faces3456.mat');
+saveFileName = fullfile(saveFilePath,fm_name);
+save(saveFileName,'fm_faces3456');

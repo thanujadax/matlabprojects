@@ -5,7 +5,7 @@ function seg3D = gridILP3D()
 
 %% Parameters
 verbose = 2; % 0,1,2
-
+usePrecomputedFeatureMatrices = 0;
 
 gridResX = 4; % num pix
 gridResY = 4;
@@ -61,6 +61,8 @@ imageStack3D = readImages2StackWithBoundary...
 %   cellStats - number of grid cells along each dimension 
 %       [numR,numC,numZ] = [numY,numX,numZ]
 gridCellStats = [numCellsY, numCellsX,numZ];
+[boundaryGridCellInds,borderFaceInds] ...
+        = getBoundaryCellInds(numCellsY,numCellsX,numZ);
 
 %% Compute feature matrices for gridCells and gridCellFaces
 if(~usePrecomputedFeatureMatrices)
@@ -74,7 +76,7 @@ if(~usePrecomputedFeatureMatrices)
     computeFmGridCellInterior(pathToFeatureMat,subDir_cellInteriorFm,...
                 subDir_sectionFm,numZ,gridCIDs_sectionIDs_rootPixIDsRel,...
                 gridResX,gridResY);
-    boundaryGridCellInds = getBoundaryCellInds(numCellsY,numCellsX,numZ);
+    
     computeFmGridFaces(pathToFeatureMat,boundaryGridCellInds,...
                 gridCIDs_sectionIDs_rootPixIDsRel,numZ,numCellsY,numCellsX);
       

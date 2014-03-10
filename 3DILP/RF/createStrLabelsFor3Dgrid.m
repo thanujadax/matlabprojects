@@ -1,7 +1,7 @@
 % function createStrLabelsFor3Dgrid(rawImgPath,labelImgPath,saveLabelFilePath,...
 %                 fileNameString,gridResX,gridResY,gridResZ)
 
-% create structured labels for
+% create structured labels for RFC training.
 
 % Inputs:
 %   rawImgPath
@@ -31,15 +31,17 @@ saveLabelFilePath = '/home/thanuja/Dropbox/data/3D_Grid_ILP/toy1/';
 
 
 gridCellLabelsFileName = 'gridCellLabels.mat';
-gridCellFaceLabelsFileName = 'gridCellFaceLabels.mat';
+gridFace12LabelsFileName = 'gridCellFace12Labels.mat';
+gridFace3456LabelsFileName = 'gridCellFace3456Labels.mat';
 
 %% Params
+doILPlabeling = 0;
 fileNameString = '*.png';
 gridResX = 128; % num pix
 gridResY = 128;
 gridResZ = 6; % distance between 2 adjacent slices in pixels
 
-thresh_mem = 30; %
+thresh_mem = 30; % membrane threshold % for initial labels for gridCells
 
 %% Read inputs
 % Load images into 3D matrix
@@ -76,7 +78,8 @@ numCellsPerSection = numCellsY * numCellsX;
 %% Get cell interior labels for all cells
 % boundary cell ids
 disp('calculating border grid cell IDs')
-borderGridCellIDs = getBoundaryCellInds(numCellsY,numCellsX,numZ);
+[borderGridCellIDs,borderFaceInds] ...
+            = getBoundaryCellInds(numCellsY,numCellsX,numZ);
 % visualize initial gridCell labels
 disp('Visualizing initial grid cell labels..')
 rootPixels = gridIDs_sectionIDs_rootPixIDsRel(1:numCellsPerSection,3);
@@ -84,15 +87,20 @@ simpleVisualizeStack_activationVector...
                     (gridCellInteriorInitLabels,rootPixels,gridResY,gridResX,sizeR,sizeC,...
                     numCellsY,numCellsX,numZ);
 % get labels from ILP
-disp('ILP for structured label creation...')
-[gridCellInteriorLabels,gridCellFaceLabels,x]...
-                    = getTrainingLabels3DgridILP...
-                    (gridCellStats,borderGridCellIDs,...
-                    gridCellInteriorInitLabels,gridCellFaceInitLabels);
+if(doILPlabeling)
+    disp('ILP for structured label creation...')
+    [gridCellInteriorLabels,gridCellFaceLabels,x]...
+                        = getTrainingLabels3DgridILP...
+                        (gridCellStats,borderGridCellIDs,...
+                        gridCellInteriorInitLabels,gridCellFaceInitLabels);
+end
 %% Visualize
-
-simpleVisualizeStack(x,rootPixels,gridResY,gridResX,sizeR,sizeC,...
-                    numCellsY,numCellsX,numZ);
+if(doILPlabeling)
+    simpleVisualizeStack(x,rootPixels,gridResY,gridResX,sizeR,sizeC,...
+                        numCellsY,numCellsX,numZ);
+else
+    % simple visualize       
+end
 %% Get face labels for all 6 faces of each cell
 % save file 
 % gridCellLabels
@@ -101,7 +109,7 @@ save(saveFileName,'gridCellInteriorLabels');
 disp('Saved labels for grid cells at:')
 disp(saveFileName)
 % gridCellFaceLabels
-saveFileName = fullfile(saveLabelFilePath,gridCellFaceLabelsFileName);
+saveFileName = fullfile(saveLabelFilePath,gridFace12LabelsFileName);
 save(saveFileName,'gridCellFaceLabels');
 disp('Saved labels for grid cell faces at:')
 disp(saveFileName)

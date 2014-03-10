@@ -1,8 +1,9 @@
 function computeFmGridCellInterior(pathToFm,subDir_cellInteriorFm,...
                 subDir_sectionFm,numZ,gridCIDs_sectionIDs_rootPixIDsRel,...
-                gridResX,gridResY)
+                gridResX,gridResY,borderCellIDs)
 
 % computes and saves the feature matrices for each gridCell
+% excludes border cells
 
 % Inputs:
 %   numZ - number of sections in the stack
@@ -17,7 +18,6 @@ checkAndCreateSubDir(pathToFm,subDir_cellInteriorFm);
 
 % featureFile.mat name structure: fm_slice_%d.mat
 
-
 numGridCellsTot = size(gridCIDs_sectionIDs_rootPixIDsRel,1); % including boundary cells
 
 % Init
@@ -25,7 +25,7 @@ onlyFile = 0;
 fileIndex = 1;
 fm_slice = readFmFile(pathToSliceFeatures,fileIndex);
 [sizeR,sizeC,numPixFeatures] = size(fm_slice);
-numGridCellFeatures = numPixFeatures * 5; % min,max,mean,var,medain
+numGridCellFeatures = numPixFeatures * 5; % min,max,mean,var,medain of each
 fm_cellInterior = zeros(numGridCellsTot,numGridCellFeatures);
 numGridCellsPerSlice = numGridCellsTot / numZ;
 % gridIndStop_slice_i = 0;
@@ -49,8 +49,9 @@ for i=1:numZ
     fm_cellInterior(gridCellInds,:) = fm_gridsForSlice_i;
     clear fm_gridsForSlice_i
 end
-
+% remove the rows corresponding to borderCellIDs
+fm_cellInterior(borderCellIDs,:) = [];
 % save
-fm_name = sprintf('fm_gridCellInteriorAll.mat');
+fm_name = sprintf('fm_cellInterior.mat');
 saveFileName = fullfile(saveFilePath,fm_name);
-save(saveFileName,fm_cellInterior);
+save(saveFileName,'fm_cellInterior');
