@@ -1,10 +1,13 @@
 function unaryScoresMat = computeUnaryScoreMatRFC...
             (pathToFms,pathToRFCs,numTrees,numCells,NUM_VAR_PER_CELL,...
-            borderCellFaceInds)
+            subDir_cellInteriorFm,subDir_cellFaceFm,...
+        listInds_fm_face12_name,listInds_fm_face34_name,listInds_fm_face56_name,...
+        listInds_fm_cells_name)
         
 % Inputs:
 %   RFC - trained random forest classifier
 
+% If NUM_VAR_PER_CELL == 7:
 % Each column contains unary scores for the following type of variables
 % 1 - cell internal state
 % 2 - face xy front
@@ -63,28 +66,38 @@ clear RFC fm
 %% Create unary score matrix for all ILP variables
 % {cell1,face1,face2,f3,f4,f5,f6} 
 % {cell2...} ...
-if(NUM_VAR_PER_CELL==6)
+if(NUM_VAR_PER_CELL==7)
     unaryScoresMat = zeros(numCells,NUM_VAR_PER_CELL);
     % col1: gridCellScores
-    unaryScoresMat(:,1) = cellInteriorScores;
+    numCellScores = numel(cellInteriorScores);
+    % load cellIndsList_forFM    
+    fm_dir_cellInterior = fullfile(pathToFms,subDir_cellInteriorFm);
+    cellIndsListFile = fullfile(fm_dir_cellInterior,listInds_fm_cells_name);
+    cellIndsList_forFM = importdata(cellIndsListFile);
+    cellScoreVector = zeros(numCells,1);
+    cellScoreVector(cellIndsList_forFM) = cellInteriorScores;
     
-    % col2: face1
-    face1LInd = 1:2:numCells*2;
-    face1LInd = setdiff(face1LInd,borderCellFaceInds);
-    face1Probs = zeros(numCells,1);
-    face12_seq1 = 1:2:numel(face12Scores);
-    face1Probs(face1LInd) = face12Scores(face12_seq1);
-    unaryScoresMat(:,2) = face1Probs;
+    % cell face matrix (transposed) - filled with face scores for each cell
+    faceScoreMatrix_t = zeros(6,numCells);
+    % faces 1,2
+    fm_dir_faces = fullfile(pathToFms,subDir_cellFaceFm);
+    faces12IndsListFile = fullfile(fm_dir_faces,listInds_fm_face12_name);
+    faces12Inds_forFM = importdata(faces12IndsListFile);
+    faceScoreMatrix_t(faces12Inds_forFM) = face12Scores;
+    % faces 3,4
+    faces34IndsListFile = fullfile(fm_dir_faces,listInds_fm_face34_name);
+    faces34Inds_forFM = importdata(faces34IndsListFile);
+    faceScoreMatrix_t(faces34Inds_forFM) = face34Scores;
+    % faces 5,6
+    faces56IndsListFile = fullfile(fm_dir_faces,listInds_fm_face56_name);
+    faces56Inds_forFM = importdata(faces56IndsListFile);
+    faceScoreMatrix_t(faces56Inds_forFM) = face56Scores;
     
-    % col3: face2
-    face2LInd = 2:2:numCells*2;
-    face2LInd = setdiff(face2LInd,borderCellFaceInds);
-    face2Probs = zeros(numCells,1);
-    face12_seq2 = 2:2:numel(face12Scores);
-    face2Probs(face2LInd) = face12Scores(face12_seq1);
-    unaryScoresMat(:,3) = face2Probs;
+    % fill in unaryScoreMat
+    unaryScoresMat(:,1) = cellScoreVector;
+    unaryScoresMat(:,2:7) = faceScoreMatrix_t';
     
 else
-    unaryScoreMat = 0;
+    unaryScoresMat = 0;
     disp('Error: computeUnaryScoreMatRFC')
 end

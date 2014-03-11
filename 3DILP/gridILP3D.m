@@ -15,6 +15,18 @@ oriFiltLen = 29;    % window size for pix feature extraction and orientation fil
 halfWidth_strucEl = 3; % structure_element_half_width-1 for orientation filter
 csHist = oriFiltLen; % window size for histogram creation
 
+
+numTrees = 500; % RFC
+
+% weighting parameters for the cost function
+W = [-1;    % cell interior
+     -1;    % face 1
+     -1;    % face 2
+     -1;    % face 3
+     -1;    % face 4
+     -1;    % face 5
+     -1;];  % face 6
+
 NUM_VAR_PER_CELL = 7; 
 % 1 - cell internal state
 % 2 - face xy front
@@ -24,20 +36,27 @@ NUM_VAR_PER_CELL = 7;
 % 6 - face xz top
 % 7 - face xz bottom
 
+
+
 %% File paths
-pathForInputImages = '/home/thanuja/Dropbox/data/3D_Grid_ILP/stack1/';
+% pathForInputImages = '/home/thanuja/Dropbox/data/3D_Grid_ILP/stack1/';
+% pathToFeatureMat = '/home/thanuja/Dropbox/data/3D_Grid_ILP/stack1/fm/';
+
+pathForInputImages ='/home/thanuja/Dropbox/data/3D_Grid_ILP/trainingData/raw/';
+pathToFeatureMat ='/home/thanuja/Dropbox/data/3D_Grid_ILP/trainingData/fm/';
+pathToRFCs = '/home/thanuja/Dropbox/data/3D_Grid_ILP/trainingData/RFCs';
+
+
 fileNameString = '*.png';
 
-pathToFeatureMat = '/home/thanuja/Dropbox/data/3D_Grid_ILP/stack1/fm/';
 subDir_sectionFm = 'indivSectionFMs';
 subDir_cellInteriorFm = 'cellInteriorFMs';
 subDir_cellFaceFm = 'cellFaceFMs';
-subDir_cellFaceFMs_xy1 = 'cellFaceFMs_xy1';
-subDir_cellFaceFMs_xy2 = 'cellFaceFMs_xy2';
-subDir_cellFaceFMs_yz1 = 'cellFaceFMs_yz1';
-subDir_cellFaceFMs_yz2 = 'cellFaceFMs_yz2';
-subDir_cellFaceFMs_xz1 = 'cellFaceFMs_xz1';
-subDir_cellFaceFMs_xz2 = 'cellFaceFMs_xz2';
+
+listInds_fm_cells_name = 'fm_listInds_cells.mat';
+listInds_fm_face12_name = 'fm_listInds_face12.mat';
+listInds_fm_face34_name = 'fm_listInds_face34.mat';
+listInds_fm_face56_name = 'fm_listInds_face56.mat';
 
 %% Read inputs
 imageStack3D = readImages2StackWithBoundary...
@@ -61,31 +80,50 @@ imageStack3D = readImages2StackWithBoundary...
 %   cellStats - number of grid cells along each dimension 
 %       [numR,numC,numZ] = [numY,numX,numZ]
 gridCellStats = [numCellsY, numCellsX,numZ];
-[boundaryGridCellInds,borderFaceInds] ...
-        = getBoundaryCellInds(numCellsY,numCellsX,numZ);
+disp('calculating border grid cell IDs')
+[borderGridCellInds,borderFaceInds,borderCellFaceInds]...
+                = getBoundaryCellInds(numCellsY,numCellsX,numZ);
+disp('done')
 
 %% Compute feature matrices for gridCells and gridCellFaces
 if(~usePrecomputedFeatureMatrices)
-    % compute feature matrices for each section of the given stack of
-    % images, and save in the given path
-    computeFeaturesForEachSlice(pathToFeatureMat,subDir_sectionFm,imageStack3D,...
-                oriFiltLen, halfWidth_strucEl, csHist);
-    
-    % writes one file (fm_gridCellInteriorAll.mat) with all gridCells of
-    % all sections
-    computeFmGridCellInterior(pathToFeatureMat,subDir_cellInteriorFm,...
-                subDir_sectionFm,numZ,gridCIDs_sectionIDs_rootPixIDsRel,...
-                gridResX,gridResY);
-    
-    computeFmGridFaces(pathToFeatureMat,boundaryGridCellInds,...
-                gridCIDs_sectionIDs_rootPixIDsRel,numZ,numCellsY,numCellsX);
+    % File names of feature matrices saved
+%   <subDir_cellInteriorFm>/fm_cellInterior.mat
+%   <subDir_cellFaceFm>/fm_faces12.mat      
+%   <subDir_cellFaceFm>/fm_faces3456.mat  
+
+% The face feature files exclude borderFaces and borderCells.
+
+% calculate feature mats
+% compute feature matrices for each section of the given stack of
+% images, and save in the given path
+disp('Calculating features for each section (pixelwise)')
+computeFeaturesForEachSlice(pathToFeatureMat,subDir_sectionFm,imageStack3D_raw,...
+            oriFiltLen, halfWidth_strucEl, csHist);
+% writes one file (fm_gridCellInteriorAll.mat) with all gridCells of
+% all sections
+disp('Calculating features for grid cells ...')
+computeFmGridCellInterior(pathToFeatureMat,subDir_cellInteriorFm,...
+            subDir_sectionFm,numZ,gridCIDs_sectionIDs_rootPixIDsRel,...
+            gridResX,gridResY,borderGridCellInds,listInds_fm_cells_name);
+
+disp('Calculating features for grid cell faces ...')        
+computeFmGridFaces(pathToFeatureMat,borderGridCellInds,borderCellFaceInds,...
+                gridCIDs_sectionIDs_rootPixIDsRel,numZ,numCellsY,numCellsX,...
+                subDir_cellInteriorFm,subDir_cellFaceFm,...
+    listInds_fm_face12_name,listInds_fm_face34_name,listInds_fm_face56_name);
+disp('********** Feature calculation done. Results saved. *********')
       
 else
     % using precomputed feature matrices
     % check if available in the given path.
 end
 %% Unary activation scores from RFCs
-unaryScoresMat = computeUnaryScoreMatRFC();
+unaryScoresMat = computeUnaryScoreMatRFC...
+            (pathToFeatureMat,pathToRFCs,numTrees,numCells,NUM_VAR_PER_CELL,...
+            subDir_cellInteriorFm,subDir_cellFaceFm,...
+        listInds_fm_face12_name,listInds_fm_face34_name,listInds_fm_face56_name,...
+        listInds_fm_cells_name);
 
 %% ILP formulation
 
@@ -116,4 +154,7 @@ params.InfUnbdInfo = 1;
 resultGurobi = gurobi(model,params);
 x = resultGurobi.x;
 %% Visualization
-seg3D = [];
+numCellsPerSection = numCellsY * numCellsX;
+rootPixels = gridCIDs_sectionIDs_rootPixIDsRel(1:numCellsPerSection,3);
+simpleVisualizeStack(x,rootPixels,gridResY,gridResX,numR,numC,...
+                    numCellsY,numCellsX,numZ);
