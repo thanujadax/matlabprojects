@@ -144,12 +144,42 @@ fm_name = sprintf('fm_faces12.mat');
 saveFileName = fullfile(saveFilePath,fm_name);
 save(saveFileName,'fm_faces12');
 
-% 2. faces xz and yz {3,4,5,6,3,4,5,6,...}
-seq2 = 1: numGridCellsTot*6;
-face3456IDsAll = setdiff(seq2,face12IDsAll);
-face3456IDsAll = setdiff(face3456IDsAll,borderFaceInds);
-fm_faces3456 = fm_cellFaces(face3456IDsAll,:);
+clear face1IDs face2IDs fm_faces12 face12IDsAll
 
-fm_name = sprintf('fm_faces3456.mat');
+% 2. faces xz {3,4,3,4,...}
+face3IDs = (seq-1)*6 + 3;
+face4IDs = (seq-1)*6 + 4;
+face34IDsAll = [face3IDs face4IDs];
+% remove border face ids
+face34IDsAll = setdiff(face34IDsAll,borderFaceInds);
+fm_faces34 = fm_cellFaces(face34IDsAll,:);
+
+fm_name = sprintf('fm_faces34.mat');
 saveFileName = fullfile(saveFilePath,fm_name);
-save(saveFileName,'fm_faces3456');
+save(saveFileName,'fm_faces34');
+
+clear face3IDs face4IDs fm_faces34 face34IDsAll
+
+% 3. faces yz {5,6,5,6,...}
+face5IDs = (seq-1)*6 + 5;
+face6IDs = (seq-1)*6 + 6;
+face56IDsAll = [face5IDs face6IDs];
+% remove border face ids
+face56IDsAll = setdiff(face56IDsAll,borderFaceInds);
+fm_faces56 = fm_cellFaces(face56IDsAll,:);
+
+fm_name = sprintf('fm_faces56.mat');
+saveFileName = fullfile(saveFilePath,fm_name);
+save(saveFileName,'fm_faces56');
+
+clear face5IDs face6IDs fm_faces56 face56IDsAll
+
+
+% seq2 = 1: numGridCellsTot*6;
+% face3456IDsAll = setdiff(seq2,face12IDsAll);
+% face3456IDsAll = setdiff(face3456IDsAll,borderFaceInds);
+% fm_faces3456 = fm_cellFaces(face3456IDsAll,:);
+% 
+% fm_name = sprintf('fm_faces3456.mat');
+% saveFileName = fullfile(saveFilePath,fm_name);
+% save(saveFileName,'fm_faces3456');

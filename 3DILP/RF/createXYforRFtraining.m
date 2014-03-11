@@ -52,12 +52,13 @@ saveLabelFilePath = '/home/thanuja/Dropbox/data/3D_Grid_ILP/trainingData/lblmat'
 % toy
 % rawImgPath = '/home/thanuja/Dropbox/data/3D_Grid_ILP/toy1/raw/';
 % labelImgPath = '/home/thanuja/Dropbox/data/3D_Grid_ILP/toy1/labels/';
-% pathToFeatureMat = '/home/thanuja/Dropbox/data/3D_Grid_ILP/toy1/fm/';
-% saveLabelFilePath = '/home/thanuja/Dropbox/data/3D_Grid_ILP/toy1/lblmat';
+% pathToFeatureMat = '/home/thanuja/Dropbox/data/3D_Grid_ILP/toy1/fm2/';
+% saveLabelFilePath = '/home/thanuja/Dropbox/data/3D_Grid_ILP/toy1/lblmat2';
 
 gridCellLabelsFileName = 'gridCellLabels.mat';
 gridFace12LabelsFileName = 'gridCellFace12Labels.mat';
-gridFace3456LabelsFileName = 'gridCellFace3456Labels.mat';
+gridFace34LabelsFileName = 'gridCellFace34Labels.mat';
+gridFace56LabelsFileName = 'gridCellFace56Labels.mat';
 
 %% Read images
 % raw
@@ -93,7 +94,7 @@ numCells = numCellsY * numCellsX * numZ;
 disp('calculating border grid cell IDs')
 [borderGridCellInds,borderFaceInds,borderCellFaceInds]...
                 = getBoundaryCellInds(numCellsY,numCellsX,numZ);
-
+disp('done')
 %% Get feature matrices
 % File names of feature matrices saved
 %   <subDir_cellInteriorFm>/fm_cellInterior.mat
@@ -120,7 +121,9 @@ computeFmGridFaces(pathToFeatureMat,borderGridCellInds,borderCellFaceInds,...
                 gridCIDs_sectionIDs_rootPixIDsRel,numZ,numCellsY,numCellsX,...
                 subDir_cellInteriorFm,subDir_cellFaceFm);
 disp('********** Feature calculation done. Results saved. *********')
-
+% fm_faces12.mat
+% fm_faces34.mat
+% fm_faces56.mat
 %% Get label vectors
 % gridCellInteriorInitLabels
 % gridCellFaceInitLabels
@@ -168,19 +171,49 @@ face12IDs = [face1IDs face2IDs];
 % remove border face ids
 face12IDs = setdiff(face12IDs,borderCellFaceInds);
 labels_faces12 = faceLabels(face12IDs);
+
 saveFileName = fullfile(saveLabelFilePath,gridFace12LabelsFileName);
 save(saveFileName,'labels_faces12');
 disp('Saved labels for grid cell faces12 at:')
 disp(saveFileName)
 
-% 2. faces3456
-seq2 = 1: numCells*6;
-face3456IDs = setdiff(seq2,face12IDs);
-face3456IDs = setdiff(face3456IDs,borderCellFaceInds);
-labels_faces3456 = faceLabels(face3456IDs);
+% 2. faces xz {3,4,3,4,...}
+face3IDs = (seq-1)*6 + 3;
+face4IDs = (seq-1)*6 + 4;
+face34IDsAll = [face3IDs face4IDs];
+% remove border face ids
+face34IDsAll = setdiff(face34IDsAll,borderCellFaceInds);
+labels_faces34 = faceLabels(face34IDsAll,:);
 
-saveFileName = fullfile(saveLabelFilePath,gridFace3456LabelsFileName);
-save(saveFileName,'labels_faces3456');
-disp('Saved labels for grid cell faces3456 at:')
+saveFileName = fullfile(saveLabelFilePath,gridFace34LabelsFileName);
+save(saveFileName,'labels_faces34');
+disp('Saved labels for grid cell faces34 at:')
 disp(saveFileName)
+
+
+% 3. faces yz {5,6,5,6,...}
+face5IDs = (seq-1)*6 + 5;
+face6IDs = (seq-1)*6 + 6;
+face56IDsAll = [face5IDs face6IDs];
+% remove border face ids
+face56IDsAll = setdiff(face56IDsAll,borderCellFaceInds);
+labels_faces56 = faceLabels(face56IDsAll,:);
+
+saveFileName = fullfile(saveLabelFilePath,gridFace56LabelsFileName);
+save(saveFileName,'labels_faces56');
+disp('Saved labels for grid cell faces56 at:')
+disp(saveFileName)
+
+
+
+% % 2. faces3456
+% seq2 = 1: numCells*6;
+% face3456IDs = setdiff(seq2,face12IDs);
+% face3456IDs = setdiff(face3456IDs,borderCellFaceInds);
+% labels_faces3456 = faceLabels(face3456IDs);
+% 
+% saveFileName = fullfile(saveLabelFilePath,gridFace3456LabelsFileName);
+% save(saveFileName,'labels_faces3456');
+% disp('Saved labels for grid cell faces3456 at:')
+% disp(saveFileName)
 disp('*******label vectors saved *******')
