@@ -1,5 +1,5 @@
-function gridCellInteriorUnary = getRFCprob...
-            (fm,forest,numTrees)
+function predictedProbs = getRFCprob...
+            (fm,forestMat,numTrees)
 
 % Inputs:
 %   fm - 3D feature matrix. Each entry in the 3rd dim corresponds to a
@@ -17,6 +17,6 @@ function gridCellInteriorUnary = getRFCprob...
 % get features for gridCells
 
 % Run classifier
-[y_h,v] = classRF_predict(double(fm), forest);
+[y_h,v] = classRF_predict(double(fm), forestMat);
 
-gridCellInteriorUnary = v(:,2)./numTrees;
+predictedProbs = v(:,2)./numTrees;
