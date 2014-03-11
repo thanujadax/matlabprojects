@@ -5,7 +5,7 @@ function seg3D = gridILP3D()
 
 %% Parameters
 verbose = 2; % 0,1,2
-usePrecomputedFeatureMatrices = 0;
+usePrecomputedFeatureMatrices = 1;
 
 gridResX = 4; % num pix
 gridResY = 4;
@@ -84,7 +84,8 @@ disp('calculating border grid cell IDs')
 [borderGridCellInds,borderFaceInds,borderCellFaceInds]...
                 = getBoundaryCellInds(numCellsY,numCellsX,numZ);
 disp('done')
-
+numCellsPerSection = numCellsY * numCellsX;
+numCells = numCellsY * numCellsX * numZ;
 %% Compute feature matrices for gridCells and gridCellFaces
 if(~usePrecomputedFeatureMatrices)
     % File names of feature matrices saved
@@ -98,7 +99,7 @@ if(~usePrecomputedFeatureMatrices)
 % compute feature matrices for each section of the given stack of
 % images, and save in the given path
 disp('Calculating features for each section (pixelwise)')
-computeFeaturesForEachSlice(pathToFeatureMat,subDir_sectionFm,imageStack3D_raw,...
+computeFeaturesForEachSlice(pathToFeatureMat,subDir_sectionFm,imageStack3D,...
             oriFiltLen, halfWidth_strucEl, csHist);
 % writes one file (fm_gridCellInteriorAll.mat) with all gridCells of
 % all sections
