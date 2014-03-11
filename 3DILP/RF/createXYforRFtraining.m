@@ -60,6 +60,11 @@ gridFace12LabelsFileName = 'gridCellFace12Labels.mat';
 gridFace34LabelsFileName = 'gridCellFace34Labels.mat';
 gridFace56LabelsFileName = 'gridCellFace56Labels.mat';
 
+listInds_fm_cells_name = 'fm_listInds_cells.mat';
+listInds_fm_face12_name = 'fm_listInds_face12.mat';
+listInds_fm_face34_name = 'fm_listInds_face34.mat';
+listInds_fm_face56_name = 'fm_listInds_face56.mat';
+
 %% Read images
 % raw
 imageStack3D_raw = readImages2StackWithBoundary...
@@ -114,12 +119,13 @@ computeFeaturesForEachSlice(pathToFeatureMat,subDir_sectionFm,imageStack3D_raw,.
 disp('Calculating features for grid cells ...')
 computeFmGridCellInterior(pathToFeatureMat,subDir_cellInteriorFm,...
             subDir_sectionFm,numZ,gridCIDs_sectionIDs_rootPixIDsRel,...
-            gridResX,gridResY,borderGridCellInds);
+            gridResX,gridResY,borderGridCellInds,listInds_fm_cells_name);
 
 disp('Calculating features for grid cell faces ...')        
 computeFmGridFaces(pathToFeatureMat,borderGridCellInds,borderCellFaceInds,...
                 gridCIDs_sectionIDs_rootPixIDsRel,numZ,numCellsY,numCellsX,...
-                subDir_cellInteriorFm,subDir_cellFaceFm);
+                subDir_cellInteriorFm,subDir_cellFaceFm,...
+    listInds_fm_face12_name,listInds_fm_face34_name,listInds_fm_face56_name);
 disp('********** Feature calculation done. Results saved. *********')
 % fm_faces12.mat
 % fm_faces34.mat

@@ -1,6 +1,6 @@
 function computeFmGridCellInterior(pathToFm,subDir_cellInteriorFm,...
                 subDir_sectionFm,numZ,gridCIDs_sectionIDs_rootPixIDsRel,...
-                gridResX,gridResY,borderCellIDs)
+                gridResX,gridResY,borderCellIDs,listInds_fm_cells_name)
 
 % computes and saves the feature matrices for each gridCell
 % excludes border cells
@@ -66,4 +66,11 @@ fm_cellInterior_sansBorderCells(borderCellIDs,:) = [];
 fm_name = sprintf('fm_cellInterior_sansBorderCells.mat');
 saveFileName = fullfile(saveFilePath,fm_name);
 save(saveFileName,'fm_cellInterior_sansBorderCells');
+
+% save the cellListInds of which the features are calculated, in the same
+% order as in the fm file
+seq = 1:numGridCellsTot;
+listInds_fm_cells = setdiff(seq,borderCellIDs);
+saveFileName = fullfile(saveFilePath,listInds_fm_cells_name);
+save(saveFileName,'listInds_fm_cells');
 
