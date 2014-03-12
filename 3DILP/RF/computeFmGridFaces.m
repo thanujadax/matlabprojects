@@ -3,6 +3,11 @@ function computeFmGridFaces(pathToFm,boundaryGridCellInds,borderFaceInds,...
                 subDir_cellInteriorFm,subDir_cellFaceFm,...
     listInds_fm_face12_name,listInds_fm_face34_name,listInds_fm_face56_name,...
     name_fm_faces12,name_fm_faces34,name_fm_faces56,name_fm_cellInterior)
+% outputs written to specified subdirectories
+% e.g. fm_face12 contains the feature vectors in each row in the order
+% 121212... in ascending order of cellInd. The cellFaceListInds are also
+% saved in a separate mat file for reference.
+
 
 % Inputs:
 

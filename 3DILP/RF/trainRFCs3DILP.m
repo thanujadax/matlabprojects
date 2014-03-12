@@ -47,7 +47,7 @@ forestName_3 = 'RFC_gridFaces3456.mat';
 %% RF training param
 NUM_TREES = 500;
 MTRY = 5;
-maxNumberOfSamplesPerClass = 25000;
+maxNumberOfSamplesPerClass = 35000;
 extra_options.sampsize = [maxNumberOfSamplesPerClass, maxNumberOfSamplesPerClass];
 %% RFC1: gridCells
 fm = importdata(fm_gridCells);

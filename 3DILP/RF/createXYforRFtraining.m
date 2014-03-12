@@ -21,8 +21,8 @@ csHist = oriFiltLen; % window size for histogram creation
 
 doILPlabeling = 0;
 fileNameString = '*.png';
-gridResX = 128; % num pix
-gridResY = 128;
+gridResX = 4; % num pix
+gridResY = 4;
 gridResZ = 6; % distance between 2 adjacent slices in pixels
 
 thresh_mem = 30; % membrane threshold % for initial labels for gridCells
@@ -45,16 +45,16 @@ subDir_cellInteriorFm = 'cellInteriorFMs';
 subDir_cellFaceFm = 'cellFaceFMs';
 subDir_RFCs = 'RFCs';
 
-% rawImgPath = '/home/thanuja/Dropbox/data/3D_Grid_ILP/trainingData/raw/';
-% labelImgPath = '/home/thanuja/Dropbox/data/3D_Grid_ILP/trainingData/neuron/';
-% pathToFeatureMat = '/home/thanuja/Dropbox/data/3D_Grid_ILP/trainingData/fm/';
-% saveLabelFilePath = '/home/thanuja/Dropbox/data/3D_Grid_ILP/trainingData/lblmat';
+rawImgPath = '/home/thanuja/Dropbox/data/3D_Grid_ILP/trainingData/raw/';
+labelImgPath = '/home/thanuja/Dropbox/data/3D_Grid_ILP/trainingData/neuron/';
+pathToFeatureMat = '/home/thanuja/Dropbox/data/3D_Grid_ILP/trainingData/fm/';
+saveLabelFilePath = '/home/thanuja/Dropbox/data/3D_Grid_ILP/trainingData/lblmat';
 
 % toy
-rawImgPath = '/home/thanuja/Dropbox/data/3D_Grid_ILP/toy1/raw/';
-labelImgPath = '/home/thanuja/Dropbox/data/3D_Grid_ILP/toy1/labels/';
-pathToFeatureMat = '/home/thanuja/Dropbox/data/3D_Grid_ILP/toy1/fm2/';
-saveLabelFilePath = '/home/thanuja/Dropbox/data/3D_Grid_ILP/toy1/lblmat2';
+% rawImgPath = '/home/thanuja/Dropbox/data/3D_Grid_ILP/toy1/raw/';
+% labelImgPath = '/home/thanuja/Dropbox/data/3D_Grid_ILP/toy1/labels/';
+% pathToFeatureMat = '/home/thanuja/Dropbox/data/3D_Grid_ILP/toy1/fm2/';
+% saveLabelFilePath = '/home/thanuja/Dropbox/data/3D_Grid_ILP/toy1/lblmat2';
 
 gridCellLabelsFileName = 'gridCellLabels.mat';
 gridFace12LabelsFileName = 'gridCellFace12Labels.mat';
@@ -138,7 +138,7 @@ computeFmGridFaces(pathToFeatureMat,borderGridCellInds,borderCellFaceInds,...
                 gridCIDs_sectionIDs_rootPixIDsRel,numZ,numCellsY,numCellsX,...
                 subDir_cellInteriorFm,subDir_cellFaceFm,...
     listInds_fm_face12_name,listInds_fm_face34_name,listInds_fm_face56_name,...
-    name_fm_faces12,name_fm_faces34,name_fm_faces56);
+    name_fm_faces12,name_fm_faces34,name_fm_faces56,name_fm_cellInterior);
 disp('********** Feature calculation done. Results saved. *********')
 % fm_faces12.mat
 % fm_faces34.mat
@@ -180,16 +180,12 @@ disp(saveFileName)
 % convert into vector
 numFaces = numCells * 6;
 faceLabels = reshape(gridCellFaceInitLabels',numFaces,1);
+faceLIDdir = fullfile(pathToFeatureMat,subDir_cellFaceFm);
 
 % 1. faces12
-numXYfaces = numCells * 2;
-seq = 1:numCells;
-face1IDs = (seq-1)*6 + 1;
-face2IDs = (seq-1)*6 + 2;
-face12IDs = [face1IDs face2IDs];
-% remove border face ids
-face12IDs = setdiff(face12IDs,borderCellFaceInds);
-labels_faces12 = faceLabels(face12IDs);
+face12LIDfile = fullfile(faceLIDdir,listInds_fm_face12_name);
+face12LIDs = importdata(face12LIDfile);
+labels_faces12 = faceLabels(face12LIDs);
 
 saveFileName = fullfile(saveLabelFilePath,gridFace12LabelsFileName);
 save(saveFileName,'labels_faces12');
@@ -197,12 +193,9 @@ disp('Saved labels for grid cell faces12 at:')
 disp(saveFileName)
 
 % 2. faces xz {3,4,3,4,...}
-face3IDs = (seq-1)*6 + 3;
-face4IDs = (seq-1)*6 + 4;
-face34IDsAll = [face3IDs face4IDs];
-% remove border face ids
-face34IDsAll = setdiff(face34IDsAll,borderCellFaceInds);
-labels_faces34 = faceLabels(face34IDsAll,:);
+face34LIDfile = fullfile(faceLIDdir,listInds_fm_face34_name);
+face34LIDs = importdata(face34LIDfile);
+labels_faces34 = faceLabels(face34LIDs);
 
 saveFileName = fullfile(saveLabelFilePath,gridFace34LabelsFileName);
 save(saveFileName,'labels_faces34');
@@ -211,28 +204,13 @@ disp(saveFileName)
 
 
 % 3. faces yz {5,6,5,6,...}
-face5IDs = (seq-1)*6 + 5;
-face6IDs = (seq-1)*6 + 6;
-face56IDsAll = [face5IDs face6IDs];
-% remove border face ids
-face56IDsAll = setdiff(face56IDsAll,borderCellFaceInds);
-labels_faces56 = faceLabels(face56IDsAll,:);
+face56LIDfile = fullfile(faceLIDdir,listInds_fm_face56_name);
+face56LIDs = importdata(face56LIDfile);
+labels_faces56 = faceLabels(face56LIDs);
 
 saveFileName = fullfile(saveLabelFilePath,gridFace56LabelsFileName);
 save(saveFileName,'labels_faces56');
 disp('Saved labels for grid cell faces56 at:')
 disp(saveFileName)
 
-
-
-% % 2. faces3456
-% seq2 = 1: numCells*6;
-% face3456IDs = setdiff(seq2,face12IDs);
-% face3456IDs = setdiff(face3456IDs,borderCellFaceInds);
-% labels_faces3456 = faceLabels(face3456IDs);
-% 
-% saveFileName = fullfile(saveLabelFilePath,gridFace3456LabelsFileName);
-% save(saveFileName,'labels_faces3456');
-% disp('Saved labels for grid cell faces3456 at:')
-% disp(saveFileName)
 disp('*******label vectors saved *******')
