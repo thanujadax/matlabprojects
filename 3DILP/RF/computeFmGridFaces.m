@@ -1,7 +1,8 @@
 function computeFmGridFaces(pathToFm,boundaryGridCellInds,borderFaceInds,...
                 gridCIDs_sectionIDs_rootPixIDsRel,numZ,numCellsY,numCellsX,...
                 subDir_cellInteriorFm,subDir_cellFaceFm,...
-    listInds_fm_face12_name,listInds_fm_face34_name,listInds_fm_face56_name)
+    listInds_fm_face12_name,listInds_fm_face34_name,listInds_fm_face56_name,...
+    name_fm_faces12,name_fm_faces34,name_fm_faces56)
 
 % Inputs:
 
@@ -141,8 +142,8 @@ face12IDsAll = [face1IDs face2IDs];
 face12IDsAll = setdiff(face12IDsAll,borderFaceInds);
 fm_faces12 = fm_cellFaces(face12IDsAll,:);
 % save face12 fm
-fm_name = sprintf('fm_faces12.mat');
-saveFileName = fullfile(saveFilePath,fm_name);
+% fm_name = sprintf('fm_faces12.mat');
+saveFileName = fullfile(saveFilePath,name_fm_faces12);
 save(saveFileName,'fm_faces12');
 % save face12 faceInds
 saveFileName = fullfile(saveFilePath,listInds_fm_face12_name);
@@ -159,8 +160,8 @@ face34IDsAll = [face3IDs face4IDs];
 face34IDsAll = setdiff(face34IDsAll,borderFaceInds);
 fm_faces34 = fm_cellFaces(face34IDsAll,:);
 % save face34 fm
-fm_name = sprintf('fm_faces34.mat');
-saveFileName = fullfile(saveFilePath,fm_name);
+% fm_name = sprintf('fm_faces34.mat');
+saveFileName = fullfile(saveFilePath,name_fm_faces34);
 save(saveFileName,'fm_faces34');
 % save face34 faceInds
 saveFileName = fullfile(saveFilePath,listInds_fm_face34_name);
@@ -177,8 +178,8 @@ face56IDsAll = [face5IDs face6IDs];
 face56IDsAll = setdiff(face56IDsAll,borderFaceInds);
 fm_faces56 = fm_cellFaces(face56IDsAll,:);
 % save face56 fm
-fm_name = sprintf('fm_faces56.mat');
-saveFileName = fullfile(saveFilePath,fm_name);
+% fm_name = sprintf('fm_faces56.mat');
+saveFileName = fullfile(saveFilePath,name_fm_faces56);
 save(saveFileName,'fm_faces56');
 % save face56 faceInds
 saveFileName = fullfile(saveFilePath,listInds_fm_face56_name);

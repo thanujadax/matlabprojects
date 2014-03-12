@@ -5,7 +5,7 @@ function seg3D = gridILP3D()
 
 %% Parameters
 verbose = 2; % 0,1,2
-usePrecomputedFeatureMatrices = 1;
+usePrecomputedFeatureMatrices = 0;
 
 gridResX = 4; % num pix
 gridResY = 4;
@@ -39,20 +39,31 @@ NUM_VAR_PER_CELL = 7;
 
 
 %% File paths
-% pathForInputImages = '/home/thanuja/Dropbox/data/3D_Grid_ILP/stack1/';
-% pathToFeatureMat = '/home/thanuja/Dropbox/data/3D_Grid_ILP/stack1/fm/';
+pathForInputImages = '/home/thanuja/Dropbox/data/3D_Grid_ILP/stack1';
+pathToFeatureMat = '/home/thanuja/Dropbox/data/3D_Grid_ILP/stack1/fm';
 
-pathForInputImages ='/home/thanuja/Dropbox/data/3D_Grid_ILP/trainingData/raw/';
-pathToFeatureMat ='/home/thanuja/Dropbox/data/3D_Grid_ILP/trainingData/fm/';
+
+% pathForInputImages ='/home/thanuja/Dropbox/data/3D_Grid_ILP/trainingData/raw/';
+% pathToFeatureMat ='/home/thanuja/Dropbox/data/3D_Grid_ILP/trainingData/fm/';
+
 pathToRFCs = '/home/thanuja/Dropbox/data/3D_Grid_ILP/trainingData/RFCs';
 
 
 fileNameString = '*.png';
-
+% subDir_Fm = 'fm'
 subDir_sectionFm = 'indivSectionFMs';
 subDir_cellInteriorFm = 'cellInteriorFMs';
 subDir_cellFaceFm = 'cellFaceFMs';
+subDir_RFCs = 'RFCs';
 
+% fm file names
+name_fm_cellInterior_sansBorder = 'fm_cellInterior_sansBorderCells.mat';
+name_fm_cellInterior = 'fm_cellInterior.mat';
+name_fm_faces12 = 'fm_faces12.mat';
+name_fm_faces34 = 'fm_faces34.mat';
+name_fm_faces56 = 'fm_faces56.mat';
+% fm variable order
+listInds_fm_cellsSansBorder_name = 'fm_listInds_cellsSansBorder.mat';
 listInds_fm_cells_name = 'fm_listInds_cells.mat';
 listInds_fm_face12_name = 'fm_listInds_face12.mat';
 listInds_fm_face34_name = 'fm_listInds_face34.mat';
@@ -99,20 +110,23 @@ if(~usePrecomputedFeatureMatrices)
 % compute feature matrices for each section of the given stack of
 % images, and save in the given path
 disp('Calculating features for each section (pixelwise)')
-computeFeaturesForEachSlice(pathToFeatureMat,subDir_sectionFm,imageStack3D,...
+computeFeaturesForEachSlice(pathToFeatureMat,subDir_sectionFm,imageStack3D_raw,...
             oriFiltLen, halfWidth_strucEl, csHist);
 % writes one file (fm_gridCellInteriorAll.mat) with all gridCells of
 % all sections
 disp('Calculating features for grid cells ...')
 computeFmGridCellInterior(pathToFeatureMat,subDir_cellInteriorFm,...
             subDir_sectionFm,numZ,gridCIDs_sectionIDs_rootPixIDsRel,...
-            gridResX,gridResY,borderGridCellInds,listInds_fm_cells_name);
+            gridResX,gridResY,borderGridCellInds,listInds_fm_cells_name,...
+            listInds_fm_cellsSansBorder_name,name_fm_cellInterior,...
+                name_fm_cellInterior_sansBorder);
 
 disp('Calculating features for grid cell faces ...')        
 computeFmGridFaces(pathToFeatureMat,borderGridCellInds,borderCellFaceInds,...
                 gridCIDs_sectionIDs_rootPixIDsRel,numZ,numCellsY,numCellsX,...
                 subDir_cellInteriorFm,subDir_cellFaceFm,...
-    listInds_fm_face12_name,listInds_fm_face34_name,listInds_fm_face56_name);
+    listInds_fm_face12_name,listInds_fm_face34_name,listInds_fm_face56_name,...
+    name_fm_faces12,name_fm_faces34,name_fm_faces56);
 disp('********** Feature calculation done. Results saved. *********')
       
 else
@@ -124,7 +138,7 @@ unaryScoresMat = computeUnaryScoreMatRFC...
             (pathToFeatureMat,pathToRFCs,numTrees,numCells,NUM_VAR_PER_CELL,...
             subDir_cellInteriorFm,subDir_cellFaceFm,...
         listInds_fm_face12_name,listInds_fm_face34_name,listInds_fm_face56_name,...
-        listInds_fm_cells_name);
+        listInds_fm_cellsSansBorder_name);
 
 %% ILP formulation
 

@@ -1,6 +1,8 @@
 function computeFmGridCellInterior(pathToFm,subDir_cellInteriorFm,...
                 subDir_sectionFm,numZ,gridCIDs_sectionIDs_rootPixIDsRel,...
-                gridResX,gridResY,borderCellIDs,listInds_fm_cells_name)
+                gridResX,gridResY,borderCellIDs,listInds_fm_cells_name,...
+                listInds_fm_cellsSansBorder_name,name_fm_cellInterior,...
+                name_fm_cellInterior_sansBorder)
 
 % computes and saves the feature matrices for each gridCell
 % excludes border cells
@@ -55,22 +57,25 @@ for i=1:numZ
 end
 
 % save
-fm_name = sprintf('fm_cellInterior.mat');
-saveFileName = fullfile(saveFilePath,fm_name);
+% fm_name = sprintf('fm_cellInterior.mat');
+saveFileName = fullfile(saveFilePath,name_fm_cellInterior);
 save(saveFileName,'fm_cellInterior');
 
 % save another version without the border cells
 % remove the rows corresponding to borderCellIDs
 fm_cellInterior_sansBorderCells = fm_cellInterior;
 fm_cellInterior_sansBorderCells(borderCellIDs,:) = [];
-fm_name = sprintf('fm_cellInterior_sansBorderCells.mat');
-saveFileName = fullfile(saveFilePath,fm_name);
+% fm_name = sprintf('fm_cellInterior_sansBorderCells.mat');
+saveFileName = fullfile(saveFilePath,name_fm_cellInterior_sansBorder);
 save(saveFileName,'fm_cellInterior_sansBorderCells');
 
 % save the cellListInds of which the features are calculated, in the same
 % order as in the fm file
 seq = 1:numGridCellsTot;
-listInds_fm_cells = setdiff(seq,borderCellIDs);
 saveFileName = fullfile(saveFilePath,listInds_fm_cells_name);
-save(saveFileName,'listInds_fm_cells');
+save(saveFileName,'seq');
+% sans border cells
+listInds_fm_cells_sansBorder = setdiff(seq,borderCellIDs);
+saveFileName = fullfile(saveFilePath,listInds_fm_cellsSansBorder_name);
+save(saveFileName,'listInds_fm_cells_sansBorder');
 

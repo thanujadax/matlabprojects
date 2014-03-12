@@ -21,8 +21,8 @@ csHist = oriFiltLen; % window size for histogram creation
 
 doILPlabeling = 0;
 fileNameString = '*.png';
-gridResX = 4; % num pix
-gridResY = 4;
+gridResX = 128; % num pix
+gridResY = 128;
 gridResZ = 6; % distance between 2 adjacent slices in pixels
 
 thresh_mem = 30; % membrane threshold % for initial labels for gridCells
@@ -43,27 +43,37 @@ NUM_VAR_PER_CELL = 7;
 subDir_sectionFm = 'indivSectionFMs';
 subDir_cellInteriorFm = 'cellInteriorFMs';
 subDir_cellFaceFm = 'cellFaceFMs';
+subDir_RFCs = 'RFCs';
 
-rawImgPath = '/home/thanuja/Dropbox/data/3D_Grid_ILP/trainingData/raw/';
-labelImgPath = '/home/thanuja/Dropbox/data/3D_Grid_ILP/trainingData/neuron/';
-pathToFeatureMat = '/home/thanuja/Dropbox/data/3D_Grid_ILP/trainingData/fm/';
-saveLabelFilePath = '/home/thanuja/Dropbox/data/3D_Grid_ILP/trainingData/lblmat';
+% rawImgPath = '/home/thanuja/Dropbox/data/3D_Grid_ILP/trainingData/raw/';
+% labelImgPath = '/home/thanuja/Dropbox/data/3D_Grid_ILP/trainingData/neuron/';
+% pathToFeatureMat = '/home/thanuja/Dropbox/data/3D_Grid_ILP/trainingData/fm/';
+% saveLabelFilePath = '/home/thanuja/Dropbox/data/3D_Grid_ILP/trainingData/lblmat';
 
 % toy
-% rawImgPath = '/home/thanuja/Dropbox/data/3D_Grid_ILP/toy1/raw/';
-% labelImgPath = '/home/thanuja/Dropbox/data/3D_Grid_ILP/toy1/labels/';
-% pathToFeatureMat = '/home/thanuja/Dropbox/data/3D_Grid_ILP/toy1/fm2/';
-% saveLabelFilePath = '/home/thanuja/Dropbox/data/3D_Grid_ILP/toy1/lblmat2';
+rawImgPath = '/home/thanuja/Dropbox/data/3D_Grid_ILP/toy1/raw/';
+labelImgPath = '/home/thanuja/Dropbox/data/3D_Grid_ILP/toy1/labels/';
+pathToFeatureMat = '/home/thanuja/Dropbox/data/3D_Grid_ILP/toy1/fm2/';
+saveLabelFilePath = '/home/thanuja/Dropbox/data/3D_Grid_ILP/toy1/lblmat2';
 
 gridCellLabelsFileName = 'gridCellLabels.mat';
 gridFace12LabelsFileName = 'gridCellFace12Labels.mat';
 gridFace34LabelsFileName = 'gridCellFace34Labels.mat';
 gridFace56LabelsFileName = 'gridCellFace56Labels.mat';
 
+listInds_fm_cellsSansBorder_name = 'fm_listInds_cellsSansBorder.mat';
 listInds_fm_cells_name = 'fm_listInds_cells.mat';
 listInds_fm_face12_name = 'fm_listInds_face12.mat';
 listInds_fm_face34_name = 'fm_listInds_face34.mat';
 listInds_fm_face56_name = 'fm_listInds_face56.mat';
+
+% fm file names
+name_fm_cellInterior_sansBorder = 'fm_cellInterior_sansBorderCells.mat';
+name_fm_cellInterior = 'fm_cellInterior.mat';
+name_fm_faces12 = 'fm_faces12.mat';
+name_fm_faces34 = 'fm_faces34.mat';
+name_fm_faces56 = 'fm_faces56.mat';
+
 
 %% Read images
 % raw
@@ -119,13 +129,16 @@ computeFeaturesForEachSlice(pathToFeatureMat,subDir_sectionFm,imageStack3D_raw,.
 disp('Calculating features for grid cells ...')
 computeFmGridCellInterior(pathToFeatureMat,subDir_cellInteriorFm,...
             subDir_sectionFm,numZ,gridCIDs_sectionIDs_rootPixIDsRel,...
-            gridResX,gridResY,borderGridCellInds,listInds_fm_cells_name);
+            gridResX,gridResY,borderGridCellInds,listInds_fm_cells_name,...
+            listInds_fm_cellsSansBorder_name,name_fm_cellInterior,...
+                name_fm_cellInterior_sansBorder);
 
 disp('Calculating features for grid cell faces ...')        
 computeFmGridFaces(pathToFeatureMat,borderGridCellInds,borderCellFaceInds,...
                 gridCIDs_sectionIDs_rootPixIDsRel,numZ,numCellsY,numCellsX,...
                 subDir_cellInteriorFm,subDir_cellFaceFm,...
-    listInds_fm_face12_name,listInds_fm_face34_name,listInds_fm_face56_name);
+    listInds_fm_face12_name,listInds_fm_face34_name,listInds_fm_face56_name,...
+    name_fm_faces12,name_fm_faces34,name_fm_faces56);
 disp('********** Feature calculation done. Results saved. *********')
 % fm_faces12.mat
 % fm_faces34.mat
