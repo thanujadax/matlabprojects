@@ -82,9 +82,9 @@ for k=1:numZ
                 
                 % cellID
                 nzElementInd = nzElementInd + 1;
-                ii(nzElementInd) = constraintCount;
-                jj(nzElementInd) = cellInd;
-                ss(nzElementInd) = 1; % coefficient for A
+                ii(nzElementInd) = constraintCount; % rowID of A
+                jj(nzElementInd) = (cellInd-1)*7 +1;% colID of A
+                ss(nzElementInd) = 1;        % coefficient for A
                 
                 % cellID_face1_ind
                 nzElementInd = nzElementInd + 1;
@@ -130,7 +130,7 @@ for k=1:numZ
                 % cellID
                 nzElementInd = nzElementInd + 1;
                 ii(nzElementInd) = constraintCount;
-                jj(nzElementInd) = cellInd;
+                jj(nzElementInd) = (cellInd-1)*7 +1;
                 ss(nzElementInd) = 1; % coefficient for A
                 
                 % cellID_face1_ind
@@ -176,7 +176,7 @@ for k=1:numZ
                 % cellID
                 nzElementInd = nzElementInd + 1;
                 ii(nzElementInd) = constraintCount;
-                jj(nzElementInd) = cellInd;
+                jj(nzElementInd) = (cellInd-1)*7 +1;
                 ss(nzElementInd) = 1; % coefficient for A
                 
                 % cellID_face1_ind
@@ -223,7 +223,7 @@ for k=1:numZ
 
             nzElementInd = nzElementInd + 1;
             ii(nzElementInd) = constraintCount;
-            jj(nzElementInd) = cellInd;
+            jj(nzElementInd) = (cellInd-1)*7 +1;
             ss(nzElementInd) = 1; % coefficient for A
             
             nzElementInd = nzElementInd + 1;
@@ -257,7 +257,7 @@ for k=1:numZ
 
             nzElementInd = nzElementInd + 1;
             ii(nzElementInd) = constraintCount;
-            jj(nzElementInd) = cellInd;
+            jj(nzElementInd) = (cellInd-1)*7 +1;
             ss(nzElementInd) = 1; % coefficient for A
             
             nzElementInd = nzElementInd + 1;
@@ -291,7 +291,7 @@ for k=1:numZ
 
             nzElementInd = nzElementInd + 1;
             ii(nzElementInd) = constraintCount;
-            jj(nzElementInd) = cellInd;
+            jj(nzElementInd) = (cellInd-1)*7 +1;
             ss(nzElementInd) = 1; % coefficient for A
             
             nzElementInd = nzElementInd + 1;

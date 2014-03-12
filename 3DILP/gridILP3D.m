@@ -19,13 +19,13 @@ csHist = oriFiltLen; % window size for histogram creation
 numTrees = 500; % RFC
 
 % weighting parameters for the cost function
-W = [-1;    % cell interior
-     -1;    % face 1
-     -1;    % face 2
-     -1;    % face 3
-     -1;    % face 4
-     -1;    % face 5
-     -1;];  % face 6
+W = [-10;    % cell interior
+     -100;    % face 1
+     -100;    % face 2
+     -100;    % face 3
+     -100;    % face 4
+     -100;    % face 5
+     -100;];  % face 6
 
 NUM_VAR_PER_CELL = 7; 
 % 1 - cell internal state

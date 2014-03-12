@@ -5,9 +5,13 @@ numVar = numel(unaryScoresMat);
 
 f = zeros(numVar,1);
 
-stop = 0;
 for i=1:numCols
+   unaryScoresMat(:,i) = unaryScoresMat(:,i) .* W(i); 
+end
+
+stop = 0;
+for i=1:numRows
     start = stop +1;
-    stop = stop + numRows;
-    f(start:stop) = unaryScoresMat(:,i) .* W(i);
+    stop = stop + numCols;
+    f(start:stop) = unaryScoresMat(i,:);
 end
