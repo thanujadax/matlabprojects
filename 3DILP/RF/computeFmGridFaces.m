@@ -2,7 +2,7 @@ function computeFmGridFaces(pathToFm,boundaryGridCellInds,borderFaceInds,...
                 gridCIDs_sectionIDs_rootPixIDsRel,numZ,numCellsY,numCellsX,...
                 subDir_cellInteriorFm,subDir_cellFaceFm,...
     listInds_fm_face12_name,listInds_fm_face34_name,listInds_fm_face56_name,...
-    name_fm_faces12,name_fm_faces34,name_fm_faces56)
+    name_fm_faces12,name_fm_faces34,name_fm_faces56,name_fm_cellInterior)
 
 % Inputs:
 
@@ -66,7 +66,9 @@ numGridCellsTot = size(gridCIDs_sectionIDs_rootPixIDsRel,1); % including boundar
 numGridCellFacesTot = numGridCellsTot * 6;
 
 % Init
-fm_cellInteriors = readFmFile(pathToGridCellInteriorFeatures,1);
+% fm_cellInteriors = readFmFile(pathToGridCellInteriorFeatures,1);
+fm_cellInteriorFileName = fullfile(pathToGridCellInteriorFeatures,name_fm_cellInterior);
+fm_cellInteriors = importdata(fm_cellInteriorFileName); % with border cells
 numGridCellFeatures = size(fm_cellInteriors,2);
 numCellFaceFeatures = numGridCellFeatures*3;
 fm_cellFaces = zeros(numGridCellFacesTot,numCellFaceFeatures);
@@ -74,7 +76,10 @@ fm_cellFaces = zeros(numGridCellFacesTot,numCellFaceFeatures);
 % cellNeighborMatrix = zeros(numCells,6); % each element is a cellId corresponding to
 %                             % the relevant face given by the col number for
 %                             % the cellID given by the row number
- 
+numNonBoundaryCells = (numCellsY-2)*(numCellsX-2)*(numZ-2);
+numNonBoundaryCellFaces = numNonBoundaryCells * 6;
+faceIndsList_all = zeros(numNonBoundaryCellFaces,1); 
+listStop = 0;
 for k=2:numZ-1
     for j=2:numCellsX-1
         for i=2:numCellsY-1
@@ -90,6 +95,10 @@ for k=2:numZ-1
                         (fm_cellInteriors,thisCellInd,setOfDirectNeighbors_6);
                 faceIndStart = (thisCellInd-1)*6 +1;
                 faceIndStop = faceIndStart +5;
+                listStart = listStop +1;
+                listStop = listStop +6;
+                faceIndsList_all(listStart:listStop)...
+                    =  faceIndStart:faceIndStop;
                 fm_cellFaces(faceIndStart:faceIndStop,:)...
                                 = FMs_for_directNeighborSet;    
             else 
@@ -100,99 +109,57 @@ for k=2:numZ-1
     end % for j
 end % for k
                                                      
-% cellFaceIndStop_i = 0;
-% for i=1:numGridCellsTot
-%     if((sum(boundaryGridCellInds==i))==0)
-%         % get ID of direct neighbor for each face in the  given order
-% %         cellSectionID = floor(i/numGridCellsPerSlice);
-% %         cellID_wrtSection = mod(i,numGridCellsPerSlice);
-% %         [cellR,cellC] = ind2sub([numCellsY numCellsX],cellID_wrtSection);
-%         [cellR,cellC,cellSectionID] = ind2sub...
-%                         ([numCellsY numCellsX numZ],i);
-%         setOfDirectNeighbors_6 = getDirectFaceNeighborsInOrder...
-%                         (i,cellSectionID,cellR,cellC,...
-%                         numCellsY,numCellsX,numZ);
-%                     
-%         % get rid of zero neighbors?
-%         
-%         FMs_for_directNeighborSet = readFaceFeatures...
-%                         (fm_cellInteriors,i,setOfDirectNeighbors_6);
-%         
-%         cellFaceIndStart_i = cellFaceIndStop_i +1;
-%         cellFaceIndStop_i = cellFaceIndStop_i +6;
-%         fm_cellFaces(cellFaceIndStart_i:cellFaceIndStop_i,:)...
-%                         = FMs_for_directNeighborSet;
-%     else
-%         % boundary cell
-%         
-%     end
-%     
-% end
 %% Saving
 % ignore boundary faces?
 
 % Features of different types of faces go in different places
 % 1. faces xy {1,2,1,2....}
-numXYfaces = numGridCellsTot * 2;
-seq = 1:numGridCellsTot;
-face1IDs = (seq-1)*6 + 1;
-face2IDs = (seq-1)*6 + 2;
-face12IDsAll = [face1IDs face2IDs];
-% remove border face ids
-face12IDsAll = setdiff(face12IDsAll,borderFaceInds);
-fm_faces12 = fm_cellFaces(face12IDsAll,:);
+face1LIDs = 1:6:numNonBoundaryCellFaces;
+face2LIDs = 2:6:numNonBoundaryCellFaces;
+listInds_fm_face12 = [face1LIDs face2LIDs];
+listInds_fm_face12 = sort(listInds_fm_face12);
+listInds_fm_face12 = faceIndsList_all(listInds_fm_face12,:);
+fm_faces12 = fm_cellFaces(listInds_fm_face12,:);
 % save face12 fm
 % fm_name = sprintf('fm_faces12.mat');
 saveFileName = fullfile(saveFilePath,name_fm_faces12);
 save(saveFileName,'fm_faces12');
 % save face12 faceInds
 saveFileName = fullfile(saveFilePath,listInds_fm_face12_name);
-listInds_fm_face12 = face12IDsAll;
 save(saveFileName,'listInds_fm_face12');
 
 clear face1IDs face2IDs fm_faces12 face12IDsAll
 
 % 2. faces xz {3,4,3,4,...}
-face3IDs = (seq-1)*6 + 3;
-face4IDs = (seq-1)*6 + 4;
-face34IDsAll = [face3IDs face4IDs];
-% remove border face ids
-face34IDsAll = setdiff(face34IDsAll,borderFaceInds);
-fm_faces34 = fm_cellFaces(face34IDsAll,:);
+face3LIDs = 3:6:numNonBoundaryCellFaces;
+face4LIDs = 4:6:numNonBoundaryCellFaces;
+listInds_fm_face34 = [face3LIDs face4LIDs];
+listInds_fm_face34 = sort(listInds_fm_face34);
+listInds_fm_face34 = faceIndsList_all(listInds_fm_face34,:);
+fm_faces34 = fm_cellFaces(listInds_fm_face34,:);
 % save face34 fm
 % fm_name = sprintf('fm_faces34.mat');
 saveFileName = fullfile(saveFilePath,name_fm_faces34);
 save(saveFileName,'fm_faces34');
 % save face34 faceInds
 saveFileName = fullfile(saveFilePath,listInds_fm_face34_name);
-listInds_fm_face34 = face34IDsAll;
 save(saveFileName,'listInds_fm_face34');
 
 clear face3IDs face4IDs fm_faces34 face34IDsAll
 
 % 3. faces yz {5,6,5,6,...}
-face5IDs = (seq-1)*6 + 5;
-face6IDs = (seq-1)*6 + 6;
-face56IDsAll = [face5IDs face6IDs];
-% remove border face ids
-face56IDsAll = setdiff(face56IDsAll,borderFaceInds);
-fm_faces56 = fm_cellFaces(face56IDsAll,:);
+face5LIDs = 5:6:numNonBoundaryCellFaces;
+face6LIDs = 6:6:numNonBoundaryCellFaces;
+listInds_fm_face56 = [face5LIDs face6LIDs];
+listInds_fm_face56 = sort(listInds_fm_face56);
+listInds_fm_face56 = faceIndsList_all(listInds_fm_face56,:);
+fm_faces56 = fm_cellFaces(listInds_fm_face56,:);
 % save face56 fm
 % fm_name = sprintf('fm_faces56.mat');
 saveFileName = fullfile(saveFilePath,name_fm_faces56);
 save(saveFileName,'fm_faces56');
 % save face56 faceInds
 saveFileName = fullfile(saveFilePath,listInds_fm_face56_name);
-listInds_fm_face56 = face56IDsAll;
 save(saveFileName,'listInds_fm_face56');
 clear face5IDs face6IDs fm_faces56 face56IDsAll
 
-
-% seq2 = 1:numGridCellsTot*6;
-% face3456IDsAll = setdiff(seq2,face12IDsAll);
-% face3456IDsAll = setdiff(face3456IDsAll,borderFaceInds);
-% fm_faces3456 = fm_cellFaces(face3456IDsAll,:);
-% 
-% fm_name = sprintf('fm_faces3456.mat');
-% saveFileName = fullfile(saveFilePath,fm_name);
-% save(saveFileName,'fm_faces3456');

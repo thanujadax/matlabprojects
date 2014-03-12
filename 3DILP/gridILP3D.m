@@ -7,8 +7,8 @@ function seg3D = gridILP3D()
 verbose = 2; % 0,1,2
 usePrecomputedFeatureMatrices = 0;
 
-gridResX = 4; % num pix
-gridResY = 4;
+gridResX = 128; % num pix
+gridResY = 128;
 gridResZ = 6; % distance between 2 adjacent slices in pixels
 
 oriFiltLen = 29;    % window size for pix feature extraction and orientation filter
@@ -39,15 +39,18 @@ NUM_VAR_PER_CELL = 7;
 
 
 %% File paths
-pathForInputImages = '/home/thanuja/Dropbox/data/3D_Grid_ILP/stack1';
-pathToFeatureMat = '/home/thanuja/Dropbox/data/3D_Grid_ILP/stack1/fm';
+% 128x128 data set
+% pathForInputImages = '/home/thanuja/Dropbox/data/3D_Grid_ILP/stack1/raw/';
+% pathToFeatureMat = '/home/thanuja/Dropbox/data/3D_Grid_ILP/stack1/fm/';
 
+% toy
+pathForInputImages = '/home/thanuja/Dropbox/data/3D_Grid_ILP/toy1/raw/';
+pathToFeatureMat = '/home/thanuja/Dropbox/data/3D_Grid_ILP/toy1/fm/';
 
 % pathForInputImages ='/home/thanuja/Dropbox/data/3D_Grid_ILP/trainingData/raw/';
 % pathToFeatureMat ='/home/thanuja/Dropbox/data/3D_Grid_ILP/trainingData/fm/';
 
 pathToRFCs = '/home/thanuja/Dropbox/data/3D_Grid_ILP/trainingData/RFCs';
-
 
 fileNameString = '*.png';
 % subDir_Fm = 'fm'
@@ -110,7 +113,7 @@ if(~usePrecomputedFeatureMatrices)
 % compute feature matrices for each section of the given stack of
 % images, and save in the given path
 disp('Calculating features for each section (pixelwise)')
-computeFeaturesForEachSlice(pathToFeatureMat,subDir_sectionFm,imageStack3D_raw,...
+computeFeaturesForEachSlice(pathToFeatureMat,subDir_sectionFm,imageStack3D,...
             oriFiltLen, halfWidth_strucEl, csHist);
 % writes one file (fm_gridCellInteriorAll.mat) with all gridCells of
 % all sections
@@ -126,7 +129,7 @@ computeFmGridFaces(pathToFeatureMat,borderGridCellInds,borderCellFaceInds,...
                 gridCIDs_sectionIDs_rootPixIDsRel,numZ,numCellsY,numCellsX,...
                 subDir_cellInteriorFm,subDir_cellFaceFm,...
     listInds_fm_face12_name,listInds_fm_face34_name,listInds_fm_face56_name,...
-    name_fm_faces12,name_fm_faces34,name_fm_faces56);
+    name_fm_faces12,name_fm_faces34,name_fm_faces56,name_fm_cellInterior);
 disp('********** Feature calculation done. Results saved. *********')
       
 else
@@ -137,13 +140,15 @@ end
 unaryScoresMat = computeUnaryScoreMatRFC...
             (pathToFeatureMat,pathToRFCs,numTrees,numCells,NUM_VAR_PER_CELL,...
             subDir_cellInteriorFm,subDir_cellFaceFm,...
-        listInds_fm_face12_name,listInds_fm_face34_name,listInds_fm_face56_name,...
-        listInds_fm_cellsSansBorder_name);
+            name_fm_faces12,listInds_fm_face12_name,...
+            name_fm_faces34,listInds_fm_face34_name,...
+            name_fm_faces56,listInds_fm_face56_name,...
+            name_fm_cellInterior,listInds_fm_cells_name);
 
 %% ILP formulation
-
+numBorderCells = numel(borderGridCellInds);
 % constraints
-[model.A,b,senseArray] = getILP3DGridConstraints(gridCellStats);
+[model.A,b,senseArray] = getILP3DGridConstraints(gridCellStats,numBorderCells);
 % objective to minimize
 f = getILP3DGridObjective(W,unaryScoresMat);
 
@@ -169,7 +174,7 @@ params.InfUnbdInfo = 1;
 resultGurobi = gurobi(model,params);
 x = resultGurobi.x;
 %% Visualization
-numCellsPerSection = numCellsY * numCellsX;
+% numCellsPerSection = numCellsY * numCellsX;
 rootPixels = gridCIDs_sectionIDs_rootPixIDsRel(1:numCellsPerSection,3);
 simpleVisualizeStack(x,rootPixels,gridResY,gridResX,numR,numC,...
                     numCellsY,numCellsX,numZ);

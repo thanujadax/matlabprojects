@@ -1,8 +1,10 @@
 function unaryScoresMat = computeUnaryScoreMatRFC...
             (pathToFms,pathToRFCs,numTrees,numCells,NUM_VAR_PER_CELL,...
             subDir_cellInteriorFm,subDir_cellFaceFm,...
-        listInds_fm_face12_name,listInds_fm_face34_name,listInds_fm_face56_name,...
-        listInds_fm_cells_name)
+        name_fm_faces12,listInds_fm_face12_name,...
+        name_fm_faces34,listInds_fm_face34_name,...
+        name_fm_faces56,listInds_fm_face56_name,...
+        name_fm_cellInterior,listInds_fm_cells_name)
         
 % Inputs:
 %   RFC - trained random forest classifier
@@ -22,10 +24,10 @@ forest_gridCells = 'RFC_gridCells.mat';
 forest_faces12 = 'RFC_gridFaces12.mat';
 forest_faces3456 = 'RFC_gridFaces3456.mat';
 
-fm_gridCells = 'fm_cellInterior.mat'; % all cells including border cells
-fm_faces12 = 'fm_faces12.mat';
-fm_faces34 = 'fm_faces34.mat';
-fm_faces56 = 'fm_faces56.mat';
+% name_fm_cellInterior = 'fm_cellInterior.mat'; % all cells including border cells
+% name_fm_faces12 = 'fm_faces12.mat';
+% name_fm_faces34 = 'fm_faces34.mat';
+% name_fm_faces56 = 'fm_faces56.mat';
 
 %% gridCellProbs_interior
 % load RFC
@@ -33,7 +35,7 @@ RFC_filename = fullfile(pathToRFCs,forest_gridCells);
 RFC = importdata(RFC_filename);
 % load fm
 fm_CellInteriorDir = fullfile(pathToFms,subDir_cellInteriorFm);
-fm_filename = fullfile(fm_CellInteriorDir,fm_gridCells);
+fm_filename = fullfile(fm_CellInteriorDir,name_fm_cellInterior);
 fm = importdata(fm_filename);
 cellInteriorScores = getRFCprob(fm,RFC,numTrees); 
 clear RFC fm
@@ -43,7 +45,7 @@ RFC_filename = fullfile(pathToRFCs,forest_faces12);
 RFC = importdata(RFC_filename);
 % load fm
 fm_facesDir = fullfile(pathToFms,subDir_cellFaceFm);
-fm_filename = fullfile(fm_facesDir,fm_faces12);
+fm_filename = fullfile(fm_facesDir,name_fm_faces12);
 fm = importdata(fm_filename);
 face12Scores = getRFCprob(fm,RFC,numTrees);
 clear RFC fm
@@ -52,7 +54,7 @@ clear RFC fm
 RFC_filename = fullfile(pathToRFCs,forest_faces3456);
 RFC = importdata(RFC_filename);
 % load fm
-fm_filename = fullfile(fm_facesDir,fm_faces34);
+fm_filename = fullfile(fm_facesDir,name_fm_faces34);
 fm = importdata(fm_filename);
 face34Scores = getRFCprob(fm,RFC,numTrees); 
 clear RFC fm 
@@ -61,7 +63,7 @@ clear RFC fm
 RFC_filename = fullfile(pathToRFCs,forest_faces3456);
 RFC = importdata(RFC_filename);
 % load fm
-fm_filename = fullfile(fm_facesDir,fm_faces56);
+fm_filename = fullfile(fm_facesDir,name_fm_faces56);
 fm = importdata(fm_filename);
 face56Scores = getRFCprob(fm,RFC,numTrees); % gridCellFaceProbs_xy_1 
 clear RFC fm

@@ -14,13 +14,13 @@ function [griIDs_sectionIDs_rootPixIDsRel,numEdgesY,numEdgesX]...
 
 % grid dimensions (numCells in each dim)
 
-numEdgesX = floor((numC-1)/(gridResX));
-marginPix_X = mod((numC-1),(gridResX));
+numEdgesX = floor(numC/gridResX);
+marginPix_X = mod(numC,gridResX);
 gridStartX = floor(marginPix_X/2);
 gridStartX = max(1,gridStartX);
 
-numEdgesY = floor((numR-1)/(gridResY));
-marginPix_Y = mod((numC-1),(gridResY));
+numEdgesY = floor(numR/gridResY);
+marginPix_Y = mod(numC,gridResY);
 gridStartY = floor(marginPix_Y/2);
 gridStartY = max(1,gridStartY);
 
@@ -40,7 +40,7 @@ nodePixList_section = sub2ind([numR numC],nodeY,nodeX);
 numGridCellsPerSection = numEdgesX * numEdgesY;
 totGridCells = numGridCellsPerSection * numZ;
 
-griIDs_sectionIDs_rootPixIDsRel = uint8(zeros(totGridCells,3));
+griIDs_sectionIDs_rootPixIDsRel = zeros(totGridCells,3);
 gridCounter = 0;
 for k=1:numZ
     for j=1:numEdgesX
