@@ -146,10 +146,9 @@ unaryScoresMat = computeUnaryScoreMatRFC...
             name_fm_cellInterior,listInds_fm_cells_name);
 
 %% ILP formulation
-numBorderCells = numel(borderGridCellInds);
 % constraints
-[model.A,b,senseArray] = getILP3DGridConstraints(gridCellStats,numBorderCells);
-% objective to minimize
+[model.A,b,senseArray] = getILP3DGridConstraints(gridCellStats,borderGridCellInds);
+% objective to minimized
 f = getILP3DGridObjective(W,unaryScoresMat);
 
 %% ILP solver
