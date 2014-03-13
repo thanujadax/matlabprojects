@@ -29,7 +29,8 @@ function [A,b,senseArray] = getILP3DGridConstraints(cellStats,borderCellInds)
 con1_AdjCellsAndFaces = 1;
 con2_CellAndFace = 1;
 con3_continuity = 0;
-con4_borderCells = 1;
+con4_borderCells = 0;
+con5_inOut = 0; % TODO: certain structures are inside others
 
 %% Init
 numR = cellStats(1);
@@ -327,7 +328,11 @@ if(con2_CellAndFace)
 end
 %% Continuity constraint
 if(con3_continuity)
-    % For each cell, for each face
+    % For each cell, for each face, there are 2 constraints.
+    % 2 since to have a closed volume each (2D) face (=tile) should
+    % continue in 2 directions (consistently across the entire system)
+    
+    
 end
 %% border cell constraint
 % the state of the boundary cells are fixed to '1'
