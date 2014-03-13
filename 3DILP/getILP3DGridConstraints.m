@@ -29,7 +29,7 @@ function [A,b,senseArray] = getILP3DGridConstraints(cellStats,borderCellInds)
 con1_AdjCellsAndFaces = 1;
 con2_CellAndFace = 1;
 con3_continuity = 0;
-con4_borderCells = 0;
+con4_borderCells = 1;
 
 %% Init
 numR = cellStats(1);
@@ -327,7 +327,7 @@ if(con2_CellAndFace)
 end
 %% Continuity constraint
 if(con3_continuity)
-    
+    % For each cell, for each face
 end
 %% border cell constraint
 % the state of the boundary cells are fixed to '1'
