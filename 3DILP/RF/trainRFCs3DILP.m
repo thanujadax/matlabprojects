@@ -1,6 +1,6 @@
-function trainRFCs3DILP()
+% function trainRFCs3DILP()
 
-createTrainingData = 1;
+createTrainingData = 0;
 if(createTrainingData)
     disp('Training data creation start time:')
     datestr(clock, 0)
