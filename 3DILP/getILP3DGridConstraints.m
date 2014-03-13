@@ -28,8 +28,8 @@ function [A,b,senseArray] = getILP3DGridConstraints(cellStats,borderCellInds)
 %% Constraint enable/disable
 con1_AdjCellsAndFaces = 1;
 con2_CellAndFace = 1;
-con3_continuity = 1;
-con4_borderCells = 1;
+con3_continuity = 0;
+con4_borderCells = 0;
 
 %% Init
 numR = cellStats(1);
@@ -40,14 +40,20 @@ numCells = cellStats(1) * cellStats(2) * cellStats(3);
 numCellsPerSection = numR*numC;
 numBorderCells = numel(borderCellInds);
 
-% precalculate number of constraints
+% init: precalculate number of constraints
 numRowsCon1 = 0;
 numRowsCon2 = 0;
 numRowsCon3 = 0;
 numRowsCon4 = 0;
 
+% init: number of nonzero elements for each contraint type
+numNZCon1 = 0;
+numNZCon2 = 0;
+numNZCon3 = 0;
+numNZCon4 = 0;
+
 if(con1_AdjCellsAndFaces)
-    numRowsCon1 = numCells*3 - numCellsPerSection * 3;
+    numRowsCon1 = numCells*3 - numR*numC - numR*numZ - numC*numZ;    
     numNZperRow = 4;
     numNZCon1 = numRowsCon1 * numNZperRow;
 end
@@ -342,6 +348,7 @@ A = sparse(ii,jj,ss,constraintCount,numVariables);
 if(numel(b)>constraintCount)
     % trim b
     b(constraintCount+1:end) = [];
+    % senseArray
 end
 %% Supplementary functions
 function faceInd = getFaceIndAbsGivenCell(cellInd,face)
