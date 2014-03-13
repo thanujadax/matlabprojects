@@ -231,23 +231,6 @@ for k=1:numZ
             jj(nzElementInd) = face_ind;
             ss(nzElementInd) = 1; % coefficient for A
             
-%             % face 2
-%             constraintCount = constraintCount + 1;
-%             b(constraintCount) = 1.1;
-%             senseArray(constraintCount) = '<';
-%             face = 2;
-%             face_ind = getFaceIndAbsGivenCell(cellInd,face);
-% 
-%             nzElementInd = nzElementInd + 1;
-%             ii(nzElementInd) = constraintCount;
-%             jj(nzElementInd) = cellInd;
-%             ss(nzElementInd) = 1; % coefficient for A
-%             
-%             nzElementInd = nzElementInd + 1;
-%             ii(nzElementInd) = constraintCount;
-%             jj(nzElementInd) = face_ind;
-%             ss(nzElementInd) = 1; % coefficient for A
-            
             % face 3
             constraintCount = constraintCount + 1;
             b(constraintCount) = 1.1;
@@ -263,24 +246,7 @@ for k=1:numZ
             nzElementInd = nzElementInd + 1;
             ii(nzElementInd) = constraintCount;
             jj(nzElementInd) = face_ind;
-            ss(nzElementInd) = 1; % coefficient for A
-            
-%             % face 4
-%             constraintCount = constraintCount + 1;
-%             b(constraintCount) = 1.1;
-%             senseArray(constraintCount) = '<';
-%             face = 4;
-%             face_ind = getFaceIndAbsGivenCell(cellInd,face);
-% 
-%             nzElementInd = nzElementInd + 1;
-%             ii(nzElementInd) = constraintCount;
-%             jj(nzElementInd) = cellInd;
-%             ss(nzElementInd) = 1; % coefficient for A
-%             
-%             nzElementInd = nzElementInd + 1;
-%             ii(nzElementInd) = constraintCount;
-%             jj(nzElementInd) = face_ind;
-%             ss(nzElementInd) = 1; % coefficient for A
+            ss(nzElementInd) = 1; % coefficient for A            
             
             % face 5
             constraintCount = constraintCount + 1;
@@ -298,32 +264,15 @@ for k=1:numZ
             ii(nzElementInd) = constraintCount;
             jj(nzElementInd) = face_ind;
             ss(nzElementInd) = 1; % coefficient for A
-            
-%             % face 6
-%             constraintCount = constraintCount + 1;
-%             b(constraintCount) = 1.1;
-%             senseArray(constraintCount) = '<';
-%             face = 6;
-%             face_ind = getFaceIndAbsGivenCell(cellInd,face);
-% 
-%             nzElementInd = nzElementInd + 1;
-%             ii(nzElementInd) = constraintCount;
-%             jj(nzElementInd) = cellInd;
-%             ss(nzElementInd) = 1; % coefficient for A
-%             
-%             nzElementInd = nzElementInd + 1;
-%             ii(nzElementInd) = constraintCount;
-%             jj(nzElementInd) = face_ind;
-%             ss(nzElementInd) = 1; % coefficient for A
-            
-            
+                        
         end
     end
 end
 
-%% boundary cell constraint
+%% border cell constraint
 % the state of the boundary cells are fixed to '1'
 
+% get the colIDs for border cells
 
 %% Create sparse output matrix
 % ii - list of row indices
