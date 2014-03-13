@@ -57,7 +57,7 @@ disp('Training RFC for gridCell classification...')
 RFC_gridCells = classRF_train(x, y, NUM_TREES,MTRY,extra_options);
 disp('RFC trained for gridCell classification!')
 saveFileName = fullfile(savePathRFC,forestName_1);
-save(saveFileName,'RFC_gridCells');
+save(saveFileName,'RFC_gridCells','-v7.3');
 disp('saved forest RFC_gridCells.mat')
 %% RFC2: cell faces12 (xy)
 fm = importdata(fm_faces12);
@@ -67,7 +67,7 @@ disp('Training RFC for gridFaces12 classification...')
 RFC_gridFaces12 = classRF_train(x, y, NUM_TREES,MTRY,extra_options);
 disp('RFC trained for gridFace12 classification!')
 saveFileName = fullfile(savePathRFC,forestName_2);
-save(saveFileName,'RFC_gridFaces12');
+save(saveFileName,'RFC_gridFaces12','-v7.3');
 disp('saved forest RFC_gridFaces12.mat')
 
 %% RFC3: cell faces3456 (xz and yz)
@@ -80,7 +80,7 @@ disp('Training RFC for gridFaces3456 classification...')
 RFC_gridFaces3456 = classRF_train(x, y, NUM_TREES,MTRY,extra_options);
 disp('RFC trained for gridFace3456 classification!')
 saveFileName = fullfile(savePathRFC,forestName_3);
-save(saveFileName,'RFC_gridFaces3456');
+save(saveFileName,'RFC_gridFaces3456','-v7.3');
 disp('saved forest RFC_gridFaces3456.mat')
 
 disp('Training RFC Finish time:')
