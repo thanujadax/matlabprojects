@@ -332,6 +332,385 @@ if(con3_continuity)
     % 2 since to have a closed volume each (2D) face (=tile) should
     % continue in 2 directions (consistently across the entire system)
     
+    % border cells are ignored
+    
+    % thisCell = cell_y
+    
+    cellInd_y = sub2ind([numR numC numZ],i,j,k);
+    cellInd_z = sub2ind([numR numC numZ],i,(j+1),k);
+    cellInd_h = sub2ind([numR numC numZ],i,(j+1),(k-1));
+    cellInd_s = sub2ind([numR numC numZ],(i+1),j,k);
+    cellInd_g = sub2ind([numR numC numZ],i,j,(k-1));
+    cellInd_l = sub2ind([numR numC numZ],(i+1),j,(k+1));
+    cellInd_d = sub2ind([numR numC numZ],i,(j+1),(k+1));
+    cellInd_c = sub2ind([numR numC numZ],i,j,(k+1));
+    cellInd_k = sub2ind([numR numC numZ],i,(j-1),(k+1));
+    cellInd_p = sub2ind([numR numC numZ],(i+1),(j-1),k);
+    cellInd_t = sub2ind([numR numC numZ],(i+1),(j+1),k);
+    cellInd_a = sub2ind([numR numC numZ],(i-1),j,(k+1));
+    cellInd_x = sub2ind([numR numC numZ],(i-1),(j+1),k);
+    
+    faceInd_y1 = getFaceIndAbsGivenCell(cellInd_y,1);
+    faceInd_y2 = getFaceIndAbsGivenCell(cellInd_y,2);
+    faceInd_y3 = getFaceIndAbsGivenCell(cellInd_y,3);
+    faceInd_y4 = getFaceIndAbsGivenCell(cellInd_y,4);
+    faceInd_y4 = getFaceIndAbsGivenCell(cellInd_y,5);
+    faceInd_y6 = getFaceIndAbsGivenCell(cellInd_y,6);
+    
+    faceInd_s1 = getFaceIndAbsGivenCell(cellInd_s,1);
+    faceInd_s2 = getFaceIndAbsGivenCell(cellInd_s,2);
+    faceInd_s3 = getFaceIndAbsGivenCell(cellInd_s,3);
+    faceInd_s4 = getFaceIndAbsGivenCell(cellInd_s,4);
+    
+    faceInd_l1 = getFaceIndAbsGivenCell(cellInd_l,1);
+    faceInd_l5 = getFaceIndAbsGivenCell(cellInd_l,5);
+    
+    faceInd_z1 = getFaceIndAbsGivenCell(cellInd_z,1);
+    faceInd_z2 = getFaceIndAbsGivenCell(cellInd_z,2);
+    faceInd_z5 = getFaceIndAbsGivenCell(cellInd_z,5);
+    faceInd_z6 = getFaceIndAbsGivenCell(cellInd_z,6);
+    
+    faceInd_d1 = getFaceIndAbsGivenCell(cellInd_d,1);
+    faceInd_d3 = getFaceIndAbsGivenCell(cellInd_d,3);
+    
+    faceInd_c3 = getFaceIndAbsGivenCell(cellInd_c,3);
+    faceInd_c4 = getFaceIndAbsGivenCell(cellInd_c,4);
+    faceInd_c5 = getFaceIndAbsGivenCell(cellInd_c,5);
+    faceInd_c6 = getFaceIndAbsGivenCell(cellInd_c,6);
+    
+    faceInd_k1 = getFaceIndAbsGivenCell(cellInd_k,1);
+    
+    faceInd_p5 = getFaceIndAbsGivenCell(cellInd_p,5);
+    
+    faceInd_t3 = getFaceIndAbsGivenCell(cellInd_t,3);
+    faceInd_t5 = getFaceIndAbsGivenCell(cellInd_t,5);
+    
+    faceInd_a1 = getFaceIndAbsGivenCell(cellInd_a,1);
+    
+    faceInd_x3 = getFaceIndAbsGivenCell(cellInd_x,3);
+    
+    faceInd_h3 = getFaceIndAbsGivenCell(cellInd_h,3);
+    
+    faceInd_g5 = getFaceIndAbsGivenCell(cellInd_g,5);
+    
+    for k=2:(numZ-1)
+        for j=2:(numC-1)
+            for i=2:(numR-1)
+                %% face1 (this = y) constr1 -
+                % this cell is y. 
+                % y1 - z1 -y4 -h3 <= 0
+                constraintCount = constraintCount + 1;
+                b(constraintCount) = 0.1;
+                senseArray(constraintCount) = '<';               
+                % y1
+                nzElementInd = nzElementInd + 1;
+                ii(nzElementInd) = constraintCount;
+                jj(nzElementInd) = faceInd_y1;
+                ss(nzElementInd) = 1; % coefficient for A
+                % -z1
+                nzElementInd = nzElementInd + 1;
+                ii(nzElementInd) = constraintCount;
+                jj(nzElementInd) = faceInd_z1;
+                ss(nzElementInd) = -1; % coefficient for A
+                % -y4
+                nzElementInd = nzElementInd + 1;
+                ii(nzElementInd) = constraintCount;
+                jj(nzElementInd) = faceInd_y4;
+                ss(nzElementInd) = -1; % coefficient for A
+                % -h3
+                nzElementInd = nzElementInd + 1;
+                ii(nzElementInd) = constraintCount;
+                jj(nzElementInd) = faceInd_h3;
+                ss(nzElementInd) = -1; % coefficient for A
+                
+                %% face1 (this = y) constr2 -
+                % y1 - s1 - y6 - g5 <=0        
+                constraintCount = constraintCount + 1;
+                b(constraintCount) = 0.1;
+                senseArray(constraintCount) = '<';                
+                % y1
+                nzElementInd = nzElementInd + 1;
+                ii(nzElementInd) = constraintCount;
+                jj(nzElementInd) = faceInd_y1;
+                ss(nzElementInd) = 1; % coefficient for A
+                % -s1
+                nzElementInd = nzElementInd + 1;
+                ii(nzElementInd) = constraintCount;
+                jj(nzElementInd) = faceInd_s1;
+                ss(nzElementInd) = -1; % coefficient for A
+                % -y6
+                nzElementInd = nzElementInd + 1;
+                ii(nzElementInd) = constraintCount;
+                jj(nzElementInd) = faceInd_y6;
+                ss(nzElementInd) = -1; % coefficient for A
+                % -g5
+                nzElementInd = nzElementInd + 1;
+                ii(nzElementInd) = constraintCount;
+                jj(nzElementInd) = faceInd_g5;
+                ss(nzElementInd) = -1; % coefficient for A
+                
+                %% face2 (this = y) constr1
+                % y2 -s2 -y6 -l5 <=0
+                constraintCount = constraintCount + 1;
+                b(constraintCount) = 0.1;
+                senseArray(constraintCount) = '<';
+                % y2
+                nzElementInd = nzElementInd + 1;
+                ii(nzElementInd) = constraintCount;
+                jj(nzElementInd) = faceInd_y2;
+                ss(nzElementInd) = 1; % coefficient for A
+                % -s2
+                nzElementInd = nzElementInd + 1;
+                ii(nzElementInd) = constraintCount;
+                jj(nzElementInd) = faceInd_s2;
+                ss(nzElementInd) = -1; % coefficient for A
+                % -y6
+                nzElementInd = nzElementInd + 1;
+                ii(nzElementInd) = constraintCount;
+                jj(nzElementInd) = faceInd_y6;
+                ss(nzElementInd) = -1; % coefficient for A
+                % -l5
+                nzElementInd = nzElementInd + 1;
+                ii(nzElementInd) = constraintCount;
+                jj(nzElementInd) = faceInd_l5;
+                ss(nzElementInd) = -1; % coefficient for A
+                               
+                %% face2 (this = y) constr2
+                % y2 -z2 -y4 -d3 <=0
+                constraintCount = constraintCount + 1;
+                b(constraintCount) = 0.1;
+                senseArray(constraintCount) = '<';
+                % y2
+                nzElementInd = nzElementInd + 1;
+                ii(nzElementInd) = constraintCount;
+                jj(nzElementInd) = faceInd_y2;
+                ss(nzElementInd) = 1; % coefficient for A
+                % -z2
+                nzElementInd = nzElementInd + 1;
+                ii(nzElementInd) = constraintCount;
+                jj(nzElementInd) = faceInd_z2;
+                ss(nzElementInd) = -1; % coefficient for A
+                % -y4
+                nzElementInd = nzElementInd + 1;
+                ii(nzElementInd) = constraintCount;
+                jj(nzElementInd) = faceInd_y6;
+                ss(nzElementInd) = -1; % coefficient for A
+                % -d3
+                nzElementInd = nzElementInd + 1;
+                ii(nzElementInd) = constraintCount;
+                jj(nzElementInd) = faceInd_d3;
+                ss(nzElementInd) = -1; % coefficient for A
+                
+                %% face3 constr1
+                % y3 -c3 - y2 - k1 <=0
+                constraintCount = constraintCount + 1;
+                b(constraintCount) = 0.1;
+                senseArray(constraintCount) = '<';
+                % y3
+                nzElementInd = nzElementInd + 1;
+                ii(nzElementInd) = constraintCount;
+                jj(nzElementInd) = faceInd_y3;
+                ss(nzElementInd) = 1; % coefficient for A
+                % -c3
+                nzElementInd = nzElementInd + 1;
+                ii(nzElementInd) = constraintCount;
+                jj(nzElementInd) = faceInd_c3;
+                ss(nzElementInd) = -1; % coefficient for A
+                % -y2
+                nzElementInd = nzElementInd + 1;
+                ii(nzElementInd) = constraintCount;
+                jj(nzElementInd) = faceInd_y2;
+                ss(nzElementInd) = -1; % coefficient for A
+                % -k1
+                nzElementInd = nzElementInd + 1;
+                ii(nzElementInd) = constraintCount;
+                jj(nzElementInd) = faceInd_k1;
+                ss(nzElementInd) = -1; % coefficient for A
+                
+                %% face3 constr2
+                % y3 -s3 - y6 - p5 <=0
+                constraintCount = constraintCount + 1;
+                b(constraintCount) = 0.1;
+                senseArray(constraintCount) = '<';
+                % y3
+                nzElementInd = nzElementInd + 1;
+                ii(nzElementInd) = constraintCount;
+                jj(nzElementInd) = faceInd_y3;
+                ss(nzElementInd) = 1; % coefficient for A
+                % -s3
+                nzElementInd = nzElementInd + 1;
+                ii(nzElementInd) = constraintCount;
+                jj(nzElementInd) = faceInd_s3;
+                ss(nzElementInd) = -1; % coefficient for A
+                % -y6
+                nzElementInd = nzElementInd + 1;
+                ii(nzElementInd) = constraintCount;
+                jj(nzElementInd) = faceInd_y6;
+                ss(nzElementInd) = -1; % coefficient for A
+                % -p5
+                nzElementInd = nzElementInd + 1;
+                ii(nzElementInd) = constraintCount;
+                jj(nzElementInd) = faceInd_p5;
+                ss(nzElementInd) = -1; % coefficient for A
+                
+                %% face4 constr 1
+                % y4 - c4 - y2 - d1 <= 0
+                constraintCount = constraintCount + 1;
+                b(constraintCount) = 0.1;
+                senseArray(constraintCount) = '<';
+                % y4
+                nzElementInd = nzElementInd + 1;
+                ii(nzElementInd) = constraintCount;
+                jj(nzElementInd) = faceInd_y4;
+                ss(nzElementInd) = 1; % coefficient for A
+                % -c4
+                nzElementInd = nzElementInd + 1;
+                ii(nzElementInd) = constraintCount;
+                jj(nzElementInd) = faceInd_c4;
+                ss(nzElementInd) = -1; % coefficient for A
+                % -y2
+                nzElementInd = nzElementInd + 1;
+                ii(nzElementInd) = constraintCount;
+                jj(nzElementInd) = faceInd_y2;
+                ss(nzElementInd) = -1; % coefficient for A
+                % -d1
+                nzElementInd = nzElementInd + 1;
+                ii(nzElementInd) = constraintCount;
+                jj(nzElementInd) = faceInd_d1;
+                ss(nzElementInd) = -1; % coefficient for A
+                
+                %% face4 constr 2
+                % y4 - s4 - y6 - t5 <=0
+                constraintCount = constraintCount + 1;
+                b(constraintCount) = 0.1;
+                senseArray(constraintCount) = '<';
+                % y4
+                nzElementInd = nzElementInd + 1;
+                ii(nzElementInd) = constraintCount;
+                jj(nzElementInd) = faceInd_y4;
+                ss(nzElementInd) = 1; % coefficient for A
+                % -s4
+                nzElementInd = nzElementInd + 1;
+                ii(nzElementInd) = constraintCount;
+                jj(nzElementInd) = faceInd_s4;
+                ss(nzElementInd) = -1; % coefficient for A
+                % -y6
+                nzElementInd = nzElementInd + 1;
+                ii(nzElementInd) = constraintCount;
+                jj(nzElementInd) = faceInd_y6;
+                ss(nzElementInd) = -1; % coefficient for A
+                % -t5
+                nzElementInd = nzElementInd + 1;
+                ii(nzElementInd) = constraintCount;
+                jj(nzElementInd) = faceInd_t5;
+                ss(nzElementInd) = -1; % coefficient for A
+                
+                %% face5 constr1
+                % y5 - c5 - y2 - a1 <= 0
+                constraintCount = constraintCount + 1;
+                b(constraintCount) = 0.1;
+                senseArray(constraintCount) = '<';
+                % y5
+                nzElementInd = nzElementInd + 1;
+                ii(nzElementInd) = constraintCount;
+                jj(nzElementInd) = faceInd_y5;
+                ss(nzElementInd) = 1; % coefficient for A
+                % -c5
+                nzElementInd = nzElementInd + 1;
+                ii(nzElementInd) = constraintCount;
+                jj(nzElementInd) = faceInd_c5;
+                ss(nzElementInd) = -1; % coefficient for A
+                % -y2
+                nzElementInd = nzElementInd + 1;
+                ii(nzElementInd) = constraintCount;
+                jj(nzElementInd) = faceInd_y2;
+                ss(nzElementInd) = -1; % coefficient for A
+                % -a1
+                nzElementInd = nzElementInd + 1;
+                ii(nzElementInd) = constraintCount;
+                jj(nzElementInd) = faceInd_a1;
+                ss(nzElementInd) = -1; % coefficient for A
+                
+                %% face5 constr2
+                % y5 - z5 - y4 - x3 <= 0
+                constraintCount = constraintCount + 1;
+                b(constraintCount) = 0.1;
+                senseArray(constraintCount) = '<';
+                % y5
+                nzElementInd = nzElementInd + 1;
+                ii(nzElementInd) = constraintCount;
+                jj(nzElementInd) = faceInd_y5;
+                ss(nzElementInd) = 1; % coefficient for A
+                % -z5
+                nzElementInd = nzElementInd + 1;
+                ii(nzElementInd) = constraintCount;
+                jj(nzElementInd) = faceInd_z5;
+                ss(nzElementInd) = -1; % coefficient for A
+                % -y4
+                nzElementInd = nzElementInd + 1;
+                ii(nzElementInd) = constraintCount;
+                jj(nzElementInd) = faceInd_y4;
+                ss(nzElementInd) = -1; % coefficient for A
+                % -x3
+                nzElementInd = nzElementInd + 1;
+                ii(nzElementInd) = constraintCount;
+                jj(nzElementInd) = faceInd_x3;
+                ss(nzElementInd) = -1; % coefficient for A
+                
+                %% face6 constr1
+                % y6 - c6 - y2 - l1 <= 0
+                constraintCount = constraintCount + 1;
+                b(constraintCount) = 0.1;
+                senseArray(constraintCount) = '<';
+                % y6
+                nzElementInd = nzElementInd + 1;
+                ii(nzElementInd) = constraintCount;
+                jj(nzElementInd) = faceInd_y6;
+                ss(nzElementInd) = 1; % coefficient for A
+                % -c6
+                nzElementInd = nzElementInd + 1;
+                ii(nzElementInd) = constraintCount;
+                jj(nzElementInd) = faceInd_c6;
+                ss(nzElementInd) = -1; % coefficient for A
+                % -y2
+                nzElementInd = nzElementInd + 1;
+                ii(nzElementInd) = constraintCount;
+                jj(nzElementInd) = faceInd_y2;
+                ss(nzElementInd) = -1; % coefficient for A
+                % -l1
+                nzElementInd = nzElementInd + 1;
+                ii(nzElementInd) = constraintCount;
+                jj(nzElementInd) = faceInd_l1;
+                ss(nzElementInd) = -1; % coefficient for A
+                %% face6 constr2
+                % y6 - z6 - y4 -t3
+                constraintCount = constraintCount + 1;
+                b(constraintCount) = 0.1;
+                senseArray(constraintCount) = '<';
+                % y6
+                nzElementInd = nzElementInd + 1;
+                ii(nzElementInd) = constraintCount;
+                jj(nzElementInd) = faceInd_y6;
+                ss(nzElementInd) = 1; % coefficient for A
+                % -z6
+                nzElementInd = nzElementInd + 1;
+                ii(nzElementInd) = constraintCount;
+                jj(nzElementInd) = faceInd_z6;
+                ss(nzElementInd) = -1; % coefficient for A
+                % -y4
+                nzElementInd = nzElementInd + 1;
+                ii(nzElementInd) = constraintCount;
+                jj(nzElementInd) = faceInd_y4;
+                ss(nzElementInd) = -1; % coefficient for A
+                % -t3
+                nzElementInd = nzElementInd + 1;
+                ii(nzElementInd) = constraintCount;
+                jj(nzElementInd) = faceInd_t3;
+                ss(nzElementInd) = -1; % coefficient for A
+                
+            end
+        end
+    end
     
 end
 %% border cell constraint
