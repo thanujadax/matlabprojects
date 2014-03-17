@@ -32,6 +32,13 @@ con3_continuity = 1;
 con4_borderCells = 0;
 con5_inOut = 0; % TODO: certain structures are inside others
 
+% debug constraints
+seq = 1:80;
+con6_enforce_0 = 1; % set of cellInds to be labeled cellInterior (0)
+    inactiveCellInds_con6 = [22 27 38 43 54 58]; 
+con7_enforce_1 = 1; % set of cellInds to be labeled cellExterior (1)
+    activeCellInds_con7 = setdiff(seq,inactiveCellInds_con6); 
+
 %% Init
 numR = cellStats(1);
 numC = cellStats(2);
@@ -46,17 +53,24 @@ numRowsCon1 = 0;
 numRowsCon2 = 0;
 numRowsCon3 = 0;
 numRowsCon4 = 0;
+numRowsCon6 = 0;
+numRowsCon7 = 0;
 
 % init: number of nonzero elements for each contraint type
 numNZCon1 = 0;
 numNZCon2 = 0;
 numNZCon3 = 0;
 numNZCon4 = 0;
+numNZCon6 = 0;
+numNZCon7 = 0;
 
 if(con1_AdjCellsAndFaces)
     numRowsCon1 = numCells*3 - numR*numC - numR*numZ - numC*numZ;    
     numNZperRow = 4;
     numNZCon1 = numRowsCon1 * numNZperRow;
+    disp('Constraint1: cell and face of direct neighbors - ACTIVE')
+else
+    disp('Constraint1: cell and face of direct neighbors - INACTIVE')
 end
 if(con2_CellAndFace)
     numRowsCon2 = numCells * 3;
@@ -73,8 +87,21 @@ if(con4_borderCells)
     numNZperRow = numBorderCells +1;
     numNZCon4 = numRowsCon4 * numNZperRow;
 end
+if(con6_enforce_0)
+   numRowsCon6 = numel(inactiveCellInds_con6); 
+   numNZperRow = 1;
+   numNZCon6 = numRowsCon6 * numNZperRow;
+   disp('Constraint6: enforced cellInterior - ACTIVE')
+end
+if(con7_enforce_1)
+   numRowsCon7 = numel(activeCellInds_con7); 
+   numNZperRow = 1;
+   numNZCon7 = numRowsCon7 * numNZperRow;
+   disp('Constraint7: enforced cellExterior - ACTIVE')
+end
 
-numConstraints = numRowsCon1 + numRowsCon2 + numRowsCon3 + numRowsCon4;
+numConstraints = numRowsCon1 + numRowsCon2 + numRowsCon3 + numRowsCon4 ...
+                    + numRowsCon6 + numRowsCon7;
 % numConstraints = numCells * 6 - 3*numBorderCells ;
 
 numVariables = numCells * 7;
@@ -83,7 +110,8 @@ b = zeros(numConstraints,1);
 senseArray(1:numConstraints) = '=';
 
 % numNonZeros = 2*3*numCells + 4*3*numCells; % without accounting for boundaries
-numNonZeros = numNZCon1 + numNZCon2 + numNZCon3 + numNZCon4; 
+numNonZeros = numNZCon1 + numNZCon2 + numNZCon3 + numNZCon4 + numNZCon6 ...
+                + numNZCon7; 
 
 % boundary cells give rise to a lower number of constraints there by lower
 % number of nonZeros for A.
@@ -120,6 +148,7 @@ if(con1_AdjCellsAndFaces)
                     face = 1;
                     face_ind = getFaceIndAbsGivenCell(cellInd,face);
                     face_neighborCellInd = sub2ind([numR numC numC],i,j,(k-1));
+                    face_neighborVarInd = (face_neighborCellInd-1)*7 +1;% colID of A
                     neighborFace = 2;
                     neighbor_face_ind = getFaceIndAbsGivenCell...
                             (face_neighborCellInd,neighborFace);
@@ -148,7 +177,7 @@ if(con1_AdjCellsAndFaces)
                     % neighbor_cellID
                     nzElementInd = nzElementInd + 1;
                     ii(nzElementInd) = constraintCount;
-                    jj(nzElementInd) = face_neighborCellInd;
+                    jj(nzElementInd) = face_neighborVarInd;
                     ss(nzElementInd) = -1; % coefficient for A
 
                     % neighbor_face2_ind
@@ -165,6 +194,7 @@ if(con1_AdjCellsAndFaces)
                     face = 3;
                     face_ind = getFaceIndAbsGivenCell(cellInd,face);
                     face_neighborCellInd = sub2ind([numR numC numZ],i,(j-1),k);
+                    face_neighborVarInd = (face_neighborCellInd-1)*7 +1;% colID of A
 
                     neighborFace = 4;
                     neighbor_face_ind = getFaceIndAbsGivenCell...
@@ -195,7 +225,7 @@ if(con1_AdjCellsAndFaces)
                     % neighbor_cellID
                     nzElementInd = nzElementInd + 1;
                     ii(nzElementInd) = constraintCount;
-                    jj(nzElementInd) = face_neighborCellInd;
+                    jj(nzElementInd) = face_neighborVarInd;
                     ss(nzElementInd) = -1; % coefficient for A
 
                     % neighbor_face2_ind
@@ -212,6 +242,7 @@ if(con1_AdjCellsAndFaces)
                     face = 5;
                     face_ind = getFaceIndAbsGivenCell(cellInd,face);
                     face_neighborCellInd = sub2ind([numR numC numZ],(i-1),j,k);
+                    face_neighborVarInd = (face_neighborCellInd-1)*7 +1;% colID of A
 
                     neighborFace = 6;
                     neighbor_face_ind = getFaceIndAbsGivenCell...
@@ -241,7 +272,7 @@ if(con1_AdjCellsAndFaces)
                     % neighbor_cellID
                     nzElementInd = nzElementInd + 1;
                     ii(nzElementInd) = constraintCount;
-                    jj(nzElementInd) = face_neighborCellInd;
+                    jj(nzElementInd) = face_neighborVarInd;
                     ss(nzElementInd) = -1; % coefficient for A
 
                     % neighbor_face2_ind
@@ -730,6 +761,36 @@ end
 if(con4_borderCells)
     % get the colIDs for border cells
 end
+
+%% enforce a set of cells to be inactive (=0, cellInterior)
+if(con6_enforce_0)
+   numInactiveCells = numel(inactiveCellInds_con6);
+   for n=1:numInactiveCells       
+        cellVariableInd = (inactiveCellInds_con6(n)-1)*7 +1;
+        constraintCount = constraintCount + 1;
+        b(constraintCount) = 0; % cell interior is 0
+        % senseArray(constraintCount) = '='; % default '='
+        nzElementInd = nzElementInd + 1;
+        ii(nzElementInd) = constraintCount;
+        jj(nzElementInd) = cellVariableInd;
+        ss(nzElementInd) = 1;
+   end
+end
+
+%% enforce a set of cells to be active (=1, cellExterior)
+if(con7_enforce_1)
+   numActiveCells = numel(activeCellInds_con7);
+   for n=1:numActiveCells       
+        cellVariableInd = (activeCellInds_con7(n)-1)*7 +1;
+        constraintCount = constraintCount + 1;
+        b(constraintCount) = 1; % cell exterior is 1
+        % senseArray(constraintCount) = '='; % default '='
+        nzElementInd = nzElementInd + 1;
+        ii(nzElementInd) = constraintCount;
+        jj(nzElementInd) = cellVariableInd;
+        ss(nzElementInd) = 1;
+   end
+end
 %% Create sparse output matrix
 % ii - list of row indices
 % jj - list of column indices
@@ -741,11 +802,11 @@ jj = jj(jj>0);
 numNonZeros = numel(ii);
 ss = ss(1:numNonZeros);
 A = sparse(ii,jj,ss,constraintCount,numVariables);
-if(numel(b)>constraintCount)
-    % trim b
-    b(constraintCount+1:end) = [];
-    % senseArray
-end
+% if(numel(b)>constraintCount)
+%     % trim b
+%     b(constraintCount+1:end) = [];
+%     % senseArray
+% end
 %% Supplementary functions
 function faceInd = getFaceIndAbsGivenCell(cellInd,face)
 % first variable of each set of 7 vars per cube is the cube internal state
