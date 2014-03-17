@@ -7,8 +7,8 @@ function seg3D = gridILP3D()
 verbose = 2; % 0,1,2
 usePrecomputedFeatureMatrices = 0;
 
-gridResX = 128; % num pix
-gridResY = 128;
+gridResX = 4; % num pix
+gridResY = 4;
 gridResZ = 6; % distance between 2 adjacent slices in pixels
 
 oriFiltLen = 29;    % window size for pix feature extraction and orientation filter
@@ -40,12 +40,12 @@ NUM_VAR_PER_CELL = 7;
 
 %% File paths
 % 128x128 data set
-% pathForInputImages = '/home/thanuja/Dropbox/data/3D_Grid_ILP/stack1/raw/';
-% pathToFeatureMat = '/home/thanuja/Dropbox/data/3D_Grid_ILP/stack1/fm/';
+pathForInputImages = '/home/thanuja/Dropbox/data/3D_Grid_ILP/stack1/raw/';
+pathToFeatureMat = '/home/thanuja/Dropbox/data/3D_Grid_ILP/stack1/fm/';
 
 % toy
-pathForInputImages = '/home/thanuja/Dropbox/data/3D_Grid_ILP/toy1/raw/';
-pathToFeatureMat = '/home/thanuja/Dropbox/data/3D_Grid_ILP/toy1/fm/';
+% pathForInputImages = '/home/thanuja/Dropbox/data/3D_Grid_ILP/toy1/raw/';
+% pathToFeatureMat = '/home/thanuja/Dropbox/data/3D_Grid_ILP/toy1/fm/';
 
 % pathForInputImages ='/home/thanuja/Dropbox/data/3D_Grid_ILP/trainingData/raw/';
 % pathToFeatureMat ='/home/thanuja/Dropbox/data/3D_Grid_ILP/trainingData/fm/';
