@@ -25,10 +25,10 @@ gridCellStateColumns = reshape(gridCellStateVariables,...
 % call visualize_section_simple for each section
 
 
-for i=2:(numSections-1)
+for i=1:numSections
     gridCellStates = gridCellStateColumns(:,i);
     section = visualizationOnGridCells_singleSection(gridCellStates,rootPixels,...
                         gridResY,gridResX,sizeR,sizeC);
-    title_str = sprintf('ILP segmentation cell interior: section %d',(i-1));
+    title_str = sprintf('ILP segmentation cell interior: section %d',i);
     figure;imshow(section);title(title_str)
 end

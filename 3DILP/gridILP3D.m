@@ -4,8 +4,12 @@ function seg3D = gridILP3D()
 % 2014.02.25
 
 %% Parameters
+produceSBMRMfiles = 1;
 verbose = 2; % 0,1,2
-usePrecomputedFeatureMatrices = 0;
+usePrecomputedFeatureMatrices = 1;
+
+% label extraction param for sbmrm file creation
+thresh_mem = 30;
 
 gridResX = 4; % num pix
 gridResY = 4;
@@ -18,14 +22,26 @@ csHist = oriFiltLen; % window size for histogram creation
 
 numTrees = 500; % RFC
 
-% weighting parameters for the cost function
-W = [-10;    % cell interior
-     -100;    % face 1
-     -100;    % face 2
-     -100;    % face 3
-     -100;    % face 4
-     -100;    % face 5
-     -100;];  % face 6
+if(produceSBMRMfiles)
+    disp('***** SBMRM MODE TURNED ON *****')
+    W = [1;    % cell interior
+         1;    % face 1
+         1;    % face 2
+         1;    % face 3
+         1;    % face 4
+         1;    % face 5
+         1];  % face 6
+else
+    % weighting parameters for the cost function
+    disp('SBMRM mode turned off....')
+    W = [-10;    % cell interior
+         -100;    % face 1
+         -100;    % face 2
+         -100;    % face 3
+         -100;    % face 4
+         -100;    % face 5
+         -100];  % face 6
+end
 
 NUM_VAR_PER_CELL = 7; 
 % 1 - cell internal state
@@ -39,16 +55,20 @@ NUM_VAR_PER_CELL = 7;
 
 
 %% File paths
+pathSBMRM = 'sbmrm/';
+
+
 % 128x128 data set
-pathForInputImages = '/home/thanuja/Dropbox/data/3D_Grid_ILP/stack1/raw/';
-pathToFeatureMat = '/home/thanuja/Dropbox/data/3D_Grid_ILP/stack1/fm/';
+% pathForInputImages = '/home/thanuja/Dropbox/data/3D_Grid_ILP/stack1/raw/';
+% pathToFeatureMat = '/home/thanuja/Dropbox/data/3D_Grid_ILP/stack1/fm/';
 
 % toy
 % pathForInputImages = '/home/thanuja/Dropbox/data/3D_Grid_ILP/toy1/raw/';
 % pathToFeatureMat = '/home/thanuja/Dropbox/data/3D_Grid_ILP/toy1/fm/';
 
-% pathForInputImages ='/home/thanuja/Dropbox/data/3D_Grid_ILP/trainingData/raw/';
-% pathToFeatureMat ='/home/thanuja/Dropbox/data/3D_Grid_ILP/trainingData/fm/';
+pathForInputImages ='/home/thanuja/Dropbox/data/3D_Grid_ILP/trainingData/raw/';
+pathToFeatureMat ='/home/thanuja/Dropbox/data/3D_Grid_ILP/trainingData/fm/';
+pathLabelImages = '/home/thanuja/Dropbox/data/3D_Grid_ILP/trainingData/neuron/';
 
 pathToRFCs = '/home/thanuja/Dropbox/data/3D_Grid_ILP/trainingData/RFCs';
 
@@ -76,6 +96,11 @@ listInds_fm_face56_name = 'fm_listInds_face56.mat';
 imageStack3D = readImages2StackWithBoundary...
                 (pathForInputImages,fileNameString,gridResY,gridResX);
 [numR,numC,numZ] = size(imageStack3D);
+if(produceSBMRMfiles)
+    % read label image stack
+    imageStack3D_labels = readImages2StackWithBoundary...
+                (pathLabelImages,fileNameString,gridResY,gridResX);
+end
 
 %% Create 3D grid
 % addressing mechanism: gridID <--> pixels(of particular section)
@@ -145,33 +170,56 @@ unaryScoresMat = computeUnaryScoreMatRFC...
             name_fm_faces56,listInds_fm_face56_name,...
             name_fm_cellInterior,listInds_fm_cells_name);
 
+
 %% ILP formulation
 % constraints
 [model.A,b,senseArray] = getILP3DGridConstraints(gridCellStats,borderGridCellInds);
-% objective to minimized
-f = getILP3DGridObjective(W,unaryScoresMat);
+% objective to be minimized
+if(produceSBMRMfiles)
+    % get initial labels
+    [gridCellInteriorInitLabels,gridCellFaceInitLabels] ...
+            = getInitLabels(imageStack3D_labels,numR,numC,...
+                        numZ,gridResX,gridResY,gridResZ,thresh_mem);
+    
+    % perform ILP and return x (sbmrm label vector)
+    [gridCellInteriorLabels,gridCellFaceLabels,x,A_sparse,b,senseArray]...
+                        = getTrainingLabels3DgridILP...
+                        (gridCellStats,borderGridCellInds,...
+                        gridCellInteriorInitLabels,gridCellFaceInitLabels);
+else
+    f = getILP3DGridObjective(W,unaryScoresMat);
+end
 
 %% ILP solver
-disp('using Gurobi ILP solver...');
-% model.A = sparse(double(A));
-model.rhs = b;
-model.obj = f';
-model.sense = senseArray;
-% model.vtype = vtypeArray;
-model.vtype = 'B';
-% model.lb = lbArray;
-% model.ub = ubArray;
-model.modelname = '3D_Grid_ILP';
-% initial guess
-% model.start = labelVector;
+if(~produceSBMRMfiles)
+    disp('using Gurobi ILP solver...');
+    % model.A = sparse(double(A));
+    model.rhs = b;
+    model.obj = f';
+    model.sense = senseArray;
+    % model.vtype = vtypeArray;
+    model.vtype = 'B';
+    % model.lb = lbArray;
+    % model.ub = ubArray;
+    model.modelname = '3D_Grid_ILP';
+    % initial guess
+    % model.start = labelVector;
 
-params.LogFile = 'gurobi_3D_Grid_ILP.log';
-params.Presolve = 0;
-params.ResultFile = 'modelfile_3D_Grid_ILP.mps';
-params.InfUnbdInfo = 1;
+    params.LogFile = 'gurobi_3D_Grid_ILP.log';
+    params.Presolve = 0;
+    params.ResultFile = 'modelfile_3D_Grid_ILP.mps';
+    params.InfUnbdInfo = 1;
 
-resultGurobi = gurobi(model,params);
-x = resultGurobi.x;
+    resultGurobi = gurobi(model,params);
+    x = resultGurobi.x;
+end
+%% write BMRM files
+if (produceSBMRMfiles)
+    f = getILP3DGridObjective(W,unaryScoresMat); % w's are set to 1.
+    featureMat = writeFeaturesFile_3DILP(unaryScoresMat,pathSBMRM);
+    constraints = writeConstraintsFile2(A_sparse,b,senseArray,pathSBMRM);
+    labels = writeLabelsFile2(x,pathSBMRM);
+end
 %% Visualization
 % numCellsPerSection = numCellsY * numCellsX;
 rootPixels = gridCIDs_sectionIDs_rootPixIDsRel(1:numCellsPerSection,3);

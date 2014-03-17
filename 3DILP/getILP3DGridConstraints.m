@@ -543,7 +543,7 @@ if(con3_continuity)
                 ss(nzElementInd) = -1; % coefficient for A
                 %% face 1, constr 4
                 % y1 - s1 - y6 - v5 <=0
-                constraintCount = constraintCount + 1;constraintCount = constraintCount + 1;
+                constraintCount = constraintCount + 1;
                 b(constraintCount) = 0.1;
                 senseArray(constraintCount) = '<';                
                 % y1
