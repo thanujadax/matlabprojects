@@ -34,9 +34,9 @@ con5_inOut = 0; % TODO: certain structures are inside others
 
 % debug constraints
 seq = 1:80;
-con6_enforce_0 = 1; % set of cellInds to be labeled cellInterior (0)
+con6_enforce_0 = 0; % set of cellInds to be labeled cellInterior (0)
     inactiveCellInds_con6 = [22 27 38 43 54 58]; 
-con7_enforce_1 = 1; % set of cellInds to be labeled cellExterior (1)
+con7_enforce_1 = 0; % set of cellInds to be labeled cellExterior (1)
     activeCellInds_con7 = setdiff(seq,inactiveCellInds_con6); 
 
 %% Init

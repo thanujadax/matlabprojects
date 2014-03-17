@@ -31,8 +31,12 @@ y_pos = gridStartY:gridResY:numR;
 % Here, a grid node corresponds to the root (0,0,0) of each cube.
 % Therefore, we get rid of the final 'grid node' which is the one at the
 % boundary
-x_pos(end) = [];
-y_pos(end) = [];
+if(numel(x_pos)>numEdgesX)
+    x_pos(end) = [];
+end
+if(numel(y_pos)>numEdgesY)
+    y_pos(end) = [];
+end
 
 [nodeX, nodeY] = meshgrid(x_pos,y_pos);
 
@@ -52,7 +56,7 @@ for k=1:numZ
             griIDs_sectionIDs_rootPixIDsRel(gridCounter,2) = k;
             % rootPixInd
             griIDs_sectionIDs_rootPixIDsRel(gridCounter,3)...
-                = sub2ind([numR numC],nodeY(i),nodeX(j));
+                = sub2ind([numR numC],nodeY(i,j),nodeX(i,j));
         end
     end
 end
