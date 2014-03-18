@@ -101,6 +101,7 @@ if(NUM_VAR_PER_CELL==7)
     unaryScoresMat(:,1) = cellScoreVector;
     unaryScoresMat(:,2:7) = faceScoreMatrix_t';
     
+    unaryScoresMat = unaryScoresMat .*2 -1;
 else
     unaryScoresMat = 0;
     disp('Error: computeUnaryScoreMatRFC')

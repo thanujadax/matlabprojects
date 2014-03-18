@@ -1,5 +1,5 @@
 function predictedProbs = getRFCprob...
-            (fm,forestMat,numTrees)
+                                (fm,forestMat,numTrees)
 
 % Inputs:
 %   fm - 3D feature matrix. Each entry in the 3rd dim corresponds to a

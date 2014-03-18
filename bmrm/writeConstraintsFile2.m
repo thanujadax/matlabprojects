@@ -17,7 +17,7 @@ filename = 'constraints.txt';
 % filename = fullfile(pathToSave,filename);
 fileID = fopen(filename,'w');
 [numConstraints,numVar] = size(Aeq);
-
+[r,c,s] = find(Aeq);
 % var_num starts from zero
 
 for i=1:numConstraints
@@ -31,8 +31,11 @@ for i=1:numConstraints
             rel = ' <= ';
     end
     
-    [r,c,coeff] = find(Aeq(i,:));
-    var_num = c - 1; % var_num starts with zero
+    % [ r,c,coeff] = find(Aeq(i,:));
+    constr_i_logicalInd = (r==i);
+    var_num = c(constr_i_logicalInd) -1;
+    % var_num = c - 1; % var_num starts with zero
+    coeff = s(constr_i_logicalInd);
     
     term = '%4.4f*%d ';
     numTerms = numel(coeff);
@@ -56,8 +59,7 @@ for i=1:numConstraints
     str = horzcat(str,bstr);
     str = horzcat(str,'\n');
     fprintf(fileID,str);
-    
-    
+       
 end
-
+fclose(fileID);
 constraints = 0;

@@ -4,7 +4,7 @@ function seg3D = gridILP3D()
 % 2014.02.25
 
 %% Parameters
-produceSBMRMfiles = 1;
+produceSBMRMfiles = 0;
 verbose = 2; % 0,1,2
 usePrecomputedFeatureMatrices = 1;
 
@@ -68,7 +68,7 @@ pathSBMRM = 'sbmrm/';
 
 pathForInputImages ='/home/thanuja/Dropbox/data/3D_Grid_ILP/trainingData/raw/';
 pathToFeatureMat ='/home/thanuja/Dropbox/data/3D_Grid_ILP/trainingData/fm/';
-pathLabelImages = '/home/thanuja/Dropbox/data/3D_Grid_ILP/trainingData/neuron/';
+% pathLabelImages = '/home/thanuja/Dropbox/data/3D_Grid_ILP/trainingData/neuron/';
 
 pathToRFCs = '/home/thanuja/Dropbox/data/3D_Grid_ILP/trainingData/RFCs';
 

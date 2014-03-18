@@ -5,14 +5,8 @@ function features = writeLabelsFile2(labelVector,pathToSave)
 
 filename = 'labels.txt';
 % filename = fullfile(pathToSave,filename);
-fileID = fopen(filename,'w');
-
-numVar = numel(labelVector);
-
-for i=1:numVar
-    ftval = '%d \n';
-    fprintf(fileID,ftval,labelVector(i));
-end
-
+fileID = fopen(filename,'wt');
+fprintf(fileID,'%d\n',labelVector);
 fclose(fileID);
 features = 0;
+
