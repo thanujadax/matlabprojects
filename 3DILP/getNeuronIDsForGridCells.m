@@ -15,11 +15,9 @@ neuronIDsForGridCells = zeros(numGridCells,1);
 lastUsedID = 0;
 freedLabels = [];
 
-for k=2:numCells
+for k=2:numSections
     for j=2:numCellsC
         for i=2:numCellsR
-            
-            flag_neighborsChanged = 0;
             
             thisCellInd = sub2ind([numCellsR numCellsC numSections],i,j,k);
             thisCellVarInd = (thisCellInd-1)*7 +1;
@@ -36,8 +34,13 @@ for k=2:numCells
                 % inactive faces
                 directNeibhbor_varInds = (setOfDirectNeighbors_6-1)*7 +1; 
                 directNeighborStates = x(directNeibhbor_varInds);
-                nonMemDirectNeighborsCID = setOfDirectNeighbors_6(...
-                            directNeighborStates==state_neuronInterior);
+%                 nonMemDirectNeighborsCID = setOfDirectNeighbors_6(...
+%                             directNeighborStates==state_neuronInterior);
+                neighFaceStates1to6 = getNeighborFaceStates...
+                                            (x,directNeibhbor_varInds);
+                nonMemDirectNeighborsCID = getNeighborCIDsToJoin(setOfDirectNeighbors_6,...
+                            directNeighborStates,neighFaceStates1to6,...
+                            faceStates_thisCell);
                         
                 if(numel(nonMemDirectNeighborsCID)>0)
                     
@@ -69,6 +72,7 @@ for k=2:numCells
                         % labels, reassign them the same label - NEIGHBOR LABELS CHANGED
                         neighborLabelsAll = nonMemNeighborLabels(nonMemNeighborLabels>0);
                         nextLabel = neighborLabelsAll(1);
+                        neuronIDsForGridCells(thisCellInd) = nextLabel;
                         [neuronIDsForGridCells,freedLabels] = changeNeighborLabels...
                             (neuronIDsForGridCells,nonMemDirectNeighborsCID,...
                             nextLabel,freedLabels);
@@ -104,8 +108,47 @@ for i=1:numNeighbors
     if(label_this~=newLabel)
         % if it's different from the newLabel, get all the cells with this
         % label and assign them the newLabel.
-        cellsWithThisLabel_logicalInds = (neuronIDsForGridCells==label_this);
-        neuronIDsForGridCells(cellsWithThisLabel_logicalInds) = newLabel;
-        freedLabels = [freedLabels; label_this];
+        if(label_this~=0)
+            cellsWithThisLabel_logicalInds = (neuronIDsForGridCells==label_this);
+            neuronIDsForGridCells(cellsWithThisLabel_logicalInds) = newLabel;
+            freedLabels = [freedLabels; label_this];
+        else
+            neuronIDsForGridCells(neighborInds(i)) = newLabel;
+            
+        end
     end
 end
+
+function neighFaceStates1to6 = getNeighborFaceStates(x,neighVarInds)
+neighFaceStates1to6 = zeros(6,1);
+% for each neighbor in order, get the relevant face ind
+% get the states
+% for i=1:6
+%     neighFaceStates1to6(i) = x(neighVarInds(i)+i);
+% end
+% face 2 of neighbor 1
+neighFaceStates1to6(1) = x(neighVarInds(1)+2);
+% face 1 of neighbor 2
+neighFaceStates1to6(2) = x(neighVarInds(2)+1);
+% face 4 of neighbor 3
+neighFaceStates1to6(3) = x(neighVarInds(3)+4);
+% face 3 of neighbor 4
+neighFaceStates1to6(4) = x(neighVarInds(4)+3);
+% face 6 of neighbor 5
+neighFaceStates1to6(5) = x(neighVarInds(5)+6);
+% face 5 of neighbor 6
+neighFaceStates1to6(6) = x(neighVarInds(6)+5);
+
+
+function neighborsToJoinCIDs = getNeighborCIDsToJoin(neighborCIDs,neighborStates,...
+                        neighborFace1to6States,thisCellFaceStates)
+
+zeroStateNeigh_logical = (neighborStates==0);
+zeroStateThisCellFaces_logical = (thisCellFaceStates==0);
+zeroStateNeighborFaces1to6_logical = (neighborFace1to6States==0);
+
+neighborsToJoin_logical = zeroStateNeigh_logical & ...
+                    zeroStateThisCellFaces_logical & ...
+                    zeroStateNeighborFaces1to6_logical;
+                
+neighborsToJoinCIDs = neighborCIDs(neighborsToJoin_logical);
