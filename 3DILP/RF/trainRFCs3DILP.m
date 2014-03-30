@@ -25,19 +25,19 @@ datestr(clock, 0)
 % fm_faces3456 = '/home/thanuja/Dropbox/data/3D_Grid_ILP/toy1/fm/cellFaceFMs/fm_faces3456.mat';
 % labels_faces3456 = '/home/thanuja/Dropbox/data/3D_Grid_ILP/toy1/lblmat/gridCellFace3456Labels.mat';
 
-savePathRFC = '/home/thanuja/Dropbox/data/3D_Grid_ILP/trainingData/RFCs';
+savePathRFC = '/home/thanuja/Dropbox/data/3D_Grid_ILP/trainingData2/RFCs';
 mkdir(savePathRFC);
 
-fm_gridCells = '/home/thanuja/Dropbox/data/3D_Grid_ILP/trainingData/fm/cellInteriorFMs/fm_cellInterior_sansBorderCells.mat';
-labels_gridCells = '/home/thanuja/Dropbox/data/3D_Grid_ILP/trainingData/lblmat/gridCellLabels.mat';
+fm_gridCells = '/home/thanuja/Dropbox/data/3D_Grid_ILP/trainingData2/fm/cellInteriorFMs/fm_cellInterior_sansBorderCells.mat';
+labels_gridCells = '/home/thanuja/Dropbox/data/3D_Grid_ILP/trainingData2/lblmat/gridCellLabels.mat';
 
-fm_faces12 = '/home/thanuja/Dropbox/data/3D_Grid_ILP/trainingData/fm/cellFaceFMs/fm_faces12.mat';
-labels_faces12 = '/home/thanuja/Dropbox/data/3D_Grid_ILP/trainingData/lblmat/gridCellFace12Labels.mat';
+fm_faces12 = '/home/thanuja/Dropbox/data/3D_Grid_ILP/trainingData2/fm/cellFaceFMs/fm_faces12.mat';
+labels_faces12 = '/home/thanuja/Dropbox/data/3D_Grid_ILP/trainingData2/lblmat/gridCellFace12Labels.mat';
 
-fm_faces34 = '/home/thanuja/Dropbox/data/3D_Grid_ILP/trainingData/fm/cellFaceFMs/fm_faces34.mat';
-fm_faces56 = '/home/thanuja/Dropbox/data/3D_Grid_ILP/trainingData/fm/cellFaceFMs/fm_faces56.mat';
-labels_faces34 = '/home/thanuja/Dropbox/data/3D_Grid_ILP/trainingData/lblmat/gridCellFace34Labels.mat';
-labels_faces56 = '/home/thanuja/Dropbox/data/3D_Grid_ILP/trainingData/lblmat/gridCellFace56Labels.mat';
+fm_faces34 = '/home/thanuja/Dropbox/data/3D_Grid_ILP/trainingData2/fm/cellFaceFMs/fm_faces34.mat';
+fm_faces56 = '/home/thanuja/Dropbox/data/3D_Grid_ILP/trainingData2/fm/cellFaceFMs/fm_faces56.mat';
+labels_faces34 = '/home/thanuja/Dropbox/data/3D_Grid_ILP/trainingData2/lblmat/gridCellFace34Labels.mat';
+labels_faces56 = '/home/thanuja/Dropbox/data/3D_Grid_ILP/trainingData2/lblmat/gridCellFace56Labels.mat';
 
 forestName_1 = 'RFC_gridCells.mat';
 forestName_2 = 'RFC_gridFaces12.mat';
