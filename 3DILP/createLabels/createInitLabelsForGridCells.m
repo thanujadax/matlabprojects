@@ -1,8 +1,8 @@
 function [gridIDs_sectionIDs_rootPixIDsRel,gridCellInteriorlabels,...
             gridCellInteriorRGBLabels,numEdgesY,numEdgesX]...
             = createInitLabelsForGridCells...
-            (imageStack3D_label,numR,numC,numZ,gridResX,gridResY,gridResZ,...
-            thresh_mem)
+            (imageStack3D_label_neuron,numR,numC,numZ,gridResX,gridResY,gridResZ,...
+            thresh_mem,imageStack3D_label_mito)
 
 % Input:
 %   imageStack3D_label - 3D matrix of the image stack. type: uint8
@@ -57,7 +57,11 @@ gridCellInteriorlabels = uint8(zeros(totGridCells,1));
 gridCellInteriorRGBLabels = zeros(totGridCells,1);
 gridCounter = 0;
 for k=1:numZ
-    labelImage = imageStack3D_label(:,:,k);
+    labelImage = imageStack3D_label_neuron(:,:,k);
+    % super impose mitochondria on the labels so that the regions
+    % indicating mito have RGB val of (0,0,0)
+    mitoImage = imageStack3D_label_mito(:,:,k);
+    labelImage(mitoImage>0) = 0;
     for j=1:numEdgesX
         for i=1:numEdgesY
             gridCounter = gridCounter + 1;
