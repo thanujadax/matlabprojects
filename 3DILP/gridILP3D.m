@@ -56,7 +56,7 @@ NUM_VAR_PER_CELL = 7;
 
 %% File paths
 pathSBMRM = 'sbmrm/';
-
+saveFinalSegPath = '/home/thanuja/Dropbox/data/3D_Grid_ILP/testData3/Results/20140331_2/';
 
 % 128x128 data set
 % pathForInputImages = '/home/thanuja/Dropbox/data/3D_Grid_ILP/stack1/raw/';
@@ -66,8 +66,8 @@ pathSBMRM = 'sbmrm/';
 % pathForInputImages = '/home/thanuja/Dropbox/data/3D_Grid_ILP/toy1/raw/';
 % pathToFeatureMat = '/home/thanuja/Dropbox/data/3D_Grid_ILP/toy1/fm/';
 
-pathForInputImages ='/home/thanuja/Dropbox/data/3D_Grid_ILP/trainingData/raw/';
-pathToFeatureMat ='/home/thanuja/Dropbox/data/3D_Grid_ILP/trainingData/fm/';
+pathForInputImages ='/home/thanuja/Dropbox/data/3D_Grid_ILP/testData3/raw/';
+pathToFeatureMat ='/home/thanuja/Dropbox/data/3D_Grid_ILP/testData3/fm/';
 % pathLabelImages = '/home/thanuja/Dropbox/data/3D_Grid_ILP/trainingData/neuron/';
 
 pathToRFCs = '/home/thanuja/Dropbox/data/3D_Grid_ILP/trainingData/RFCs';
@@ -223,5 +223,10 @@ end
 %% Visualization
 % numCellsPerSection = numCellsY * numCellsX;
 rootPixels = gridCIDs_sectionIDs_rootPixIDsRel(1:numCellsPerSection,3);
-simpleVisualizeStack(x,rootPixels,gridResY,gridResX,numR,numC,...
-                    numCellsY,numCellsX,numZ);
+% simpleVisualizeStack(x,rootPixels,gridResY,gridResX,numR,numC,...
+%                     numCellsY,numCellsX,numZ);
+neuronIDsForGridCells ...
+            = getNeuronIDsForGridCells(x,numCellsY,numCellsX,numZ);
+visualizeNeurons(neuronIDsForGridCells,numCellsY,...
+                    numCellsX,numZ,gridResY,gridResX,rootPixels,...
+                    saveFinalSegPath);
