@@ -60,7 +60,11 @@ for k=1:numZ
     labelImage = imageStack3D_label_neuron(:,:,k);
     % super impose mitochondria on the labels so that the regions
     % indicating mito have RGB val of (0,0,0)
-    mitoImage = imageStack3D_label_mito(:,:,k);
+    if(~isempty(imageStack3D_label_mito))
+        mitoImage = imageStack3D_label_mito(:,:,k);
+    else
+        mitoImage = 0;
+    end
     labelImage(mitoImage>0) = 0;
     for j=1:numEdgesX
         for i=1:numEdgesY

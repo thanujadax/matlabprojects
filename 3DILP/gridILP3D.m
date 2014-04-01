@@ -4,7 +4,7 @@ function seg3D = gridILP3D()
 % 2014.02.25
 
 %% Parameters
-produceSBMRMfiles = 0;
+produceSBMRMfiles = 1;
 verbose = 2; % 0,1,2
 usePrecomputedFeatureMatrices = 1;
 
@@ -56,7 +56,7 @@ NUM_VAR_PER_CELL = 7;
 
 %% File paths
 pathSBMRM = 'sbmrm/';
-saveFinalSegPath = '/home/thanuja/Dropbox/data/3D_Grid_ILP/testData3/Results/20140331_2/';
+saveFinalSegPath = '/home/thanuja/Dropbox/data/3D_Grid_ILP/trainingData2/sbmrm/20140401_1/';
 
 % 128x128 data set
 % pathForInputImages = '/home/thanuja/Dropbox/data/3D_Grid_ILP/stack1/raw/';
@@ -66,9 +66,10 @@ saveFinalSegPath = '/home/thanuja/Dropbox/data/3D_Grid_ILP/testData3/Results/201
 % pathForInputImages = '/home/thanuja/Dropbox/data/3D_Grid_ILP/toy1/raw/';
 % pathToFeatureMat = '/home/thanuja/Dropbox/data/3D_Grid_ILP/toy1/fm/';
 
-pathForInputImages ='/home/thanuja/Dropbox/data/3D_Grid_ILP/testData3/raw/';
-pathToFeatureMat ='/home/thanuja/Dropbox/data/3D_Grid_ILP/testData3/fm/';
-% pathLabelImages = '/home/thanuja/Dropbox/data/3D_Grid_ILP/trainingData/neuron/';
+pathForInputImages ='/home/thanuja/Dropbox/data/3D_Grid_ILP/trainingData2/raw/';
+pathToFeatureMat ='/home/thanuja/Dropbox/data/3D_Grid_ILP/trainingData2/fm/';
+pathLabelImages = '/home/thanuja/Dropbox/data/3D_Grid_ILP/trainingData2/neuron/';
+
 
 pathToRFCs = '/home/thanuja/Dropbox/data/3D_Grid_ILP/trainingData/RFCs';
 
@@ -100,6 +101,10 @@ if(produceSBMRMfiles)
     % read label image stack
     imageStack3D_labels = readImages2StackWithBoundary...
                 (pathLabelImages,fileNameString,gridResY,gridResX);
+            
+    disp('** Mito labels not considered separately. Treated as cell interior **')
+    imageStack3D_label_mito = [];
+    
 end
 
 %% Create 3D grid
@@ -179,7 +184,8 @@ if(produceSBMRMfiles)
     % get initial labels
     [gridCellInteriorInitLabels,gridCellFaceInitLabels] ...
             = getInitLabels(imageStack3D_labels,numR,numC,...
-                        numZ,gridResX,gridResY,gridResZ,thresh_mem);
+                        numZ,gridResX,gridResY,gridResZ,thresh_mem,...
+                        imageStack3D_label_mito);
     
     % perform ILP and return x (sbmrm label vector)
     [gridCellInteriorLabels,gridCellFaceLabels,x,A_sparse,b,senseArray]...
