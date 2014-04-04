@@ -16,3 +16,13 @@ function c_2dConnectedComps = get2DConnCompsForEachSlice...
 
 % Init
 
+for k=2:numSections
+    for j=2:numCellsC
+        for i=2:numCellsR
+            
+            
+            
+            
+        end
+    end
+end

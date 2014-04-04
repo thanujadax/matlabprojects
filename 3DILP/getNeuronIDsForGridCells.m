@@ -1,4 +1,4 @@
-function neuronIDsForGridCells ...
+function [neuronIDsForGridCells, neuronID2DForGridCells] ...
             = getNeuronIDsForGridCells(x,numCellsR,numCellsC,numSections)
     
 % Extracting connected components (neurons)
@@ -12,8 +12,13 @@ state_neuronInterior = 0;
 numGridCells = numCellsR*numCellsC*numSections;
 
 neuronIDsForGridCells = zeros(numGridCells,1);
+neuronID2DForGridCells = zeros(numGridCells,1); 
+
 lastUsedID = 0;
 freedLabels = [];
+
+lastUsedID_2D = 0;
+freedLabels_2D = [];
 
 for k=2:numSections
     for j=2:numCellsC
@@ -28,14 +33,17 @@ for k=2:numSections
                 face6_varInd = thisCellVarInd + 6;
                 faceStates_thisCell = x(face1_varInd:face6_varInd);
 
-                setOfDirectNeighbors_6 = getDirectFaceNeighborsInOrder...
+                [setOfDirectNeighbors_6,setOfDirectNeighbors2D_4]...
+                        = getDirectFaceNeighborsInOrder...
                                     (thisCellInd,numCellsR,numCellsC,numSections);
                 % out of non-membrane neighbors, which are connected across
                 % inactive faces
-                directNeibhbor_varInds = (setOfDirectNeighbors_6-1)*7 +1; 
+                directNeibhbor_varInds = (setOfDirectNeighbors_6-1)*7 +1;
+                directNeibhbor2D_varInds = (setOfDirectNeighbors2D_4-1)*7 +1;
+                
                 directNeighborStates = x(directNeibhbor_varInds);
-%                 nonMemDirectNeighborsCID = setOfDirectNeighbors_6(...
-%                             directNeighborStates==state_neuronInterior);
+                directNeighbor2DStates = x(directNeibhbor2D_varInds);
+=
                 neighFaceStates1to6 = getNeighborFaceStates...
                                             (x,directNeibhbor_varInds);
                 nonMemDirectNeighborsCID = getNeighborCIDsToJoin(setOfDirectNeighbors_6,...
