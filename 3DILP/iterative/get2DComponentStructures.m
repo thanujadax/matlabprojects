@@ -4,10 +4,10 @@ function neuronIDs2D = get2DComponentStructures(neuronIDsForGridCells,...
 % assign a unique ID for each 2D neuron section
 
 % Outputs:
-%   c_p2c: parentID -> childrenIDs
+%   c_p2c: parentID -> childrenIDs (voxInd)
 %   adjGraph: adjacency graph for all nodes(=2Dneuron section)
 %           TODO: make this a sparse matrix
-%   edgePropertices: edgeID -> properties
+%   edgeProperties: edgeID -> properties
 
 % Input:
 %   neuronIDsForGridCells: N-by-1 matrix where each element says the
@@ -39,3 +39,4 @@ for k=2:(numZ-1)
     
     
 end
+

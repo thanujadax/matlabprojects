@@ -43,7 +43,7 @@ for k=2:numSections
                 
                 directNeighborStates = x(directNeibhbor_varInds);
                 directNeighbor2DStates = x(directNeibhbor2D_varInds);
-=
+
                 neighFaceStates1to6 = getNeighborFaceStates...
                                             (x,directNeibhbor_varInds);
                 nonMemDirectNeighborsCID = getNeighborCIDsToJoin(setOfDirectNeighbors_6,...

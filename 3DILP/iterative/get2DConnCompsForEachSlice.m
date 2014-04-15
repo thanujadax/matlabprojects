@@ -7,7 +7,7 @@ function c_2dConnectedComps = get2DConnCompsForEachSlice...
 % Output:
 %   c_2dConnectedComps - cell array. Each cell containts a cell array as
 %   well. Each cell variable of the outer cell array corresponds to an EM slice.
-%   Each innter cell variable corresponds to a 2D neuron slice and contains
+%   Each inner cell variable corresponds to a 2D neuron slice and contains
 %   a vector of gridCellIDs 
 
 % Input:
