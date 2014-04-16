@@ -46,10 +46,16 @@ for k=2:numSections
 
                 neighFaceStates1to6 = getNeighborFaceStates...
                                             (x,directNeibhbor_varInds);
+                neighFaceStates3to6 = getNeighborFaceStates...
+                                            (x,directNeibhbor2D_varInds);
                 nonMemDirectNeighborsCID = getNeighborCIDsToJoin(setOfDirectNeighbors_6,...
                             directNeighborStates,neighFaceStates1to6,...
                             faceStates_thisCell);
                         
+                nonMemDirectNeighborsCID_2D = getNeighborCIDsToJoin(setOfDirectNeighbors2D_4,...
+                            directNeighbor2DStates,neighFaceStates3to6,...
+                            faceStates_thisCell);
+                % 3D labels        
                 if(numel(nonMemDirectNeighborsCID)>0)
                     
                     nonMemNeighborLabels = neuronIDsForGridCells...
@@ -86,6 +92,43 @@ for k=2:numSections
                             nextLabel,freedLabels);
                     end
 
+                end
+                % 2D labels
+                if(numel(nonMemDirectNeighborsCID_2D)>0)
+                    
+                    nonMemNeighborLabels = neuronID2DForGridCells...
+                                    (nonMemDirectNeighborsCID_2D);
+                    if(sum(nonMemNeighborLabels)==0)
+                        % if they don't have a label, assign a new label to this
+                        % gridCell and those neighbors - NEIGHBOR LABELS CHANGED
+                        [nextLabel_2D,lastUsedID_2D,freedLabels_2D] ...
+                                    = getNextLabel(lastUsedID_2D,freedLabels_2D);
+                        neuronID2DForGridCells(thisCellInd) = nextLabel_2D;
+                        [neuronID2DForGridCells,freedLabels_2D] = changeNeighborLabels...
+                            (neuronID2DForGridCells,nonMemDirectNeighborsCID_2D,...
+                            nextLabel_2D,freedLabels_2D);
+                        
+                    elseif(sum(nonMemNeighborLabels)==1)                        
+                        % if one of those neighbors have a label, assign it to all
+                        % those neighbors and this cell as well - NEIGHBOR LABELS CHANGED
+                        nextLabel_2D = nonMemNeighborLabels(nonMemNeighborLabels>0);
+                        neuronID2DForGridCells(thisCellInd) = nextLabel_2D;
+                        
+                        [neuronID2DForGridCells,freedLabels_2D] = changeNeighborLabels...
+                            (neuronID2DForGridCells,nonMemDirectNeighborsCID_2D,...
+                            nextLabel_2D,freedLabels_2D);
+                        
+                    elseif(sum(nonMemNeighborLabels)>1)
+                        % if more than one of those neighbors have different
+                        % labels, reassign them the same label - NEIGHBOR LABELS CHANGED
+                        neighborLabelsAll = nonMemNeighborLabels(nonMemNeighborLabels>0);
+                        nextLabel_2D = neighborLabelsAll(1);
+                        neuronID2DForGridCells(thisCellInd) = nextLabel_2D;
+                        [neuronID2DForGridCells,freedLabels_2D] = changeNeighborLabels...
+                            (neuronID2DForGridCells,nonMemDirectNeighborsCID_2D,...
+                            nextLabel_2D,freedLabels_2D);
+                    end            
+                                
                 end
             end
         end
