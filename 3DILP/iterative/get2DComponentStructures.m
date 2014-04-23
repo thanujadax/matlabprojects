@@ -2,6 +2,8 @@ function neuronIDs2D = get2DComponentStructures(neuronIDsForGridCells,...
                         numR,numC,numZ)
 
 % assign a unique ID for each 2D neuron section
+% the unique id is assigned for each voxel (grid cell)
+
 
 % Outputs:
 %   c_p2c: parentID -> childrenIDs (voxInd)
