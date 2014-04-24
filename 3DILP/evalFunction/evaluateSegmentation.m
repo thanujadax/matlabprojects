@@ -25,9 +25,14 @@ function s_evaluation = evaluateSegmentation()
 [neuronIDsForGridCells, nodeIDs2DForGridCells] ...
             = getNeuronIDsForGridCells(x,numCellsR,numCellsC,numSections);
 
+% calculate features for RFC
 neuronComp2Dfeatures = getNeuron2Dfeatures();
 neuronComp3Dfeatures = getNeuron3Dfeatures();
 skeletonFeatures = getSkeletonFeatures();
 
 %%  Evaluate components
+s_skeletonEval = skeletonEval();
+s_3DcompEval = compEval3D();
+s_2DcompEval = compEval2D();
+
 
