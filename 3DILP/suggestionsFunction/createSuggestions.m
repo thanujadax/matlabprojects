@@ -15,3 +15,18 @@ function s_suggestions = createSuggestions()
 %           false membrane to be cell interior, combining the pair of cells
 %           in concern to combine
 
+
+[s_suggestions.A,s_suggestions.b,s_suggestions.senseArray]...
+                    = getNewConstraints();
+
+
+% getting 2D hypothesis : changes to the low-level costs
+
+% 1 : merge errors
+s_suggestions.membraneHypothesisGridCells ...
+                    = getMembraneHypothesisGridCells();
+
+% 2 : split errors
+s_suggestions.cellInteriorHypothesisGridCells ... 
+                    = getCellInteriorHypothesisGridCells();
+

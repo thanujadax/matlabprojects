@@ -10,6 +10,9 @@ function s_skeletonEval = skeletonEval(adjGraph)
 %   s_skeletonEval.loopLinks : global constraint violations
 %       - mutually exclusive sets of links (linkIDs)
 
+%   s_skeletonEval.twoWayMerges
+%   s_skeletonEval.twoWaySplits
+
 %   s_skeletonEval.abruptEnds (nodeIDs)
 
 %   s_skeletonEval.locallyConfidentSubgraphs : (linkIDs)
@@ -18,7 +21,10 @@ function s_skeletonEval = skeletonEval(adjGraph)
 %       - weak medium range subgraphs (linkIDs)
 
 % global constraint violations
-s_skeletonEval.loopLinks = getLoops(adjGraph);
+[s_skeletonEval.loopLinks, ...
+  s_skeletonEval.twoWayMerges, ...
+  s_skeletonEval.twoWaySplits] ...    
+            = getStructureViolations(adjGraph);
 
 % read RFC features from file
 
@@ -27,4 +33,6 @@ s_skeletonEval.loopLinks = getLoops(adjGraph);
     = subgraphEvaluation();
 
 s_skeletonEval.abruptEnds = getAbruptEnds();
+
+
 

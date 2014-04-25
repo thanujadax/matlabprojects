@@ -2,17 +2,22 @@ function s_2DcompEval = compEval2D(neuronComp2D,s_3DcompEval,s_skeletonEval)
 
 % Inputs
 %   neuronComp2D
-%   s_3DcompEval
 %   s_skeletonEval
-%       global constraint vilations
+%       loop links : global constraint vilations
 %       abrupt ends
+%       locally confident suggraphs
+%       locally weak subgraphs
+%   s_3DcompEval
+%       weak 3D links
+%       strong 3D links
 
 % Outputs 
 %   potential merge errors (node IDs)
 %   potential split errors (sets of nodeIDs)
+%   potential missclassification (cellInterior -> membrane or vice versa)
 
 
-comp2Dfeatures = get2DcompFeatures();
+comp2DFeatures = get2DcompFeatures();
 s_2DcompEval.comp2Dscores = RFC_2Dcomponents(comp2DFeatures);
 
 s_2DcompEval.mergeErrors = RFC_mergeErrors();
