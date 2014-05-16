@@ -201,6 +201,11 @@ function c_contiguousBlocks = getContiguousBlocks(inputVector)
 diffVect = diff(inputVector);
 numBlocks = sum(diffVect>1) + 1;
 blockEndInds = find(diffVect>1);
+% make sure blockEndsInds is a row vector
+[nr,nc] = size(blockEndInds);
+if(nr>1)
+    blockEndInds = blockEndInds';
+end
 blockEndInds = [blockEndInds numel(inputVector)];
 start = 1;
 c_contiguousBlocks = {};
