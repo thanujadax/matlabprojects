@@ -67,10 +67,16 @@ activeNeighborRList = intersect(onRegionIndList,immediateNeighborRList);
 if(~isempty(activeNeighborRList))
     newNeighbors = setdiff(activeNeighborRList,thisRegionNeighborList);
     if(~isempty(newNeighbors))
+        if(size(newNeighbors,1)>1)
+            newNeighbors = newNeighbors';
+        end
         thisRegionNeighborList = [thisRegionNeighborList newNeighbors];
         newConnectedEdges = setdiff(offEdgeIDsForThisRegion,connectedEdgeIDs);
         if(~isempty(newConnectedEdges))
-            connectedEdgeIDs = [connectedEdgeIDs; newConnectedEdges'];
+            if(size(newConnectedEdges,2)>1)
+                newConnectedEdges = newConnectedEdges';
+            end
+            connectedEdgeIDs = [connectedEdgeIDs; newConnectedEdges];
         end
         % get the connected regions for the regions in the list as well
         % iterate until no new regions are added to the list of regions
