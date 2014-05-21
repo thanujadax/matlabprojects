@@ -4,34 +4,35 @@
 
 % each edge in the ws graph is represented by 2 (oppositely) directed edges 
 
+%% Settings
+
 produceBMRMfiles = 0;
-showIntermediate = 0;
+showIntermediate = 1;
 useGurobi = 1;
 fromInputImage = 1;
+usePrecalculatedProbabilityMaps = 1;
+
+%% File names and paths
+
+% probability map image file should have the same name as the raw image file
+rawImagePath = '/home/thanuja/Dropbox/data/evaldata/input';
+rawImageFileName = 'I11_raw05.tif';
+rawImageFullFile = fullfile(rawImagePath,rawImageFileName);
+
+probabilityMapPath = '';
+dir_membraneProb = '';
+dir_mitochondriaProb = '';
+
+membraneProbabilityImage = fullfile(probabilityMapPath,dir_membraneProb,rawImageFileName);
+mitochondriaProbabilityImage = fullfile(probabilityMapPath,dir_membraneProb,rawImageFileName);
+
+% for sbmrm
+labelImagePath = '';
+labelImageFileName = '';
+labelImageFullFile = fullfile(labelImagePath,labelImageFileName);
 
 
-% imagePath = '/home/thanuja/Dropbox/data/mitoData/emJ_00_170x.png';
-% imagePath = '/home/thanuja/Dropbox/data/testImg/testCurves1.png';
-% imagePath = '/home/thanuja/Dropbox/data/mitoData/stem1_256by256.png';
-% imagePath = '/home/thanuja/Dropbox/data/thanuja/emchallenge-class/competition-final0000.tif';
-% imagePath = '/home/thanuja/Dropbox/data/RF_training_edge/I15_testingImage.tif';
-% imagePath = '/home/thanuja/Dropbox/data/RF_training_edge/I05_trainingImage.tif';
-% imagePath = '/home/thanuja/Dropbox/data/evaldata/input/I11_raw05.tif';
-
-% rawImagePath = '/home/thanuja/Dropbox/data/evaldata/input/I08_raw05.tif';
-
-% labelImagePath = '/home/thanuja/Dropbox/data/evaldata/labels/I05_neuronLabels05.tif';
-% imagePath = '/home/thanuja/Dropbox/data/evaldata2/input/I03_raw06.tif';
-% labelImagePath = '/home/thanuja/Dropbox/data/evaldata2/labels/I03_neuronLabels06.tif';
-
-
-rawImagePath = '/home/thanuja/Dropbox/data/evaldata/input/I11_raw05.tif';
-% labelImagePath = '/home/thanuja/Dropbox/data/evaldata/labels/I11_neuronLabels05.tif';
-
-% rawImagePath = '/home/thanuja/Dropbox/data/testImg/testImg11.png';
-% labelImagePath = '/home/thanuja/Dropbox/data/testImg/testImg11_labels.png';
-
-
+%% Parameters
 orientationStepSize = 10;
 orientations = 0:orientationStepSize:350;
 
@@ -52,7 +53,6 @@ priorThreshFracBB = 0.55; % threshold of edgePrior for an edge to be considered 
 minNumActEdgesPercentage = 0;  % percentage of the tot num edges to retain (min)
 
 % param
-
 
 cEdge = 1;        % general scaling factor for edge priors
 cCell = 1;        % positive scaling factor for cell priors
@@ -105,8 +105,8 @@ end
 
 %% read inputimage and get orientedScoreSpace and max_abs value of OFR
 disp('using image file:')
-disp(rawImagePath);
-imgIn0 = double(imread(rawImagePath));
+disp(rawImageFullFile);
+imgIn0 = double(imread(rawImageFullFile));
 [a,b,c] = size(imgIn0);
 if(c==3)
     imgIn0 = rgb2gray(imgIn0);
@@ -191,18 +191,24 @@ disp('preparing coefficients for ILP solver...')
 edgePriors = getEdgeUnaryAbs(edgepixels,output(:,:,3));
 
 % get edge activation probabilities from RFC
-if ~exist('forestEdgeProb.mat','file')
-    disp('RF for edge classification. Training new classifier...')
-    forestEdgeProb = trainRF_edgeProb();
+
+if(usePrecomputedProbabilityMaps)
+    % calculate edgeUnary from probability map image
+    edgeUnary = getEdgeProbabilityFromMap();
 else
-    load forestEdgeProb.mat
-    disp('loaded pre-trained RF for edge activation probability inference.')
+    
+    if ~exist('forestEdgeProb.mat','file')
+        disp('RF for edge classification. Training new classifier...')
+        forestEdgeProb = trainRF_edgeProb();
+    else
+        load forestEdgeProb.mat
+        disp('loaded pre-trained RF for edge activation probability inference.')
+    end
+
+    edgeUnary = getEdgeProbabilitiesFromRFC...
+                (forestEdgeProb,imgIn,OFR,edgepixels,edgePriors,...
+                boundaryEdgeIDs,edgeListInds,numTrees);
 end
-
-edgeUnary = getEdgeProbabilitiesFromRFC...
-            (forestEdgeProb,imgIn,OFR,edgepixels,edgePriors,...
-            boundaryEdgeIDs,edgeListInds,numTrees);
-
 
 % assigning predetermined edgePriors for boundaryEdges before nodeAngleCost
 % calculation
