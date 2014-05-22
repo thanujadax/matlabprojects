@@ -56,7 +56,7 @@ if(showImg)
     figure;imshow(pixelProbabilities);
     title('pixel probability map')
 end
-regionScores = getCellPriors_probability(pixelProbabilities,setOfCells,edges2pixels,...
-    nodeInds,edges2nodes,K,sizeR,sizeC,wsIndsForCells,ws,showImg);
+regionScores = getCellPriors_probability(pixelProbabilities,setOfCells,...
+    sizeR,sizeC,wsIndsForCells,ws,showImg);
 
 

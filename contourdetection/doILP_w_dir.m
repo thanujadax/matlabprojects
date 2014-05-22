@@ -7,24 +7,29 @@
 %% Settings
 
 produceBMRMfiles = 0;
-showIntermediate = 1;
+showIntermediate = 0;
 useGurobi = 1;
 fromInputImage = 1;
-usePrecalculatedProbabilityMaps = 1;
+usePrecomputedProbabilityMaps = 1;
+useMitochondriaDetection = 0;
 
 %% File names and paths
 
 % probability map image file should have the same name as the raw image file
-rawImagePath = '/home/thanuja/Dropbox/data/evaldata/input';
-rawImageFileName = 'I11_raw05.tif';
+% rawImagePath = '/home/thanuja/Dropbox/data2/raw';
+rawImagePath = '/home/thanuja/Dropbox/data2/probabilities/neuron';
+rawImageFileName = '0000.png';
+
 rawImageFullFile = fullfile(rawImagePath,rawImageFileName);
 
-probabilityMapPath = '';
-dir_membraneProb = '';
-dir_mitochondriaProb = '';
+probabilityMapPath = '/home/thanuja/Dropbox/data2/probabilities';
+dir_membraneProb = 'membrane';
+dir_mitochondriaProb = 'mitochondria';
+dir_neuronProb = 'neuron';
 
 membraneProbabilityImage = fullfile(probabilityMapPath,dir_membraneProb,rawImageFileName);
-mitochondriaProbabilityImage = fullfile(probabilityMapPath,dir_membraneProb,rawImageFileName);
+neuronProbabilityImage = fullfile(probabilityMapPath,dir_neuronProb,rawImageFileName);
+mitochondriaProbabilityImage = fullfile(probabilityMapPath,dir_mitochondriaProb,rawImageFileName);
 
 % for sbmrm
 labelImagePath = '';
@@ -39,8 +44,8 @@ orientations = 0:orientationStepSize:350;
 barLength = 13; % should be odd
 barWidth = 4; %
 marginSize = ceil(barLength/2);
-marginPixVal = 0;
-threshFrac = 0.1;
+marginPixVal = 0.3;
+threshFrac = 0;   % 0.1 for raw images %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 medianFilterH = 0;
 invertImg = 1;      % 1 for EM images when input image is taken from imagePath
 b_imWithBorder = 1; % add thick dark border around the image
@@ -86,12 +91,15 @@ if(produceBMRMfiles)
 else
     % use pre-learned parameters
     % optimial w is [-7.52064, -7.38296, 0.468054, 0.403942, -7.79221, -5.75401]
-    w_on_e = -7.52064;     % edge weight
+%    w_on_e = -7.52064;     % edge weight
+    w_on_e = -10;
     w_off_e = -7.38296;
+
     w_off_n = 0.468054;    % node off weight
     w_on_n = 0.403942;     % node on weight
     w_on_r = -7.79221;     % region weight
-    w_off_r = -5.75401;
+    % w_off_r = -5.75401;
+    w_off_r = -18;
 end
 
 
@@ -135,11 +143,7 @@ OFR_mag = output(:,:,3);
 
 % generate hsv outputs using the orientation information
 % output(:,:,1) contains the hue (orinetation) information
-if(~fromInputImage)
-    [output rgbimg] = reconstructHSVgauss_mv(OFR,orientations,...
-            barLength,barWidth,threshFrac,medianFilterH);
-    OFR_mag = imread(imFilePath);
-end
+
 if(showIntermediate)
     figure;imshow(rgbimg)
 end
@@ -192,9 +196,10 @@ edgePriors = getEdgeUnaryAbs(edgepixels,output(:,:,3));
 
 % get edge activation probabilities from RFC
 
-if(usePrecomputedProbabilityMaps)
+if(0) % not using precomputed probability maps for graph edges - doesn't make sense!
     % calculate edgeUnary from probability map image
-    edgeUnary = getEdgeProbabilityFromMap();
+    edgeUnary = getEdgeProbabilityFromMap(...
+        membraneProbabilityImage,edgepixels,marginSize,(1-marginPixVal));
 else
     
     if ~exist('forestEdgeProb.mat','file')
@@ -260,16 +265,29 @@ edgeOrientations = (edgeOrientationsInds-1).*orientationStepSize;
 % normalize input image
 normalizedInputImage = imgIn./(max(max(imgIn)));
 
-%% get region priors from RFC probability map
-if ~exist('forest.mat','file')
-    disp('RF for membrane classification not found. Training new classifier...')
-    forest = trainRandomForest_pixelProb();
+%% get region unaries
+if(usePrecomputedProbabilityMaps)
+    
+    regionUnary = getRegionScoreFromProbImage(...
+    neuronProbabilityImage,mitochondriaProbabilityImage,...
+    useMitochondriaDetection,marginSize,marginPixVal,...
+    setOfRegions,sizeR,sizeC,wsIDsForRegions,ws,showIntermediate);
+    
 else
-    load forest.mat
-    disp('loaded pre-trained RF for membrane vs cell-interior classification')
+    
+    if ~exist('forest.mat','file')
+        disp('RF for membrane classification not found. Training new classifier...')
+        forest = trainRandomForest_pixelProb();
+    else
+        load forest.mat
+        disp('loaded pre-trained RF for membrane vs cell-interior classification')
+    end
+    regionUnary = regionScoreCalculator(forest,normalizedInputImage,setOfRegions,edges2pixels,...
+        nodeInds,edges2nodes,cCell,wsIDsForRegions,ws,showIntermediate);   
+    
 end
-regionUnary = regionScoreCalculator(forest,normalizedInputImage,setOfRegions,edges2pixels,...
-    nodeInds,edges2nodes,cCell,wsIDsForRegions,ws,showIntermediate);
+
+
 numRegions = numel(regionUnary);
 %% Boundary edges
 % assigning predetermined edge priors for boundary edges after

@@ -1,29 +1,29 @@
-% Read png file
-% filename = '/home/thanuja/matlabprojects/data/mitoData/labels/stem1_membranes.png';
-% filename = '/home/thanuja/matlabprojects/data/mitoData/stem.tiff';
-filename = '/home/thanuja/Dropbox/data/em_2013january/mitochondria/08.tiff';
-% filename = '/home/thanuja/Dropbox/data/RF_training_mem/I00_trainingLabels.tif';
-% filename = '/home/thanuja/Dropbox/data/em_2013january/neurons/01.tiff';
-fmt = 'tif';
-A = imread(filename, fmt);
-% C = rgb2gray(A);
-% write to another file
-% writefile = '/home/thanuja/Dropbox/data/em_2013january/samples/raw00_512.png';
-% writefile = '/home/thanuja/Dropbox/data/RF_training_edge/I01_trainingLabels.tif';
-writeFilePath = '/home/thanuja/Dropbox/data/3D_Grid_ILP/trainingData2/mito/';
+% Read file
 
-dimx = 300;
-dimy = 300;
+filename = '/home/thanuja/projects/drosophila-l3/stack2/raw/00.tif';
+
+A = double(imread(filename));
+A = A./(max(max(A)));
+
+% C = rgb2gray(A);
+
+% write to another file
+% writefile = '/home/thanuja/Dropbox/data/RF_training_edge/I01_trainingLabels.tif';
+writeFilePath = '/home/thanuja/Dropbox/data2/raw';
+writeFileName = '0000.png';
+
+dimx = 500;
+dimy = 500;
 
 startRow = 1;
-stopRow = dimy;
+stopRow = startRow -1 + dimy;
 
 startCol = 1;
-stopCol = dimx;
+stopCol = startCol - 1 + dimx;
 
 numDim = 3;
-writeFileName = '08.png';
-writeFileName = strcat(writeFilePath,writeFileName);
+
+writeFileName = fullfile(writeFilePath,writeFileName);
 B = A(startRow:stopRow,startCol:stopCol,:);
 imwrite(B,writeFileName,'png')
 figure;imshow(B);
