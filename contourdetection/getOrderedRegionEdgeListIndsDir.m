@@ -103,13 +103,15 @@ else
     
     cwOrderedDirEdgeListInds = getCwDirSetOfEdges(edgeLId_1,nextCwEdgeLId_inRegion,...
                     nodeLId_0,edges2nodes_directional,edgeListInds_region,...
-                    nodeLIdsForRegion,nodeEdgeIDs,edgeListIndsAll,edges2nodes);
+                    nodeLIdsForRegion,nodeEdgeIDs,edgeListIndsAll,edges2nodes,...
+                    junctionTypeListInds,jAnglesAll_alpha);
     
 end
 
 function cwOrderedDirEdgeListInds = getCwDirSetOfEdges(edgeLId_1,nextEdgeLID,...
                         nextNodeLID,edges2nodes_directional,edgeListInds_region,...
-                        nodeLIdsForRegion,nodeEdgeIDs,edgeListIndsAll,edges2nodes)       
+                        nodeLIdsForRegion,nodeEdgeIDs,edgeListIndsAll,edges2nodes,...
+                        junctionTypeListInds,jAnglesAll_alpha)       
                     
 numEdges_region = numel(edgeListInds_region);
 cwOrderedDirEdgeListInds = zeros(numEdges_region,1);
@@ -144,14 +146,36 @@ if(numEdges_region>1)
         allEdgeIDsForNextNode(1) = []; % 1st element is nodePixInd
         [~,allEdgeLIDsForNextNode] = intersect(edgeListIndsAll,allEdgeIDsForNextNode);
         nodeEdgeLIDpair = intersect(edgeListInds_region,allEdgeLIDsForNextNode);
-        nextEdgeLID = setdiff(nodeEdgeLIDpair,nextEdgeLID);
-        nextNodePair = edges2nodes(nextEdgeLID,:);
+        if(numel(nodeEdgeLIDpair)>2)
+            % depending on the incoming edge, pick the next node pair
+            % get the ccw angles wrt incoming edge
+            
+            % get the edge with the closest ccw angle as the next edge
+            nextEdgeLID = getNextClockwiseEdge(nextNodeLID,0,edgeListIndsAll(nextEdgeLID),...
+            nodeEdgeIDs,junctionTypeListInds,jAnglesAll_alpha,edgeListIndsAll);
+        
+        elseif(numel(nodeEdgeLIDpair)<2)
+           disp('ERROR: getOrderedRegionEdgeListIndsDir.m: no next edge!')  
+            
+        else            
+            nextEdgeLID = setdiff(nodeEdgeLIDpair,nextEdgeLID); 
+        end
+        nextNodePair = edges2nodes(nextEdgeLID,:);     
+        if(numel(nextNodePair)==0)
+           disp('ERROR: getOrderedRegionEdgeListIndsDir.m: no next node pair!!') 
+        end
+        
         if(nextNodePair(1)==nextNodeLID)
             nextEdgeLID_dir = nextEdgeLID;
         else
             nextEdgeLID_dir = nextEdgeLID + numEdges;
         end
+        if(numel(nextEdgeLID_dir) ~= 1)
+            disp('ERROR: getOrderedRegionEdgeListIndsDir.m: numel(nextEdgeLID_dir) ~= 1');
+            numel(nextEdgeLID_dir)
+        else
         cwOrderedDirEdgeListInds(i) = nextEdgeLID_dir;
+        end
     end
 end
 

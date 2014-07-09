@@ -1,7 +1,8 @@
 % Read file
 
-filename = '/home/thanuja/projects/drosophila-l3/stack2/raw/00.tif';
-
+% filename = '/home/thanuja/projects/drosophila-l3/stack2/raw/00.tif';
+% filename = '/home/thanuja/projects/drosophila-l3/stack2/classification/schmidhuber/median_filtered/neurons/neurons0000.png';
+filename = '/home/thanuja/projects/drosophila-l3/stack2/classification/schmidhuber/median_filtered/membrane/00_schmidhuber_membrane.tiff';
 A = double(imread(filename));
 A = A./(max(max(A)));
 
@@ -9,16 +10,19 @@ A = A./(max(max(A)));
 
 % write to another file
 % writefile = '/home/thanuja/Dropbox/data/RF_training_edge/I01_trainingLabels.tif';
-writeFilePath = '/home/thanuja/Dropbox/data2/raw';
-writeFileName = '0000.png';
+% writeFilePath = '/home/thanuja/Dropbox/data2/raw';
+% writeFilePath = '/home/thanuja/Dropbox/data2/probabilities/neuron';
+% writeFilePath = '/home/thanuja/Dropbox/data2/probabilities/neuron';
+writeFilePath = '/home/thanuja/Dropbox/data2/probabilities/membrane';
+writeFileName = '101.png';
 
-dimx = 500;
-dimy = 500;
+dimx = 250;
+dimy = 250;
 
-startRow = 1;
+startRow = 200;
 stopRow = startRow -1 + dimy;
 
-startCol = 1;
+startCol = 200;
 stopCol = startCol - 1 + dimx;
 
 numDim = 3;

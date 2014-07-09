@@ -4,7 +4,7 @@ function seg3D = gridILP3D()
 % 2014.02.25
 
 %% Parameters
-produceSBMRMfiles = 1;
+produceSBMRMfiles = 0;
 verbose = 2; % 0,1,2
 usePrecomputedFeatureMatrices = 1;
 
@@ -35,8 +35,8 @@ else
     % weighting parameters for the cost function
     disp('SBMRM mode turned off....')
     W = [-10;    % cell interior
-         -100;    % face 1
-         -100;    % face 2
+         -120;    % face 1
+         -120;    % face 2
          -100;    % face 3
          -100;    % face 4
          -100;    % face 5
@@ -56,7 +56,7 @@ NUM_VAR_PER_CELL = 7;
 
 %% File paths
 pathSBMRM = 'sbmrm/';
-saveFinalSegPath = '/home/thanuja/Dropbox/data/3D_Grid_ILP/trainingData2/sbmrm/20140401_1/';
+saveFinalSegPath = '/home/thanuja/Dropbox/data/3D_Grid_ILP/results/20140522/run1';
 
 % 128x128 data set
 % pathForInputImages = '/home/thanuja/Dropbox/data/3D_Grid_ILP/stack1/raw/';

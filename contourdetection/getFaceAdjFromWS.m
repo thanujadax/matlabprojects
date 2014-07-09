@@ -36,7 +36,9 @@ maxNumEdgesPerRegion = 0;
 k = 0; % index for cells to store sets of edges of each region
 for i=start:numWsFaces
     clear intPix_i edgePix_i edgeSet_i
-    
+   if(i == 609)
+       a = 99;
+   end
     % get internal pixels
     intPix_i = (ws==i);
     % get edge pixels
@@ -87,68 +89,68 @@ setOfRegionsMat_2 = [wsIDsForRegions' setOfRegionsMat];
 [faceAdj,edges2regions,~,twoRegionEdgeIDs] = getAdjacencyMat(setOfRegionsMat_2);
 
 
-function edgePix = getEdgePixForWsFace(intPix,ws)
-
-edgePix = [];
-
-[sizeR, sizeC] = size(ws);
-[r,c] = find(intPix);
-topRow = min(r);
-botRow = max(r);
-leftCol = min(c);
-rightCol = max(c);
-
-% each row
-for j=topRow:botRow
-    row_j = find(intPix(j,:));
-    lc_j = min(row_j);
-    rc_j = max(row_j);
-    eLeft = lc_j -1;
-    if(eLeft>0 && ws(j,eLeft)==0)
-        % it's an edge
-        newPix = [j eLeft];
-        edgePix = [edgePix; newPix];
-    end
-    eRight = rc_j +1;
-    if(eRight<=sizeC && ws(j,eRight)==0)
-        % it's an edge
-        newPix = [j eRight];
-        edgePix = [edgePix; newPix];
-    end
-    vertical = 0;
-    edgePix_inbred = getEdgePixFromInbreadRegions(row_j,...
-                    j,vertical,ws);
-    [ibr ibc] = ind2sub([sizeR sizeC],edgePix_inbred);
-    edgePix = [edgePix; [ibr' ibc']];
-end
-
-% each col
-for j=leftCol:rightCol
-    col_j = find(intPix(:,j));
-    tr_j = min(col_j);
-    br_j = max(col_j);
-    eTop = tr_j -1;
-    if(eTop>0 && ws(eTop,j)==0)
-        % it's an edge
-        newPix = [eTop j];
-        edgePix = [edgePix; newPix];
-    end
-    ebottom = br_j +1;
-    if(ebottom<=sizeR && ws(ebottom,j)==0)
-        % it's an edge
-        newPix = [ebottom j];
-        edgePix = [edgePix; newPix];
-    end
-    vertical = 1;
-    edgePix_inbred = getEdgePixFromInbreadRegions(col_j,...
-                j,vertical,ws);
-    % edgePix is in [r c] format
-    [ibr ibc] = ind2sub([sizeR sizeC],edgePix_inbred);
-    edgePix = [edgePix; [ibr' ibc']];
-end
-
-edgePix = sub2ind([sizeR sizeC],edgePix(:,1),edgePix(:,2));
-edgePix = unique(edgePix);
+% function edgePix = getEdgePixForWsFace(intPix,ws)
+% 
+% edgePix = [];
+% 
+% [sizeR, sizeC] = size(ws);
+% [r,c] = find(intPix);
+% topRow = min(r);
+% botRow = max(r);
+% leftCol = min(c);
+% rightCol = max(c);
+% 
+% % each row
+% for j=topRow:botRow
+%     row_j = find(intPix(j,:));
+%     lc_j = min(row_j);
+%     rc_j = max(row_j);
+%     eLeft = lc_j -1;
+%     if(eLeft>0 && ws(j,eLeft)==0)
+%         % it's an edge
+%         newPix = [j eLeft];
+%         edgePix = [edgePix; newPix];
+%     end
+%     eRight = rc_j +1;
+%     if(eRight<=sizeC && ws(j,eRight)==0)
+%         % it's an edge
+%         newPix = [j eRight];
+%         edgePix = [edgePix; newPix];
+%     end
+%     vertical = 0;
+%     edgePix_inbred = getEdgePixFromInbreadRegions(row_j,...
+%                     j,vertical,ws);
+%     [ibr ibc] = ind2sub([sizeR sizeC],edgePix_inbred);
+%     edgePix = [edgePix; [ibr' ibc']];
+% end
+% 
+% % each col
+% for j=leftCol:rightCol
+%     col_j = find(intPix(:,j));
+%     tr_j = min(col_j);
+%     br_j = max(col_j);
+%     eTop = tr_j -1;
+%     if(eTop>0 && ws(eTop,j)==0)
+%         % it's an edge
+%         newPix = [eTop j];
+%         edgePix = [edgePix; newPix];
+%     end
+%     ebottom = br_j +1;
+%     if(ebottom<=sizeR && ws(ebottom,j)==0)
+%         % it's an edge
+%         newPix = [ebottom j];
+%         edgePix = [edgePix; newPix];
+%     end
+%     vertical = 1;
+%     edgePix_inbred = getEdgePixFromInbreadRegions(col_j,...
+%                 j,vertical,ws);
+%     % edgePix is in [r c] format
+%     [ibr ibc] = ind2sub([sizeR sizeC],edgePix_inbred);
+%     edgePix = [edgePix; [ibr' ibc']];
+% end
+% 
+% edgePix = sub2ind([sizeR sizeC],edgePix(:,1),edgePix(:,2));
+% edgePix = unique(edgePix);
 
 
 

@@ -7,7 +7,7 @@
 %% Settings
 
 produceBMRMfiles = 0;
-showIntermediate = 0;
+showIntermediate = 1;
 useGurobi = 1;
 fromInputImage = 1;
 usePrecomputedProbabilityMaps = 1;
@@ -16,9 +16,9 @@ useMitochondriaDetection = 0;
 %% File names and paths
 
 % probability map image file should have the same name as the raw image file
-% rawImagePath = '/home/thanuja/Dropbox/data2/raw';
-rawImagePath = '/home/thanuja/Dropbox/data2/probabilities/neuron';
-rawImageFileName = '0000.png';
+rawImagePath = '/home/thanuja/Dropbox/data2/raw';
+% rawImagePath = '/home/thanuja/Dropbox/data2/probabilities/neuron';
+rawImageFileName = '101.png';
 
 rawImageFullFile = fullfile(rawImagePath,rawImageFileName);
 
@@ -45,7 +45,7 @@ barLength = 13; % should be odd
 barWidth = 4; %
 marginSize = ceil(barLength/2);
 marginPixVal = 0.3;
-threshFrac = 0;   % 0.1 for raw images %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+threshFrac = 0.1;   % 0.1 for raw images %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 medianFilterH = 0;
 invertImg = 1;      % 1 for EM images when input image is taken from imagePath
 b_imWithBorder = 1; % add thick dark border around the image
