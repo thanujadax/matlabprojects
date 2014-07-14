@@ -18,7 +18,7 @@ useMitochondriaDetection = 0;
 % probability map image file should have the same name as the raw image file
 rawImagePath = '/home/thanuja/Dropbox/data2/raw';
 % rawImagePath = '/home/thanuja/Dropbox/data2/probabilities/neuron';
-rawImageFileName = '101.png';
+rawImageFileName = '0000.png';
 
 rawImageFullFile = fullfile(rawImagePath,rawImageFileName);
 
@@ -406,7 +406,7 @@ end
 [c_edgeLIDsForRegions_dir_cw,setOfRegions_edgeLIDs,edgeLIDs2nodes_directional] ...
         = getOrderedRegionEdgeListIndsDir...
         (setOfRegions,edges2nodes,jAnglesAll_alpha,...
-        junctionTypeListInds,nodeEdges,edgeListInds);
+        junctionTypeListInds,nodeEdges,edgeListInds,edges2pixels,sizeR,sizeC);
 
 dirEdges2regionsOnOff = getRegionsForDirectedEdges...
             (c_edgeLIDsForRegions_dir_cw,edgeLIDs2nodes_directional,...
