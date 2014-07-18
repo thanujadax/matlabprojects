@@ -1,10 +1,13 @@
 % Read file
 
-% filename = '/home/thanuja/projects/drosophila-l3/stack2/raw/00.tif';
+filename = '/home/thanuja/projects/drosophila-l3/stack2/raw/00.tif';
 % filename = '/home/thanuja/projects/drosophila-l3/stack2/classification/schmidhuber/median_filtered/neurons/neurons0000.png';
-filename = '/home/thanuja/projects/drosophila-l3/stack2/classification/schmidhuber/median_filtered/membrane/00_schmidhuber_membrane.tiff';
+% filename = '/home/thanuja/projects/drosophila-l3/stack2/classification/schmidhuber/median_filtered/membrane/00_schmidhuber_membrane.tiff';
+% filename = '/home/thanuja/projects/drosophila-l3/stack2/groundtruth/result_0000.tiff';
+
 A = double(imread(filename));
-A = A./(max(max(A)));
+% A = A./(max(max(A)));
+A = A./255;
 
 % C = rgb2gray(A);
 
@@ -13,23 +16,30 @@ A = A./(max(max(A)));
 % writeFilePath = '/home/thanuja/Dropbox/data2/raw';
 % writeFilePath = '/home/thanuja/Dropbox/data2/probabilities/neuron';
 % writeFilePath = '/home/thanuja/Dropbox/data2/probabilities/neuron';
-writeFilePath = '/home/thanuja/Dropbox/data2/probabilities/membrane';
-writeFileName = '101.png';
+% writeFilePath = '/home/thanuja/Dropbox/data2/probabilities/membrane';
+% writeFilePath = '/home/thanuja/projects/toyData/set9/groundtruth';
+% writeFilePath = '/home/thanuja/projects/toyData/set9/membranes';
+% writeFilePath = '/home/thanuja/projects/toyData/set9/neurons';
+writeFilePath = '/home/thanuja/projects/toyData/set9/raw';
 
-dimx = 250;
-dimy = 250;
+writeFileName = '00.tiff';
+writeType = 'tiff';
+% writeType = 'png';
 
-startRow = 200;
+dimx = 51;
+dimy = 57;
+
+startRow = 402;
 stopRow = startRow -1 + dimy;
 
-startCol = 200;
+startCol = 319;
 stopCol = startCol - 1 + dimx;
 
 numDim = 3;
 
 writeFileName = fullfile(writeFilePath,writeFileName);
 B = A(startRow:stopRow,startCol:stopCol,:);
-imwrite(B,writeFileName,'png')
+imwrite(B,writeFileName,writeType)
 figure;imshow(B);
 
 % k = 00; % file index
