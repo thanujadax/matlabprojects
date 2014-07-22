@@ -120,6 +120,7 @@ for i=1:numCs
     
     % get regions for this cell and the internal pixels. set RGB
     cellRegionList_i = c_cells2regions{i};
+    holeRegionList = getHoleRegionsInCell();
     regionPixels = getRegionPixels(cellRegionList_i,wsIDsForRegions,ws);
     rMat(regionPixels) = R;
     gMat(regionPixels) = G;
@@ -154,6 +155,5 @@ end
 
 % figure;imshow(visualizeCells);
 segmentationOut = removeThickBorder(visualizeCells,marginSize);
-
 figure;imshow(segmentationOut);
 end

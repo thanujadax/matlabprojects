@@ -18,7 +18,7 @@ useMitochondriaDetection = 0;
 % probability map image file should have the same name as the raw image file
 rawImagePath = '/home/thanuja/Dropbox/data2/raw';
 % rawImagePath = '/home/thanuja/Dropbox/data2/probabilities/neuron';
-rawImageFileName = '0000.png';
+rawImageFileName = '000.png';
 
 rawImageFullFile = fullfile(rawImagePath,rawImageFileName);
 
