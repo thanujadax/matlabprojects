@@ -8,6 +8,7 @@
 
 produceBMRMfiles = 0;
 showIntermediate = 1;
+fillSpaces = 1;          % fills holes in segmentationOut
 useGurobi = 1;
 fromInputImage = 1;
 usePrecomputedProbabilityMaps = 1;
@@ -533,4 +534,4 @@ end
 segmentationOut = visualizeX2(x,sizeR,sizeC,numEdges,numRegions,edgepixels,...
             junctionTypeListInds,nodeInds,connectedJunctionIDs,edges2nodes,...
             nodeEdges,edgeListInds,faceAdj,setOfRegions,wsIDsForRegions,ws,...
-            marginSize,showIntermediate);
+            marginSize,showIntermediate,fillSpaces);

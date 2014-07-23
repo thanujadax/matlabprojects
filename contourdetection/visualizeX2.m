@@ -1,7 +1,7 @@
 function segmentationOut = visualizeX2(x,sizeR,sizeC,numEdges,numRegions,edgepixels,...
             junctionTypeListInds,nodeInds,connectedJunctionIDs,edges2nodes,...
             nodeEdges,edgeListInds,faceAdj,setOfRegions,wsIDsForRegions,ws,...
-            marginSize,showIntermediate)
+            marginSize,showIntermediate,fillSpaces)
 % version 2. with directed edges. 2013.12.03
         
         
@@ -120,7 +120,6 @@ for i=1:numCs
     
     % get regions for this cell and the internal pixels. set RGB
     cellRegionList_i = c_cells2regions{i};
-    holeRegionList = getHoleRegionsInCell();
     regionPixels = getRegionPixels(cellRegionList_i,wsIDsForRegions,ws);
     rMat(regionPixels) = R;
     gMat(regionPixels) = G;
@@ -155,5 +154,9 @@ end
 
 % figure;imshow(visualizeCells);
 segmentationOut = removeThickBorder(visualizeCells,marginSize);
+% fill holes
+if(fillSpaces)
+    segmentationOut = fillHoles(segmentationOut);
+end
 figure;imshow(segmentationOut);
 end
