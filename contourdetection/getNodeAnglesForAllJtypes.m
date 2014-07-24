@@ -23,13 +23,13 @@ for dim=1:numJtypes
     if(jEdgesAll{dim}==0)
         jAnglesAll{dim} = 0;
     else
-        jEdges0 = jEdgesAll{dim};
-        % jEdges = jEdges0(jEdges0>0);
-        [r,c] = find(jEdges0>0);
-        rmax = max(r);
-        cmax = max(c);
-        jEdges = zeros(rmax,cmax);
-        jEdges(r,c) = jEdges0(r,c);       
+        % jEdges0 = jEdgesAll{dim};
+        % [r,c] = find(jEdges0>0);
+        jEdges = jEdgesAll{dim};
+        % rmax = max(r);
+        % cmax = max(c);
+        % jEdges = zeros(rmax,cmax);
+        % jEdges(r,c) = jEdges0(r,c);       
         [numJ,degree] = size(jEdges);
         jAngles = zeros(numJ,degree);
         numOrientations = size(orientedScoreSpace3D,3);

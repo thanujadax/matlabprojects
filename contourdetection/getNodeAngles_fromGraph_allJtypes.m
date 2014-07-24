@@ -23,13 +23,13 @@ for dim=1:numJtypes
     if(jEdgesAll{dim}==0)
         jAnglesAll_alpha{dim} = 0;
     else
-        jEdges0 = jEdgesAll{dim};
+        jEdges = jEdgesAll{dim};
         % jEdges = jEdges0(jEdges0>0);
-        [r,c] = find(jEdges0>0);
-        rmax = max(r);
-        cmax = max(c);
-        jEdges = zeros(rmax,cmax);
-        jEdges(r,c) = jEdges0(r,c);       
+        % [r,c] = find(jEdges0>0);
+        % rmax = max(r);
+        % cmax = max(c);
+        % jEdges = zeros(rmax,cmax);
+        % jEdges(r,c) = jEdges0(r,c);       
         [numJ,degree] = size(jEdges);
         jAngles = zeros(numJ,degree);
         for i=1:numJ
