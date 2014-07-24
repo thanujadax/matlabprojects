@@ -20,13 +20,15 @@ for jType=1:numJtypes
     [rL,cL] = find(junctionTypeListInds(:,jType)>0);
     if(~isempty(rL))
         listInds = junctionTypeListInds(rL,jType);
-        edgeSet = nodeEdges(listInds,2:numColNodeEdges);
-        [r c] = find(edgeSet>0);
+        numColNodeEdges_i = jType+2;
+        edgeSet = nodeEdges(listInds,2:numColNodeEdges_i);
+        [r,c] = find(edgeSet>0);
         rmax = max(r);
         cmax = max(c);
-        edgeSetNoZeros = zeros(rmax,cmax);
-        edgeSetNoZeros(r,c) = edgeSet(r,c);
-        jEdges{jType} = edgeSetNoZeros;
+        % edgeSetNoZeros = zeros(rmax,cmax);
+        % edgeSetNoZeros(r,c) = edgeSet(r,c);
+        % jEdges{jType} = edgeSetNoZeros;
+        jEdges{jType} = edgeSet;
     else
         jEdges{jType} = 0;
     end

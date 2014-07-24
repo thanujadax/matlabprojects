@@ -1,6 +1,10 @@
 function [labelIndImg,numLabels] = getLabelIndexImg(labelImage)
 
-grayImg = rgb2gray(labelImage);
+if(size(labelImage,3)==3)
+    grayImg = rgb2gray(labelImage);
+else
+    grayImg = labelImage;
+end
 labelIndImg0 = im2uint16(grayImg);
 
 % re-index from 1 to n, in order

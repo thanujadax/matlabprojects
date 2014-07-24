@@ -6,7 +6,7 @@
 
 %% Settings
 
-produceBMRMfiles = 0;
+produceBMRMfiles = 1;
 showIntermediate = 1;
 fillSpaces = 1;          % fills holes in segmentationOut
 useGurobi = 1;
@@ -19,7 +19,7 @@ useMitochondriaDetection = 0;
 % probability map image file should have the same name as the raw image file
 rawImagePath = '/home/thanuja/Dropbox/data2/raw';
 % rawImagePath = '/home/thanuja/Dropbox/data2/probabilities/neuron';
-rawImageFileName = '000.png';
+rawImageFileName = '00.png';
 
 rawImageFullFile = fullfile(rawImagePath,rawImageFileName);
 
@@ -33,8 +33,8 @@ neuronProbabilityImage = fullfile(probabilityMapPath,dir_neuronProb,rawImageFile
 mitochondriaProbabilityImage = fullfile(probabilityMapPath,dir_mitochondriaProb,rawImageFileName);
 
 % for sbmrm
-labelImagePath = '';
-labelImageFileName = '';
+labelImagePath = '/home/thanuja/Dropbox/data2/results';
+labelImageFileName = '00.png';
 labelImageFullFile = fullfile(labelImagePath,labelImageFileName);
 
 
@@ -124,7 +124,7 @@ end
 % imgIn0 = imgIn0(1:128,:);
 
 if(produceBMRMfiles)
-    labelImage = imread(labelImagePath);
+    labelImage = imread(labelImageFullFile);
     % labelImage = labelImage(1:128,:,:);
 end
 % add thick border
@@ -141,7 +141,7 @@ end
                         barLength,barWidth,invertImg,threshFrac);
 % output is in HSV form
 OFR_mag = output(:,:,3);
-
+OFR_hue = output(:,:,1);
 % generate hsv outputs using the orientation information
 % output(:,:,1) contains the hue (orinetation) information
 
@@ -156,6 +156,8 @@ ws = watershed(OFR_mag);
 disp('creating graph from watershed boundaries...');
 [adjacencyMat,nodeEdges,edges2nodes,edges2pixels,connectedJunctionIDs,selfEdgePixelSet] ...
     = getGraphFromWS(ws,output,showIntermediate);
+clear adjacencyMat
+clear output
 % nodeEdges - contain edgeIDs for each node
 
 nodeInds = nodeEdges(:,1);                  % indices of the junction nodes
@@ -193,7 +195,7 @@ numBoundaryEdges = numel(boundaryEdgeIDs);
 disp('preparing coefficients for ILP solver...')
 %% Edge unary values
 % edge priors - from orientation filters
-edgePriors = getEdgeUnaryAbs(edgepixels,output(:,:,3));
+edgePriors = getEdgeUnaryAbs(edgepixels,OFR_mag);
 
 % get edge activation probabilities from RFC
 
@@ -261,6 +263,7 @@ disp('calculating adjacency graph of regions ...')
     = getFaceAdjFromWS(ws,edges2pixels,b_imWithBorder,boundaryEdgeIDs);
 
 [~,edgeOrientationsInds] = getEdgePriors(OFR,edges2pixels);
+clear OFR
 edgeOrientations = (edgeOrientationsInds-1).*orientationStepSize;
 
 % normalize input image
@@ -313,7 +316,7 @@ end
 % edge
 
 offEdgeListIDs = getUnOrientedEdgeIDs(edgepixels,...
-                lenThresh,output(:,:,1),sizeR,sizeC);
+                lenThresh,OFR_hue,sizeR,sizeC);
             
 % remove boundaryNodeEdgeListIDs from the offEdgeListIDs
 offEdgeListIDs = setdiff(offEdgeListIDs,boundaryNodeEdgeListIDs);
