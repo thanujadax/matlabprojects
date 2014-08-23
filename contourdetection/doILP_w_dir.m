@@ -1,4 +1,5 @@
-% function segmentationOut = doILP_w_dir(rawImagePath)
+function segmentationOut = doILP_w_dir(inputPath,imageFileName,imageID,...
+    rawType,neuronProbabilityType,membraneProbabilityType,mitoProbabilityType)
 
 % version 3. 2014.01.06
 
@@ -6,8 +7,8 @@
 
 %% Settings
 
-produceBMRMfiles = 1;
-showIntermediate = 1;
+produceBMRMfiles = 0;
+showIntermediate = 0;
 fillSpaces = 1;          % fills holes in segmentationOut
 useGurobi = 1;
 fromInputImage = 1;
@@ -16,27 +17,65 @@ useMitochondriaDetection = 0;
 
 %% File names and paths
 
+% inputPath = '/home/thanuja/Dropbox/data2';
+
 % probability map image file should have the same name as the raw image file
-rawImagePath = '/home/thanuja/Dropbox/data2/raw';
+rawImagePath = fullfile(inputPath,'raw');
+% rawImagePath = '/home/thanuja/Dropbox/data2/raw';
 % rawImagePath = '/home/thanuja/Dropbox/data2/probabilities/neuron';
-rawImageFileName = '00.png';
+% rawImageFileName = '00.png';
+if(~isempty(imageID))
+    imgFileString = strcat('*.',rawType);
+    rawImageFilesAll = dir(fullfile(rawImagePath,imgFileString));
+    rawImageFileName = rawImageFilesAll(imageID).name;
+
+else
+    rawImageFileName = imageFileName;
+end
 
 rawImageFullFile = fullfile(rawImagePath,rawImageFileName);
 
-probabilityMapPath = '/home/thanuja/Dropbox/data2/probabilities';
-dir_membraneProb = 'membrane';
+% probabilityMapPath = '/home/thanuja/Dropbox/data2/probabilities';
+% probabilityMapPath = fullfile(inputPath,'probabilities');
+probabilityMapPath = inputPath;
+
+dir_membraneProb = 'membranes';
 dir_mitochondriaProb = 'mitochondria';
-dir_neuronProb = 'neuron';
+dir_neuronProb = 'neurons';
 
-membraneProbabilityImage = fullfile(probabilityMapPath,dir_membraneProb,rawImageFileName);
-neuronProbabilityImage = fullfile(probabilityMapPath,dir_neuronProb,rawImageFileName);
-mitochondriaProbabilityImage = fullfile(probabilityMapPath,dir_mitochondriaProb,rawImageFileName);
 
+if(~isempty(imageID))
+    imgFileString = strcat('*.',membraneProbabilityType);
+    
+    membraneProbabilityImageFilesAll = dir(fullfile(...
+        probabilityMapPath,dir_membraneProb,imgFileString));
+    membraneProbabilityImage = membraneProbabilityImageFilesAll(imageID).name;
+  
+    imgFileString = strcat('*.',neuronProbabilityType);
+    neuronProbabilityImageFilesAll = dir(fullfile(...
+        probabilityMapPath,dir_neuronProb,imgFileString));
+    neuronProbabilityImage = neuronProbabilityImageFilesAll(imageID).name;
+    neuronProbabilityImage = fullfile(probabilityMapPath,dir_neuronProb,neuronProbabilityImage);
+    disp(neuronProbabilityImage);
+    
+    imgFileString = strcat('*.',mitoProbabilityType);
+    mitoProbabilityImageFilesAll = dir(fullfile(...
+        probabilityMapPath,dir_mitochondriaProb,imgFileString));
+    mitochondriaProbabilityImage = mitoProbabilityImageFilesAll(imageID).name;
+    mitochondriaProbabilityImage = fullfile(...
+        probabilityMapPath,dir_mitochondriaProb,mitochondriaProbabilityImage);
+    disp(mitochondriaProbabilityImage)
+else
+    membraneProbabilityImage = fullfile(probabilityMapPath,dir_membraneProb,rawImageFileName);
+    neuronProbabilityImage = fullfile(probabilityMapPath,dir_neuronProb,rawImageFileName);
+    mitochondriaProbabilityImage = fullfile(probabilityMapPath,dir_mitochondriaProb,rawImageFileName);
+end
 % for sbmrm
-labelImagePath = '/home/thanuja/Dropbox/data2/results';
-labelImageFileName = '00.png';
-labelImageFullFile = fullfile(labelImagePath,labelImageFileName);
-
+if(produceBMRMfiles)
+    labelImagePath = '/home/thanuja/Dropbox/data2/results';
+    labelImageFileName = '00.png';
+    labelImageFullFile = fullfile(labelImagePath,labelImageFileName);
+end
 
 %% Parameters
 orientationStepSize = 10;
