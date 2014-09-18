@@ -23,21 +23,21 @@ imgFileExtension = 'tiff';
 % writeFilePath = '/home/thanuja/projects/inputData/trainingHalf/neurons/';
 % writeFilePath = '/home/thanuja/projects/inputData/trainingHalf/membranes/';
 
-% writeFilePath = '/home/thanuja/projects/inputData/trainingHalf';
-writeFilePath = '/home/thanuja/projects/inputData/testingHalf';
+writeFilePath = '/home/thanuja/projects/inputData/trainingHalf';
+%writeFilePath = '/home/thanuja/projects/inputData/testingHalf';
 
 % writeSubDir = 'raw';
 % writeSubDir = 'neurons';
 % writeSubDir = 'membranes';
 writeSubDir = 'groundtruth';
 
-writeType = 'png';
+writeType = 'tif';
 
 %% param
 dimx = 1024;
 dimy = 512;
 
-startRow = 513;
+startRow = 1;
 stopRow = startRow -1 + dimy;
 
 startCol = 1;
@@ -64,8 +64,8 @@ for i=1:nfiles
     disp('Input file: ');
     disp(inputFullFile);
     A = double(imread(inputFullFile));
-    A = A./255;
-    B = A(startRow:stopRow,startCol:stopCol,:);
+    % A = A./255;
+    B = uint16(A(startRow:stopRow,startCol:stopCol,:));
     writeName = sprintf('%02d.%s',k,writeType);
     writeFileName = fullfile(writeFilePath,writeSubDir,writeName);
     disp('Output file: ')
