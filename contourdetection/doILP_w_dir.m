@@ -58,6 +58,7 @@ if(~isempty(imageID))
     neuronProbabilityImage = fullfile(probabilityMapPath,dir_neuronProb,neuronProbabilityImage);
     disp(neuronProbabilityImage);
     
+    if(useMitochondriaDetection)
     imgFileString = strcat('*.',mitoProbabilityType);
     mitoProbabilityImageFilesAll = dir(fullfile(...
         probabilityMapPath,dir_mitochondriaProb,imgFileString));
@@ -65,10 +66,16 @@ if(~isempty(imageID))
     mitochondriaProbabilityImage = fullfile(...
         probabilityMapPath,dir_mitochondriaProb,mitochondriaProbabilityImage);
     disp(mitochondriaProbabilityImage)
+    else
+        mitochondriaProbabilityImage = [];
+    end
+    
 else
     membraneProbabilityImage = fullfile(probabilityMapPath,dir_membraneProb,rawImageFileName);
     neuronProbabilityImage = fullfile(probabilityMapPath,dir_neuronProb,rawImageFileName);
-    mitochondriaProbabilityImage = fullfile(probabilityMapPath,dir_mitochondriaProb,rawImageFileName);
+    if(useMitochondriaDetection)
+        mitochondriaProbabilityImage = fullfile(probabilityMapPath,dir_mitochondriaProb,rawImageFileName);
+    end
 end
 % for sbmrm
 if(produceBMRMfiles)

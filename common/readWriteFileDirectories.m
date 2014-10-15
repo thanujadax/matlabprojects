@@ -15,7 +15,9 @@
 % inputDirectoryName = '/home/thanuja/projects/drosophila-l3/stack2/raw/';
 % inputDirectoryName =  '/home/thanuja/projects/drosophila-l3/stack2/classification/schmidhuber/median_filtered/neurons/';
 % inputDirectoryName = '/home/thanuja/projects/drosophila-l3/stack2/classification/schmidhuber/median_filtered/membrane/';
-inputDirectoryName = '/home/thanuja/projects/drosophila-l3/stack2/groundtruth/';
+% inputDirectoryName = '/home/thanuja/projects/drosophila-l3/stack2/groundtruth/';
+
+inputDirectoryName = '/home/thanuja/projects/sopnet/sopnetFIB/result/';
 
 imgFileExtension = 'tiff';
 
@@ -23,15 +25,16 @@ imgFileExtension = 'tiff';
 % writeFilePath = '/home/thanuja/projects/inputData/trainingHalf/neurons/';
 % writeFilePath = '/home/thanuja/projects/inputData/trainingHalf/membranes/';
 
-writeFilePath = '/home/thanuja/projects/inputData/trainingHalf';
-%writeFilePath = '/home/thanuja/projects/inputData/testingHalf';
+% writeFilePath = '/home/thanuja/projects/inputData/trainingHalf';
+% writeFilePath = '/home/thanuja/projects/inputData/testingHalf';
+writeFilePath = '/home/thanuja/projects/sopnet/sopnetFIB/resultpng';
 
 % writeSubDir = 'raw';
 % writeSubDir = 'neurons';
 % writeSubDir = 'membranes';
-writeSubDir = 'groundtruth';
-
-writeType = 'tif';
+% writeSubDir = 'groundtruth';
+writeSubDir = '';
+writeType = 'png';
 
 %% param
 dimx = 1024;
@@ -64,8 +67,9 @@ for i=1:nfiles
     disp('Input file: ');
     disp(inputFullFile);
     A = double(imread(inputFullFile));
-    % A = A./255;
-    B = uint16(A(startRow:stopRow,startCol:stopCol,:));
+    A = A./255;
+%     B = (A(startRow:stopRow,startCol:stopCol,:));
+B = A;
     writeName = sprintf('%02d.%s',k,writeType);
     writeFileName = fullfile(writeFilePath,writeSubDir,writeName);
     disp('Output file: ')

@@ -21,11 +21,11 @@ num_images = numel(info);
 
 k = 0;
 for i = zStart:zStop
-    A = uint16(imread(inputFileName, i));
-    B = A(yStart:yStop,xStart:xStop);
+    A = double(imread(inputFileName, i));
+    B = A(yStart:yStop,xStart:xStop)./255;
     writeName = sprintf('%02d.%s',k,writeType);
     writeFileName = fullfile(outputDirectory,writeName);
     k = k+1;
     imwrite(B,writeFileName,writeType)
-    figure;imagesc(B);
+    figure;imshow(B);
 end
