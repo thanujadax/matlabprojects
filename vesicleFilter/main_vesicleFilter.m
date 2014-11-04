@@ -1,3 +1,5 @@
+% Vesicle filter 3D
+
 %% Parameters
 innerRadius = 1;
 outerRadius = 3;
