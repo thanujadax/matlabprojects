@@ -15,12 +15,15 @@ message = sprintf('Input image file name = %s', inputImageFileName);
 disp(message)
 inputImageMat = double(imread(inputImageFileName));
 inputImageMat = inputImageMat./255;
+inputImageMat_1_1 = rescaleImg1_1(inputImageMat);
 figure; imshow(inputImageMat); title('input image')
+
+
 %% Convolution
 disp('generate vesicle template')
 vesicleTemplate = getVesicleElement2D(r1,r2,r3);
 disp('convoluting...')
-convolutionResult = convn(inputImageMat,vesicleTemplate);
+convolutionResult = convn(inputImageMat_1_1,vesicleTemplate);
 figure;imagesc(convolutionResult);title('convolution result')
 %% Visualization
 message = sprintf('writing output to %s',outputImageFileName);
