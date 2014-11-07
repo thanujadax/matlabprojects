@@ -16,7 +16,7 @@ disp(message)
 inputImageMat = double(imread(inputImageFileName));
 inputImageMat = inputImageMat./255;
 inputImageMat_1_1 = rescaleImg1_1(inputImageMat);
-figure; imshow(inputImageMat); title('input image')
+figure; imshow(inputImageMat_1_1); title('input image')
 
 
 %% Convolution
