@@ -69,28 +69,31 @@ nextCwEdgeLId_2 = getNextClockwiseEdge(nodeListInds(2),edgeLId_1,edgeID_1,...
 % next edge
 nextCwEdgeLId_inRegion = intersect...
                 (edgeListInds_region,[nextCwEdgeLId_1,nextCwEdgeLId_2]);
-% debug code start
+% debug code start (???)
 i = 1;
 while(numel(nextCwEdgeLId_inRegion)~=1)
     % Pick one edge (1st in the list)
-    i = i + 1;
-    edgeLId_1 = edgeListInds_region(i);
-    edgeID_1 = edgeListIndsAll(edgeLId_1);
-    % Get the nodes at each end of the edge. At each node get the next edge as
-    % if to complete a clockwise cycle.
-    nodeListInds = edges2nodes_directional(edgeLId_1,:);
-    nextCwEdgeLId_1 = getNextClockwiseEdge(nodeListInds(1),edgeLId_1,edgeID_1,...
-                nodeEdgeIDs,junctionTypeListInds,jAnglesAll_alpha,edgeListIndsAll,...
-            edges2pixels,sizeR,sizeC);
-
-    nextCwEdgeLId_2 = getNextClockwiseEdge(nodeListInds(2),edgeLId_1,edgeID_1,...
-                nodeEdgeIDs,junctionTypeListInds,jAnglesAll_alpha,edgeListIndsAll,...
+    
+    if(length(edgeListInds_region)<=i);
+        edgeLId_1 = edgeListInds_region(i);
+        edgeID_1 = edgeListIndsAll(edgeLId_1);
+        % Get the nodes at each end of the edge. At each node get the next edge as
+        % if to complete a clockwise cycle.
+        nodeListInds = edges2nodes_directional(edgeLId_1,:);
+        nextCwEdgeLId_1 = getNextClockwiseEdge(nodeListInds(1),edgeLId_1,edgeID_1,...
+                    nodeEdgeIDs,junctionTypeListInds,jAnglesAll_alpha,edgeListIndsAll,...
                 edges2pixels,sizeR,sizeC);
 
-    % One of the two edges belong to the current region. Keep this edge as the
-    % next edge
-    nextCwEdgeLId_inRegion = intersect...
-                    (edgeListInds_region,[nextCwEdgeLId_1,nextCwEdgeLId_2]);    
+        nextCwEdgeLId_2 = getNextClockwiseEdge(nodeListInds(2),edgeLId_1,edgeID_1,...
+                    nodeEdgeIDs,junctionTypeListInds,jAnglesAll_alpha,edgeListIndsAll,...
+                    edges2pixels,sizeR,sizeC);
+
+        % One of the two edges belong to the current region. Keep this edge as the
+        % next edge
+        nextCwEdgeLId_inRegion = intersect...
+                        (edgeListInds_region,[nextCwEdgeLId_1,nextCwEdgeLId_2]);   
+    end
+    i = i + 1;
 end
 % debug code end
 
