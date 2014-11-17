@@ -11,6 +11,7 @@ for i=1:numImg
     outputFullFile = fullfile(saveFilePath,imageName);
     disp(outputFullFile);
     image_i = inputImageStack(:,:,i);
+    image_i = image_i./255;
     imagesc(image_i);
     imwrite(image_i,outputFullFile);
 end

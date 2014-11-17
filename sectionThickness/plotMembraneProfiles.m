@@ -7,7 +7,7 @@ inputImageMat = inputImageMat./255;
 
 % rescale from -1 to +1
 inputImageMat_1_1 = rescaleImg1_1(inputImageMat);
-
+figure
 %% membrane 1
 rstart =381;
 rstop = 398;
