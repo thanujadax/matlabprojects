@@ -1,4 +1,4 @@
-function g = estimateSamplingRatio(I,maxG)
+function [g,m12] = estimateSamplingRatio(I,maxG)
 % ESTIMATESAMPLINGRATIO estimates distance.
 %
 % from Sporring 2014
