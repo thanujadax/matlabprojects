@@ -2,7 +2,12 @@
 % (or variance)
 
 % estimator based on correlation coefficient
+xcorrMeasure = 1;
+% if 0, use sd of intensity difference method
+
 maxShift = 15;
+
+
 
 % read set of input images
 inputImageDir = '/home/thanuja/projects/inputData/trainingHalf/raw';
@@ -17,7 +22,11 @@ xcorrMat = zeros(numImg,maxShift);
 for i=1:numImg
     disp(i);
     imageFileName = fullfile(inputImageDir,allImageFiles(i).name);
-    xcorrMat(i,:) = getXcorrShiftedImg(imageFileName,maxShift);
+    if(xcorrMeasure)
+        xcorrMat(i,:) = getXcorrShiftedImg(imageFileName,maxShift);
+    else
+        xcorrMat(i,:) = getIntensityDeviationShiftedImg(imageFileName,maxShift);
+    end
 end
 
 % plot
