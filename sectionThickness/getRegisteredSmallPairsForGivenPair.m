@@ -1,5 +1,5 @@
-function cell_registeredSmallPairs = getRegisteredSmallPairsForGivenPair(image1,image2,...
-        patchSizeX,patchSizeY)
+function [image1_patches,image2_patches] = getRegisteredSmallPairsForGivenPair...
+    (image1,image2,patchSizeX,patchSizeY)
     
 % Inputs:
 % image1 - image matrix
@@ -11,6 +11,9 @@ function cell_registeredSmallPairs = getRegisteredSmallPairsForGivenPair(image1,
 % image matrices each of which are from the adjacent images.
 
 % extract patches from image1
+image1_patches = extractPatchesFromImage(image1,patchSizeX,patchSizeY);
 
 % register each patch with image2 and extract corresponding patches from
 % image2
+image2_patchesRegistered = extractRegisteredPatchesForGivenPatches(...
+                                    image2,image2_patches);
