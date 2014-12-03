@@ -18,7 +18,14 @@ c = normxcorr2(image1_patch,image2);
 corr_offset = [(xpeak-size(image1_patch,2))
                (ypeak-size(image1_patch,1))];
 
-
 % total offset
-xoffset = corr_offset(1);
-yoffset = corr_offset(2);
+cOffset = corr_offset(1);
+rOffset = corr_offset(2);
+
+% extract corresponding patch
+[sizeR,sizeC] = size(image1_patch);
+
+rStop = rOffset + sizeR;
+cStop = cOffset + sizeC;
+
+image2_patch = image2(rOffset:rStop,cOffset:cStop);
