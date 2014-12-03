@@ -13,7 +13,7 @@ function [t_median,t_mean,t_var] = getThicknessForRegisteredPairs...
 image1_patches = normalize(image1_patches);
 image2_patches = normalize(image2_patches);
 
-[~,~,numPatches] = image1_patches;
+[~,~,numPatches] = size(image1_patches);
 thickness = zeros(numPatches,1);
 
 for i=1:numPatches
