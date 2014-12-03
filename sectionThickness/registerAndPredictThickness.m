@@ -1,5 +1,6 @@
 function [t_median,t_mean,t_var] = registerAndPredictThickness(...
-    inputImagePath,imgFileType,patchSizeX,patchSizeY,maxNumPatches,overlap)
+    inputImagePath,imgFileType,patchSizeX,patchSizeY,maxNumPatches,overlap,...
+    maxThicknessPix)
 
 % Inputs:
 
@@ -17,12 +18,19 @@ function [t_median,t_mean,t_var] = registerAndPredictThickness(...
 % sub-pairs of images and calculate the distance between each such pair and
 % then take the median (to be robust against outliers)
 
+% NB: If the image patches are  too small it will negatively affect the
+% thickness estimate. If the image patches are too large, the patch registration
+% process will not be effective.
+
 allImageFiles = dir(fullfile(inputImagePath,strcat('*.',imgFileType)));
 numImg = length(allImageFiles);
 % for each pair of images
 t_median = zeros(1,numImg-1);
 t_mean = zeros(1,numImg-1);
 t_var = zeros(1,numImg-1);
+
+thicknessCurve = getThicknessCurve();
+
 for i=1:numImg-1
     % extract corresponding smaller pieces and register
     image1 = fullfile(inputImageDir,allImageFiles(i).name);
@@ -30,8 +38,9 @@ for i=1:numImg-1
     [image1_patches,image2_patches] = getRegisteredSmallPairs(image1,image2,...
         patchSizeX,patchSizeY,maxNumPatches,overlap);
     % calculate the distance between each pair
-    estimatesForPair = getThicknessForRegisteredPairs(image1_patches,image2_patches);
-    [t_median(i),t_mean(i),t_var(i)] = thicknessStatsFromSmallPairs(estimatesForPair);
+    [t_median(i),t_mean(i),t_var(i)] = getThicknessForRegisteredPairs...
+            (image1_patches,image2_patches,thicknessCurve);
+    
 
 end
 % return median mean and variance
