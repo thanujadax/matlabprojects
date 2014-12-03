@@ -1,15 +1,16 @@
-function image2_patch = getCorrespondingPatch(image2,image1_patch)
+function image2_patch = getCorrespondingPatch(image2_name,image1_patch)
 
 % find the corresponding patch image2_patch in image2 which is mostly
 % correlated with image1_patch
 
 % Inputs:
-%   image2: image in which we should find the patch
+%   image2: image fine name in which we should find the patch
 %   image1_patch: 
 
 % Output:
 %   image2_patch: 
 
+image2 = double(imread(image2_name));
 c = normxcorr2(image1_patch,image2);
 
 % offset found by correlation

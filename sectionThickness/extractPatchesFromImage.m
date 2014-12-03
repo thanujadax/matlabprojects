@@ -1,10 +1,11 @@
 function imagePatches = extractPatchesFromImage(...
-    inputImage,patchSizeC,patchSizeR,maxNumPatches,overlap)
+    inputImageName,patchSizeC,patchSizeR,maxNumPatches,overlap)
 
 % extract non overlapping patches
 
 % TODO: extend to have overlapping patches as well
 
+inputImage = double(imread(inputImageName));
 [sizeR,sizeC] = size(inputImage);
 if(patchSizeC>sizeC || patchSizeR>sizeR)
     disp('Error extractPatchesFromImage: patch size exceeds image size!')
