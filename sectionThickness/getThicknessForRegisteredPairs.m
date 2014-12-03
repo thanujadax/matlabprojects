@@ -1,4 +1,4 @@
-function [t_median,t_mean,t_var] = getThicknessForRegisteredPairs...
+function [t_median,t_mean,t_std] = getThicknessForRegisteredPairs...
     (image1_patches,image2_patches,thicknessCurve,maxThicknessPix)
 
 % given registered patches from two images, estimate the thickness of
@@ -23,4 +23,4 @@ end
 
 t_median = median(thickness);
 t_mean = mean(thickness);
-t_var = var(thickness);
+t_std = std(thickness);

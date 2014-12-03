@@ -1,4 +1,4 @@
-function [t_median,t_mean,t_var, thicknessCurve,tCurve_std] ...
+function [t_median,t_mean,t_std, thicknessCurve,tCurve_std] ...
     = registerAndPredictThickness(...
     inputImagePath,imgFileType,patchSizeX,patchSizeY,maxNumPatches,overlap,...
     maxThicknessPix)
@@ -28,10 +28,10 @@ numImg = length(allImageFiles);
 % for each pair of images
 t_median = zeros(1,numImg-1);
 t_mean = zeros(1,numImg-1);
-t_var = zeros(1,numImg-1);
+t_std = zeros(1,numImg-1);
 
-inputImageFileNam
-[thicknessCurve, tCurve_std] = getThicknessCurve(allImageFiles,maxThicknessPix);
+
+[thicknessCurve, tCurve_std] = getThicknessCurve(inputImagePath,imgFileType,maxThicknessPix);
 
 % plot estimator curve
 figure();
@@ -50,4 +50,5 @@ for i=1:numImg-1
 
 end
 % plot estimated thickness
+figure();
 shadedErrorBar((1:maxThicknessPix),t_median,t_std,'b');

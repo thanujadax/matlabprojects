@@ -16,12 +16,9 @@ xcorrMat = zeros(numImg,maxShift);
 
 for i=1:numImg
     imageFileName = fullfile(inputImageDir,allImageFiles(i).name);
-    if(xcorrMeasure)
-        xcorrMat(i,:) = getXcorrShiftedImg(imageFileName,maxShift);
-    else
-        xcorrMat(i,:) = getIntensityDeviationShiftedImg(imageFileName,maxShift);
-    end
+    xcorrMat(i,:) = getXcorrShiftedImg(imageFileName,maxShift);
+
 end
 
-thicknessCurve = mean(xcorrMat,2);
-t_std = std(xcorrMat,0,2);
+thicknessCurve = mean(xcorrMat,1);
+t_std = std(xcorrMat);
