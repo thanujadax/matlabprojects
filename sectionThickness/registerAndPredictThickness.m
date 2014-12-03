@@ -39,8 +39,8 @@ shadedErrorBar((1:maxThicknessPix),thicknessCurve,tCurve_std,'g');
 
 for i=1:numImg-1
     % extract corresponding smaller pieces and register
-    image1 = fullfile(inputImageDir,allImageFiles(i).name);
-    image2 = fullfile(inputImageDir,allImageFiles(i+1).name);
+    image1 = fullfile(inputImagePath,allImageFiles(i).name);
+    image2 = fullfile(inputImagePath,allImageFiles(i+1).name);
     [image1_patches,image2_patches] = getRegisteredSmallPairs(image1,image2,...
         patchSizeX,patchSizeY,maxNumPatches,overlap);
     % calculate the distance between each pair
