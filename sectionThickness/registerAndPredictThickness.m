@@ -1,4 +1,5 @@
-function [t_median,t_mean,t_var] = registerAndPredictThickness(...
+function [t_median,t_mean,t_var, thicknessCurve,tCurve_std] ...
+    = registerAndPredictThickness(...
     inputImagePath,imgFileType,patchSizeX,patchSizeY,maxNumPatches,overlap,...
     maxThicknessPix)
 
@@ -29,7 +30,12 @@ t_median = zeros(1,numImg-1);
 t_mean = zeros(1,numImg-1);
 t_var = zeros(1,numImg-1);
 
-thicknessCurve = getThicknessCurve();
+inputImageFileNam
+[thicknessCurve, tCurve_std] = getThicknessCurve(allImageFiles,maxThicknessPix);
+
+% plot estimator curve
+figure();
+shadedErrorBar((1:maxThicknessPix),thicknessCurve,tCurve_std,'g');
 
 for i=1:numImg-1
     % extract corresponding smaller pieces and register
@@ -38,10 +44,10 @@ for i=1:numImg-1
     [image1_patches,image2_patches] = getRegisteredSmallPairs(image1,image2,...
         patchSizeX,patchSizeY,maxNumPatches,overlap);
     % calculate the distance between each pair
-    [t_median(i),t_mean(i),t_var(i)] = getThicknessForRegisteredPairs...
-            (image1_patches,image2_patches,thicknessCurve);
+    [t_median(i),t_mean(i),t_std(i)] = getThicknessForRegisteredPairs...
+            (image1_patches,image2_patches,thicknessCurve,maxThicknessPix);
     
 
 end
-% return median mean and variance
-
+% plot estimated thickness
+shadedErrorBar((1:maxThicknessPix),t_median,t_std,'b');
