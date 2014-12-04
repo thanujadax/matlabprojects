@@ -1,5 +1,5 @@
 function imagePatches = extractPatchesFromImage(...
-    inputImageName,patchSizeC,patchSizeR,maxNumPatches,overlap)
+    inputImageName,patchSizeC,patchSizeR,maxNumPatches,overlap,margin)
 
 % extract non overlapping patches
 

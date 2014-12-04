@@ -16,8 +16,8 @@ c = normxcorr2(image1_patch,image2);
 % offset found by correlation
 [max_c, imax] = max(abs(c(:)));
 [ypeak, xpeak] = ind2sub(size(c),imax(1));
-corr_offset = [(xpeak-size(image1_patch,2))
-               (ypeak-size(image1_patch,1))];
+corr_offset = [(xpeak-size(image1_patch,2)+1)
+               (ypeak-size(image1_patch,1) +1)];
 
 % total offset
 cOffset = corr_offset(1);
