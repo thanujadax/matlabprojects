@@ -6,7 +6,7 @@ xyResolution = 5; % nm
 xcorrMeasure = 0;
 % if 0, use sd of intensity difference method
 
-maxShift = 15;
+maxShift = 20;
 
 
 
