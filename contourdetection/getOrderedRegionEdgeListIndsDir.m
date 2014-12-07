@@ -71,10 +71,11 @@ nextCwEdgeLId_inRegion = intersect...
                 (edgeListInds_region,[nextCwEdgeLId_1,nextCwEdgeLId_2]);
 % debug code start (???): important to make sure the outputs are assigned
 i = 1;
+edgeListInds_region = edgeListInds_region(edgeListInds_region>0);
 while(numel(nextCwEdgeLId_inRegion)~=1)
     % Pick one edge (1st in the list)
     
-    if(length(edgeListInds_region)<=i);
+    if(numel(edgeListInds_region)<=i);
         edgeLId_1 = edgeListInds_region(i);
         edgeID_1 = edgeListIndsAll(edgeLId_1);
         % Get the nodes at each end of the edge. At each node get the next edge as
