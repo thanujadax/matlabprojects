@@ -36,7 +36,7 @@ maxNumEdgesPerRegion = 0;
 k = 0; % index for cells to store sets of edges of each region
 for i=start:numWsFaces
     clear intPix_i edgePix_i edgeSet_i
-   if(i == 609)
+   if(i == 943)
        a = 99;
    end
     % get internal pixels

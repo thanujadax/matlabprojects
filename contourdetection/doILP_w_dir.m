@@ -7,7 +7,7 @@ function segmentationOut = doILP_w_dir(inputPath,imageFileName,imageID,...
 
 %% Settings
 
-produceBMRMfiles = 0;
+produceBMRMfiles = 0;  % set label file below if 1
 showIntermediate = 0;
 fillSpaces = 1;          % fills holes in segmentationOut
 useGurobi = 1;
