@@ -1,5 +1,5 @@
 function [adjacencyMat,nodeEdges,edges2nodes,edges2pixels,connectedJunctionIDs,...
-    selfEdgePixelSet] = getGraphFromWS(ws,hsvOutput,displayImg)
+    selfEdgePixelSet,newWS] = getGraphFromWS(ws,hsvOutput,displayImg)
 
 % Outputs:
 % nodeEdges: contains the set of edgeIDs for each nodePixInd
@@ -109,6 +109,9 @@ edges2pixels = getEdges2Pixels(edgePixLabels);
 
 [adjacencyMat,edges2nodes,selfEdgeIDs,~] = getAdjacencyMat(nodeEdges);
 
+% calculate new ws by merging those ws regions that were initially separated
+[newWS,removedWS] = getCorrectedWSregions(ws,selfEdgeIDs,edges2pixels);
+
 % initialize output
 selfEdgePixelSet = zeros(numel(selfEdgeIDs),1);
 
@@ -151,6 +154,8 @@ end
 if(saveMatrices)
     save('edges2pixels.mat','edges2pixels')
 end
+
+
 %% visualize graph
 if(displayImg)
     [r,c] = ind2sub([sizeR sizeC],nodeInds);
