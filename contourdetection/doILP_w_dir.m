@@ -200,7 +200,8 @@ ws = watershed(OFR_mag);
 [sizeR,sizeC] = size(ws);
 %% generate graph from the watershed edges
 disp('creating graph from watershed boundaries...');
-[adjacencyMat,nodeEdges,edges2nodes,edges2pixels,connectedJunctionIDs,selfEdgePixelSet] ...
+[adjacencyMat,nodeEdges,edges2nodes,edges2pixels,connectedJunctionIDs,selfEdgePixelSet,...
+    ws,ws_original,removedWsIDs] ...
     = getGraphFromWS(ws,output,showIntermediate);
 clear adjacencyMat
 clear output
