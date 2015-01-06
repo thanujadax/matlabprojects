@@ -1,5 +1,6 @@
 function [adjacencyMat,nodeEdges,edges2nodes,edges2pixels,connectedJunctionIDs,...
-    selfEdgePixelSet,ws,ws_original,removedWsIDs] = getGraphFromWS(ws,hsvOutput,displayImg)
+    selfEdgePixelSet,ws,ws_original,removedWsIDs,newRemovedEdgeLIDs]...
+    = getGraphFromWS(ws,hsvOutput,displayImg)
 
 % Outputs:
 % nodeEdges: contains the set of edgeIDs for each nodePixInd

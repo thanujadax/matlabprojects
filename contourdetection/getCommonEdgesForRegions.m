@@ -25,20 +25,26 @@ end
 % see if there are common edges for each pair of merged regions
 % get all pair combinations of regions
 V = 1:numMergedRegions;
-regionCombinationInds = nchoosek(V,2);
-numCombinations = size(regionCombinationInds,1);
-% for each combination (pair of regions) check if there is a common edge
-
-for i=1:numCombinations
-    regionLID_a = regionCombinationInds(i,1);
-    edgeLIDs_a = cell_regionEdgeLIDs{regionLID_a};
+if(numMergedRegions>1)
+    % if there's only one region, we don't have to do anything since there
+    % won't be any additional edges which are potentially dividing multiple
+    % regions that were merged afterwards
     
-    regionLID_b = regionCombinationInds(i,2);
-    edgeLIDs_b = cell_regionEdgeLIDs{regionLID_b};    
+    regionCombinationInds = nchoosek(V,2);
+    numCombinations = size(regionCombinationInds,1);
+    % for each combination (pair of regions) check if there is a common edge
 
-    commonEdgeLIDs = intersect(edgeLIDs_a,edgeLIDs_b);
-    
-    edgeLIDsCommonToMergedRegions = [edgeLIDsCommonToMergedRegions commonEdgeLIDs];
+    for i=1:numCombinations
+        regionLID_a = regionCombinationInds(i,1);
+        edgeLIDs_a = cell_regionEdgeLIDs{regionLID_a};
+
+        regionLID_b = regionCombinationInds(i,2);
+        edgeLIDs_b = cell_regionEdgeLIDs{regionLID_b};    
+
+        commonEdgeLIDs = intersect(edgeLIDs_a,edgeLIDs_b);
+
+        edgeLIDsCommonToMergedRegions = [edgeLIDsCommonToMergedRegions; commonEdgeLIDs];
+    end
 end
 
 

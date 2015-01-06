@@ -29,7 +29,7 @@ for i = 1:numel(cell_mergedWsIDs_original)
     % fix the edges if any found
     numCommonEdges = sum(edgeLIDssCommonToMergedRegions>0);
     if(numCommonEdges>0)
-        invisibleEdgeLIDs = [invisibleEdgeLIDs edgeLIDssCommonToMergedRegions];
+        invisibleEdgeLIDs = [invisibleEdgeLIDs; edgeLIDssCommonToMergedRegions];
         % fix newWS
         % get edge pixels
         edgePixelsToChange = edgepixels(edgeLIDssCommonToMergedRegions,:);

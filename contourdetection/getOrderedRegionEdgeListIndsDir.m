@@ -73,9 +73,9 @@ nextCwEdgeLId_inRegion = intersect...
             
 % debug code start 20141224
 if(numel(nextCwEdgeLId_inRegion)>1)
-    disp('ERROR: getOrderedRegionEgeListIndsDir. numEdgeses >1')
+    error('ERROR: getOrderedRegionEgeListIndsDir. numEdgeses >1')
 elseif(numel(nextCwEdgeLId_inRegion)<1)
-    disp('ERROR: getOrderedRegionEgeListIndsDir. numEdgeses <1')
+    error('ERROR: getOrderedRegionEgeListIndsDir. numEdgeses <1')
     
 else
 
@@ -111,7 +111,7 @@ else
 % % debug code end
 
 if(isempty(nextCwEdgeLId_inRegion))
-    disp('ERROR1: getOrderedRegionEdgeListIndsDir.m nextCwEdge not found!')
+    error('ERROR1: getOrderedRegionEdgeListIndsDir.m nextCwEdge not found!')
 else
     % From this edge, pick the node at the other end find the edge attached to
     % it in the same region. This is the next edge. Continue finding the next
