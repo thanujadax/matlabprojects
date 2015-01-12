@@ -42,7 +42,20 @@ for i=1:numel(removeEdgeIDs)
     else
         % if one of the regions is already in the expandedWsIDs list, keep
         % expanding that. i.e. assign that id to the other
-        if(ismember(regionIDs(1),expandedWsIDs))
+        % TODO: what if both regions are expanding?
+        
+        if(ismember(regionIDs(1),expandedWsIDs) && ismember(regionIDs(2),expandedWsIDs))
+            % both regions are expanding
+            % get all merged regions under R2 and assign them R1 in newWS
+            mergedRegionIndsR2 = find(expandedWsIDs==regionIDs(2));
+            mergedRegionsR2 = cell_mergedWsIDs_original{mergedRegionIndsR2};
+            % remove R2 from the expandedRegions list
+            % add the mergedRegions of R2 to that of R1
+            % remove R2 from the mergedRegions cell list
+        
+        
+        
+        elseif(ismember(regionIDs(1),expandedWsIDs))
             newWS(ws==regionIDs(2)) = regionIDs(1);
             removedWsIDs = [removedWsIDs regionIDs(2)];
             % assign the edge pixels also the ws id
