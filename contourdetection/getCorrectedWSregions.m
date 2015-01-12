@@ -61,7 +61,7 @@ for i=1:numel(removeEdgeIDs)
             mergedRegionInd = find(expandedWsIDs==regionIDs(2));
             oldWsID = getOldWsID(ws,newWS,regionIDs(1));
             cell_mergedWsIDs_original{mergedRegionInd}(end+1) = oldWsID;            
-        else
+        elseif(~ismember(regionIDs(1),removedWsIDs))
             newWS(ws==regionIDs(2)) = regionIDs(1);
             removedWsIDs = [removedWsIDs regionIDs(2)];
             % assign the edge pixels also the ws id
@@ -70,6 +70,15 @@ for i=1:numel(removeEdgeIDs)
             % create new element for merged old ws id
             oldWsID = getOldWsID(ws,newWS,regionIDs(2));
             cell_mergedWsIDs_original{end+1} = [oldWsID ];
+        elseif(~ismember(regionIDs(2),removedWsIDs))
+            newWS(ws==regionIDs(1)) = regionIDs(2);
+            removedWsIDs = [removedWsIDs regionIDs(1)];
+            % assign the edge pixels also the ws id
+            newWS(edgepixels_i) = regionIDs(2);
+            expandedWsIDs = [expandedWsIDs regionIDs(2)];
+            % create new element for merged old ws id
+            oldWsID = getOldWsID(ws,newWS,regionIDs(1));
+            cell_mergedWsIDs_original{end+1} = [oldWsID ];            
         end
     end
 
