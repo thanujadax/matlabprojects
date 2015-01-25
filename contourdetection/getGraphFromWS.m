@@ -112,7 +112,7 @@ edges2pixels = getEdges2Pixels(edgePixLabels);
 
 % calculate new ws by merging those ws regions that were initially separated
 ws_original = ws;
-[ws,removedWsIDs, newRemovedEdgeLIDs] = getCorrectedWSregions(ws,selfEdgeIDs,edges2pixels);
+[ws,removedWsIDs, newRemovedEdgeLIDs] = getCorrectedWSregions(ws,selfEdgeIDs,edges2pixels,displayImg);
 
 % initialize output
 selfEdgePixelSet = zeros(numel(selfEdgeIDs),1);

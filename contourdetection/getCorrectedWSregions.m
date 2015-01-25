@@ -1,5 +1,5 @@
 function [newWS, removedWsIDs, invisibleEdgeLIDs] = getCorrectedWSregions...
-                        (ws,removeEdgeIDs,edges2pixels)
+                        (ws,removeEdgeIDs,edges2pixels,showImg)
 % merges ws regions after removing removeEdgeIDs
 
 % Inputs
@@ -46,14 +46,22 @@ for i=1:numel(removeEdgeIDs)
         
         if(ismember(regionIDs(1),expandedWsIDs) && ismember(regionIDs(2),expandedWsIDs))
             % both regions are expanding
+            % R2 <- R1 in newWS
             % get all merged regions under R2 and assign them R1 in newWS
-            mergedRegionIndsR2 = find(expandedWsIDs==regionIDs(2));
-            mergedRegionsR2 = cell_mergedWsIDs_original{mergedRegionIndsR2};
-            % remove R2 from the expandedRegions list
+            mergedRegionIndR2 = find(expandedWsIDs==regionIDs(2));
+            mergedRegionIDsR2 = cell_mergedWsIDs_original{mergedRegionIndR2};
+       
+            newWS = replaceWSIDs(newWS,ws,mergedRegionIDsR2,regionIDs(1));
+            
             % add the mergedRegions of R2 to that of R1
+            mergedRegionIndR1 = find(expandedWsIDs==regionIDs(1));
+            mergedRegionIDsR1 = cell_mergedWsIDs_original{mergedRegionIndR1};
+            mergedRegionIDsR1 = [mergedRegionIDsR1 mergedRegionIDsR2];
+            cell_mergedWsIDs_original{mergedRegionIndR1} = mergedRegionIDsR1;
             % remove R2 from the mergedRegions cell list
-        
-        
+            cell_mergedWsIDs_original(mergedRegionIndR2) = [];
+            % remove R2 from the expandedRegions list
+            expandedWsIDs(mergedRegionIndR2) = [];
         
         elseif(ismember(regionIDs(1),expandedWsIDs))
             newWS(ws==regionIDs(2)) = regionIDs(1);
@@ -100,9 +108,17 @@ end
 % if there are edges separating adjoining mergedWsIDs, make them invisible
 % by assigning the same regionID to the edge
 
+if(showImg)
+    figure;imagesc(newWS);title('ws after merging RE regions')
+end
+
 [newWS, invisibleEdgeLIDs] = fixEdgesBetweenMergedRegions(...
     newWS,cell_mergedWsIDs_original,ws,edges2pixels,expandedWsIDs);
 
+
+if(showImg)
+    figure;imagesc(newWS);title('ws after merging RE regions and fixing edges')
+end
 
 function oldWsID = getOldWsID(ws,newWS,regionID)
 % we already know that regionID is not an expandedRegion
