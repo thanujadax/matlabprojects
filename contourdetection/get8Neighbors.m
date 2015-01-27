@@ -50,8 +50,8 @@ r = r0 - 1;
 c = c0 + 1;
 
 i = i + 1;
-if(sum(r>0)>0)
-neighbors((r>0),i) = sub2ind([sizeR sizeC],r(r>0),c(r>0));
+if(sum(r>0 | c<=sizeC)>0)
+neighbors((r>0 | c<=sizeC),i) = sub2ind([sizeR sizeC],r(r>0),c(r>0));
 end
 % N6
 r = r0 + 1;
