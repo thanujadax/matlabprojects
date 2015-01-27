@@ -1,5 +1,4 @@
-function edgeListInds = getEdgeIDsFromPixels(someEdgePixels,edges2pixels,...
-                    sizeR,sizeC)
+function edgeListInds = getEdgeIDsFromPixels(someEdgePixels,edges2pixels)
 
 % Inputs
 %   someEdgePixels - unordered set of edge pixels possibly belonging to
@@ -14,6 +13,7 @@ edgepixels(:,1) = [];
 
 [~,i_edgepixels,~] = intersect(edgepixels,someEdgePixels);
 
-[edgeListInds,~] = ind2sub([sizeR sizeC],i_edgepixels);
+[sizer,sizec] = size(edgepixels);
+[edgeListInds,~] = ind2sub([sizer sizec],i_edgepixels);
 
 edgeListInds = unique(edgeListInds);

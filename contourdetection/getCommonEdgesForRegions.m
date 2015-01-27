@@ -54,5 +54,4 @@ intPix = (ws==regionID);
 regionEdgePix = getEdgePixForWsFace(intPix,ws);
 % get the edgeLIDs for the pixels
 [sizeR,sizeC] = size(ws);
-regionEdgeLIDs = getEdgeIDsFromPixels(regionEdgePix,edges2pixels,...
-                    sizeR,sizeC);
+regionEdgeLIDs = getEdgeIDsFromPixels(regionEdgePix,edges2pixels);

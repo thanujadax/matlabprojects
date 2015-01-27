@@ -233,8 +233,10 @@ end
 numEdges = size(edges2nodes,1);
 
 % boundary edges
-boundaryEdgeIDs = getBoundaryEdges2(wsRegionBoundariesFromGraph,barLength,edgepixels,...
-    nodeEdges,edgeListInds,showIntermediate);
+% boundaryEdgeIDs = getBoundaryEdges2(wsRegionBoundariesFromGraph,barLength,edgepixels,...
+%     nodeEdges,edgeListInds,showIntermediate);
+
+boundaryEdgeIDs = getBoundaryEdgeIDs(ws,edges2pixels);
 numBoundaryEdges = numel(boundaryEdgeIDs);
 
 [~,boundaryEdgeListInds] = intersect(edgeListInds,boundaryEdgeIDs); 
