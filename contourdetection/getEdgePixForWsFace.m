@@ -5,6 +5,7 @@ function edgePix = getEdgePixForWsFace(intPix,ws)
 intPix_inds = find(intPix>0);
 [sizeR,sizeC] = size(ws);
 neighbors8_pixind = get8Neighbors(intPix_inds,sizeR,sizeC);
+neighbors8_pixind = neighbors8_pixind(neighbors8_pixind>0);
 allNeighbors8List_pixind = unique(neighbors8_pixind);
 
 wsVals = ws(allNeighbors8List_pixind);

@@ -2,6 +2,8 @@ function neighbors = get8Neighbors(pixID,sizeR,sizeC)
 
 % works with pixID being a vector of pixel indices
 
+% warning: contains zero for non existent neighbors
+
 [r0,c0] = ind2sub([sizeR sizeC],pixID);
 % TODO: sanity checks when entering values into neighbors matrix
 numPixInput = numel(pixID);

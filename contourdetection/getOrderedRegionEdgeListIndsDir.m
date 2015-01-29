@@ -73,9 +73,9 @@ nextCwEdgeLId_inRegion = intersect...
             
 % debug code start 20141224
 if(numel(nextCwEdgeLId_inRegion)>1)
-    error('ERROR: getOrderedRegionEgeListIndsDir. numEdgeses >1')
+    error('ERROR: getOrderedRegionEgeListIndsDir. numEdges >1')
 elseif(numel(nextCwEdgeLId_inRegion)<1)
-    error('ERROR: getOrderedRegionEgeListIndsDir. numEdgeses <1')
+    error('ERROR: getOrderedRegionEgeListIndsDir. numEdges <1')
     
 else
 

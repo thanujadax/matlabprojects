@@ -9,7 +9,7 @@ function jAnglesAll_alpha = getNodeAngles_fromGraph_allJtypes(junctionTypeListIn
 %   jEdgesAll - cell array with jEdgesAll{i} corresponding the edgeSet of
 %   junction type i. each row in the edge set corresponds to a junction
 %   instance of that type
-MAX_NUM_PIXELS = 5;  % maximum number of pixels away from the node used to calculate alpha
+MAX_NUM_PIXELS = 10;  % maximum number of pixels away from the node used to calculate alpha
 [nre,nce] = size(edges2pixels);  % first column is the edgeID
 edgepixels = edges2pixels(:,2:nce);
 
@@ -41,6 +41,11 @@ for dim=1:numJtypes
 %             end
             % end debug
             nodeListInd = junctionTypeListInds(i,dim);% get the index of the node in concern
+            %debug
+            if(nodeListInd==250)
+                aa = 99;
+            end
+            %end debug
             nodeInd = nodeInds(nodeListInd); 
             [rNode,cNode] = ind2sub([sizeR sizeC],nodeInd);
             for j=1:degree
@@ -65,8 +70,9 @@ for dim=1:numJtypes
                     [rP,cP] = ind2sub([sizeR sizeC],nodePixels');
                     numEdgePix = numel(nodePixels);
 %                     orientations = zeros(numEdgePix,1);
-                    if(numEdgePix<4)
-                        %
+                    if(numEdgePix<8)
+                        % if the edge is not very long, only look at the pixels
+                        % close to this node to determine the direction
                         % get the 2 junction nodes
                         edgeNodes = edges2nodes(edgeListInd,:);
                         if(edgeNodes(1)==nodeListInd)
@@ -83,6 +89,8 @@ for dim=1:numJtypes
                         x = cNode2 - cNode;
                     else
                         % get alpha wrt the end edge pixels
+                        % edge is too long. Take the direction wrt pixel at
+                        % MAX_NUM_PIXELS away from current node which is set above
                         rp1 = rP(1);
                         rp2 = rP(end);
                         cp1 = cP(1);
