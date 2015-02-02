@@ -1,5 +1,5 @@
 function jAnglesAll_alpha = getNodeAngles_fromGraph_allJtypes(junctionTypeListInds,...
-    nodeInds,jEdgesAll,edges2pixels,sizeR,sizeC,edges2nodes)
+    nodeInds,jEdgesAll,edges2pixels,sizeR,sizeC,edges2nodes,connectedJunctionIDs)
 % returns a cell array.
 % jAnglesAll{i} - each row corresponds to the set of angles for each
 % junction of type i (type 1 = J2)
@@ -42,13 +42,17 @@ for dim=1:numJtypes
             % end debug
             nodeListInd = junctionTypeListInds(i,dim);% get the index of the node in concern
             %debug
-            if(nodeListInd==250)
+            if(nodeListInd==519)
                 aa = 99;
             end
             %end debug
             nodeInd = nodeInds(nodeListInd); 
+            
             [rNode,cNode] = ind2sub([sizeR sizeC],nodeInd);
             for j=1:degree
+            % TODO: If the node is a cluster node determine the angle based on
+            % the neares pixel of the clusternode to the edge in concern
+            
                 % for each edge of this node
                 edgeID = edges_i(j);
                 if(edgeID~=0)
@@ -85,6 +89,15 @@ for dim=1:numJtypes
                         % calculate alpha based on these 2
                         nodeInd2 = nodeInds(node2ListInd); 
                         [rNode2,cNode2] = ind2sub([sizeR sizeC],nodeInd2);
+                        if(isClusterNode(nodeInd,connectedJunctionIDs))
+                            % is cluster node. pick the closest cluster
+                            % pixel
+                            % get all cluster pixels
+                            clusterPixInds = getClusterPixInds(nodeInd,connectedJunctionIDs);
+                            closestPixelInd = getClosestPixel(nodeInd2,clusterPixInds,sizeR,sizeC);
+                            [rNode,cNode] = ind2sub([sizeR sizeC],closestPixelInd);
+                        end
+                        
                         y = rNode2 - rNode;
                         x = cNode2 - cNode;
                     else

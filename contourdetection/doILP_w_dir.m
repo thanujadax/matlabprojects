@@ -290,7 +290,7 @@ jAnglesAll = getNodeAnglesForAllJtypes(junctionTypeListInds,...
 
 % get the angles for the edges based on its position in the graph
 jAnglesAll_alpha = getNodeAngles_fromGraph_allJtypes(junctionTypeListInds,...
-    nodeInds,jEdges,edges2pixels,sizeR,sizeC,edges2nodes);
+    nodeInds,jEdges,edges2pixels,sizeR,sizeC,edges2nodes,connectedJunctionIDs);
 
 % angle costs
 nodeAngleCosts = cell(1,numJtypes);
