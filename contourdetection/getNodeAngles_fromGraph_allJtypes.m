@@ -41,11 +41,6 @@ for dim=1:numJtypes
 %             end
             % end debug
             nodeListInd = junctionTypeListInds(i,dim);% get the index of the node in concern
-            %debug
-            if(nodeListInd==519)
-                aa = 99;
-            end
-            %end debug
             nodeInd = nodeInds(nodeListInd); 
             
             [rNode,cNode] = ind2sub([sizeR sizeC],nodeInd);

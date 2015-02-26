@@ -65,7 +65,7 @@ nextCwEdgeLId_2 = getNextClockwiseEdge(nodeListInds(2),edgeLId_1,edgeID_1,...
             nodeEdgeIDs,junctionTypeListInds,jAnglesAll_alpha,edgeListIndsAll,...
             edges2pixels,sizeR,sizeC);
 
-% One of the two edges belong to the current region. Keep this edge as the
+% One of the two edges belongs to the current region. Keep this edge as the
 % next edge
 nextCwEdgeLId_inRegion = intersect...
                 (edgeListInds_region,[nextCwEdgeLId_1,nextCwEdgeLId_2]);
@@ -73,62 +73,67 @@ nextCwEdgeLId_inRegion = intersect...
             
 % debug code start 20141224
 if(numel(nextCwEdgeLId_inRegion)>1)
-    error('ERROR: getOrderedRegionEgeListIndsDir. numEdges >1')
+    disp('getOrderedRegionEdgeListIndsDir. numEdges >1.. running tie breaker...');
+    nextCwEdgeLId_inRegion = nextCwEdgeTieBreaker(...
+    nodeInd,prevEdgeLID,nextEdgeLIDsList,edgepixels,...
+    connectedJunctionIDs,sizeR,sizeC);
+    disp('tie broken');
+    % error('ERROR: getOrderedRegionEdgeListIndsDir. numEdges >1')
 elseif(numel(nextCwEdgeLId_inRegion)<1)
-    error('ERROR: getOrderedRegionEgeListIndsDir. numEdges <1')
+    error('ERROR: getOrderedRegionEdgeListIndsDir. numEdges <1')
     
 else
 
-% debug code stop
-            
-% % debug code start (???): important to make sure the outputs are assigned
-% i = 1;
-% % edgeListInds_region = edgeListInds_region(edgeListInds_region>0);
-% while(numel(nextCwEdgeLId_inRegion)~=1)
-%     % Pick one edge (1st in the list)
-%     
-%     if(numel(edgeListInds_region)>=i);
-%         edgeLId_1 = edgeListInds_region(i);
-%         edgeID_1 = edgeListIndsAll(edgeLId_1);
-%         % Get the nodes at each end of the edge. At each node get the next edge as
-%         % if to complete a clockwise cycle.
-%         nodeListInds = edges2nodes_directional(edgeLId_1,:);
-%         nextCwEdgeLId_1 = getNextClockwiseEdge(nodeListInds(1),edgeLId_1,edgeID_1,...
-%                     nodeEdgeIDs,junctionTypeListInds,jAnglesAll_alpha,edgeListIndsAll,...
-%                 edges2pixels,sizeR,sizeC);
-% 
-%         nextCwEdgeLId_2 = getNextClockwiseEdge(nodeListInds(2),edgeLId_1,edgeID_1,...
-%                     nodeEdgeIDs,junctionTypeListInds,jAnglesAll_alpha,edgeListIndsAll,...
-%                     edges2pixels,sizeR,sizeC);
-% 
-%         % One of the two edges belong to the current region. Keep this edge as the
-%         % next edge
-%         nextCwEdgeLId_inRegion = intersect...
-%                         (edgeListInds_region,[nextCwEdgeLId_1,nextCwEdgeLId_2]);   
-%     end
-%     i = i + 1;
-% end
-% % debug code end
+    % debug code stop
 
-if(isempty(nextCwEdgeLId_inRegion))
-    error('ERROR1: getOrderedRegionEdgeListIndsDir.m nextCwEdge not found!')
-else
-    % From this edge, pick the node at the other end find the edge attached to
-    % it in the same region. This is the next edge. Continue finding the next
-    % edges in the clockwise order until all the edges are collected.
-    if(nextCwEdgeLId_inRegion==nextCwEdgeLId_1)
-        nodeLId_0 = nodeListInds(1);
+    % % debug code start (???): important to make sure the outputs are assigned
+    % i = 1;
+    % % edgeListInds_region = edgeListInds_region(edgeListInds_region>0);
+    % while(numel(nextCwEdgeLId_inRegion)~=1)
+    %     % Pick one edge (1st in the list)
+    %     
+    %     if(numel(edgeListInds_region)>=i);
+    %         edgeLId_1 = edgeListInds_region(i);
+    %         edgeID_1 = edgeListIndsAll(edgeLId_1);
+    %         % Get the nodes at each end of the edge. At each node get the next edge as
+    %         % if to complete a clockwise cycle.
+    %         nodeListInds = edges2nodes_directional(edgeLId_1,:);
+    %         nextCwEdgeLId_1 = getNextClockwiseEdge(nodeListInds(1),edgeLId_1,edgeID_1,...
+    %                     nodeEdgeIDs,junctionTypeListInds,jAnglesAll_alpha,edgeListIndsAll,...
+    %                 edges2pixels,sizeR,sizeC);
+    % 
+    %         nextCwEdgeLId_2 = getNextClockwiseEdge(nodeListInds(2),edgeLId_1,edgeID_1,...
+    %                     nodeEdgeIDs,junctionTypeListInds,jAnglesAll_alpha,edgeListIndsAll,...
+    %                     edges2pixels,sizeR,sizeC);
+    % 
+    %         % One of the two edges belong to the current region. Keep this edge as the
+    %         % next edge
+    %         nextCwEdgeLId_inRegion = intersect...
+    %                         (edgeListInds_region,[nextCwEdgeLId_1,nextCwEdgeLId_2]);   
+    %     end
+    %     i = i + 1;
+    % end
+    % % debug code end
+
+    if(isempty(nextCwEdgeLId_inRegion))
+        error('ERROR1: getOrderedRegionEdgeListIndsDir.m nextCwEdge not found!')
     else
-        nodeLId_0 = nodeListInds(2);
+        % From this edge, pick the node at the other end find the edge attached to
+        % it in the same region. This is the next edge. Continue finding the next
+        % edges in the clockwise order until all the edges are collected.
+        if(nextCwEdgeLId_inRegion==nextCwEdgeLId_1)
+            nodeLId_0 = nodeListInds(1);
+        else
+            nodeLId_0 = nodeListInds(2);
+        end
+
+        cwOrderedDirEdgeListInds = getCwDirSetOfEdges(edgeLId_1,nextCwEdgeLId_inRegion,...
+                        nodeLId_0,edges2nodes_directional,edgeListInds_region,...
+                        nodeLIdsForRegion,nodeEdgeIDs,edgeListIndsAll,edges2nodes,...
+                        junctionTypeListInds,jAnglesAll_alpha,...
+                        edges2pixels,sizeR,sizeC);
+
     end
-    
-    cwOrderedDirEdgeListInds = getCwDirSetOfEdges(edgeLId_1,nextCwEdgeLId_inRegion,...
-                    nodeLId_0,edges2nodes_directional,edgeListInds_region,...
-                    nodeLIdsForRegion,nodeEdgeIDs,edgeListIndsAll,edges2nodes,...
-                    junctionTypeListInds,jAnglesAll_alpha,...
-                    edges2pixels,sizeR,sizeC);
-    
-end
 
 end % new end added to match the new debug code 20141224
 
