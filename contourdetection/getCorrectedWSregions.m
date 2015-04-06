@@ -171,6 +171,12 @@ for i=1:numel(removeEdgeIDs)
             error('something wrong in getCorrectedWSregions')
         end
     end
+    
+    %start debug
+    if(ismember(191,removedWsIDs))
+        aaa = 99;
+    end
+    % stop debug
 
 end
 
