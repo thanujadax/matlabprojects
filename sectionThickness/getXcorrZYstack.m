@@ -22,12 +22,14 @@ xcorrMat = zeros(maxNumImages,maxShift);
 
 A = zeros(numR,numC);
 B = zeros(numR,numC);
-z = 1;
-
+z = 1; % starting image
+% TODO: current we take the first n images for the estimation. Perhaps we
+% can think of geting a random n images.
+disp('Estimating similarity curve using zy sections ...')
 for z=1:maxNumImages
     for g=1:maxShift
-        A(:,:) = InputImageStack(:,z,:);
-        B(:,:) = InputImageStack(:,z+g,:);  % with shift
+        A(:,:) = inputImageStack(:,z,:);
+        B(:,:) = inputImageStack(:,z+g,:);  % with shift
         xcorrMat(z,g) = corr2(A,B);
     end
 end
