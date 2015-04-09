@@ -1,5 +1,5 @@
-function xcorrMat = getXcorrZYstack(inputImageStackFileName,maxShift,maxNumImages)
-% calculate the correlation along the zy plane. i.e. perpendicular to the
+function xcorrMat = getXcorrXYstack(inputImageStackFileName,maxShift,maxNumImages)
+% calculate the correlation along the xy plane. i.e. parallel to the
 % cutting plane where we have maximum resolution (5nmx5nm for FIBSEM)
 
 % Inputs:
@@ -25,16 +25,23 @@ B = zeros(numR,numC);
 z = 1; % starting image
 % TODO: current we take the first n images for the estimation. Perhaps we
 % can think of geting a random n images.
-disp('Estimating similarity curve using zy sections ...')
+disp('Estimating similarity curve using correlation coefficient of shifted XY sections ...')
 for z=1:maxNumImages
+    I = inputImageStack(:,:,z);
+    [numR,numC] = size(I);
     for g=1:maxShift
-        A(:,:) = inputImageStack(:,z,:);
-        B(:,:) = inputImageStack(:,z+g,:);  % with shift
+        A = zeros(numR-g,numC);
+        B = zeros(numR-g,numC);
+
+        A(:,:) = I(1+g:size(I,1),:);
+        B(:,:) = I(1:size(I,1)-g,:);
+        
         xcorrMat(z,g) = corr2(A,B);
     end
 end
+
 %% plot
-titleStr = 'Coefficient of Correlation using ZY sections';
+titleStr = 'Coefficient of Correlation using shifted XY sections';
 xlabelStr = 'Shifted pixels';
 ylabelStr = 'Coefficient of Correlation';
 transparent = 0;

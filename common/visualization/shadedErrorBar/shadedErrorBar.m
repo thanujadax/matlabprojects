@@ -1,4 +1,5 @@
-function varargout=shadedErrorBar(x,y,errBar,lineProps,transparent)
+function varargout=shadedErrorBar(x,y,errBar,lineProps,transparent,...
+    titleStr,xlabelStr,ylabelStr)
 % function H=shadedErrorBar(x,y,errBar,lineProps,transparent)
 %
 % Purpose 
@@ -50,7 +51,7 @@ function varargout=shadedErrorBar(x,y,errBar,lineProps,transparent)
     
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%    
 % Error checking    
-error(nargchk(3,5,nargin))
+error(nargchk(3,8,nargin))
 
 
 %Process y using function handles if needed to make the error bar
@@ -154,6 +155,9 @@ H.edge(2)=plot(x,uE,'-','color',edgeColor);
 delete(H.mainLine)
 H.mainLine=plot(x,y,lineProps{:});
 
+title(titleStr);
+xlabel(xlabelStr);
+ylabel(ylabelStr);
 
 if ~holdStatus, hold off, end
 

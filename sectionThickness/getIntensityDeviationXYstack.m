@@ -1,5 +1,6 @@
-function xcorrMat = getXcorrZYstack(inputImageStackFileName,maxShift,maxNumImages)
-% calculate the correlation along the zy plane. i.e. perpendicular to the
+function sigmaMat = getIntensityDeviationXYstack...
+    (inputImageStackFileName,maxShift,maxNumImages)
+% calculate the sd of intensity difference along the xy plane. i.e. parallel to the
 % cutting plane where we have maximum resolution (5nmx5nm for FIBSEM)
 
 % Inputs:
@@ -18,25 +19,28 @@ inputImageStack = readTiffStackToArray(inputImageStackFileName);
 numR = size(inputImageStack,1);
 numC = size(inputImageStack,3); % z axis
 
-xcorrMat = zeros(maxNumImages,maxShift);
+sigmaMat = zeros(maxNumImages,maxShift);
 
 A = zeros(numR,numC);
 B = zeros(numR,numC);
 z = 1; % starting image
 % TODO: current we take the first n images for the estimation. Perhaps we
 % can think of geting a random n images.
-disp('Estimating similarity curve using zy sections ...')
+disp('Estimating similarity curve using SD of intensity differences across shifted XY sections')
 for z=1:maxNumImages
+    I = inputImageStack(:,:,z);
+    [numR,numC] = size(I);
     for g=1:maxShift
-        A(:,:) = inputImageStack(:,z,:);
-        B(:,:) = inputImageStack(:,z+g,:);  % with shift
-        xcorrMat(z,g) = corr2(A,B);
+        d1I = (I(1+g:size(I,1),:)-I(1:size(I,1)-g,:));
+        d2I = (I(:,1+g:size(I,2))-I(:,1:size(I,2)-g));
+        sigmaMat(z,g) = std([d1I(:);d2I(:)]);
     end
 end
+
 %% plot
-titleStr = 'Coefficient of Correlation using ZY sections';
+titleStr = 'SD of pixel intensity deviations using shifted XY sections';
 xlabelStr = 'Shifted pixels';
-ylabelStr = 'Coefficient of Correlation';
+ylabelStr = 'SD of pixel intensity deviation';
 transparent = 0;
 shadedErrorBar((1:maxShift),mean(xcorrMat,1),std(xcorrMat),'g',transparent,...
     titleStr,xlabelStr,ylabelStr);
