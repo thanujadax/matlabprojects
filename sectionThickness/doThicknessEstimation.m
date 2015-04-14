@@ -1,10 +1,10 @@
-function thickness = doThicknessEstimation(...
+function thicknessEstimates = doThicknessEstimation(...
     calibrationMethod,inputImageStackFileName,outputSavePath)
 
 % do thickness estimation based on one of the following methods to
 % calibrate the similarity curve
 
-calibrationMethod = 2;
+calibrationMethod = 3;
 % 1 - correlation coefficient across ZY sections
 % 2 - correlation coefficient across XY sections
 % 3 - SD of XY per pixel intensity difference
