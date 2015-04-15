@@ -5,8 +5,8 @@ function thicknessEstimates = doThicknessEstimation(...
 % calibrate the similarity curve
 
 calibrationMethod = 3;
-% 1 - correlation coefficient across ZY sections
-% 2 - correlation coefficient across XY sections
+% 1 - correlation coefficient across ZY sections, along x axis
+% 2 - correlation coefficient across XY sections, along x axis
 % 3 - SD of XY per pixel intensity difference
 % TODO: methods robust against registration problems
 
@@ -55,7 +55,7 @@ disp('done')
 %% Predict
 % predict section thickness for the data set
 relZresolution = predictThicknessFromCurve(...
-        inputImageStackFileName,xcorrMat,maxShift);
+        inputImageStackFileName,xcorrMat,maxShift,calibrationMethod);
 thicknessEstimates = relZresolution .* xyResolution;
 figure;plot(thicknessEstimates)
 title('Section thickness estimates (nm)')
