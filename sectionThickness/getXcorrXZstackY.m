@@ -15,11 +15,12 @@ inputImageStack = readTiffStackToArray(inputImageStackFileName);
 % I = double(imread(imageStack));
 numR = size(inputImageStack,1);
 numC = size(inputImageStack,3); % z axis
+[numY,numX,numZ] = size (inputImageStack);
 
 xcorrMat = zeros(maxNumImages,maxShift);
 
-A = zeros(numR,numC);
-B = zeros(numR,numC);
+A = zeros(numZ,numX);
+B = zeros(numZ,numX);
 z = 1; % starting image
 % TODO: current we take the first n images for the estimation. Perhaps we
 % can think of geting a random n images.

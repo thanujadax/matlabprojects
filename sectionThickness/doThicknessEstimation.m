@@ -4,7 +4,7 @@ function thicknessEstimates = doThicknessEstimation(...
 % do thickness estimation based on one of the following methods to
 % calibrate the similarity curve
 
-calibrationMethod = 1;
+calibrationMethod = 7;
 % 1 - correlation coefficient across ZY sections, along x axis
 % 2 - correlation coefficient across XY sections, along x axis
 % 3 - SD of XY per pixel intensity difference
@@ -19,7 +19,7 @@ maxNumImages = 20; % number of sections to initiate calibration.
 numPairs = 2; % number of section pairs to be used to estimate the thickness of one section
 
 inputImageStackFileName = '/home/thanuja/projects/data/FIBSEM_dataset/cubes/s108_1-200.tif';
-outputSavePath = '/home/thanuja/projects/tests/thickness/zyCalibration/s108_1-200_20150416';
+outputSavePath = '/home/thanuja/projects/tests/thickness/similarityCurves/s108_1-200_20150416';
 
 %% 
 
@@ -63,7 +63,8 @@ end
 
 % save output
 disp('Saving xcorrMat')
-xcorrFileName = fullfile(outputSavePath,'xcorrMat.mat');
+matName = sprintf('xcorrMat%d.mat',calibrationMethod);
+xcorrFileName = fullfile(outputSavePath,matName);
 save(xcorrFileName,'xcorrMat')
 disp('done')
 
