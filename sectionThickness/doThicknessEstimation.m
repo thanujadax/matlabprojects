@@ -40,7 +40,7 @@ elseif(calibrationMethod == 3)
     xcorrMat = getIntensityDeviationXYstack(inputImageStackFileName,maxShift,maxNumImages);
     disp('done!')
 else
-    error('Unrecognized calibration method specifed. Check calibrationMethod')
+    error('Unrecognized calibration method specified. Check calibrationMethod')
 end
 
 % save output
