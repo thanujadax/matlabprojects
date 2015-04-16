@@ -4,7 +4,7 @@ function thicknessEstimates = doThicknessEstimation(...
 % do thickness estimation based on one of the following methods to
 % calibrate the similarity curve
 
-calibrationMethod = 3;
+calibrationMethod = 1;
 % 1 - correlation coefficient across ZY sections, along x axis
 % 2 - correlation coefficient across XY sections, along x axis
 % 3 - SD of XY per pixel intensity difference
@@ -16,6 +16,7 @@ maxShift = 20;
 maxNumImages = 10; % number of sections to initiate calibration.
                 % the calibration curve is the mean value obtained by all
                 % these initiations
+numPairs = 2; % number of section pairs to be used to estimate the thickness of one section
 
 inputImageStackFileName = '/home/thanuja/projects/data/FIBSEM_dataset/cubes/s108_1-200.tif';
 outputSavePath = '/home/thanuja/projects/tests/thickness/zyCalibration/s108_1-200_20150409';
@@ -23,7 +24,7 @@ outputSavePath = '/home/thanuja/projects/tests/thickness/zyCalibration/s108_1-20
 %% 
 
 if(calibrationMethod == 1)
-    disp('Performing xcorr using ZY stack ...')
+    disp('Calculating c.o.c decay curve using ZY stack, along X ...')
     xcorrMat = getXcorrZYstack(inputImageStackFileName,maxShift,maxNumImages);
     disp('done!')
     % each column of xcorrMat corresponds to a sequence of shifted frames of
@@ -31,14 +32,28 @@ if(calibrationMethod == 1)
     % each row corresponds to one starting image (zy section) of the stack
 
 elseif(calibrationMethod == 2)
-    disp('Performing xcorr using shifted XY images stack ...')
+    disp('Calculating c.o.c decay curve using XY images stack, along X ...')
     xcorrMat = getXcorrXYstack(inputImageStackFileName,maxShift,maxNumImages);
     disp('done!')    
     
 elseif(calibrationMethod == 3)
-    disp('Calculating SD of intensity deviation using shifted XY sections stack ...')
+    disp('Calculating SD of intensity deviation curve using shifted XY sections stack, along X ...')
     xcorrMat = getIntensityDeviationXYstack(inputImageStackFileName,maxShift,maxNumImages);
     disp('done!')
+elseif(calibrationMethod == 4)
+    disp('Calculating c.o.c decay curve using ZY stack, along Y ...')
+    xcorrMat = getXcorrZYstackY(inputImageStackFileName,maxShift,maxNumImages);
+    disp('curve estimation done')
+elseif(calibrationMethod == 5)
+    disp('Calculating c.o.c decay curve using XY images stack, along Y ...')
+    
+    
+elseif(calibrationMethod == 6)
+    disp('Calculating c.o.c decay curve using XZ images stack, along X ...')
+    
+elseif(calibrationMethod == 7)
+    disp('Calculating c.o.c decay curve using XZ images stack, along Y ...')
+    
 else
     error('Unrecognized calibration method specified. Check calibrationMethod')
 end
@@ -54,10 +69,22 @@ disp('done')
 
 %% Predict
 % predict section thickness for the data set
-relZresolution = predictThicknessFromCurve(...
-        inputImageStackFileName,xcorrMat,maxShift,calibrationMethod);
+% relZresolution = predictThicknessFromCurve(...
+%         inputImageStackFileName,xcorrMat,maxShift,calibrationMethod);
+    
+relZresolution = predictThicknessFromCurveFromMultiplePairs(...
+        inputImageStackFileName,xcorrMat,maxShift,calibrationMethod,numPairs);
+% each row contains one set of estimates for all the sections. First row is
+% from the images i and i+1, the second row is from images i and i+2 etc    
 thicknessEstimates = relZresolution .* xyResolution;
-figure;plot(thicknessEstimates)
+if(size(thicknessEstimates,1)==1)
+    figure;plot(thicknessEstimates);
+elseif(size(thicknessEstimates,1)==2)
+    figure;plot(thicknessEstimates(1,:),'r');
+    hold on
+    plot((thicknessEstimates(2,:).* 0.5),'g');
+    hold off
+end
 title('Section thickness estimates (nm)')
 xlabel('Section index')
 ylabel('Estimated thickness (nm)')

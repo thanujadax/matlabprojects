@@ -41,6 +41,6 @@ end
 titleStr = 'SD of pixel intensity deviations using shifted XY sections';
 xlabelStr = 'Shifted pixels';
 ylabelStr = 'SD of pixel intensity deviation';
-transparent = 0;
+transparent = 1;
 shadedErrorBar((1:maxShift),mean(sigmaMat,1),std(sigmaMat),'g',transparent,...
     titleStr,xlabelStr,ylabelStr);

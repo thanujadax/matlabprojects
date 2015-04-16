@@ -1,5 +1,5 @@
 function xcorrMat = getXcorrXYstack(inputImageStackFileName,maxShift,maxNumImages)
-% calculate the correlation along the xy plane. i.e. parallel to the
+% calculate the correlation of XY face along the Y axis . i.e. parallel to the
 % cutting plane where we have maximum resolution (5nmx5nm for FIBSEM)
 
 % Inputs:
@@ -41,7 +41,7 @@ for z=1:maxNumImages
 end
 
 %% plot
-titleStr = 'Coefficient of Correlation using shifted XY sections';
+titleStr = 'Coefficient of Correlation using XY sections along X axis';
 xlabelStr = 'Shifted pixels';
 ylabelStr = 'Coefficient of Correlation';
 transparent = 0;
