@@ -13,13 +13,13 @@ calibrationMethod = 1;
 %% Parameters
 xyResolution = 5; % nm
 maxShift = 20;
-maxNumImages = 10; % number of sections to initiate calibration.
+maxNumImages = 20; % number of sections to initiate calibration.
                 % the calibration curve is the mean value obtained by all
                 % these initiations
 numPairs = 2; % number of section pairs to be used to estimate the thickness of one section
 
 inputImageStackFileName = '/home/thanuja/projects/data/FIBSEM_dataset/cubes/s108_1-200.tif';
-outputSavePath = '/home/thanuja/projects/tests/thickness/zyCalibration/s108_1-200_20150409';
+outputSavePath = '/home/thanuja/projects/tests/thickness/zyCalibration/s108_1-200_20150416';
 
 %% 
 
@@ -32,7 +32,7 @@ if(calibrationMethod == 1)
     % each row corresponds to one starting image (zy section) of the stack
 
 elseif(calibrationMethod == 2)
-    disp('Calculating c.o.c decay curve using XY images stack, along X ...')
+    disp('Calculating c.o.c decay curve using XY images stack, along Y ...')
     xcorrMat = getXcorrXYstack(inputImageStackFileName,maxShift,maxNumImages);
     disp('done!')    
     
@@ -45,15 +45,18 @@ elseif(calibrationMethod == 4)
     xcorrMat = getXcorrZYstackY(inputImageStackFileName,maxShift,maxNumImages);
     disp('curve estimation done')
 elseif(calibrationMethod == 5)
-    disp('Calculating c.o.c decay curve using XY images stack, along Y ...')
-    
+    disp('Calculating c.o.c decay curve using XY images stack, along X ...')
+    xcorrMat = getXcorrXYstackX(inputImageStackFileName,maxShift,maxNumImages);
+    disp('curve estimation done!')    
     
 elseif(calibrationMethod == 6)
     disp('Calculating c.o.c decay curve using XZ images stack, along X ...')
-    
+    xcorrMat = getXcorrXZstackX(inputImageStackFileName,maxShift,maxNumImages);
+    disp('curve estimation done!')    
 elseif(calibrationMethod == 7)
     disp('Calculating c.o.c decay curve using XZ images stack, along Y ...')
-    
+    xcorrMat = getXcorrXZstackY(inputImageStackFileName,maxShift,maxNumImages);
+    disp('curve estimation done!')
 else
     error('Unrecognized calibration method specified. Check calibrationMethod')
 end

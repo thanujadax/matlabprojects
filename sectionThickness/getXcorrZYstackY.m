@@ -1,6 +1,7 @@
-function xcorrMat = getXcorrXYstack(inputImageStackFileName,maxShift,maxNumImages)
-% calculate the correlation of XY face along the Y axis . i.e. parallel to the
-% cutting plane where we have maximum resolution (5nmx5nm for FIBSEM)
+function xcorrMat = getXcorrZYstackY(inputImageStackFileName,maxShift,maxNumImages)
+% calculate c.o.c curve on the ZY plane, shifting the (same) image along
+% the Y axis. Multiple images are used to get an average estimate of the
+% decay of c.o.c.
 
 % Inputs:
 % imageStack - image stack (tif) for which the thickness has to be
@@ -20,28 +21,21 @@ numC = size(inputImageStack,3); % z axis
 
 xcorrMat = zeros(maxNumImages,maxShift);
 
-A = zeros(numR,numC);
-B = zeros(numR,numC);
 z = 1; % starting image
 % TODO: current we take the first n images for the estimation. Perhaps we
 % can think of geting a random n images.
-disp('Estimating similarity curve using correlation coefficient of shifted XY sections ...')
+disp('Estimating similarity curve using zy sections, shifting along Y ...')
 for z=1:maxNumImages
-    I = inputImageStack(:,:,z);
-    [numR,numC] = size(I);
     for g=1:maxShift
         A = zeros(numR-g,numC);
-        B = zeros(numR-g,numC);
-
-        A(:,:) = I(1+g:size(I,1),:);
-        B(:,:) = I(1:size(I,1)-g,:);
-        
+        B = zeros(numR-g,numC);   
+        A(:,:) = inputImageStack(1+g:size(inputImageStack,1),z,:);
+        B(:,:) = inputImageStack(1:size(inputImageStack,1)-g,z,:);  % with shift
         xcorrMat(z,g) = corr2(A,B);
     end
 end
-
 %% plot
-titleStr = 'Coefficient of Correlation using XY sections along Y axis';
+titleStr = 'Coefficient of Correlation using ZY sections, along Y';
 xlabelStr = 'Shifted pixels';
 ylabelStr = 'Coefficient of Correlation';
 transparent = 0;
