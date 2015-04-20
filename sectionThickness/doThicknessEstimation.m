@@ -4,7 +4,7 @@ function thicknessEstimates = doThicknessEstimation(...
 % do thickness estimation based on one of the following methods to
 % calibrate the similarity curve
 
-calibrationMethod = 7;
+calibrationMethod = 5;
 % 1 - correlation coefficient across ZY sections, along x axis
 % 2 - correlation coefficient across XY sections, along x axis
 % 3 - SD of XY per pixel intensity difference

@@ -21,21 +21,22 @@ inputImageStack = readTiffStackToArray(inputImageStackFileName);
 % I = double(imread(imageStack));
 numR = size(inputImageStack,1);
 numC = size(inputImageStack,3); % z axis
-
+[numY,numX,numZ] = size(inputImageStack);
 cocMat = zeros(maxNumImages,maxShift);
 
 % TODO: current we take the first n images for the estimation. Perhaps we
 % can think of geting a random n images.
 disp('Estimating similarity curve using correlation coefficient of shifted XY sections ...')
+I = zeros(numX,numZ);
 for z=1:maxNumImages
-    I = inputImageStack(z,:,:);
+    I(:,:) = inputImageStack(z,:,:);
     [numR,numC] = size(I);
     for g=1:maxShift
-        A = zeros(numR,numC-g);
-        B = zeros(numR,numC-g);
+        A = zeros(numR-g,numC);
+        B = zeros(numR-g,numC);
 
-        A(:,:) = I(:,1+g:size(I,2));
-        B(:,:) = I(:,1:size(I,2)-g);
+        A(:,:) = I(1+g:size(I,1),:);
+        B(:,:) = I(1:size(I,1)-g,:);
         
         cocMat(z,g) = corr2(A,B);
     end

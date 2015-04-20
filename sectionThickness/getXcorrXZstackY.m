@@ -19,8 +19,8 @@ numC = size(inputImageStack,3); % z axis
 
 xcorrMat = zeros(maxNumImages,maxShift);
 
-A = zeros(numZ,numX);
-B = zeros(numZ,numX);
+A = zeros(numX,numZ);
+B = zeros(numX,numZ);
 z = 1; % starting image
 % TODO: current we take the first n images for the estimation. Perhaps we
 % can think of geting a random n images.
