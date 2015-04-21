@@ -2,6 +2,15 @@
 function [output3,RGBimg3,orientedScoreSpace3D] = getOFR(imgIn,orientations,barLength,...
                         barWidth,invertImg,threshFrac)
                     
+% inputs:
+%   imgIn - image matrix
+%   orientations - vector of orientations of bars to be used e.g. 0:10:350
+%   barLength - 13
+%   barWidth - 4
+%   invertImg - 1 for EM images to have dark pixels to be close to 1.
+%   threshFrac - fraction ([0,1]) of the intensity of the peaks of
+%   convolution filter to be removed.
+                    
 % output3 = HSV 3D matrix
 %% parameters
 displayIntermediateFigures=0;
