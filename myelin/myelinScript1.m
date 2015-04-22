@@ -9,6 +9,23 @@ maskSize = 7;
 gbImage = gaussianFilter(inputImage,sigma,maskSize);
 figure;imagesc(inputImage);title('Gaussian blurred image')
 
+%% Thresholding
+threshold = 0.15;
+thresholdedGbImage = im2bw(gbImage,threshold);
+figure;imshow(thresholdedGbImage);title('thresholded gaussian blurred image')
+
+%% Get connected components
+CC = bwconncomp(thresholdedGbImage);
+numPixels = cellfun(@numel,CC.PixelIdxList);
+% [biggest,idx] = max(numPixels);
+[sortedNumPixelList,cellIDsForSortedPixelsList] = sort(numPixels,'descend');
+
+% pick the largest
+% to access the pixel listCC.PixelIdxList{idx}
+% biggest
+
+
+
 %% Erosion and dilation
 SE = strel('square',5);
 
@@ -27,7 +44,7 @@ figure;imagesc(erosionDilation);title('dilated eroded')
 %% connected component analysis
 threshold = 0.15;
 binaryImage = im2bw(dilationErosion,threshold);
-figure;imshow(binaryImage);title('binary image')
+figure;imshow(binaryImage);title('binary image after dilation and erosion')
 
 %% watershed
 % invertedGbImage = invertImage(gbImage);
