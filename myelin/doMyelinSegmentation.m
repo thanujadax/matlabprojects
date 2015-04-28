@@ -20,7 +20,7 @@ outputPath = '/home/thanuja/projects/data/myelin/ssSEM/s909/output20150428';
 params.sigmaGaussianBlur = 2;
 params.maskSizeGaussianBlur = 7;
 params.threshold_pixelIntensity = 0.15; % to generate binary images for myelin labels
-params.numPixelsCC = 3000; % minimum number of pixels for CC to be considered as myelin
+params.numPixelsCC = 4000; % minimum number of pixels for CC to be considered as myelin
 
 %% Perform segmentation on raw images
 inputMylProbMapFilesString = strcat('*.',inputFilePaths.fileExt);
@@ -29,6 +29,8 @@ inputMylProbMapFilesString = fullfile(inputFilePaths.myelinProbabilityMaps,...
 inputProbabilityMapDirectory = dir(inputMylProbMapFilesString);
 
 for i = 1:length(inputProbabilityMapDirectory)
+    str1 = sprintf('Processing input image %d out of %d ...',i,length(inputProbabilityMapDirectory));
+    disp(str1)
     probabilityMapFileName = fullfile(inputFilePaths.myelinProbabilityMaps,inputProbabilityMapDirectory(i).name);
     str1 = strcat('Reading probability map ',probabilityMapFileName);
     disp(str1)
