@@ -13,8 +13,8 @@ function doMyelinSegmentation(inputFilePaths,params,outputPath)
 %% File paths
 inputFilePaths.fileExt = 'png';
 inputFilePaths.rawImages = '/home/thanuja/projects/data/myelin/ssSEM/s909/raw20150428';
-inputFilePaths.myelinProbabilityMaps = '/home/thanuja/projects/data/myelin/ssSEM/s909/probabilityMaps20150428';
-outputPath = '/home/thanuja/projects/data/myelin/ssSEM/s909/output20150428';
+inputFilePaths.myelinProbabilityMaps = '/home/thanuja/projects/data/myelin/ssSEM/s909/probabilityMaps';
+outputPath = '/home/thanuja/projects/data/myelin/ssSEM/s909/output';
 
 %% Parameters
 params.sigmaGaussianBlur = 2;

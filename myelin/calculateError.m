@@ -6,10 +6,10 @@ function errors = calculateError()
 %   errors.F1score - 
 
 %% File names and paths
-inputFilePaths.groundTruthDirectory = '/home/thanuja/projects/data/myelin/ssSEM/s909/groundTruth20150428';
-inputFilePaths.segmentationDirectory = '/home/thanuja/projects/data/myelin/ssSEM/s909/output20150428';
+inputFilePaths.groundTruthDirectory = '/home/thanuja/projects/data/myelin/ssSEM/s909/groundTruth';
+inputFilePaths.segmentationDirectory = '/home/thanuja/projects/data/myelin/ssSEM/s909/output';
 inputFilePaths.inputFileType = 'png';
-outputFileName = '/home/thanuja/projects/data/myelin/ssSEM/s909/output20150428/predictionError.txt';
+outputFileName = '/home/thanuja/projects/data/myelin/ssSEM/s909/output/predictionError.txt';
 
 %% Parameters
 
@@ -19,12 +19,12 @@ outputFileName = '/home/thanuja/projects/data/myelin/ssSEM/s909/output20150428/p
 
 inputGroundTruthFilesString = strcat('*.',inputFilePaths.inputFileType);
 inputGroundTruthFilesString = fullfile...
-    ('/home/thanuja/projects/data/myelin/ssSEM/s909/groundTruth20150428',inputGroundTruthFilesString);
+    (inputFilePaths.groundTruthDirectory,inputGroundTruthFilesString);
 inputGroundTruthDirectory = dir(inputGroundTruthFilesString);
 
 inputSegmentationFilesString = strcat('*.',inputFilePaths.inputFileType);
 inputSegmentationFilesString = fullfile...
-    ('/home/thanuja/projects/data/myelin/ssSEM/s909/output20150428',inputSegmentationFilesString);
+    (inputFilePaths.segmentationDirectory,inputSegmentationFilesString);
 inputSegmentationDirectory = dir(inputSegmentationFilesString);
 
 numGroundTruthImages = length(inputGroundTruthDirectory);
@@ -40,7 +40,7 @@ if(numGroundTruthImages==numSegmentImages)
 else
     disp('WARNING: calculateError.m: the number of ground truth images and the number of segmented images do not match.!');
     numImagesToProcess = min(numGroundTruthImages,numSegmentImages);
-    str1('Comparing the first %d images.',numImagesToProcess);
+    str1=sprintf('Comparing the first %d images.',numImagesToProcess);
     disp(str1)
 end
 errors.ri = zeros(1,numImagesToProcess);
