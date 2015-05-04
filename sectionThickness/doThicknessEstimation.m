@@ -8,7 +8,7 @@ function thicknessEstimates = doThicknessEstimation(...
 
 %% Parameters
 
-% calibrationMethod = 5;
+calibrationMethod = 5;
 
 % 1 - correlation coefficient across ZY sections, along x axis
 % 2 - correlation coefficient across XY sections, along x axis
@@ -19,18 +19,18 @@ function thicknessEstimates = doThicknessEstimation(...
 % 7 - 
 % TODO: methods robust against registration problems
 
-% params.xyResolution = 5; % nm
-% params.maxShift = 20;
-% params.maxNumImages = 20; % number of sections to initiate calibration.
-%                 % the calibration curve is the mean value obtained by all
-%                 % these initiations
-% params.numPairs = 2; % number of section pairs to be used to estimate the thickness of onesection
-% params.plotOutput = 1;
-% params.usePrecomputedCurve = 0;
-% params.pathToPrecomputedCurve = '';
-% 
-% inputImageStackFileName = '/home/thanuja/projects/data/FIBSEM_dataset/cubes/s108_1-200.tif';
-% outputSavePath = '/home/thanuja/projects/tests/thickness/similarityCurves/s108_1-200_20150416';
+params.xyResolution = 5; % nm
+params.maxShift = 20;
+params.maxNumImages = 20; % number of sections to initiate calibration.
+                % the calibration curve is the mean value obtained by all
+                % these initiations
+params.numPairs = 2; % number of section pairs to be used to estimate the thickness of onesection
+params.plotOutput = 1;
+params.usePrecomputedCurve = 0;
+params.pathToPrecomputedCurve = '';
+
+inputImageStackFileName = '/home/thanuja/projects/data/FIBSEM_dataset/cubes/s108/s108_1-200.tif';
+outputSavePath = '/home/thanuja/projects/tests/thickness/similarityCurves/s108_1-200_20150416';
 
 %% 
 
@@ -76,7 +76,7 @@ else
     error('Unrecognized calibration method specified. Check calibrationMethod')
 end
 
-% save calibration curve
+%% save calibration curve
 disp('Saving xcorrMat')
 matName = sprintf('xcorrMat%d.mat',calibrationMethod);
 xcorrFileName = fullfile(outputSavePath,matName);
@@ -96,17 +96,22 @@ relZresolution = predictThicknessFromCurveFromMultiplePairs(...
 % each row contains one set of estimates for all the sections. First row is
 % from the images i and i+1, the second row is from images i and i+2 etc    
 thicknessEstimates = relZresolution .* params.xyResolution;
-% save predicted thickness to text file
-
-
-% plot output if required
+%% save predicted thickness to text file
+thicknessFileName = '_predictedThickness.txt';
+tokenizedFName = strsplit(inputImageStackFileName,filesep);
+nameOfStack = strtok(tokenizedFName(end),'.');
+thicknessFileName = strcat(nameOfStack,thicknessFileName);
+thicknessFileName = fullfile(outputSavePath,thicknessFileName);
+thicknessEstimates = thicknessEstimates';
+save(thicknessFileName{1},'thicknessEstimates','-ASCII');
+%% plot output if required
 if(params.plotOutput)
-    if(size(thicknessEstimates,1)==1)
+    if(size(thicknessEstimates,2)==1)
         figure;plot(thicknessEstimates);
-    elseif(size(thicknessEstimates,1)==2)
-        figure;plot(thicknessEstimates(1,:),'r');
+    elseif(size(thicknessEstimates,2)==2)
+        figure;plot(thicknessEstimates(:,1),'r');
         hold on
-        plot((thicknessEstimates(2,:).* 0.5),'g');
+        plot((thicknessEstimates(:,2).* 0.5),'g');
         hold off
     end
     title('Section thickness estimates (nm)')
