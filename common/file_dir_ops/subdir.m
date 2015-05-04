@@ -33,7 +33,7 @@ function [sub,fls] = subfolder(CurrPath,sub,fls)
 tmp = dir(CurrPath);
 tmp = tmp(~ismember({tmp.name},{'.' '..'}));
 for i = {tmp([tmp.isdir]).name}
-   sub{end+1} = [CurrPath '\' i{:}];
+   sub{end+1} = [CurrPath filesep i{:}];
    if nargin==2
       sub = subfolder(sub{end},sub);
    else

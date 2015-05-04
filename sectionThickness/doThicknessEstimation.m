@@ -7,7 +7,9 @@ function thicknessEstimates = doThicknessEstimation(...
 % calibrate the similarity curve
 
 %% Parameters
-calibrationMethod = 5;
+
+% calibrationMethod = 5;
+
 % 1 - correlation coefficient across ZY sections, along x axis
 % 2 - correlation coefficient across XY sections, along x axis
 % 3 - SD of XY per pixel intensity difference
@@ -16,15 +18,19 @@ calibrationMethod = 5;
 % 6 - c.o.c acroxx XZ sections, along X
 % 7 - 
 % TODO: methods robust against registration problems
-params.xyResolution = 5; % nm
-params.maxShift = 20;
-params.maxNumImages = 20; % number of sections to initiate calibration.
-                % the calibration curve is the mean value obtained by all
-                % these initiations
-params.numPairs = 2; % number of section pairs to be used to estimate the thickness of one section
 
-inputImageStackFileName = '/home/thanuja/projects/data/FIBSEM_dataset/cubes/s108_1-200.tif';
-outputSavePath = '/home/thanuja/projects/tests/thickness/similarityCurves/s108_1-200_20150416';
+% params.xyResolution = 5; % nm
+% params.maxShift = 20;
+% params.maxNumImages = 20; % number of sections to initiate calibration.
+%                 % the calibration curve is the mean value obtained by all
+%                 % these initiations
+% params.numPairs = 2; % number of section pairs to be used to estimate the thickness of onesection
+% params.plotOutput = 1;
+% params.usePrecomputedCurve = 0;
+% params.pathToPrecomputedCurve = '';
+% 
+% inputImageStackFileName = '/home/thanuja/projects/data/FIBSEM_dataset/cubes/s108_1-200.tif';
+% outputSavePath = '/home/thanuja/projects/tests/thickness/similarityCurves/s108_1-200_20150416';
 
 %% 
 
@@ -90,14 +96,20 @@ relZresolution = predictThicknessFromCurveFromMultiplePairs(...
 % each row contains one set of estimates for all the sections. First row is
 % from the images i and i+1, the second row is from images i and i+2 etc    
 thicknessEstimates = relZresolution .* params.xyResolution;
-if(size(thicknessEstimates,1)==1)
-    figure;plot(thicknessEstimates);
-elseif(size(thicknessEstimates,1)==2)
-    figure;plot(thicknessEstimates(1,:),'r');
-    hold on
-    plot((thicknessEstimates(2,:).* 0.5),'g');
-    hold off
+% save predicted thickness to text file
+
+
+% plot output if required
+if(params.plotOutput)
+    if(size(thicknessEstimates,1)==1)
+        figure;plot(thicknessEstimates);
+    elseif(size(thicknessEstimates,1)==2)
+        figure;plot(thicknessEstimates(1,:),'r');
+        hold on
+        plot((thicknessEstimates(2,:).* 0.5),'g');
+        hold off
+    end
+    title('Section thickness estimates (nm)')
+    xlabel('Section index')
+    ylabel('Estimated thickness (nm)')
 end
-title('Section thickness estimates (nm)')
-xlabel('Section index')
-ylabel('Estimated thickness (nm)')

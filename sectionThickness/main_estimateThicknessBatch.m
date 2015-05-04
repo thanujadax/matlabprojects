@@ -18,13 +18,15 @@ params.maxNumImages = 50; % number of sections to initiate calibration.
                 % the calibration curve is the mean value obtained by all
                 % these initiations
 params.numPairs = 2; % number of section pairs to be used to estimate the thickness of one section
+params.plotOutput = 0; % don't plot intermediate curves.
+params.usePrecomputedCurve = 0;
+params.pathToPrecomputedCurve = '';
 
 % inputImageStackFileName = '/home/thanuja/projects/data/FIBSEM_dataset/cubes/s108_1-200.tif';
-% outputSavePath = '/home/thanuja/projects/tests/thickness/similarityCurves/s108_1-200_20150416';
+outputSavePath = '/home/thanuja/projects/tests/thickness/batchEstimation/20150504';
 
 %% File paths
 imageCubeDirectory = '/home/thanuja/projects/data/FIBSEM_dataset/cubes';
-
 
 % get the list of directories
 [sampleDirectories,~] = subdir(imageCubeDirectory);
@@ -38,7 +40,13 @@ for i=1:length(sampleDirectories)
     imageStackDir = dir(imageStackFileString);
     
     % process each image stack in the sample
+    for i=1:length(imageStackDir)
+        inputImageStackFileName = fullfile...
+            (sampleSubDirName,imageStackDir(i).name);
+        thicknessEstimates = doThicknessEstimation(...
+    calibrationMethod,inputImageStackFileName,outputSavePath,params);
     
+    end
     
     % TODO: do we use the same curve for ths same sample?
     % makes sense to do so. Make aggregate curve?
