@@ -6,6 +6,12 @@ function thicknessEstimates = doThicknessEstimation(...
 % do thickness estimation based on one of the following methods to
 % calibrate the similarity curve
 
+% output:
+%   thicknessEstimates - column vector of thickness estimates = distance
+%   between 2 adjacent sections. It will have multiple columns if
+%   param.numPairs > 1. 2nd column will be the estimate using the i and
+%   i+2nd image. etc.
+
 %% Parameters
 
 calibrationMethod = 5;
