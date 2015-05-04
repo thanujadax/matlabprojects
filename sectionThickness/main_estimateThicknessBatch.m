@@ -17,7 +17,7 @@ params.maxShift = 15;
 params.maxNumImages = 50; % number of sections to initiate calibration.
                 % the calibration curve is the mean value obtained by all
                 % these initiations
-params.numPairs = 2; % number of section pairs to be used to estimate the thickness of one section
+params.numPairs = 1; % number of section pairs to be used to estimate the thickness of one section
 params.plotOutput = 0; % don't plot intermediate curves.
 params.usePrecomputedCurve = 0;
 params.pathToPrecomputedCurve = '';
@@ -31,7 +31,7 @@ imageCubeDirectory = '/home/thanuja/projects/data/FIBSEM_dataset/cubes';
 % get the list of directories
 [sampleDirectories,~] = subdir(imageCubeDirectory);
 
-% tiff stacks are storedd in each directory
+% tiff stacks are stored in each directory
 for i=1:length(sampleDirectories)
     sampleSubDirName = sampleDirectories{i};
     % read all image stacks in this sample
@@ -45,7 +45,7 @@ for i=1:length(sampleDirectories)
             (sampleSubDirName,imageStackDir(i).name);
         thicknessEstimates = doThicknessEstimation(...
     calibrationMethod,inputImageStackFileName,outputSavePath,params);
-    
+    % writes output to output path as txt file. Col vector.
     end
     
     % TODO: do we use the same curve for ths same sample?

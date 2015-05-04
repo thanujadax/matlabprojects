@@ -5,7 +5,7 @@ function thicknessEstimates = doThicknessEstimation(...
 % curves to determine the distance between two (adjacent) sections
 % do thickness estimation based on one of the following methods to
 % calibrate the similarity curve
-
+%
 % output:
 %   thicknessEstimates - column vector of thickness estimates = distance
 %   between 2 adjacent sections. It will have multiple columns if
@@ -14,29 +14,30 @@ function thicknessEstimates = doThicknessEstimation(...
 
 %% Parameters
 
-calibrationMethod = 5;
-
-% 1 - correlation coefficient across ZY sections, along x axis
-% 2 - correlation coefficient across XY sections, along x axis
-% 3 - SD of XY per pixel intensity difference
-% 4 - c.o.c across ZY sections along Y
-% 5 - c.o.c across XY sections, along X
-% 6 - c.o.c acroxx XZ sections, along X
-% 7 - 
-% TODO: methods robust against registration problems
-
-params.xyResolution = 5; % nm
-params.maxShift = 20;
-params.maxNumImages = 20; % number of sections to initiate calibration.
-                % the calibration curve is the mean value obtained by all
-                % these initiations
-params.numPairs = 2; % number of section pairs to be used to estimate the thickness of onesection
-params.plotOutput = 1;
-params.usePrecomputedCurve = 0;
-params.pathToPrecomputedCurve = '';
-
-inputImageStackFileName = '/home/thanuja/projects/data/FIBSEM_dataset/cubes/s108/s108_1-200.tif';
-outputSavePath = '/home/thanuja/projects/tests/thickness/similarityCurves/s108_1-200_20150416';
+% calibrationMethod = 5;
+% 
+% % 1 - correlation coefficient across ZY sections, along x axis
+% % 2 - correlation coefficient across XY sections, along Y axis
+% % 3 - SD of XY per pixel intensity difference
+% % 4 - c.o.c across ZY sections along Y
+% % 5 - c.o.c across XY sections, along X
+% % 6 - c.o.c acroxx XZ sections, along X
+% % 7 - 
+% % TODO: methods robust against registration problems
+% 
+% params.predict = 1; % set to 0 if only the interpolation curve is required.
+% params.xyResolution = 5; % nm
+% params.maxShift = 15;
+% params.maxNumImages = 60; % number of sections to initiate calibration.
+%                 % the calibration curve is the mean value obtained by all
+%                 % these initiations
+% params.numPairs = 1; % number of section pairs to be used to estimate the thickness of onesection
+% params.plotOutput = 1;
+% params.usePrecomputedCurve = 0;
+% params.pathToPrecomputedCurve = '';
+% 
+% inputImageStackFileName = '/home/thanuja/projects/data/FIBSEM_dataset/largercubes/s108/s108.tif';
+% outputSavePath = '/home/thanuja/projects/tests/thickness/similarityCurves/s108';
 
 %% 
 
@@ -84,7 +85,7 @@ end
 
 %% save calibration curve
 disp('Saving xcorrMat')
-matName = sprintf('xcorrMat%d.mat',calibrationMethod);
+matName = sprintf('xcorrMat%02d.mat',calibrationMethod);
 xcorrFileName = fullfile(outputSavePath,matName);
 save(xcorrFileName,'xcorrMat')
 disp('done')
@@ -92,6 +93,7 @@ disp('done')
 % %% plot
 % shadedErrorBar((1:params.maxShift),mean(xcorrMat,1),std(xcorrMat),'g');
 
+if(params.predict)
 %% Predict
 % predict section thickness for the data set
 % relZresolution = predictThicknessFromCurve(...
@@ -103,7 +105,7 @@ relZresolution = predictThicknessFromCurveFromMultiplePairs(...
 % from the images i and i+1, the second row is from images i and i+2 etc    
 thicknessEstimates = relZresolution .* params.xyResolution;
 %% save predicted thickness to text file
-thicknessFileName = '_predictedThickness.txt';
+thicknessFileName = sprintf('%02d_predictedThickness.txt',calibrationMethod);
 tokenizedFName = strsplit(inputImageStackFileName,filesep);
 nameOfStack = strtok(tokenizedFName(end),'.');
 thicknessFileName = strcat(nameOfStack,thicknessFileName);
@@ -123,4 +125,5 @@ if(params.plotOutput)
     title('Section thickness estimates (nm)')
     xlabel('Section index')
     ylabel('Estimated thickness (nm)')
+end
 end
