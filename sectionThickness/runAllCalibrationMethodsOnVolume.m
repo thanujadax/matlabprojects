@@ -1,4 +1,5 @@
-function runAllCalibrationMethodsOnVolume()
+function runAllCalibrationMethodsOnVolume...
+    (inputImageStackFileName,outputSavePath,params)
 
 % run all calibration methods for one volume and save the calibration
 % curves and the predictions in the outputPath

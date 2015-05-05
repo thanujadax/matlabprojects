@@ -16,13 +16,13 @@ function thicknessEstimates = doThicknessEstimation(...
 
 % calibrationMethod = 5;
 % 
-% % 1 - correlation coefficient across ZY sections, along x axis
-% % 2 - correlation coefficient across XY sections, along Y axis
+% % 1 - c.o.c across ZY sections, along x axis
+% % 2 - c.o.c across XY sections, along Y axis
 % % 3 - SD of XY per pixel intensity difference
 % % 4 - c.o.c across ZY sections along Y
 % % 5 - c.o.c across XY sections, along X
 % % 6 - c.o.c acroxx XZ sections, along X
-% % 7 - 
+% % 7 - c.o.c acroxx XZ sections, along Y
 % % TODO: methods robust against registration problems
 % 
 % params.predict = 1; % set to 0 if only the interpolation curve is required.
@@ -85,7 +85,10 @@ end
 
 %% save calibration curve
 disp('Saving xcorrMat')
-matName = sprintf('xcorrMat%02d.mat',calibrationMethod);
+tokenizedFName = strsplit(inputImageStackFileName,filesep);
+nameOfStack = strtok(tokenizedFName(end),'.');
+nameOfStack = nameOfStack{1};
+matName = sprintf('xcorrMat_%s_%02d.mat',nameOfStack,calibrationMethod);
 xcorrFileName = fullfile(outputSavePath,matName);
 save(xcorrFileName,'xcorrMat')
 disp('done')
@@ -105,13 +108,12 @@ relZresolution = predictThicknessFromCurveFromMultiplePairs(...
 % from the images i and i+1, the second row is from images i and i+2 etc    
 thicknessEstimates = relZresolution .* params.xyResolution;
 %% save predicted thickness to text file
-thicknessFileName = sprintf('%02d_predictedThickness.txt',calibrationMethod);
-tokenizedFName = strsplit(inputImageStackFileName,filesep);
-nameOfStack = strtok(tokenizedFName(end),'.');
+thicknessFileName = sprintf('_cm%02d_thickness.txt',calibrationMethod);
+
 thicknessFileName = strcat(nameOfStack,thicknessFileName);
 thicknessFileName = fullfile(outputSavePath,thicknessFileName);
 thicknessEstimates = thicknessEstimates';
-save(thicknessFileName{1},'thicknessEstimates','-ASCII');
+save(thicknessFileName,'thicknessEstimates','-ASCII');
 %% plot output if required
 if(params.plotOutput)
     if(size(thicknessEstimates,2)==1)
