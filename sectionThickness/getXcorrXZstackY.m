@@ -23,7 +23,8 @@ disp('Estimating similarity curve using zy sections ...')
 numImages = numImages - maxShift;
 if(maxNumImages>numImages)
     maxNumImages = numImages;
-    disp('maxNumImages > numImages. using numImages = %d instead',numImages);
+    str1 = sprintf('maxNumImages > numImages. using numImages = %d instead',numImages);
+    disp(str1)
 end
 numShifts = maxShift - minShift + 1;
 xcorrMat = zeros(maxNumImages,numShifts);

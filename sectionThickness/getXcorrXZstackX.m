@@ -28,7 +28,8 @@ numImages = numY;
 disp('Estimating similarity curve using correlation coefficient of shifted XY sections ...')
 if(maxNumImages>numImages)
     maxNumImages = numImages;
-    disp('maxNumImages > numImages. using numImages = %d instead',numImages);
+    str1 = sprintf('maxNumImages > numImages. using numImages = %d instead',numImages);
+    disp(str1)
 end
 numShifts = maxShift - minShift + 1;
 cocMat = zeros(maxNumImages,numShifts);

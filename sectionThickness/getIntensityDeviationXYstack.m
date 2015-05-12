@@ -19,7 +19,8 @@ inputImageStack = readTiffStackToArray(inputImageStackFileName);
 numImages = size(inputImageStack,3);
 if(maxNumImages>numImages)
     maxNumImages = numImages;
-    disp('maxNumImages > numImages. using numImages = %d instead',numImages);
+    str1 = sprintf('maxNumImages > numImages. using numImages = %d instead',numImages);
+    disp(str1)
 end
 numShifts = maxShift - minShift + 1;
 sigmaMat = zeros(maxNumImages,numShifts);

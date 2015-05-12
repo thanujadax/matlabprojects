@@ -13,7 +13,7 @@ function thicknessEstimates = doThicknessEstimation(...
 %   i+2nd image. etc.
 
 %% Parameters
-
+% 
 % calibrationMethod = 10;
 % 
 % % 1 - c.o.c across ZY sections, along x axis
@@ -41,7 +41,7 @@ function thicknessEstimates = doThicknessEstimation(...
 % params.suppressPlots = 0;
 % params.pathToPrecomputedCurve = '';
 % 
-% inputImageStackFileName = '/home/thanuja/projects/data/FIBSEM_dataset/largercubes/s108/s108.tif';
+% inputImageStackFileName = '/home/thanuja/projects/data/FIBSEM_dataset/largercubes/s202/s202_1.tif';
 % outputSavePath = '/home/thanuja/projects/tests/thickness/similarityCurves/test';
 
 %% 
