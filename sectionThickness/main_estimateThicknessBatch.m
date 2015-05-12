@@ -15,7 +15,7 @@ param.imgStackFileExt = 'tif';
 
 params.predict = 1;
 params.xyResolution = 5; % nm
-params.maxShift = 15;
+params.maxShift = 10;
 params.maxNumImages = 100; % number of sections to initiate calibration.
                 % the calibration curve is the mean value obtained by all
                 % these initiations
