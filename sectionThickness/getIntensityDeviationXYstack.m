@@ -24,9 +24,6 @@ end
 
 sigmaMat = zeros(maxNumImages,maxShift);
 
-A = zeros(numR,numC);
-B = zeros(numR,numC);
-z = 1; % starting image
 % TODO: current we take the first n images for the estimation. Perhaps we
 % can think of geting a random n images.
 disp('Estimating similarity curve using SD of intensity differences across shifted XY sections')
@@ -42,9 +39,9 @@ for z=1:maxNumImages
 end
 
 %% plot
-titleStr = 'SD of pixel intensity deviations using shifted XY sections';
-xlabelStr = 'Shifted pixels';
-ylabelStr = 'SD of pixel intensity deviation';
-transparent = 1;
-shadedErrorBar((1:maxShift),mean(sigmaMat,1),std(sigmaMat),'g',transparent,...
-    titleStr,xlabelStr,ylabelStr);
+% titleStr = 'SD of pixel intensity deviations using shifted XY sections';
+% xlabelStr = 'Shifted pixels';
+% ylabelStr = 'SD of pixel intensity deviation';
+% transparent = 1;
+% shadedErrorBar((1:maxShift),mean(sigmaMat,1),std(sigmaMat),'g',transparent,...
+%     titleStr,xlabelStr,ylabelStr);

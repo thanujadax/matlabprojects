@@ -45,9 +45,9 @@ for z=1:maxNumImages
 end
 
 %% plot
-titleStr = 'Coefficient of Correlation using XY sections along X axis';
-xlabelStr = 'Shifted pixels';
-ylabelStr = 'Coefficient of Correlation';
-transparent = 0;
-shadedErrorBar((1:maxShift),mean(cocMat,1),std(cocMat),'g',transparent,...
-    titleStr,xlabelStr,ylabelStr);
+% titleStr = 'Coefficient of Correlation using XY sections along X axis';
+% xlabelStr = 'Shifted pixels';
+% ylabelStr = 'Coefficient of Correlation';
+% transparent = 0;
+% shadedErrorBar((1:maxShift),mean(cocMat,1),std(cocMat),'g',transparent,...
+%     titleStr,xlabelStr,ylabelStr);

@@ -43,6 +43,8 @@ function thicknessEstimates = doThicknessEstimation(...
 
 if(calibrationMethod == 1)
     disp('Calculating c.o.c decay curve using ZY stack, along X ...')
+    calibrationString = 'c.o.c ZY along X';
+    calibrationFigureFileString = '01_cocZY_X';
     xcorrMat = getXcorrZYstack(inputImageStackFileName,params.maxShift,params.maxNumImages);
     disp('done!')
     % each column of xcorrMat corresponds to a sequence of shifted frames of
@@ -51,54 +53,81 @@ if(calibrationMethod == 1)
 
 elseif(calibrationMethod == 2)
     disp('Calculating c.o.c decay curve using XY images stack, along Y ...')
+    calibrationString = 'c.o.c XY along Y';
+    calibrationFigureFileString = '02_cocXY_Y';
     xcorrMat = getXcorrXYstack(inputImageStackFileName,params.maxShift,params.maxNumImages);
     disp('done!')    
     
 elseif(calibrationMethod == 3)
+    calibrationString = 'SD of pixel intensity XY along X';
     disp('Calculating SD of intensity deviation curve using shifted XY sections stack, along X ...')
     xcorrMat = getIntensityDeviationXYstack(inputImageStackFileName,params.maxShift,params.maxNumImages);
     disp('done!')
-%       disp('Skipping calibration method 3 (SD of intensity deviation)')
+    calibrationFigureFileString = '03_sdpiXY_X';
     
 elseif(calibrationMethod == 4)
+    calibrationString = 'c.o.c ZY along Y';
     disp('Calculating c.o.c decay curve using ZY stack, along Y ...')
     xcorrMat = getXcorrZYstackY(inputImageStackFileName,params.maxShift,params.maxNumImages);
     disp('curve estimation done')
+    calibrationFigureFileString = '04_cocZY_Y';
     
 elseif(calibrationMethod == 5)
+    calibrationString = 'c.o.c XY along X';
     disp('Calculating c.o.c decay curve using XY images stack, along X ...')
     xcorrMat = getXcorrXYstackX(inputImageStackFileName,params.maxShift,params.maxNumImages);
     disp('curve estimation done!')    
+    calibrationFigureFileString = '05_cocXY_X';
     
 elseif(calibrationMethod == 6)
+    calibrationString = 'c.o.c XZ along X';
     disp('Calculating c.o.c decay curve using XZ images stack, along X ...')
     xcorrMat = getXcorrXZstackX(inputImageStackFileName,params.maxShift,params.maxNumImages);
     disp('curve estimation done!')    
+    calibrationFigureFileString = '06_cocXZ_X';
     
 elseif(calibrationMethod == 7)
+    calibrationString = 'c.o.c XZ along Y';
     disp('Calculating c.o.c decay curve using XZ images stack, along Y ...')
     xcorrMat = getXcorrXZstackY(inputImageStackFileName,params.maxShift,params.maxNumImages);
     disp('curve estimation done!')
+    calibrationFigureFileString = '07_cocXZ_Y';
     
 else
     error('Unrecognized calibration method specified. Check calibrationMethod')
 end
 
-%% save calibration curve
-disp('Saving xcorrMat')
+
+%% plot calibration curve
+
 tokenizedFName = strsplit(inputImageStackFileName,filesep);
 nameOfStack = strtok(tokenizedFName(end),'.');
 nameOfStack = nameOfStack{1};
+
+if(params.plotOutput)
+    titleStr = sprintf('Similarity curve (%d): %s. Vol %s',calibrationMethod,calibrationString,nameOfStack);
+    title(titleStr)
+    xlabelStr = 'Shifted pixels';
+    ylabelStr = 'Coefficient of Correlation';
+    transparent = 0;
+    shadedErrorBar((1:params.maxShift),mean(xcorrMat,1),std(xcorrMat),'g',transparent,...
+        titleStr,xlabelStr,ylabelStr);
+    % save calibration curve figure
+    % calibrationFigureFileName = strcat(calibrationFigureFileString,'.png')
+    calibrationFigureFileName = fullfile(outputSavePath,calibrationFigureFileString);
+    print(calibrationFigureFileName,'-dpng');
+end
+
+%% save calibration curve .mat
+disp('Saving xcorrMat')
+
 matName = sprintf('xcorrMat_%s_%02d.mat',nameOfStack,calibrationMethod);
 xcorrFileName = fullfile(outputSavePath,matName);
 save(xcorrFileName,'xcorrMat')
 disp('done')
 
-% %% plot
-% shadedErrorBar((1:params.maxShift),mean(xcorrMat,1),std(xcorrMat),'g');
-
+%% Predict thickness
 if(params.predict)
-%% Predict
 % predict section thickness for the data set
 % relZresolution = predictThicknessFromCurve(...
 %         inputImageStackFileName,xcorrMat,params.maxShift,calibrationMethod);
@@ -125,7 +154,8 @@ if(params.plotOutput)
         plot((thicknessEstimates(:,2).* 0.5),'g');
         hold off
     end
-    title('Section thickness estimates (nm)')
+    titleStr = sprintf('Section thickness estimates. Vol: %s. Cal: %d',nameOfStack,calibrationMethod);
+    title(titleStr);
     xlabel('Section index')
     ylabel('Estimated thickness (nm)')
 end
