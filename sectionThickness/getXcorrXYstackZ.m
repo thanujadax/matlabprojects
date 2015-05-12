@@ -1,7 +1,5 @@
-function xcorrMat = getXcorrZYstackY(inputImageStackFileName,maxShift,minShift,maxNumImages)
-% calculate c.o.c curve on the ZY plane, shifting the (same) image along
-% the Y axis. Multiple images are used to get an average estimate of the
-% decay of c.o.c.
+function xcorrMat = getXcorrXYstackZ(inputImageStackFileName,maxShift,minShift,maxNumImages)
+% calculate the c.o.c of the XY plane along the Z axis.
 
 % Inputs:
 % imageStack - image stack (tif) for which the thickness has to be
@@ -17,33 +15,30 @@ inputImageStack = readTiffStackToArray(inputImageStackFileName);
 
 % I = double(imread(imageStack));
 numR = size(inputImageStack,1);
-numC = size(inputImageStack,3); % z axis
-numImages = size(inputImageStack,2); % x axis
+numC = size(inputImageStack,2); % z axis
+numImages = size(inputImageStack,3); % x axis
 
+A = zeros(numR,numC);
+B = zeros(numR,numC);
+
+z = 1; % starting image
 % TODO: current we take the first n images for the estimation. Perhaps we
 % can think of geting a random n images.
-disp('Estimating similarity curve using zy sections, shifting along Y ...')
+disp('Estimating similarity curve using zy sections ...')
+numImages = numImages - maxShift;
 if(maxNumImages>numImages)
     maxNumImages = numImages;
     disp('maxNumImages > numImages. using numImages = %d instead',numImages);
 end
 numShifts = maxShift - minShift + 1;
 xcorrMat = zeros(maxNumImages,numShifts);
+
 for z=1:maxNumImages
     k=0;
     for g=minShift:maxShift
-        A = zeros(numR-g,numC);
-        B = zeros(numR-g,numC);   
-        A(:,:) = inputImageStack(1+g:size(inputImageStack,1),z,:);
-        B(:,:) = inputImageStack(1:size(inputImageStack,1)-g,z,:);  % with shift
+        A(:,:) = inputImageStack(:,:,z);
+        B(:,:) = inputImageStack(:,:,z+g);  % with shift
         k=k+1;
         xcorrMat(z,k) = corr2(A,B);
     end
 end
-%% plot
-% titleStr = 'Coefficient of Correlation using ZY sections, along Y';
-% xlabelStr = 'Shifted pixels';
-% ylabelStr = 'Coefficient of Correlation';
-% transparent = 0;
-% shadedErrorBar((1:maxShift),mean(xcorrMat,1),std(xcorrMat),'g',transparent,...
-%     titleStr,xlabelStr,ylabelStr);

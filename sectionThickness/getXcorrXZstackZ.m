@@ -1,5 +1,5 @@
-function cocMat = getXcorrXZstackZ(inputImageStackFileName,maxShift,maxNumImages)
-% calculate the correlation of XZ face along the Z axis.
+function cocMat = getXcorrXZstackZ(inputImageStackFileName,maxShift,minShift,maxNumImages)
+% calculate the c.o.c of XZ face along the Z axis
 
 % Inputs:
 % imageStack - image stack (tif) for which the thickness has to be
@@ -19,32 +19,34 @@ inputImageStack = readTiffStackToArray(inputImageStackFileName);
 % initially use just one image
 
 % I = double(imread(imageStack));
-numR = size(inputImageStack,1);
-numC = size(inputImageStack,3); % z axis
-
-cocMat = zeros(maxNumImages,maxShift);
+[numImages,numR,numC] = size(inputImageStack); 
 
 % TODO: current we take the first n images for the estimation. Perhaps we
 % can think of geting a random n images.
 disp('Estimating similarity curve using correlation coefficient of shifted XY sections ...')
-for z=1:maxNumImages
-    I = inputImageStack(z,:,:);
-    [numR,numC] = size(I);
-    for g=1:maxShift
-        A = zeros(numR-g,numC);
-        B = zeros(numR-g,numC);
+if(maxNumImages>numImages)
+    maxNumImages = numImages;
+    disp('maxNumImages > numImages. using numImages = %d instead',numImages);
+end
+numShifts = maxShift - minShift + 1;
+cocMat = zeros(maxNumImages,numShifts);
+for z=1:maxNumImages 
+    k=0;
+    for g=minShift:maxShift
+        A = zeros(numR,numC-g);
+        B = zeros(numR,numC-g);
 
-        A(:,:) = I(1+g:size(I,1),:);
-        B(:,:) = I(1:size(I,1)-g,:);
-        
-        cocMat(z,g) = corr2(A,B);
+        A(:,:) = inputImageStack(z,:,1+g:numC);
+        B(:,:) = inputImageStack(z,:,1:numC-g);
+        k=k+1;
+        cocMat(z,k) = corr2(A,B);
     end
 end
 
 %% plot
-titleStr = 'Coefficient of Correlation using XZ sections along Z axis';
-xlabelStr = 'Shifted pixels';
-ylabelStr = 'Coefficient of Correlation';
-transparent = 0;
-shadedErrorBar((1:maxShift),mean(cocMat,1),std(cocMat),'g',transparent,...
-    titleStr,xlabelStr,ylabelStr);
+% titleStr = 'Coefficient of Correlation using XY sections along X axis';
+% xlabelStr = 'Shifted pixels';
+% ylabelStr = 'Coefficient of Correlation';
+% transparent = 0;
+% shadedErrorBar((1:maxShift),mean(cocMat,1),std(cocMat),'g',transparent,...
+%     titleStr,xlabelStr,ylabelStr);

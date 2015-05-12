@@ -1,4 +1,4 @@
-function cocMat = getXcorrXYstackX(inputImageStackFileName,maxShift,maxNumImages)
+function cocMat = getXcorrXYstackX(inputImageStackFileName,maxShift,minShift,maxNumImages)
 % calculate the correlation of XY face along the X axis . i.e. parallel to the
 % cutting plane where we have maximum resolution (5nmx5nm for FIBSEM)
 
@@ -29,18 +29,20 @@ if(maxNumImages>numImages)
     maxNumImages = numImages;
     disp('maxNumImages > numImages. using numImages = %d instead',numImages);
 end
-cocMat = zeros(maxNumImages,maxShift);
+numShifts = maxShift - minShift + 1;
+cocMat = zeros(maxNumImages,numShifts);
 for z=1:maxNumImages
     I = inputImageStack(:,:,z);
     [numR,numC] = size(I);
-    for g=1:maxShift
+    k=0;
+    for g=minShift:maxShift
         A = zeros(numR,numC-g);
         B = zeros(numR,numC-g);
 
         A(:,:) = I(:,1+g:size(I,2));
         B(:,:) = I(:,1:size(I,2)-g);
-        
-        cocMat(z,g) = corr2(A,B);
+        k=k+1;
+        cocMat(z,k) = corr2(A,B);
     end
 end
 

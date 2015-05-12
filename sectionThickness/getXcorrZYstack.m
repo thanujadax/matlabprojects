@@ -1,4 +1,4 @@
-function xcorrMat = getXcorrZYstack(inputImageStackFileName,maxShift,maxNumImages)
+function xcorrMat = getXcorrZYstack(inputImageStackFileName,maxShift,minShift,maxNumImages)
 % calculate the correlation of the ZY plane along the X axis.
 
 % Inputs:
@@ -30,19 +30,15 @@ if(maxNumImages>numImages)
     maxNumImages = numImages;
     disp('maxNumImages > numImages. using numImages = %d instead',numImages);
 end
-xcorrMat = zeros(maxNumImages,maxShift);
+numShifts = maxShift - minShift + 1;
+xcorrMat = zeros(maxNumImages,numShifts);
 
 for z=1:maxNumImages
-    for g=1:maxShift
+    k=0;
+    for g=minShift:maxShift
+        k = k + 1;
         A(:,:) = inputImageStack(:,z,:);
         B(:,:) = inputImageStack(:,z+g,:);  % with shift
-        xcorrMat(z,g) = corr2(A,B);
+        xcorrMat(z,k) = corr2(A,B);
     end
 end
-% %% plot
-% titleStr = 'Coefficient of Correlation using ZY sections';
-% xlabelStr = 'Shifted pixels';
-% ylabelStr = 'Coefficient of Correlation';
-% transparent = 0;
-% shadedErrorBar((1:maxShift),mean(xcorrMat,1),std(xcorrMat),'g',transparent,...
-%     titleStr,xlabelStr,ylabelStr);

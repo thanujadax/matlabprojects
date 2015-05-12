@@ -7,11 +7,13 @@ function runAllCalibrationMethodsOnAllVolumes...
 params.predict = 1; % set to 0 if only the interpolation curve is required.
 params.xyResolution = 5; % nm
 params.maxShift = 10;
+params.minShift = 0;
 params.maxNumImages = 700; % number of sections to initiate calibration.
                 % the calibration curve is the mean value obtained by all
                 % these initiations
 params.numPairs = 1; % number of section pairs to be used to estimate the thickness of onesection
 params.plotOutput = 1;
+params.suppressPlots = 1;
 params.usePrecomputedCurve = 0;
 params.pathToPrecomputedCurve = '';
 params.imgStackFileExt = 'tif';

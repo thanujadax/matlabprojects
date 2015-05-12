@@ -1,4 +1,4 @@
-function relativeDistancePix = getRelativeDistance_cc2(image1,image2,curve,maxVal)
+function relativeDistancePix = getRelativeDistance_cc2(image1,image2,curve,maxVal,minVal)
 % predicts relative section interval in terms of the pixel length in xy
 % plane, using correlation coefficient
 % Inputs:
@@ -6,4 +6,4 @@ function relativeDistancePix = getRelativeDistance_cc2(image1,image2,curve,maxVa
 
 cc = corr2(image1,image2);
 
-relativeDistancePix = interp1(curve,1:maxVal,cc);
+relativeDistancePix = interp1(curve,minVal:maxVal,cc);

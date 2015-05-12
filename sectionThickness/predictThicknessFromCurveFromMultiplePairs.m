@@ -1,5 +1,5 @@
 function relZresolution = predictThicknessFromCurveFromMultiplePairs(...
-        imageStackFileName,xcorrMat,maxShift,calibrationMethod,numPairs)
+        imageStackFileName,xcorrMat,minShift,maxShift,calibrationMethod,numPairs)
 % Returns the section thickness relative to the xy resolution. Multiply by
 % xyResolution to get the actual thickness.
 
@@ -28,7 +28,7 @@ if(numPairs > 0)
             % calculate the distance between two images based on the SD of
             % pixel differences
             deviationSigma = getPixIntensityDeviationSigma(image1,image2);
-            relZresolution(1,i) = getRelativeDistance(mean(xcorrMat,1),maxShift,deviationSigma);
+            relZresolution(1,i) = getRelativeDistance(mean(xcorrMat,1),minShift,maxShift,deviationSigma);
         end
     else
         for i = 1:numImg-1
@@ -36,7 +36,7 @@ if(numPairs > 0)
             image2 = inputImageStack(:,:,(i+1));
             % calculate the distance between the two images based on the
             % correlation coefficient
-            relZresolution(1,i) = getRelativeDistance_cc2(image1,image2,mean(xcorrMat,1),maxShift);
+            relZresolution(1,i) = getRelativeDistance_cc2(image1,image2,mean(xcorrMat,1),maxShift,minShift);
         end
     end
 end
@@ -49,7 +49,7 @@ if(numPairs>1)
             % calculate the distance between two images based on the SD of
             % pixel differences
             deviationSigma = getPixIntensityDeviationSigma(image1,image2);
-            relZresolution(2,i) = getRelativeDistance(mean(xcorrMat,1),maxShift,deviationSigma);
+            relZresolution(2,i) = getRelativeDistance(mean(xcorrMat,1),maxShift,minShift,deviationSigma);
         end
     else
         for i = 1:numImg-2
@@ -57,7 +57,7 @@ if(numPairs>1)
             image2 = inputImageStack(:,:,(i+2));
             % calculate the distance between the two images based on the
             % correlation coefficient
-            relZresolution(2,i) = getRelativeDistance_cc2(image1,image2,mean(xcorrMat,1),maxShift);
+            relZresolution(2,i) = getRelativeDistance_cc2(image1,image2,mean(xcorrMat,1),maxShift,minShift);
         end
     end    
 end

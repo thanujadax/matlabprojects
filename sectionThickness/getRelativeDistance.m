@@ -1,3 +1,3 @@
-function dist = getRelativeDistance(curve,maxVal,value)
+function dist = getRelativeDistance(curve,startVal,maxVal,value)
 
-dist = interp1(curve,1:maxVal,value);
+dist = interp1(curve,startVal:maxVal,value);

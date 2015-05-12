@@ -14,7 +14,7 @@ function thicknessEstimates = doThicknessEstimation(...
 
 %% Parameters
 
-% calibrationMethod = 5;
+% calibrationMethod = 10;
 % 
 % % 1 - c.o.c across ZY sections, along x axis
 % % 2 - c.o.c across XY sections, along Y axis
@@ -23,21 +23,26 @@ function thicknessEstimates = doThicknessEstimation(...
 % % 5 - c.o.c across XY sections, along X
 % % 6 - c.o.c acroxx XZ sections, along X
 % % 7 - c.o.c acroxx XZ sections, along Y
+% % 8 - c.o.c across XY sections, along Z
+% % 9 - c.o.c across ZY sections, along Z
+% % 10 - c.o.c. across XZ sections, along Z
 % % TODO: methods robust against registration problems
 % 
 % params.predict = 1; % set to 0 if only the interpolation curve is required.
 % params.xyResolution = 5; % nm
-% params.maxShift = 15;
+% params.minShift = 0;
+% params.maxShift = 10;
 % params.maxNumImages = 60; % number of sections to initiate calibration.
 %                 % the calibration curve is the mean value obtained by all
 %                 % these initiations
 % params.numPairs = 1; % number of section pairs to be used to estimate the thickness of onesection
 % params.plotOutput = 1;
 % params.usePrecomputedCurve = 0;
+% params.suppressPlots = 0;
 % params.pathToPrecomputedCurve = '';
 % 
 % inputImageStackFileName = '/home/thanuja/projects/data/FIBSEM_dataset/largercubes/s108/s108.tif';
-% outputSavePath = '/home/thanuja/projects/tests/thickness/similarityCurves/s108';
+% outputSavePath = '/home/thanuja/projects/tests/thickness/similarityCurves/test';
 
 %% 
 
@@ -45,7 +50,7 @@ if(calibrationMethod == 1)
     disp('Calculating c.o.c decay curve using ZY stack, along X ...')
     calibrationString = 'c.o.c ZY along X';
     calibrationFigureFileString = '01_cocZY_X';
-    xcorrMat = getXcorrZYstack(inputImageStackFileName,params.maxShift,params.maxNumImages);
+    xcorrMat = getXcorrZYstack(inputImageStackFileName,params.maxShift,params.minShift,params.maxNumImages);
     disp('done!')
     % each column of xcorrMat corresponds to a sequence of shifted frames of
     % the zy plane along the x axis.
@@ -55,44 +60,65 @@ elseif(calibrationMethod == 2)
     disp('Calculating c.o.c decay curve using XY images stack, along Y ...')
     calibrationString = 'c.o.c XY along Y';
     calibrationFigureFileString = '02_cocXY_Y';
-    xcorrMat = getXcorrXYstack(inputImageStackFileName,params.maxShift,params.maxNumImages);
+    xcorrMat = getXcorrXYstack(inputImageStackFileName,params.maxShift,params.minShift,params.maxNumImages);
     disp('done!')    
     
 elseif(calibrationMethod == 3)
     calibrationString = 'SD of pixel intensity XY along X';
     disp('Calculating SD of intensity deviation curve using shifted XY sections stack, along X ...')
-    xcorrMat = getIntensityDeviationXYstack(inputImageStackFileName,params.maxShift,params.maxNumImages);
+    xcorrMat = getIntensityDeviationXYstack(inputImageStackFileName,params.maxShift,params.minShift,params.maxNumImages);
     disp('done!')
     calibrationFigureFileString = '03_sdpiXY_X';
     
 elseif(calibrationMethod == 4)
     calibrationString = 'c.o.c ZY along Y';
     disp('Calculating c.o.c decay curve using ZY stack, along Y ...')
-    xcorrMat = getXcorrZYstackY(inputImageStackFileName,params.maxShift,params.maxNumImages);
+    xcorrMat = getXcorrZYstackY(inputImageStackFileName,params.maxShift,params.minShift,params.maxNumImages);
     disp('curve estimation done')
     calibrationFigureFileString = '04_cocZY_Y';
     
 elseif(calibrationMethod == 5)
     calibrationString = 'c.o.c XY along X';
     disp('Calculating c.o.c decay curve using XY images stack, along X ...')
-    xcorrMat = getXcorrXYstackX(inputImageStackFileName,params.maxShift,params.maxNumImages);
+    xcorrMat = getXcorrXYstackX(inputImageStackFileName,params.maxShift,params.minShift,params.maxNumImages);
     disp('curve estimation done!')    
     calibrationFigureFileString = '05_cocXY_X';
     
 elseif(calibrationMethod == 6)
     calibrationString = 'c.o.c XZ along X';
     disp('Calculating c.o.c decay curve using XZ images stack, along X ...')
-    xcorrMat = getXcorrXZstackX(inputImageStackFileName,params.maxShift,params.maxNumImages);
+    xcorrMat = getXcorrXZstackX(inputImageStackFileName,params.maxShift,params.minShift,params.maxNumImages);
     disp('curve estimation done!')    
     calibrationFigureFileString = '06_cocXZ_X';
     
 elseif(calibrationMethod == 7)
     calibrationString = 'c.o.c XZ along Y';
     disp('Calculating c.o.c decay curve using XZ images stack, along Y ...')
-    xcorrMat = getXcorrXZstackY(inputImageStackFileName,params.maxShift,params.maxNumImages);
+    xcorrMat = getXcorrXZstackY(inputImageStackFileName,params.maxShift,params.minShift,params.maxNumImages);
     disp('curve estimation done!')
     calibrationFigureFileString = '07_cocXZ_Y';
     
+elseif(calibrationMethod == 8)
+    calibrationString = 'c.o.c XY along Z';
+    disp('Calculating c.o.c decay curve using XY images stack, along Z ...')
+    xcorrMat = getXcorrXYstackZ(inputImageStackFileName,params.maxShift,params.minShift,params.maxNumImages);
+    disp('curve estimation done!')
+    calibrationFigureFileString = '08_cocXY_Z';
+    
+elseif(calibrationMethod == 9)
+    calibrationString = 'c.o.c ZY along Z';
+    disp('Calculating c.o.c decay curve using ZY images stack, along Z ...')
+    xcorrMat = getXcorrZYstackZ(inputImageStackFileName,params.maxShift,params.minShift,params.maxNumImages);
+    disp('curve estimation done!')
+    calibrationFigureFileString = '09_cocZY_Z';
+    
+elseif(calibrationMethod == 10)
+    calibrationString = 'c.o.c XZ along Z';
+    disp('Calculating c.o.c decay curve using XZ images stack, along Z ...')
+    xcorrMat = getXcorrXZstackZ(inputImageStackFileName,params.maxShift,params.minShift,params.maxNumImages);
+    disp('curve estimation done!')
+    calibrationFigureFileString = '10_cocXZ_Z';    
+        
 else
     error('Unrecognized calibration method specified. Check calibrationMethod')
 end
@@ -110,7 +136,10 @@ if(params.plotOutput)
     xlabelStr = 'Shifted pixels';
     ylabelStr = 'Coefficient of Correlation';
     transparent = 0;
-    shadedErrorBar((1:params.maxShift),mean(xcorrMat,1),std(xcorrMat),'g',transparent,...
+    if(params.suppressPlots)
+        set(gcf,'Visible','off');
+    end
+    shadedErrorBar((params.minShift:params.maxShift),mean(xcorrMat,1),std(xcorrMat),'g',transparent,...
         titleStr,xlabelStr,ylabelStr);
     % save calibration curve figure
     % calibrationFigureFileName = strcat(calibrationFigureFileString,'.png')
@@ -133,7 +162,7 @@ if(params.predict)
 %         inputImageStackFileName,xcorrMat,params.maxShift,calibrationMethod);
     
 relZresolution = predictThicknessFromCurveFromMultiplePairs(...
-        inputImageStackFileName,xcorrMat,params.maxShift,calibrationMethod,params.numPairs);
+        inputImageStackFileName,xcorrMat,params.minShift,params.maxShift,calibrationMethod,params.numPairs);
 % each row contains one set of estimates for all the sections. First row is
 % from the images i and i+1, the second row is from images i and i+2 etc    
 thicknessEstimates = relZresolution .* params.xyResolution;
@@ -144,12 +173,29 @@ thicknessFileName = strcat(nameOfStack,thicknessFileName);
 thicknessFileName = fullfile(outputSavePath,thicknessFileName);
 thicknessEstimates = thicknessEstimates';
 save(thicknessFileName,'thicknessEstimates','-ASCII');
+
+% save also the relative thickness (not scaled by relative xy resolution)
+relzFileName = sprintf('_cm%02d_relZresolution.dat',calibrationMethod);
+
+relzFileName = strcat(nameOfStack,relzFileName);
+relzFileName = fullfile(outputSavePath,relzFileName);
+relZresolution = relZresolution';
+save(relzFileName,'relZresolution','-ASCII');
+
 %% plot output if required
 if(params.plotOutput)
     if(size(thicknessEstimates,2)==1)
-        figure;plot(thicknessEstimates);
+        figure;
+        if(params.suppressPlots)
+            set(gcf,'Visible','off');
+        end
+        plot(thicknessEstimates);
     elseif(size(thicknessEstimates,2)==2)
-        figure;plot(thicknessEstimates(:,1),'r');
+        figure;
+        if(params.suppressPlots)
+            set(gcf,'Visible','off');
+        end        
+        plot(thicknessEstimates(:,1),'r');
         hold on
         plot((thicknessEstimates(:,2).* 0.5),'g');
         hold off
