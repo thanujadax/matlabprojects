@@ -1,6 +1,5 @@
 function xcorrMat = getXcorrZYstack(inputImageStackFileName,maxShift,maxNumImages)
-% calculate the correlation along the zy plane. i.e. perpendicular to the
-% cutting plane where we have maximum resolution (5nmx5nm for FIBSEM)
+% calculate the correlation of the ZY plane along the X axis.
 
 % Inputs:
 % imageStack - image stack (tif) for which the thickness has to be
@@ -17,15 +16,22 @@ inputImageStack = readTiffStackToArray(inputImageStackFileName);
 % I = double(imread(imageStack));
 numR = size(inputImageStack,1);
 numC = size(inputImageStack,3); % z axis
-
-xcorrMat = zeros(maxNumImages,maxShift);
+numImages = size(inputImageStack,2); % x axis
 
 A = zeros(numR,numC);
 B = zeros(numR,numC);
+
 z = 1; % starting image
 % TODO: current we take the first n images for the estimation. Perhaps we
 % can think of geting a random n images.
 disp('Estimating similarity curve using zy sections ...')
+numImages = numImages - maxShift;
+if(maxNumImages>numImages)
+    maxNumImages = numImages;
+    disp('maxNumImages > numImages. using numImages = %d instead',numImages);
+end
+xcorrMat = zeros(maxNumImages,maxShift);
+
 for z=1:maxNumImages
     for g=1:maxShift
         A(:,:) = inputImageStack(:,z,:);

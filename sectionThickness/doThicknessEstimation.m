@@ -58,6 +58,7 @@ elseif(calibrationMethod == 3)
     disp('Calculating SD of intensity deviation curve using shifted XY sections stack, along X ...')
     xcorrMat = getIntensityDeviationXYstack(inputImageStackFileName,params.maxShift,params.maxNumImages);
     disp('done!')
+%       disp('Skipping calibration method 3 (SD of intensity deviation)')
     
 elseif(calibrationMethod == 4)
     disp('Calculating c.o.c decay curve using ZY stack, along Y ...')

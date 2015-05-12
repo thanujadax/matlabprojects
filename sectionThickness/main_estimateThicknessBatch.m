@@ -33,7 +33,7 @@ imageCubeDirectory = '/home/thanuja/projects/data/FIBSEM_dataset/largercubes';
 [sampleDirectories,~] = subdir(imageCubeDirectory);
 
 % tiff stacks are stored in each directory
-for i=1:length(sampleDirectories)
+parfor i=1:length(sampleDirectories)
     
     sampleSubDirName = sampleDirectories{i};
     % read all image stacks in this sample
@@ -44,9 +44,9 @@ for i=1:length(sampleDirectories)
     str1 = sprintf('Processing image stack %s with method %d',sampleSubDirName,calibrationMethod);
     disp(str1)
     % process each image stack in the sample
-    for i=1:length(imageStackDir)
+    for j=1:length(imageStackDir)
         inputImageStackFileName = fullfile...
-            (sampleSubDirName,imageStackDir(i).name);
+            (sampleSubDirName,imageStackDir(j).name);
         thicknessEstimates = doThicknessEstimation(...
     calibrationMethod,inputImageStackFileName,outputSavePath,params);
     % writes output to output path as txt file. Col vector.

@@ -19,14 +19,18 @@ inputImageStack = readTiffStackToArray(inputImageStackFileName);
 % initially use just one image
 
 % I = double(imread(imageStack));
-numR = size(inputImageStack,1);
-numC = size(inputImageStack,3); % z axis
+
 [numY,numX,numZ] = size(inputImageStack);
-cocMat = zeros(maxNumImages,maxShift);
+numImages = numY;
 
 % TODO: current we take the first n images for the estimation. Perhaps we
 % can think of geting a random n images.
 disp('Estimating similarity curve using correlation coefficient of shifted XY sections ...')
+if(maxNumImages>numImages)
+    maxNumImages = numImages;
+    disp('maxNumImages > numImages. using numImages = %d instead',numImages);
+end
+cocMat = zeros(maxNumImages,maxShift);
 I = zeros(numX,numZ);
 for z=1:maxNumImages
     I(:,:) = inputImageStack(z,:,:);
@@ -43,9 +47,9 @@ for z=1:maxNumImages
 end
 
 %% plot
-titleStr = 'Coefficient of Correlation using XZ sections along X axis';
-xlabelStr = 'Shifted pixels';
-ylabelStr = 'Coefficient of Correlation';
-transparent = 0;
-shadedErrorBar((1:maxShift),mean(cocMat,1),std(cocMat),'g',transparent,...
-    titleStr,xlabelStr,ylabelStr);
+% titleStr = 'Coefficient of Correlation using XZ sections along X axis';
+% xlabelStr = 'Shifted pixels';
+% ylabelStr = 'Coefficient of Correlation';
+% transparent = 0;
+% shadedErrorBar((1:maxShift),mean(cocMat,1),std(cocMat),'g',transparent,...
+%     titleStr,xlabelStr,ylabelStr);

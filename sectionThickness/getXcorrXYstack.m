@@ -15,17 +15,17 @@ inputImageStack = readTiffStackToArray(inputImageStackFileName);
 % initially use just one image
 
 % I = double(imread(imageStack));
-numR = size(inputImageStack,1);
-numC = size(inputImageStack,3); % z axis
+numImages = size(inputImageStack,3);
 
-xcorrMat = zeros(maxNumImages,maxShift);
-
-A = zeros(numR,numC);
-B = zeros(numR,numC);
-z = 1; % starting image
 % TODO: current we take the first n images for the estimation. Perhaps we
 % can think of geting a random n images.
 disp('Estimating similarity curve using correlation coefficient of shifted XY sections ...')
+if(maxNumImages>numImages)
+    maxNumImages = numImages;
+    disp('maxNumImages > numImages. using numImages = %d instead',numImages);
+end
+xcorrMat = zeros(maxNumImages,maxShift);
+
 for z=1:maxNumImages
     I = inputImageStack(:,:,z);
     [numR,numC] = size(I);
