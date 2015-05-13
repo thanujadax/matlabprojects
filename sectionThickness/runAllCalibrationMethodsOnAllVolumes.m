@@ -54,7 +54,7 @@ for i=1:length(sampleDirectories)
         outputSavePath_i = fullfile(outputSavePath,nameOfStack);
 
         % writes output to output path as txt file. Col vector.
-        for calibrationMethod=1:7
+        for calibrationMethod=1:10
             str1 = sprintf('Running calibration method %02d on image stack %s',calibrationMethod,sampleSubDirName);
             disp(str1)
             thicknessEstimates = doThicknessEstimation(...
@@ -65,4 +65,4 @@ end
 
 % save parameters for future reference
 outputParamsFileName = fullfile(outputSavePath,'params.mat');
-save(outputParamsFileName,params);
+save(outputParamsFileName,'params');
