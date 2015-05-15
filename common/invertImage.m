@@ -5,6 +5,13 @@ function invertedImg = invertImage(imgIn)
 % imgIn = imgIn./(max(max(imgIn)));
 % imgIn = imgIn .* 255;
 
-invertedImg = imgIn - max(max(imgIn));
+if(max(max(imgIn))>1)
+    maxVal = 255;
+else
+    maxVal = 1;
+end
+
+imgIn = double(imgIn);
+invertedImg = imgIn - maxVal;
 invertedImg = invertedImg .* (-1);
 % invertedImg = uint8(invertedImg);
