@@ -182,8 +182,8 @@ end
 
 % if there are edges separating adjoining mergedWsIDs, make them invisible
 % by assigning the same regionID to the edge
-
 if(showImg)
+    
     figure;imagesc(newWS);title('ws after merging RE regions')
 end
 

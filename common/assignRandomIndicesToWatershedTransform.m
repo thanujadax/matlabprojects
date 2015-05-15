@@ -5,6 +5,7 @@ randomIndicesList = randperm(maxInd);
 
 wsOut = wsIn;
 
-for i=1:maxInd
+% ws 1 will remain the same
+for i=2:maxInd
     wsOut(wsIn==i) = randomIndicesList(i);
 end
