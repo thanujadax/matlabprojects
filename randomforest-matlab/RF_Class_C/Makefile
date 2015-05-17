@@ -37,8 +37,8 @@ twonorm:  clean cokus classTree rfsub rfutils
 mex_classRF: $(SRC)classRF.cpp  $(SRC)mex_ClassificationRF_train.cpp $(SRC)mex_ClassificationRF_predict.cpp
 	echo 'Generating Mex'
 #	mex -c $(SRC)classRF.cpp -outdir $(BUILD)classRF.o -DMATLAB $(MEXFLAGS)
-	mex $(SRC)mex_ClassificationRF_train.cpp  $(SRC)classRF.cpp $(BUILD)classTree.o $(BUILD)rfutils.o rfsub.o $(BUILD)cokus.o  -o mexClassRF_train -lgfortran -lm -DMATLAB $(MEXFLAGS)
-	mex $(SRC)mex_ClassificationRF_predict.cpp $(SRC)classRF.cpp $(BUILD)classTree.o $(BUILD)rfutils.o rfsub.o $(BUILD)cokus.o  -o mexClassRF_predict -lgfortran -lm -DMATLAB $(MEXFLAGS)
+	mex $(SRC)mex_ClassificationRF_train.cpp  $(SRC)classRF.cpp $(BUILD)classTree.o $(BUILD)rfutils.o rfsub.o $(BUILD)cokus.o  -output mexClassRF_train -lgfortran -lm -DMATLAB $(MEXFLAGS)
+	mex $(SRC)mex_ClassificationRF_predict.cpp $(SRC)classRF.cpp $(BUILD)classTree.o $(BUILD)rfutils.o rfsub.o $(BUILD)cokus.o  -output mexClassRF_predict -lgfortran -lm -DMATLAB $(MEXFLAGS)
 
 cokus: $(SRC)cokus.cpp
 	echo 'Compiling Cokus (random number generator)'

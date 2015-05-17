@@ -5,9 +5,9 @@ neuronProbabilityType = 'png';
 membraneProbabilityType = 'tiff';
 mitoProbabilityType = 'png';
 
-inputPath = '/home/thanuja/projects/toyData/set8/';
-outputPath = '/home/thanuja/Dropbox/RESULTS/contourdetection/batch20140823/';
-outputPathPNG = '/home/thanuja/Dropbox/RESULTS/contourdetection/batch20140823_png/';
+inputPath = '/home/thanuja/projects/data/toyData/set8/';
+outputPath = '/home/thanuja/projects/tests/contours/20150514';
+outputPathPNG = '/home/thanuja/projects/tests/contours/20150514png';
 % read all images in the raw images file path
 rawImagePath = fullfile(inputPath,'raw');
 allRawFiles = dir(fullfile(rawImagePath,'*.tif'));
