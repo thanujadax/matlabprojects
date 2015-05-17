@@ -7,8 +7,8 @@ close all;
 sInputDir = '/home/thanuja/Dropbox/data/evaldata/';
 sGroundTruth = 'labels2/';
 % The directory with the experiments
-sAlgoOutput = 'output/';
-sExperiment = 'exp1/';
+sAlgoOutput = 'output/'; % segmented images
+sExperiment = 'exp1/'; % output of evaluation goes here
 
 % == LOAD THE DATA == 
 lDirGroundTruth = dir(fullfile(sInputDir,sGroundTruth));
