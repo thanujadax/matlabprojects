@@ -97,16 +97,24 @@ wsEdges2 = wsBoundaries;
 wsEdges2(edgePixColors(:,1)) = edgePixColors(:,2);
 % figure;imshow(wsEdges2);title('edges between junctions labeled separately')
 %% extract edges with zero pixel length
-connectedJunctionIDs = getClusteredJunctions(wsJ);
+% connectedJunctionIDs = getClusteredJunctions(wsJ);
+[connectedJunctionIDs,psuedoEdges2nodes] = getClusterNodesAndPsEdges(wsJ);
 % connectedJunctionIDs contain the same ID for each node that is connected
-% together with zero length edges
-% nodeZeroEdges - store node - edge1,edge2 etc for these zero length edge
+% together with zero length edges, in the 4 neighborhood.
+% pEdges2nodes - each row will give 2 nodes connected by a zero length edge
+
 %% Build the adjacency matrix of the junction nodes
 % edge to pixel correspondence
 edges2pixels = getEdges2Pixels(edgePixLabels);
 % edges2ignore = getEdgesToIgnore(edges2pixels,connectedJunctionIDs,sizeR,sizeC);
 % for each node, get a list of edge IDs connected to it
-[nodeEdges,nodeInds] = getNodeEdges(ind4J,edgePixLabels,connectedJunctionIDs,sizeR,sizeC);
+
+numPsuedoEdges = size(pEdges2Nodes,1);
+maxEdgeID = size(edges2pixels,1);
+psuedoEdgeIDs = (maxEdgeID+1) : (maxEdgeID+numPsuedoEdges);
+
+[nodeEdges,nodeInds] = getNodeEdges(ind4J,edgePixLabels,connectedJunctionIDs,sizeR,sizeC,...
+            psuedoEdgeIDs,psuedoEdges2nodes);
 
 [adjacencyMat,edges2nodes,selfEdgeIDs,~] = getAdjacencyMat(nodeEdges);
 
