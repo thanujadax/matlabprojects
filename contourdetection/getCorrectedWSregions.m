@@ -27,6 +27,10 @@ for i=1:numel(removeEdgeIDs)
     edgeListInd_i = find(edgeIDsAll==removeEdgeIDs(i));
     edgepixels_i = edgepixelsAll(edgeListInd_i,:);
     edgepixels_i = edgepixels_i(edgepixels_i>0);
+    if(numel(edgepixels_i)==0)
+        % psuedoEdge
+        continue;
+    end
     regionIDs = getRegionsForEdgePixels(ws,edgepixels_i,sizeR,sizeC);
     regionIDs = sort(regionIDs);
     % regionIDs contain original wsIDs
@@ -171,12 +175,6 @@ for i=1:numel(removeEdgeIDs)
             error('something wrong in getCorrectedWSregions')
         end
     end
-    
-    %start debug
-    if(ismember(191,removedWsIDs))
-        aaa = 99;
-    end
-    % stop debug
 
 end
 

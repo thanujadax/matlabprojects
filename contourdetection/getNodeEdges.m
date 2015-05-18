@@ -1,10 +1,15 @@
-function [nodeEdges,nodeIndsNoDuplicates] = getNodeEdges(nodeInds,edgePixLabels,connectedJunctionIDs,sizeR,sizeC)
+function [nodeEdges,nodeIndsNoDuplicates] = getNodeEdges...
+    (nodeInds,edgePixLabels,connectedJunctionIDs,sizeR,sizeC,...
+    psuedoEdgeIDs,psuedoEdges2nodes)
 % Inputs:
 %   nodeInd - array of junction indices
 %   edgePixLabels - N-by-2 array of edge labels for each pixel, given by
 %   the index wrt the original image (watershed)
 %   connectedJunctionIDs - list of clusterd junction indices with the associated
 %   cluster label.
+%   psuedoEdgeIDs - 
+%   psuedoEdges2nodes - each row contains the 2 nodes which are connected
+%   by a psuedoEdge
 
 % Output:
 %   nodeEdges - array with edge labels corresponding to each junction. each
@@ -38,7 +43,7 @@ for i=1:numClusters
     end    
 end
 
-nodeEdges = zeros(numNodesCombined,5);
+nodeEdges = zeros(numNodesCombined,5); % 5 is not fixed
 
 for i=1:numNodesCombined
     thisNodeIndex = nodeIndsNoDuplicates(i);
@@ -86,6 +91,10 @@ for i=1:numNodesCombined
             end                        
         end
     end
+    % add psuedoEdges
+    % Caution: the nodeInds in psuedoEdges might be not there due to the
+    % replacement of clusNodes with a single ID. Look for this 
+    
     % sort edgeIDs in ascending order
     if(k>1)
         edgeList_i = nodeEdges(i,2:k);
