@@ -26,7 +26,7 @@ params.usePrecomputedCurve = 0;
 params.pathToPrecomputedCurve = '';
 
 inputImageStackFileName = '/home/thanuja/projects/data/FIBSEM_dataset/largercubes/s108/s108.tif';
-outputSavePath = '/home/thanuja/projects/tests/thickness/similarityCurves/20150512/s108';
+outputSavePath = '/home/thanuja/projects/tests/thickness/similarityCurves/20150512/s704';
 
 fileStr = 'xcorrMat'; % general string that defines the .mat file
 tokenizedSubDirName = strsplit(outputSavePath,filesep);
