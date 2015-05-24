@@ -11,8 +11,8 @@ calibrationMethod = 1;
 % % 6 - c.o.c acroxx XZ sections, along X
 % % 7 - c.o.c acroxx XZ sections, along Y
 % TODO: methods robust against registration problems
-param.imgStackFileExt = 'tif';
-
+params.imgStackFileExt = 'tif';
+params.minShift = 0;
 params.predict = 1;
 params.xyResolution = 5; % nm
 params.maxShift = 10;
@@ -37,7 +37,7 @@ parfor i=1:length(sampleDirectories)
     
     sampleSubDirName = sampleDirectories{i};
     % read all image stacks in this sample
-    imageStackFileString = strcat('*.',param.imgStackFileExt);
+    imageStackFileString = strcat('*.',params.imgStackFileExt);
     imageStackFileString = fullfile(sampleSubDirName,imageStackFileString);
     imageStackDir = dir(imageStackFileString);
     

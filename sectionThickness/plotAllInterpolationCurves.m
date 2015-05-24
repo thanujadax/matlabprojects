@@ -26,9 +26,12 @@ params.usePrecomputedCurve = 0;
 params.pathToPrecomputedCurve = '';
 
 inputImageStackFileName = '/home/thanuja/projects/data/FIBSEM_dataset/largercubes/s108/s108.tif';
-outputSavePath = '/home/thanuja/projects/tests/thickness/similarityCurves/s502';
+outputSavePath = '/home/thanuja/projects/tests/thickness/similarityCurves/20150512/s108';
 
 fileStr = 'xcorrMat'; % general string that defines the .mat file
+tokenizedSubDirName = strsplit(outputSavePath,filesep);
+tokenizedSubDirName = tokenizedSubDirName{end};
+
 
 %% Plot all interpolation curves with shaded error bars with different colors
 % x
@@ -47,12 +50,12 @@ x = 1:params.maxShift;
 lineProps = [];
 transparent = 1;
 
-figure; 
-H = mseb(x,y,errBar,lineProps,transparent);
-legend('1.ZY_x','2.XY_y','4.ZY_y','5.XY_x','6.XZ_x','7.XZ_y');
-xlabel('Distance (num pixels)')
-ylabel('Coefficient of correlation')
-title('Thickness interpolation curves: s502');
+% figure; 
+% H = mseb(x,y,errBar,lineProps,transparent);
+% legend('1.ZY_x','2.XY_y','4.ZY_y','5.XY_x','6.XZ_x','7.XZ_y');
+% xlabel('Distance (num pixels)')
+% ylabel('Coefficient of correlation')
+% title('Thickness interpolation curves: s502');
 %set(gca,'position',[0 0 1 1],'units','normalized')
 
 % same plot without error bars
@@ -60,10 +63,11 @@ figure;
 % errBarZero = zeros(size(errBar));
 % H2 = mseb(x,y,errBarZero,lineProps,transparent);
 plot(y');
-legend('1.ZY_x','2.XY_y','4.ZY_y','5.XY_x','6.XZ_x','7.XZ_y');
+legend('1.ZY_x','2.XY_y','4.ZY_y','5.XY_x','6.XZ_x','7.XZ_y','8.XY_z','9.ZY_z','10.XZ_z');
 xlabel('Distance (num pixels)')
 ylabel('Coefficient of correlation')
-title('Thickness interpolation curves: s502');
+titleStr = sprintf('Thickness interpolation curves: %s',tokenizedSubDirName);
+title(titleStr);
 %set(gca,'position',[0 0 1 1],'units','normalized')
 %% Plot all predicted thicknesses
 predictedThickness = getPredictedThicknessesFromTxtFile(outputSavePath);
@@ -71,9 +75,10 @@ errBarZ = zeros(size(predictedThickness));
 figure;
 % H3 = mseb([],predictedThickness,errBarZ,lineProps,transparent);
 plot(predictedThickness')
-legend('1.ZY_x','2.XY_y','4.ZY_y','5.XY_x','6.XZ_x','7.XZ_y');
+legend('1.ZY_x','2.XY_y','4.ZY_y','5.XY_x','6.XZ_x','7.XZ_y','8.XY_z','9.ZY_z','10.XZ_z');
 xlabel('Section interval index')
 ylabel('Estimated thickness (nm)')
-title('Thickness estimates: s502')
+titleStr = sprintf('Thickness estimates: %s',tokenizedSubDirName);
+title(titleStr);
 %set(gca,'position',[0 0 1 1],'units','normalized')
 %% Calculate variance of prediction across different methods, from the same section
