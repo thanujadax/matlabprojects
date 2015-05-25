@@ -3,16 +3,18 @@ function main_estimateThicknessBatch()
 
 %% Parameters
 calibrationMethod = 1;
-% % 1 - c.o.c across ZY sections, along x axis
+% % 1 - c.o.c across XY sections, along X
 % % 2 - c.o.c across XY sections, along Y axis
-% % 3 - SD of XY per pixel intensity difference
+% % 3 - c.o.c across ZY sections, along x axis
 % % 4 - c.o.c across ZY sections along Y
-% % 5 - c.o.c across XY sections, along X
-% % 6 - c.o.c acroxx XZ sections, along X
-% % 7 - c.o.c acroxx XZ sections, along Y
-% TODO: methods robust against registration problems
-param.imgStackFileExt = 'tif';
-
+% % 5 - c.o.c acroxx XZ sections, along X
+% % 6 - c.o.c acroxx XZ sections, along Y
+% % 7 - c.o.c across XY sections, along Z
+% % 8 - c.o.c across ZY sections, along Z
+% % 9 - c.o.c. across XZ sections, along Z
+% % 10 - SD of XY per pixel intensity difference
+params.imgStackFileExt = 'tif';
+params.minShift = 0;
 params.predict = 1;
 params.xyResolution = 5; % nm
 params.maxShift = 10;
@@ -37,7 +39,7 @@ parfor i=1:length(sampleDirectories)
     
     sampleSubDirName = sampleDirectories{i};
     % read all image stacks in this sample
-    imageStackFileString = strcat('*.',param.imgStackFileExt);
+    imageStackFileString = strcat('*.',params.imgStackFileExt);
     imageStackFileString = fullfile(sampleSubDirName,imageStackFileString);
     imageStackDir = dir(imageStackFileString);
     

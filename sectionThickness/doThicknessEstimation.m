@@ -16,16 +16,17 @@ function thicknessEstimates = doThicknessEstimation(...
 % 
 % calibrationMethod = 10;
 % 
-% % 1 - c.o.c across ZY sections, along x axis
+% % 1 - c.o.c across XY sections, along X
 % % 2 - c.o.c across XY sections, along Y axis
-% % 3 - SD of XY per pixel intensity difference
+% % 3 - c.o.c across ZY sections, along x axis
 % % 4 - c.o.c across ZY sections along Y
-% % 5 - c.o.c across XY sections, along X
-% % 6 - c.o.c acroxx XZ sections, along X
-% % 7 - c.o.c acroxx XZ sections, along Y
-% % 8 - c.o.c across XY sections, along Z
-% % 9 - c.o.c across ZY sections, along Z
-% % 10 - c.o.c. across XZ sections, along Z
+% % 5 - c.o.c acroxx XZ sections, along X
+% % 6 - c.o.c acroxx XZ sections, along Y
+% % 7 - c.o.c across XY sections, along Z
+% % 8 - c.o.c across ZY sections, along Z
+% % 9 - c.o.c. across XZ sections, along Z
+% % 10 - SD of XY per pixel intensity difference
+
 % % TODO: methods robust against registration problems
 % 
 % params.predict = 1; % set to 0 if only the interpolation curve is required.
@@ -46,7 +47,7 @@ function thicknessEstimates = doThicknessEstimation(...
 
 %% 
 
-if(calibrationMethod == 1)
+if(calibrationMethod == 3)
     disp('Calculating c.o.c decay curve using ZY stack, along X ...')
     calibrationString = 'c.o.c ZY along X';
     calibrationFigureFileString = '01_cocZY_X';
@@ -63,7 +64,7 @@ elseif(calibrationMethod == 2)
     xcorrMat = getXcorrXYstack(inputImageStackFileName,params.maxShift,params.minShift,params.maxNumImages);
     disp('done!')    
     
-elseif(calibrationMethod == 3)
+elseif(calibrationMethod == 10)
     calibrationString = 'SD of pixel intensity XY along X';
     disp('Calculating SD of intensity deviation curve using shifted XY sections stack, along X ...')
     xcorrMat = getIntensityDeviationXYstack(inputImageStackFileName,params.maxShift,params.minShift,params.maxNumImages);
@@ -77,42 +78,42 @@ elseif(calibrationMethod == 4)
     disp('curve estimation done')
     calibrationFigureFileString = '04_cocZY_Y';
     
-elseif(calibrationMethod == 5)
+elseif(calibrationMethod == 1)
     calibrationString = 'c.o.c XY along X';
     disp('Calculating c.o.c decay curve using XY images stack, along X ...')
     xcorrMat = getXcorrXYstackX(inputImageStackFileName,params.maxShift,params.minShift,params.maxNumImages);
     disp('curve estimation done!')    
     calibrationFigureFileString = '05_cocXY_X';
     
-elseif(calibrationMethod == 6)
+elseif(calibrationMethod == 5)
     calibrationString = 'c.o.c XZ along X';
     disp('Calculating c.o.c decay curve using XZ images stack, along X ...')
     xcorrMat = getXcorrXZstackX(inputImageStackFileName,params.maxShift,params.minShift,params.maxNumImages);
     disp('curve estimation done!')    
     calibrationFigureFileString = '06_cocXZ_X';
     
-elseif(calibrationMethod == 7)
+elseif(calibrationMethod == 6)
     calibrationString = 'c.o.c XZ along Y';
     disp('Calculating c.o.c decay curve using XZ images stack, along Y ...')
     xcorrMat = getXcorrXZstackY(inputImageStackFileName,params.maxShift,params.minShift,params.maxNumImages);
     disp('curve estimation done!')
     calibrationFigureFileString = '07_cocXZ_Y';
     
-elseif(calibrationMethod == 8)
+elseif(calibrationMethod == 7)
     calibrationString = 'c.o.c XY along Z';
     disp('Calculating c.o.c decay curve using XY images stack, along Z ...')
     xcorrMat = getXcorrXYstackZ(inputImageStackFileName,params.maxShift,params.minShift,params.maxNumImages);
     disp('curve estimation done!')
     calibrationFigureFileString = '08_cocXY_Z';
     
-elseif(calibrationMethod == 9)
+elseif(calibrationMethod == 8)
     calibrationString = 'c.o.c ZY along Z';
     disp('Calculating c.o.c decay curve using ZY images stack, along Z ...')
     xcorrMat = getXcorrZYstackZ(inputImageStackFileName,params.maxShift,params.minShift,params.maxNumImages);
     disp('curve estimation done!')
     calibrationFigureFileString = '09_cocZY_Z';
     
-elseif(calibrationMethod == 10)
+elseif(calibrationMethod == 9)
     calibrationString = 'c.o.c XZ along Z';
     disp('Calculating c.o.c decay curve using XZ images stack, along Z ...')
     xcorrMat = getXcorrXZstackZ(inputImageStackFileName,params.maxShift,params.minShift,params.maxNumImages);
