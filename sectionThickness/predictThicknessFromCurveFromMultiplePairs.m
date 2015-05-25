@@ -4,9 +4,16 @@ function relZresolution = predictThicknessFromCurveFromMultiplePairs(...
 % xyResolution to get the actual thickness.
 
 % calibrationMethod
-% 1 - correlation coefficient across ZY sections, along x axis
-% 2 - correlation coefficient across XY sections, along x axis
-% 3 - SD of XY per pixel intensity difference
+% % 1 - c.o.c across XY sections, along X
+% % 2 - c.o.c across XY sections, along Y axis
+% % 3 - c.o.c across ZY sections, along x axis
+% % 4 - c.o.c across ZY sections along Y
+% % 5 - c.o.c acroxx XZ sections, along X
+% % 6 - c.o.c acroxx XZ sections, along Y
+% % 7 - c.o.c across XY sections, along Z
+% % 8 - c.o.c across ZY sections, along Z
+% % 9 - c.o.c. across XZ sections, along Z
+% % 10 - SD of XY per pixel intensity difference
 % TODO: methods robust against registration problems
 
 % numPairs -
@@ -21,7 +28,7 @@ str1 = sprintf('Calculating distances using %d pairs',numPairs);
 disp(str1);
 
 if(numPairs > 0)
-    if(calibrationMethod==3)
+    if(calibrationMethod==10)
         for i = 1:numImg-1
             image1 = inputImageStack(:,:,i);
             image2 = inputImageStack(:,:,(i+1));
@@ -42,7 +49,7 @@ if(numPairs > 0)
 end
 
 if(numPairs>1)
-    if(calibrationMethod==3)
+    if(calibrationMethod==10)
         for i = 1:numImg-2
             image1 = inputImageStack(:,:,i);
             image2 = inputImageStack(:,:,(i+2));
