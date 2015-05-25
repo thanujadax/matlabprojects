@@ -11,7 +11,7 @@ function [y,errBar] = getMeanInterpolationCurves(matFilePath,fileStr,calibration
 
 % calibrationInds - vector containing the indices of the calibration methods to be used. If empty, all are used.
 
-matFileNames = '*.mat';
+matFileNames = strcat(fileStr,'*.mat');
 matFileNames = fullfile(matFilePath,matFileNames);
 
 matFileDir = dir(matFileNames);
