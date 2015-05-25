@@ -1,4 +1,4 @@
-function [y,errBar] = makeEnsembleDecayCurveForVolume(matFilePath,fileStr,zDirection)
+function [y,errBar] = makeEnsembleDecayCurveForVolume(matFilePath,fileStr,zDirection,calibrationMethods)
 
 % Inputs:
 % matFilePath = '/home/thanuja/projects/tests/thickness/similarityCurves/20150512/s108';
@@ -19,7 +19,7 @@ end
 % get mean and variance
 % plot smoot curve - using interpolation ?
 
-combinedMat = readAllMatFiles(matFilePath,fileStr,zDirection);
+combinedMat = readAllMatFiles(matFilePath,fileStr,zDirection,calibrationMethods);
 [numR,numC] = size(combinedMat);
 % each row corresponds to a different image. each column correspond to c.c.
 % at different distances
