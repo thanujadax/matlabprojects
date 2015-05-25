@@ -70,7 +70,7 @@ predictionFileName = sprintf('%s_%s_%s',predictionFigureFileStr,subTitle,method)
 predictionFileName = fullfile(outputSavePath,predictionFileName);
 print(predictionFileName,'-dpng');
 % save thickness in txt file
-save(fullfile(predictionFileName,'.dat'),'predictedThickness','-ASCII');
+save(strcat(predictionFileName,'.dat'),'predictedThickness','-ASCII');
 % calculate the error, mean error and the variance
 
 %% method 2: predict the thickness/resolution in the assumed unknown direction
@@ -89,6 +89,8 @@ predictionFileName = sprintf('%s_%s_%s',predictionFigureFileStr,subTitle,method2
 predictionFileName = fullfile(outputSavePath,predictionFileName);
 print(predictionFileName,'-dpng');
 % save thickness in txt file
-save(fullfile(predictionFileName,'.dat'),'predictedThickness','-ASCII');
+save(strcat(predictionFileName,'.dat'),'predictedThickness','-ASCII');
 % calculate the error, mean error and the variance
+
+% todo add histograms, error.
 
