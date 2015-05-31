@@ -1,5 +1,5 @@
 function fm = getEdgeFeatureMat(rawImage,edgepixels,OFR,edgePriors,...
-                boundaryEdgeIDs,edgeListInds)
+                boundaryEdgeIDs,edgeListInds,psuedoEdgeIDs,psuedoEdges2nodes)
 
 % Inputs:
 %   rawImage
@@ -41,6 +41,11 @@ parfor i=1:numEdges
     fm_i = zeros(1,numFeatures);
     edgepixels_i = edgepixels(i,:);
     edgepixels_i = edgepixels_i(edgepixels_i>0);
+    if(isempty(edgepixels_i))
+        edgepixels_i = getPsuedoEdgePixels...
+            (i,psuedoEdgeIDs,psuedoEdges2nodes,edgeListInds);
+    end
+    
     numEdgePixels = numel(edgepixels_i);
     [r,c] = ind2sub([sizeR sizeC],edgepixels_i);
     % 1. precalculated edge prior
