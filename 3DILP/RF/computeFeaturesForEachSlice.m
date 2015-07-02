@@ -1,4 +1,4 @@
-function computeFeaturesForEachSlice(pathToFm,subDir_sectionFm,imageStack3D,...
+function computeFeaturesForEachSlice(pathToFm,subDir_sectionFm,rawImagePath,...
                 oriFiltLen, halfWidth_strucEl, csHist)
 
 % computes and saves the feature matrices for each section of the input
@@ -13,7 +13,9 @@ checkAndCreateSubDir(pathToFm,subDir_sectionFm);
 
 % featureFile.mat name structure: fm_slice_%d.mat
 
-[~,~,numZ] = size(imageStack3D);
+% [~,~,numZ] = size(imageStack3D);
+
+
 
 for i=1:numZ
     % get feature matrix for this section

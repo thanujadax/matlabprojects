@@ -2,6 +2,12 @@ function rot = filterImageWithMembraneTemplateRotated(im, d)
 
 dim = size(im);
 
+% % rescale im to (-1,+1) if it is (0,1)
+% if(min(min(im))>=0,)
+%     % rescale to -1 +1
+%     
+% end
+
   a = pi / 8;
   t = [cos(a) sin(a) 0; -sin(a) cos(a) 0; 0 0 1];
   dt = centeredRotate(d, 0);
