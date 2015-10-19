@@ -6,13 +6,13 @@ function h = overlayLabelOnImage(backgroundImage,foregroundImage)
 %   foregroundImage - e.g. segmentation to visualize overlaid on EM image
 
 
-outputPath = '/home/thanuja/projects/data/myelin/ssSEM/s909/overlaid'
-backgroundImageFileName = '/home/thanuja/projects/data/myelin/ssSEM/s909/raw20150428/raw03.png';
-foregroundImageFileName = '/home/thanuja/projects/data/myelin/ssSEM/s909/output20150428/segmentedMyelin3.png';
+% outputPath = '/home/thanuja/projects/data/myelin/ssSEM/s909/overlaid'
+% backgroundImageFileName = '/home/thanuja/projects/data/myelin/ssSEM/s909/raw20150428/raw03.png';
+% foregroundImageFileName = '/home/thanuja/projects/data/myelin/ssSEM/s909/output20150428/segmentedMyelin3.png';
 
 
-backgroundImage = imread(backgroundImageFileName);
-foregroundImage = imread(foregroundImageFileName);
+% backgroundImage = imread(backgroundImage);
+% foregroundImage = imread(foregroundImage);
 
 backgroundImage = invertImage(backgroundImage);
 backgroundImage = backgroundImage./255;
@@ -33,9 +33,12 @@ figure;
  
   % Use our influence map as the 
  % AlphaData for the solid green image.
+ % normalize forground image
+ 
  foregroundImage = double(foregroundImage);
- foregroundImage(foregroundImage>0) = 0.1;
- set(h, 'AlphaData', foregroundImage)
- set(gca,'position',[0 0 1 1],'units','normalized')
+ foregroundImage = foregroundImage./(max(max(foregroundImage)));
+%  foregroundImage(foregroundImage>0) = 0.1;
+ set(h, 'AlphaData', foregroundImage);
+ set(gca,'position',[0 0 1 1],'units','normalized');
  
  % save figure

@@ -2,10 +2,13 @@
 
 % filename = '/home/thanuja/projects/drosophila-l3/stack2/raw/00.tif';
 % filename = '/home/thanuja/projects/drosophila-l3/stack2/classification/schmidhuber/median_filtered/neurons/neurons0000.png';
-filename = '/home/thanuja/projects/drosophila-l3/stack2/classification/schmidhuber/median_filtered/membrane/00_schmidhuber_membrane.tiff';
+% filename = '/home/thanuja/projects/drosophila-l3/stack2/classification/schmidhuber/median_filtered/membrane/00_schmidhuber_membrane.tiff';
 % filename = '/home/thanuja/projects/drosophila-l3/stack2/groundtruth/result_0000.tiff';
 
-A = double(imread(filename));
+filename = '/home/thanuja/projects/data/FIBSEM_dataset/largercubes/s704/s704.tif';
+imageInd = 1;
+% A = double(imread(filename));
+A = readTiffStackToArray(filename);
 % A = A./(max(max(A)));
 % A = A./255;
 
@@ -15,20 +18,20 @@ A = double(imread(filename));
 % writefile = '/home/thanuja/Dropbox/data/RF_training_edge/I01_trainingLabels.tif';
 % writeFilePath = '/home/thanuja/Dropbox/data2/raw';
 % writeFilePath = '/home/thanuja/Dropbox/data2/probabilities/neuron';
-writeFilePath = '/home/thanuja/Dropbox/data2/probabilities/membrane';
+writeFilePath = '/home/thanuja/projects/tests/thickness/similarityCurves/FIBSEMpng/s704DifferentPos/001/rowShifted';
 % writeFilePath = '/home/thanuja/projects/toyData/set9/groundtruth';
 % writeFilePath = '/home/thanuja/projects/toyData/set9/membranes';
 % writeFilePath = '/home/thanuja/projects/toyData/set9/neurons';
 % writeFilePath = '/home/thanuja/projects/toyData/set9/raw';
 
-writeFileName = '00.png';
+writeFileName = '200.png';
 % writeType = 'tiff';
 writeType = 'png';
 
-dimx = 1024;
-dimy = 1024;
+dimx = 700;
+dimy = 700;
 
-startRow = 1;
+startRow = 200;
 stopRow = startRow -1 + dimy;
 
 startCol = 1;
@@ -37,7 +40,7 @@ stopCol = startCol - 1 + dimx;
 numDim = 3;
 
 writeFileName = fullfile(writeFilePath,writeFileName);
-B = A(startRow:stopRow,startCol:stopCol,:);
+B = A(startRow:stopRow,startCol:stopCol,imageInd)./255;
 imwrite(B,writeFileName,writeType)
 figure;imshow(B);
 
