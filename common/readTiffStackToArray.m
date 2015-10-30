@@ -9,7 +9,13 @@ inputImageStack = zeros(imHeight,imWidth,numImages);
 
 if(strcmp(info(1).Format,'png'))
 
-    inputImageStack(:,:) = imread(inputImageVolumeFileName);
+    tmp1 = imread(inputImageVolumeFileName);
+    
+    if(size(tmp1,3)==3)
+        inputImageStack(:,:) = rgb2gray(tmp1);
+    else
+        inputImageStack(:,:) = tmp1;
+    end
     
 else
 
