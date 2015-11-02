@@ -1,8 +1,8 @@
-function writeTiffStackToSeparateImages(inputImageVolumeFileName,saveFilePath,fileType)
+function writeTiffStackToSeparateImages(inputImageVolumeFileName,saveFilePath,fileType,numImg)
 
 inputImageStack = readTiffStackToArray(inputImageVolumeFileName);
 
-numImg = size(inputImageStack,3);
+% numImg = size(inputImageStack,3);
 
 %fileType = 'tif';
 
