@@ -125,7 +125,6 @@ for i=1:numCs
     gMat(regionPixels) = G;
     bMat(regionPixels) = B;
     
-    
     % get internal edges for this cell. set RGB.
     regionIntEdgeIDs = c_cellInternalEdgeIDs{i};
     regionIntEdgeListInds_logicalInd = ismember(edgeListInds,regionIntEdgeIDs);

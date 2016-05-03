@@ -1,4 +1,4 @@
-function constraints = writeConstraintsFile(Aeq,b,senseArray)
+function constraints = writeConstraintsFile(Aeq,b,senseArray,outputPath)
 
 % create constraints.txt
 % # contains one linear constraints per row on the allowed labels in the following form:
@@ -14,6 +14,7 @@ function constraints = writeConstraintsFile(Aeq,b,senseArray)
 % 1*0 1*1 == 1 # y_0 + y_1 == 1
 
 filename = 'constraints.txt';
+filename = fullfile(outputPath,filename);
 fileID = fopen(filename,'w');
 [numConstraints,numVar] = size(Aeq);
 

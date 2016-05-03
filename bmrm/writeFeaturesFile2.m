@@ -1,4 +1,4 @@
-function featureMat = writeFeaturesFile2(f,jEdges,numEdges,numRegions)
+function featureMat = writeFeaturesFile2(f,jEdges,numEdges,numRegions,outputPath)
 
 % features.txt
 % 
@@ -23,6 +23,7 @@ numRows = numel(f);
 featureMat = zeros(numRows,numFeatures);
 
 filename = 'features.txt';
+filename = fullfile(outputPath,filename);
 fileID = fopen(filename,'w');
 
 numVar = numel(f);

@@ -6,20 +6,27 @@
 
 %% Parameters
 % use wild cards to allow for indices
-pathForImages_training = '/home/thanuja/Dropbox/data/edgeTraining2/trainingRaw/'; 
-pathForImages_testing = '/home/thanuja/Dropbox/data/edgeTraining2/testRaw/';
-pathForLabels_training = '/home/thanuja/Dropbox/data/edgeTraining2/trainingLabels/';
-pathForLabels_testing = '/home/thanuja/Dropbox/data/edgeTraining2/testLabels/';
+
+outputRoot = '/home/thanuja/projects/RESULTS/contours/20160503_edgeProbabilityRFC';
+
+pathForImages_training = '/home/thanuja/projects/data/drosophilaLarva_ssTEM/edgeProbability/raw/training'; 
+pathForImages_testing = '/home/thanuja/projects/data/drosophilaLarva_ssTEM/edgeProbability/raw/test';
+
+pathForLabels_training = '/home/thanuja/projects/data/drosophilaLarva_ssTEM/edgeProbability/labels/training';
+pathForLabels_testing = '/home/thanuja/projects/data/drosophilaLarva_ssTEM/edgeProbability/labels/test';
+
+pathForMembranes_training = '/home/thanuja/projects/data/drosophilaLarva_ssTEM/edgeProbability/membranes/training';
+pathForMembranes_testing = '/home/thanuja/projects/data/drosophilaLarva_ssTEM/edgeProbability/membranes/test';
 
 fileNameString = '*.tif';
 
 showIntermediate = 0;
 
-maxNumberOfSamplesPerClass = 25000;
+maxNumberOfSamplesPerClass = 100000;
 LEN_IMG_IND = 3;
 % RF training param
 NUM_TREES = 500;
-MTRY = 5;
+MTRY = 7; % number of predictors sampled for splitting each tree
 
 orientationsStepSize = 10;
 orientations = 0:orientationsStepSize:350;
@@ -34,8 +41,10 @@ medianFilterH = 0;
 invertImg = 1;      % 1 for EM images when input image is taken from imagePath
 marginPixVal = 0;
 %% read training data - x
-rawImageFiles_training = dir(strcat(pathForImages_training,fileNameString)); % raw images for training
-labelImageFiles_training = dir(strcat(pathForLabels_training,fileNameString)); % training labels
+rawImageFiles_training = dir(fullfile(pathForImages_training,fileNameString)); % raw images for training
+labelImageFiles_training = dir(fullfile(pathForLabels_training,fileNameString)); % training labels
+membraneFiles_training = dir(fullfile(pathForMembranes_training,fileNameString)); % membrane probabilities
+
 numTrainingImgs = length(rawImageFiles_training);
 % Extract edges 
 % Extract features for edges
@@ -49,6 +58,7 @@ for i=1:numTrainingImgs
     
     rawImagePath_i = fullfile(pathForImages_training,rawImageFiles_training(i).name);
     labelImagePath_i = fullfile(pathForLabels_training,labelImageFiles_training(i).name);
+    membraneProbMapPath_i = fullfile(pathForMembranes_training,membraneFiles_training(i).name);
     
     [c_cells2WSregions,c_internalEdgeIDs,c_extEdgeIDs,c_internalNodeInds,...
     c_extNodeInds,inactiveEdgeIDs,edgeListInds,edgepixels,OFR,edgePriors,OFR_mag,...
@@ -83,9 +93,14 @@ for i=1:numTrainingImgs
     rawImage = rawImage./(max(max(rawImage)));
     rawImage = addThickBorder(rawImage,marginSize,marginPixVal);
     
+    membraneProbabilityMap = double(imread(membraneProbMapPath_i));
+    membraneProbabilityMap = membraneProbabilityMap./(max(max(membraneProbabilityMap)));
+    membraneProbabilityMap = addThickBorder(membraneProbabilityMap,marginSize,0);
+    
     % clear fm
     fm = getEdgeFeatureMat(rawImage,edgepixels_reordered_tr,OFR,...
-        edgePriors_reordered_tr,boundaryEdgeIDs,edgeListInds_reordered_tr);
+        edgePriors_reordered_tr,boundaryEdgeIDs,edgeListInds_reordered_tr,...
+        membraneProbabilityMap);
     % append to the feature matrix x and the label matrix y
     x = [x; fm];
     numActiveEdges = numel(activeEdgeIDs);
@@ -94,11 +109,11 @@ for i=1:numTrainingImgs
     inactiveLabelVect = zeros(numInactiveEdges,1);
     y = [y; activeLabelVect; inactiveLabelVect];
     
-    % debug code
-    checksum1 = size(fm,1) - numel(activeLabelVect) - numel(inactiveLabelVect);
-    if(checksum1~=0)
-        qq=1;
-    end
+%     % debug code
+%     checksum1 = size(fm,1) - numel(activeLabelVect) - numel(inactiveLabelVect);
+%     if(checksum1~=0)
+%         qq=1;
+%     end
     
     
     % visualize active edges (red) and inactive edges (green)
@@ -126,8 +141,8 @@ for i=1:numTrainingImgs
 end
 disp('feature extraction done! Saving feature matrix x and label vector y...')
 % save x and y
-save('x.mat','x');
-save('y.mat','y');
+save(fullfile(outputRoot,'x.mat'),'x');
+save(fullfile(outputRoot,'y.mat'),'y');
 disp('saved!')
 
 %% Train RFC
@@ -144,7 +159,9 @@ extra_options.sampsize = [maxNumberOfSamplesPerClass, maxNumberOfSamplesPerClass
 if ~exist('forestEdgeProb.mat','file')
     forestEdgeProb = classRF_train(x, y, NUM_TREES,MTRY,extra_options);
     disp('RFC learned for edge classification!')
-    save forestEdgeProb.mat forestEdgeProb
+    save(fullfile(outputRoot,'forestEdgeProbV7.mat'),forestEdgeProb,'-v7.3');
+%     save forestEdgeProb.mat forestEdgeProb
+    save(fullfile(outputRoot,'forestEdgeProb.mat'),forestEdgeProb);
     disp('saved forest forestEdgeProb.mat')
 else
     disp('forestEdgeProb.mat already exists!')
@@ -155,8 +172,9 @@ clear x y
 
 %% Testing, visualization and evaluation
 % read test image
-rawImageFiles_testing = dir(strcat(pathForImages_testing,fileNameString));
-labelImageFiles_testing = dir(strcat(pathForLabels_testing,fileNameString)); % training labels
+rawImageFiles_testing = dir(fullfile(pathForImages_testing,fileNameString));
+labelImageFiles_testing = dir(fullfile(pathForLabels_testing,fileNameString)); % training labels
+membraneFiles_testing = dir(fullfile(pathForMembranes_testing,fileNameString));
 numTestingImgs = length(rawImageFiles_testing);
 
 x0 = []; % feature matrix for test data
@@ -173,6 +191,7 @@ for i=1:numTestingImgs
     
     rawImagePath_i = fullfile(pathForImages_testing,rawImageFiles_testing(i).name);
     labelImagePath_i = fullfile(pathForLabels_testing,labelImageFiles_testing(i).name);
+    membraneProbMapPath_i = fullfile(pathForMembranes_testing,membraneFiles_testing(i).name);
     
     [c_cells2WSregions,c_internalEdgeIDs,c_extEdgeIDs,c_internalNodeInds,...
     c_extNodeInds,inactiveEdgeIDs,edgeListInds,edgepixels,OFR,edgePriors,OFR_mag,...
@@ -197,9 +216,14 @@ for i=1:numTestingImgs
     rawImage = rawImage./(max(max(rawImage)));
     rawImage = addThickBorder(rawImage,marginSize,marginPixVal);
     
+    membraneProbabilityMap = double(imread(membraneProbMapPath_i));
+    membraneProbabilityMap = membraneProbabilityMap./(max(max(membraneProbabilityMap)));
+    membraneProbabilityMap = addThickBorder(membraneProbabilityMap,marginSize,0);
+    
     clear fm
     fm = getEdgeFeatureMat(rawImage,edgepixels_reordered,OFR,...
-        edgePriors_reordered,boundaryEdgeIDs,edgeListInds_reordered);
+        edgePriors_reordered,boundaryEdgeIDs,edgeListInds_reordered,...
+        membraneProbabilityMap);
     % append to the feature matrix x and the label matrix y
     x0 = [x0; fm];
     numActiveEdges = numel(activeEdgeIDs);
@@ -211,8 +235,8 @@ for i=1:numTestingImgs
 end
 
 disp('done. saving feature matrix for training data')
-save('x0.mat','x0');
-save('y0.mat','y0');
+save(fullfile(outputRoot,'x0.mat'),'x0');
+save(fullfile(outputRoot,'y0.mat'),'y0');
 % predicting labels for test data
 [y_h,v] = classRF_predict(double(x0), forestEdgeProb);
 predictedEdgeProbabilities = v(:,2);
@@ -242,7 +266,7 @@ visualization(:,:,3) = visualizeB;
 figure; imshow(visualization)
 
 % prediction error
-numTestEdges = numel(y_h);
+numTestEdges = numel(y_h)
 predictionError = (sum(abs(y0 - y_h)))/numTestEdges
 
 % visualize edge probabilities
@@ -258,4 +282,4 @@ end
 figure;imagesc(visualizeEdgeProbPred);title('predicted probabilities')
 figure;imagesc(visualizeEdgePriorProb);title('prior probabilities')
 
-imwrite(visualizeEdgeProbPred,'/home/thanuja/Dropbox/data/prediction20131030.tif','tif');
+imwrite(visualizeEdgeProbPred,fullfile(outputRoot,'prediction.tif'),'tif');

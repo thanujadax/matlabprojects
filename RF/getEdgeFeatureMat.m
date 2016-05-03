@@ -1,5 +1,6 @@
 function fm = getEdgeFeatureMat(rawImage,edgepixels,OFR,edgePriors,...
-                boundaryEdgeIDs,edgeListInds,psuedoEdgeIDs,psuedoEdges2nodes)
+                boundaryEdgeIDs,edgeListInds,psuedoEdgeIDs,psuedoEdges2nodes,...
+                membraneProbabilityMap)
 
 % Inputs:
 %   rawImage
@@ -30,7 +31,7 @@ function fm = getEdgeFeatureMat(rawImage,edgepixels,OFR,edgePriors,...
 
 % Tot number of features = 59
 
-numFeatures = 59;
+numFeatures = 68;
 numEdges = size(edgepixels,1);
 [sizeR,sizeC,numOFRdim] = size(OFR);
 % dimVector = 1:numOFRdim;
@@ -126,6 +127,15 @@ parfor i=1:numEdges
     k = K(end) + 1;
     K = k;
     fm_i(K) = isBoundaryEdge(i,boundaryEdgeIDs,edgeListInds)
+    % 60-68: membrane probabilities (from low-level RFC)
+    k=K(end) + 1;
+    K = k:(k+4);
+    rawImage_i = membraneProbabilityMap;
+    rawImage_i = invertImage(rawImage_i);
+    pixIntensityVector = rawImage_i(edgepixels_i);
+    [mean,max,min,std,median] ...
+     = getVecStats(pixIntensityVector);
+    fm_i(K) = [mean,max,min,std,median];
     
     fm(i,:) = fm_i;
 end

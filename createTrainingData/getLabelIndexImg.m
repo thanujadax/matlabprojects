@@ -21,3 +21,6 @@ for i=1:numLabels
     pixelsForLabel_i = (labelIndImg0==sortedLabels(i));
     labelIndImg(pixelsForLabel_i) = i;
 end
+
+% save label index image
+

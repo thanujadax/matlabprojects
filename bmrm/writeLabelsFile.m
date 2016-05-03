@@ -1,9 +1,10 @@
-function features = writeLabelsFile(labelVector)
+function features = writeLabelsFile(labelVector,outputPath)
 
 % labels.txt
 
 
 filename = 'labels.txt';
+filename = fullfile(outputPath,filename);
 fileID = fopen(filename,'w');
 
 numVar = numel(labelVector);
