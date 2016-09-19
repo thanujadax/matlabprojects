@@ -72,15 +72,6 @@ if(size(size(imgIn),2)>2)
 else
     img = imgIn;
 end
-if(displayIntermediateFigures)
-    figure(1);
-    imshow(img);
-    colormap('gray');
-    title('original')
-end
-if(displayIntermediateFigures)
-    figure;imshow(img);title('input image')
-end
     % invert
 if(invertImg)
     imgInv = invertImage(img);
@@ -89,32 +80,14 @@ else
 end
 % rescale 0 - 1
 imgInv = imgInv/max(max(imgInv));
-if(displayIntermediateFigures)
-    figure(2);
-    imshow(imgInv);
-    title('inverted input')
-    colormap('gray');
-end
 % thresholding
 if(grayThresholding == 1)
  imgInv = simpleThreshold(imgInv,grayThreshold);
- if(displayIntermediateFigures)
-     figure(8);
-     imshow(imgInv);
-     title('inverted input after thresholding')
-     colormap('gray');
- end
 end
 
 % gaussian smoothening
 if(gaussianFiltering==1)
     imgInv = gaussianFilter(imgInv,sigma,maskSize);
-    if(displayIntermediateFigures)
-        figure(5);
-        imshow(imgInv);
-        title('gaussian smoothening');
-        colormap('gray');
-    end
 end
 %% convolution
 % convolution using oriented gaussian kernels
@@ -138,29 +111,4 @@ disp(str);
 %% Visualization
 [output3,RGBimg3] = reconstructHSVgauss_mv(orientedScoreSpace3D,orientations,...
             barLength,barWidth,threshFrac,medianFilterH);
-% titlestr = sprintf('threshold percentage = %f',threshFrac);
-if(displayIntermediateFigures)
-    figure;imshow(RGBimg3);title('RGB impression of max_OFR')
-end
-    % title(titlestr)
-% % batch processing
-% savefilepath = '/home/thanuja/Dropbox/RESULTS/orientations/thresholding4/';
-% for i=20:5:75
-%     % run reconstruction for threshold = i/100
-%     threshFrac = i/100;
-%     [output3 RGBimg3] = reconstructHSVgauss_mv(orientedScoreSpace3D,orientations,barLength,barWidth,threshFrac);
-%     % save it in a folder
-%     savefilename = sprintf('threshPercent%d.png',i);
-%     savefilename = strcat(savefilepath,savefilename);
-%     titlestr = sprintf('threshold = %f',threshFrac);
-%     h = figure;imshow(RGBimg3);title(titlestr);    
-%     saveas(h,savefilename);
-% end
 
-
-% [output RGBimg] = reconstructHSVbars(orientedScoreSpace3D,orientations,barLength,barWidth,threshFrac);
-% writeFile1 = '/home/thanuja/Dropbox/RESULTS/hough/orientations/reconst_hough256raw00_L11_1.png';
-% imwrite(RGBimg,writeFile1,'png');
-% [output2 RGBimg2] = reconstructHSVlines(houghSpace3D,orientations,barLength,lineWidth,threshFrac);
-% writeFile2 = '/home/thanuja/Dropbox/RESULTS/hough/orientations/reconst_hough256raw00_L11_lines_1.png';
-% imwrite(RGBimg,writeFile2,'png');

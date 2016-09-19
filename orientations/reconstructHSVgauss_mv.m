@@ -15,8 +15,8 @@ indVote = peaks3D>thresh;
 threshVotes3D(indVote) = peaks3D(indVote);
     
 % construct the final output so that each pixel displays its maximum vote
-display('Assembling the final output...');
-progressbar('Assembling the final output')
+display('Assembling OFR output...');
+% progressbar('Assembling the final output')
 
 for r=1:numRows
     for c=1:numCols
@@ -41,7 +41,7 @@ for r=1:numRows
             % output(r,c,3) = 1;                % V - score
         end
     end
-    progressbar(r/numRows);
+    % progressbar(r/numRows);
 end
 
 % median filtering of H to remove salt pepper type of noise in the

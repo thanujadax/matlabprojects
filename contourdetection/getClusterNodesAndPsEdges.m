@@ -92,7 +92,7 @@ end
 
 % pseudo edges between only-8-neighboring pixels
 psuedoEdgeNodeInds = find(eightNH_J>0);
-numPsuedoEdgeNodes = numel(pseudoEdgeNodeInds);
+numPsuedoEdgeNodes = numel(psuedoEdgeNodeInds);
 if(numPsuedoEdgeNodes==0)
     pEdges2nodes = 0;
 else
