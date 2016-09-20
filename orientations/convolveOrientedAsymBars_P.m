@@ -24,7 +24,7 @@ bar = [bar;negLine];
 % init
 orientationScoreSpace3D = zeros(numRows,numCols,numOrientations);
 
-parfor i=1:numOrientations
+for i=1:numOrientations
     img_i = img;
     % get the gaussian kernel
     bar_i = bar;
